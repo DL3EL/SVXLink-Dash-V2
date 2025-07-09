@@ -32,7 +32,7 @@ my $verbose = 0;
 # 10.3.0.1 ist das ggü liegende tun interface
 my $tm = localtime(time);
 my $tgdatei_upd = 0;
-my $version = "2.20";
+my $version = "2.30";
 
     my $cmd = "pwd";
 	my $dir =`$cmd`;
@@ -53,15 +53,17 @@ my $version = "2.20";
 		$counter++;
 		if (substr($a,0,2) eq "v=") {
 		    $verbose = substr($a,2,1);
-		    print "Debug On, Level: $verbose\n" if $verbose;
-		} 
-		if (substr($a,0,2) eq "r=") {
-		    $reload = substr($a,2,1);
-		    print "Reload: $reload\n" if $verbose;
+		    print LOG "Debug On, Level: $verbose\n" if $verbose;
 		} else {
-            print "ARG_b: $a\n" if $verbose;
-            $valid_mon_tgs[$vmt_org] = trim_plus($a);
-            ++$vmt_org;
+            if (substr($a,0,2) eq "r=") {
+                $reload = substr($a,2,1);
+                print LOG "Reload: $reload\n" if $verbose;
+            } else {
+                print "ARG_b: $a\n" if $verbose;
+                print LOG "ARG_b: $a\n" if $verbose;
+                ++$vmt_org;
+                $valid_mon_tgs[$vmt_org] = trim_plus($a);
+            }
         }
 	}
     $vmt = $vmt_org;
@@ -69,21 +71,23 @@ my $version = "2.20";
     $acttg = $valid_mon_tgs[$vmt];
     printf LOG "$counter (0)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg if $verbose;
     $acttg = $valid_mon_tgs[$vmt];
-    --$vmt;
+#    --$vmt;
     while ($vmt) {
         printf LOG "(1a)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg;
         if ($acttg eq $valid_mon_tgs[$vmt]) {
-            --$vmt_org;
-            last;
+            printf LOG "(1c)TG%s: %s [%s] vmt_org:%s\n",$vmt,$valid_mon_tgs[$vmt],$acttg,$vmt_org;
+#            --$vmt_org;
+#            last;
         }    
         printf LOG "(1b)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg;
         --$vmt;
     }
     $vmt = $vmt_org;
-#    while ($vmt) {
-#        --$vmt;
-#        printf "(2)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg;
-#    }
+    printf LOG "VMT Liste: (%s)\n",$vmt;
+    while ($vmt) {
+        --$vmt;
+        printf LOG "(2)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg;
+    }
 # exit;
 
     read_tgdatei($tgdatei);
@@ -105,6 +109,10 @@ my $version = "2.20";
 sub getfm_funknetz {
 my @mon_array;
 my $mon_tg;
+my $mon_tgs_org = "";
+my $act_tg_org = "";
+my $def_tg_org = "";
+my $def_tg_found = 0;
 my $mon_tgi;
 my $active_tg;
 my $act_tg;
@@ -116,13 +124,13 @@ my $curr_act = 0;
 #<tr style=""><td style="padding:5px;padding-right:20px;white-space:nowrap;">DB0HTV</td><td style="padding:5px;padding-right:20px;">0&nbsp;/&nbsp;26269</td><td>Monitor:&nbsp;2&nbsp;/&nbsp;2626&nbsp;/&nbsp;26267&nbsp;/&nbsp;26269</td></tr><tr style=""><td style="padding:5px;padding-right:20px;white-space:nowrap;">DB0HTV-XLX</td><td style="padding:5px;padding-right:20px;">0&nbsp;/&nbsp;26269</td><td>Monitor:&nbsp;26269</td></tr>
 #<tr style=""><td style="padding:5px;padding-right:20px;white-space:nowrap;">DL3EL</td><td style="padding:5px;padding-right:20px;">0&nbsp;/&nbsp;26269</td><td>Monitor:&nbsp;777&nbsp;/&nbsp;26269&nbsp;/&nbsp;262649</td></tr>
 #<tr style="color:#008000;"><td style="padding:5px;padding-right:20px;white-space:nowrap;">DB0BH</td><td style="padding:5px;padding-right:20px;">91593&nbsp;/&nbsp;91593</td><td>Monitor:&nbsp;2&nbsp;/&nbsp;1000&nbsp;/&nbsp;1080&nbsp;/&nbsp;1084&nbsp;/&nbsp;1089&nbsp;/&nbsp;1262&nbsp;/&nbsp;2628&nbsp;/&nbsp;26284&nbsp;/&nbsp;91472&nbsp;/&nbsp;91593&nbsp;/&nbsp;96126&nbsp;/&nbsp;97265&nbsp;/&nbsp;97348&nbsp;/&nbsp;97475</td></tr>
-    printf "\n\nLese fm_funknetz_: %s<br>\nVERARBEITUNG\n",$fm_funknetz_content if ($verbose >=4);
+    printf LOG "\n\nLese fm_funknetz_: %s<br>\nVERARBEITUNG\n",$fm_funknetz_content if ($verbose >=5);
     $nn = 0;
     $mm = 0;
     @array = split (/<\/tr>/, $fm_funknetz_content);
 
     foreach $entry (@array) {
-		print "Entry($nn) [$entry]\n" if ($verbose >3);
+		print LOG "Entry($nn) [$entry]\n" if ($verbose >5);
         if (substr($entry,11,5) eq "color") {
             $curr_act = 1;
             $at_least_one_curr = 1;
@@ -130,77 +138,97 @@ my $curr_act = 0;
             $curr_act = 0;
         }    
 		$callfound = ($entry =~ /.*<td style=\"padding:5px;padding-right:20px;white-space:nowrap;\">([\w-]+)<\/td>/i)? $1 : "undef";
-        printf "Call: %s\n",$callfound if ($verbose >3);
+        printf LOG "Call: %s\n",$callfound if ($verbose >3);
         if ($callfound ne "undef") {
+            my $ii = 0;
 #            $call = ($callfound =~ /([\w]+)([-\w]*)/i)? $1 : "undef";
             $call = $callfound;
             $DataTabFN{$call}{'CALL'} = $call;
             $tg1 = ($entry =~ /.*<td style=\"padding:5px;padding-right:20px;white-space:nowrap;\">([\w-]+)<\/td><td style="padding:5px;padding-right:20px;">([\w]+)&nbsp;\/&nbsp;([\w]+)<\/td><td>Monitor:(.*)<\/td>/i)? $2 : "undef";
-            printf "$call TGs: %s %s / %s Monitor TGs: %s ->\n",$1,$2,$3,$4 if ($verbose >3);
-            print "MonTGs:" if ($verbose >3);
+            $mon_tgs_org = $4;
+            $mon_tgs_org = $mon_tgs_org . "&nbsp;";
+            printf LOG "$call TGs: %s %s / %s Monitor TGs: %s ->\n",$1,$2,$3,$mon_tgs_org if ($verbose >3);
             $active_tg = $2;
+            $def_tg_org = $3;
+            $mon_tgs_org = $mon_tgs_org . "&nbsp;" . $def_tg_org . "&nbsp;";
+            printf LOG "$call: ActTG: %s, DefTG:%s, MonTGs:%s\n",$active_tg,$def_tg_org,$mon_tgs_org if ($verbose >3);
+            print LOG "MonTGs:" if ($verbose >3);
             if ($active_tg ne "0") {
-                print "Active TG: $active_tg \n" if ($verbose >4);
+                printf LOG "Active TG: %s (%s)  \n",$active_tg,$call if ($verbose >3);
                 $DataTabActTG{$active_tg}{'TG'} = $active_tg;
                 ++$DataTabActTG{$active_tg}{'USER'};
+# add active tg to monitor tgs
+#                $DataTabFN{$call}{'MTGS'}[$mm] = $active_tg;
+#                printf LOG "$call ActMonTG %s (gültig)",$active_tg if ($verbose >3);
+#                $DataTabFN{$call}{'VALID'} = 1;
+#                ++$mm;
             }    
-            @mon_array = split (/&nbsp;/, $4);
+            @mon_array = split (/&nbsp;/, $mon_tgs_org);
+            $DataTabFN{$call}{'VALID'} = 0;
             $DataTabFN{$call}{'CURR_ACT'} = $curr_act;
             $DataTabFN{$call}{'CURR_ACT_TG'} = $active_tg if $curr_act;
-            $DataTabFN{$call}{'VALID'} = 0;
             foreach $mon_tg (@mon_array) {
                 if (($mon_tg ne "") && ($mon_tg ne "/")) {
-                    print "$mon_tg Vergleich mit " if ($verbose >3);
+                    print LOG "\n$ii [$vmt] MonTG $mon_tg Vergleich mit " if ($verbose >3);
+                    ++$ii;
                     while ($vmt) {
-                        --$vmt;
-                        print "($vmt) $valid_mon_tgs[$vmt]" if ($verbose >3);
+                        printf LOG "($vmt) [%s] eq [%s]",$valid_mon_tgs[$vmt],$mon_tg if ($verbose >3);
                         if ($mon_tg eq $valid_mon_tgs[$vmt]) {
                             $DataTabFN{$call}{'MTGS'}[$mm] = $mon_tg;
-                            print "(gültig)" if ($verbose >3);
+                            printf LOG " MonTG %s (gültig)",$mon_tg if ($verbose >3);
                             $DataTabFN{$call}{'VALID'} = 1;
                             ++$mm;
+#                            last;
                         }
-                        print " " if ($verbose >3);
+                        print LOG " " if ($verbose >3);
+                        --$vmt;
                     }
                     $vmt = $vmt_org;        
                     $DataTabFN{$call}{'VALID_CNTR'} = $mm;
                 }    
+#                if ($mon_tg eq $def_tg_org) {
+#                    $def_tg_found = 1;
+#                }    
             }
-            print "\n" if ($verbose >3);
             if ($tg1 ne "undef") {
-                $tg2 = $3;	
+                $tg2 = $def_tg_org;	
             }
+            printf LOG "\n$call valid:%s $tg1,$tg2\n",$DataTabFN{$call}{'VALID'} if ($verbose >3);
             if ($DataTabFN{$call}{'VALID'} == 1) {
-                printf "FunknetzTG Call [%s] gelesen, %s Monitor TGs ($mm)\n<br>",$call,$mm-1 if ($verbose >3);
+                printf LOG "FunknetzTG Call [%s] gelesen, %s Monitor TGs ($mm)\n<br>",$call,$mm-1 if ($verbose >3);
                 $DataTabFN{$call}{'ADDON'} = $2;
                 $DataTabFN{$call}{'TGS'} = $tg1 . "/" . $tg2;
-                printf "FunknetzTG %s gelesen, TG1=%s, TG2=%s [$callfound / $2]\n<br>",$call,$tg1,$tg2 if ($verbose >3);
-                print "MonitorTGs: ($mm) " if ($verbose >3);
+                $DataTabFN{$call}{'MTGS'}[$mm] = $tg1;
+                ++$mm;
+                $DataTabFN{$call}{'MTGS'}[$mm] = $tg2;
+                ++$mm;
+                printf LOG "FunknetzTG %s gelesen, TG1=%s, TG2=%s [$callfound / $2]\n<br>",$call,$tg1,$tg2 if ($verbose >3);
+                print LOG "MonitorTGs: ($mm) " if ($verbose >3);
                 while ($mm) {
                     --$mm;
-                    printf "%s, ",$DataTabFN{$call}{'MTGS'}[$mm] if ($verbose >3);
+                    printf LOG "%s, ",$DataTabFN{$call}{'MTGS'}[$mm] if ($verbose >3);
                 }    
-                print "\n" if ($verbose >3);
+                print LOG "\n" if ($verbose >3);
                 ++$nn;
 #                last if ($nn > 40);
             }
          }
 	}
-    printf "$nn gueltige FunknetzTGs gelesen und in Tabelle geschrieben<br>" if ($verbose >3);
+    printf LOG "$nn gueltige FunknetzTGs gelesen und in Tabelle geschrieben<br>" if ($verbose >3);
     $nn=0;
     foreach $call (sort keys %DataTabFN) {
         if ($DataTabFN{$call}{'VALID'} == 1) {
-            print "$DataTabFN{$call}{'CALL'} [$call]" if ($verbose >3);
+            print LOG "$DataTabFN{$call}{'CALL'} [$call]" if ($verbose >3);
             $mm = $DataTabFN{$call}{'VALID_CNTR'};
             while ($mm) {
                 --$mm;
-                printf "($mm)%s, ",$DataTabFN{$call}{'MTGS'}[$mm] if ($verbose >3);
+                printf LOG "($mm)%s, ",$DataTabFN{$call}{'MTGS'}[$mm] if ($verbose >3);
                 $mon_tg = $DataTabFN{$call}{'MTGS'}[$mm];
                 ++$nn;
                 $mon_tgi = sprintf ("%07d.%03d",$DataTabFN{$call}{'MTGS'}[$mm],$nn);
                 $DataTabMonTG{$mon_tgi}{'MONTG'} = $mon_tg;
                 $DataTabMonTG{$mon_tgi}{'CALL'} = $call;
-                printf "NT: ($mm)%s [Index:%s] %s:NT ",$mon_tg,$mon_tgi,$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >3);
+                printf LOG "NT: ($mm)%s [Index:%s] %s:NT ",$mon_tg,$mon_tgi,$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >3);
             }    
         }
         if ($DataTabFN{$call}{'CURR_ACT'} == 1) {
@@ -256,7 +284,7 @@ my $mon_tg_act = 0;
 my $zz = 0;
 my $ii = 0;
 
-    print "\nTG Monitoring Liste:\n" if ($verbose >3);
+    print LOG "\nTG Monitoring Liste:\n" if ($verbose >3);
     $log_time = act_time();
     printf "<tr height=25px><th>(Script Run: $log_time) Nutzer Monitor TGs (Netz Update %s)</th></tr><tr><td>",$_[0];
     printf LOG "(Script Run: $log_time) Nutzer Monitor TGs (Netz Update %s)\n",$_[0];
@@ -264,7 +292,7 @@ my $ii = 0;
     print "<tr><td>";
     foreach $mon_tgi (sort keys %DataTabMonTG) {
         $mon_tg = $DataTabMonTG{$mon_tgi}{'MONTG'};
-        print "$mon_tg_act eq $mon_tg? [Index: $mon_tgi]\n" if ($verbose >3);
+        print LOG "$mon_tg_act eq $mon_tg? [Index: $mon_tgi]\n" if ($verbose >3);
         if ($mon_tg_act ne $mon_tg) {
 #            printf "</td></tr><tr><td><b>TG %s</b></td></tr><tr><td>", $mon_tg;
             printf "</td></tr><tr><td><form method=\"post\"><button type=submit id=jmptoA name=jmptoA class=active_id value=%s>TG %s</button></form>",$mon_tg,$mon_tg;
@@ -278,8 +306,8 @@ my $ii = 0;
             $zz = 0;
         }    
 #        print ", " if ($nn++);
-        printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=0);
-        printf LOG "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
+        printf LOG "%s ",$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=0);
+        printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
         ++$ii;
     }	
     print "</td></tr>";
@@ -346,7 +374,7 @@ sub read_content {
     {
         local $/;#	
         $fm_funknetz_content = <INPUT>;
-        printf "$log_time FM-Funknetz Daten aus Cache geholt<br>\n" if $verbose;
+        printf LOG "$log_time FM-Funknetz Daten aus Cache geholt<br>\n" if $verbose;
     }    
     close INPUT;
 }
