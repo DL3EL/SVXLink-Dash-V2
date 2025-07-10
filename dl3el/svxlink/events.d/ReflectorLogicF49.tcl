@@ -138,11 +138,11 @@ proc report_tg_status {} {
 proc tg_selected {new_tg old_tg} {
 if {$new_tg != 0} {
   puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
-  exec echo ’*9#’ > /tmp/dtmf_svx
+  exec echo "*9#" > /tmp/dtmf_svx
   puts "RefF49: dmtf *9# geschickt (tg_sel)"
 } else {
   puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
-  exec echo ’*91#’ > /tmp/dtmf_svx
+  exec echo "*91#" > /tmp/dtmf_svx
   puts "RefF49: dmtf *91# geschickt (tg_sel)"
 }
   #puts "### tg_selected #$new_tg (old #$old_tg)"
@@ -180,7 +180,7 @@ proc tg_local_activation {new_tg old_tg} {
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
   puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_local"
-  exec echo ’*9#’ > /tmp/dtmf_svx
+  exec echo "*9#" > /tmp/dtmf_svx
   puts "RefF49: dmtf *9# geschickt (tg_local)"
   }
 }
@@ -210,7 +210,7 @@ proc tg_remote_activation {new_tg old_tg} {
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
   puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_rem"
-  exec echo ’*9#’ > /tmp/dtmf_svx
+  exec echo "*9#" > /tmp/dtmf_svx
   puts "RefF49: dmtf *9# geschickt (tg_rem)"
   }
 }
