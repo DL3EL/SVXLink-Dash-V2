@@ -481,7 +481,7 @@ proc dtmf_cmd_received {cmd} {
   }
   if {$cmd == "97"} {
     puts "97 received, rebooting now"
-#    exec sudo reboot &
+    exec sudo reboot &
     return 1
   }
   if {$cmd == "95"} {
