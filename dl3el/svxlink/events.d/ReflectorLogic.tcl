@@ -1,6 +1,7 @@
 ###############################################################################
 #
 # ReflectorLogic event handlers
+# Mod by DL3EL for a setup with 2 reflectorlogics, to avoid bridging
 #
 ###############################################################################
 
@@ -85,11 +86,13 @@ proc reflector_connection_status_update {is_established} {
   variable reflector_connection_established
   if {$is_established != $reflector_connection_established} {
     set reflector_connection_established $is_established
-    playMsg "Core" "reflector"
+#    playMsg "Core" "reflector"
     if {$is_established} {
-      playMsg "Core" "connected"
+      CW::play "R CO"
+      #playMsg "Core" "connected"
     } else {
-      playMsg "Core" "disconnected"
+      CW::play "SK"
+#      playMsg "Core" "disconnected"
     }
   }
 }
@@ -136,9 +139,18 @@ proc report_tg_status {} {
 #   old_tg -- The talk group that was active
 #
 proc tg_selected {new_tg old_tg} {
+if {$new_tg != 0} {
   puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
+  exec echo "*810#" > /tmp/dtmf_svx
   exec echo "*8#" > /tmp/dtmf_svx
   puts "Ref: dmtf *8# geschickt (tg_sel)"
+
+  exec echo "*91$new_tg#" > /tmp/dtmf_svx
+  puts "Ref: dmtf *91$new_tg# geschickt (tg_sel)"
+} else {
+  puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
+}
+
   #puts "### tg_selected #$new_tg (old #$old_tg)"
   # Reject incoming Echolink connections while a talkgroup is active
   #if {$new_tg != 0} {
@@ -174,6 +186,7 @@ proc tg_local_activation {new_tg old_tg} {
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
   puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_local"
+  exec echo "*810#" > /tmp/dtmf_svx
   exec echo "*8#" > /tmp/dtmf_svx
   puts "Ref: dmtf *8# geschickt (tg_local)"
   }

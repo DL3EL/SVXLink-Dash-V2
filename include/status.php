@@ -28,8 +28,18 @@ if (isProcessRunning('svxlink')) {
     
     
  // $inReflectorDefaultLang = explode(",", $svxconfig['ReflectorLogic']['DEFAULT_LANG']);
+   $reflectorlogic1 = "";
+   $reflectorlogic2 = "";
+// we support tewo different reflectorlogis, there have to be matching .tcl files. The first reflectorlogis has to be "ReflectorLogic", the second one "ReflectorLogicxyz"
    foreach ($check_logics as $key) {
       echo "<tr><td style=\"background:#ffffed;\"><span style=\"color:#b5651d;font-weight: bold;\">".$key."</span></td></tr>";
+      if (strncmp($key, "ReflectorLogic", 14) === 0) {
+         if (strlen($key) == 14) {
+            $reflectorlogic1 = $key;
+         } else {
+            $reflectorlogic2 = $key;
+         }    
+      }
    }
    echo "</table>\n";
    echo "<table style=\"margin-top:2px;margin-bottom:13px;\">\n";
@@ -42,7 +52,7 @@ if (isProcessRunning('svxlink')) {
       //$modules=""; 
       $modecho = "False";
    }
-   $inReflectorDefaultLang = explode(",", $svxconfig['ReflectorLogic']['DEFAULT_LANG']);
+   $inReflectorDefaultLang = explode(",", $svxconfig[$reflectorlogic1]['DEFAULT_LANG']);
 
    if ($modules!="") {
       define("SVXMODULES",$modules);
@@ -65,11 +75,34 @@ if (isProcessRunning('svxlink')) {
       echo "<tr><td style=\"background: #ffffed;\" ><span style=\"color:#b0b0b0;\"><b>No Modules</b></span></td></tr>";
    }
    echo "</table>\n";
+//#### neu
+   $fmnetwork1 = $svxconfig[$reflectorlogic1]['HOSTS'];    
+   if ($fmnetwork1 =="") {
+      $fmnetwork1 = $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
+   }
+//   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork1."</th></tr><tr>";
+   echo "<table><tr><th>".$fmnetwork1."</th></tr><tr>";
+   $svxrstatus = getSVXRstatus($reflectorlogic1);
+   echo "<tr>";
+   if ($svxrstatus=="Connected") {
+      echo "<td style=\"background:#c3e5cc;\"><div style=\"margin-top:2px;margin-bottom:2px;white-space:normal;color:#b44010;font-weight:bold;\">";
+      echo $svxrstatus."</div>";
+   }
+   if ($svxrstatus=="Not connected") {
+      echo "<td style=\"background:#ff9;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#454545;font-weight:bold;\">";
+      echo $svxrstatus."</div>";
+   }
+   if ($svxrstatus=="No status") {
+      echo "<td style=\"background:#ffffed;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#b0b0b0;font-weight:bold;\">"; 
+      echo $svxrstatus."</div>";
+   }
+   echo "</td></tr>";
+   echo "</table>\n";
 
-   $tgtmp = trim(getSVXTGTMP());
+   $tgtmp = trim(getSVXTGTMP($reflectorlogic1));
    echo "<table colspan=2 style=\"margin-top:4px;margin-bottom:13px;\">\n";
-   $tgdefault = $svxconfig['ReflectorLogic']['DEFAULT_TG'];
-   $tgmon = explode(",",$svxconfig['ReflectorLogic']['MONITOR_TGS']);
+   $tgdefault = $svxconfig[$reflectorlogic1]['DEFAULT_TG'];
+   $tgmon = explode(",",$svxconfig[$reflectorlogic1]['MONITOR_TGS']);
    echo "<tr><th width=50%>TG Default</th><td style=\"background:#ffffed;color:green;font-weight: bold;\">".$tgdefault."</td></tr>\n";
    echo "<tr><th width=50%>TG Monitor</th><td style=\"background:#ffffed;color:#b44010;font-weight: bold;\">";
    echo "<div style=\"white-space:normal;\">";
@@ -79,62 +112,52 @@ if (isProcessRunning('svxlink')) {
    echo "<span style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgtmp."</span>";
    echo "</div></td></tr>\n";
 
-   $tgselect = trim(getSVXTGSelect());
+   $tgselect = trim(getSVXTGSelect($reflectorlogic1));
    if ( $tgselect=="0") {
       $tgselect="";
    }
    echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";
    echo "</table>";
-   if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
-      // ab hier für die automatische Anwahl eines zweiten Reflectors
-      // damit das funktioniert, müssen in der include/config.php folgende Einträge (ggf. angepasster Pfadname) gemacht werden:
-      //define("DL3EL", "/var/www/html/dl3el");
-      // must be a number, must not be a string
-      //define("DL3EL_SPEC_TG", 49);
-      // DL3EL definiert das Verzeichnis mit meinen Erweiterungen (hier nur die Datei mit dem TG Status), svxlink muss Schreibrechte auf das Verzeichnis haben
-      // DL3EL_SPEC_TG benennt die TG auf einen anderen Reflektor, bei der automatisch, wenn sie empfangen wird, der Reflektor verbunden wird
-      // derzeit muss die Reflektorlogik auf das Kommand 8 reaieren
-      if (defined('DL3EL')) {
-         $svxStatusFile = DL3EL . "/tg_status";
-         $svxdata = shell_exec('cat ' . $svxStatusFile);
-         if (defined('DL3EL_SPEC_TG')) {
-            $svx_spec_tg = DL3EL_SPEC_TG;
-         } else {   
-            $svx_spec_tg = 0;
-         }   
 
-         //echo "TGsel:$tgselect / SVX:$svxdata <br>";
-         if (($tgselect == $svx_spec_tg) && ($svxdata != $svx_spec_tg)){
-            $newtg= $tgselect . " >" . $svxStatusFile;
-            shell_exec("echo $newtg");
-            // wichtig ist, dass die Logik für Ref-F49 mit dem KOmmando 8 verknüpft ist (svxlink.con)
-            $newtg = "*9#*81" . $tgselect . "#";
-            $exec= "echo '$newtg' > /tmp/dtmf_svx";
-            exec($exec,$output);
-            echo "<meta http-equiv='refresh' content='0'>";
-            $exec= "echo '" . $_POST['dtmfsvx'] . "' > /tmp/dtmf_svx";
-            exec($exec,$output);
-            echo "<meta http-equiv='refresh' content='0'>";
-         }
-         $svxdata = shell_exec('cat ' . $svxStatusFile);
-         if (($tgselect != $svx_spec_tg) && ($svxdata == $svx_spec_tg)) {
-            $newtg= $tgselect . " >" . $svxStatusFile;
-            shell_exec("echo $newtg");
-            $newtg = "*8#*91" . $tgselect . "#";
-            $exec= "echo '$newtg' > /tmp/dtmf_svx";
-            exec($exec,$output);
-            echo "<meta http-equiv='refresh' content='0'>";
-            $exec= "echo '" . $_POST['dtmfsvx'] . "' > /tmp/dtmf_svx";
-            exec($exec,$output);
-            echo "<meta http-equiv='refresh' content='0'>";
-         }
-         if ($tgselect != $svxdata) {
-            $newtg= $tgselect . " >" . $svxStatusFile;
-            shell_exec("echo $newtg");
-         }
-      }
-   // bis hier für die automatische Anwahl eines zweiten Reflectors
-   }	
+   $fmnetwork2 = $svxconfig[$reflectorlogic2]['HOSTS'];     
+//   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork2."</th></tr><tr>";
+   echo "<table><tr><th>".$fmnetwork2."</th></tr><tr>";
+   $svxrstatus = getSVXRstatus($reflectorlogic2);
+   echo "<tr>";
+   if ($svxrstatus=="Connected") {
+      echo "<td style=\"background:#c3e5cc;\"><div style=\"margin-top:2px;margin-bottom:2px;white-space:normal;color:#b44010;font-weight:bold;\">";
+      echo $svxrstatus."</div>";
+   }
+   if ($svxrstatus=="Not connected") {
+      echo "<td style=\"background:#ff9;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#454545;font-weight:bold;\">";
+      echo $svxrstatus."</div>";
+   }
+   if ($svxrstatus=="No status") {
+      echo "<td style=\"background:#ffffed;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#b0b0b0;font-weight:bold;\">"; 
+      echo $svxrstatus."</div>";
+   }
+   echo "</td></tr>";
+   echo "</table>\n";
+   $tgtmp = trim(getSVXTGTMP($reflectorlogic2));
+   echo "<table colspan=2 style=\"margin-top:4px;margin-bottom:13px;\">\n";
+   $tgdefault = $svxconfig[$reflectorlogic2]['DEFAULT_TG'];
+   $tgmon = explode(",",$svxconfig[$reflectorlogic2]['MONITOR_TGS']);
+   echo "<tr><th width=50%>TG Default</th><td style=\"background:#ffffed;color:green;font-weight: bold;\">".$tgdefault."</td></tr>\n";
+   echo "<tr><th width=50%>TG Monitor</th><td style=\"background:#ffffed;color:#b44010;font-weight: bold;\">";
+   echo "<div style=\"white-space:normal;\">";
+   foreach ($tgmon as $key) {
+      echo $key." ";
+   }
+   echo "<span style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgtmp."</span>";
+   echo "</div></td></tr>\n";
+
+   $tgselect = trim(getSVXTGSelect($reflectorlogic2));
+   if ( $tgselect=="0") {
+      $tgselect="";
+   }
+   echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";
+   echo "</table>";
+
    if ($svxconfig["Rx1"]["PEAK_METER"] =="1") {
       $ispeak = true ;
    }   
@@ -152,24 +175,6 @@ if (isProcessRunning('svxlink')) {
       echo getTXInfo();
       echo "</table>\n"; 
    }
-
-   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork."</th></tr><tr>";
-   $svxrstatus = getSVXRstatus();
-   echo "<tr>";
-   if ($svxrstatus=="Connected") {
-      echo "<td style=\"background:#c3e5cc;\"><div style=\"margin-top:2px;margin-bottom:2px;white-space:normal;color:#b44010;font-weight:bold;\">";
-      echo $svxrstatus."</div>";
-   }
-   if ($svxrstatus=="Not connected") {
-      echo "<td style=\"background:#ff9;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#454545;font-weight:bold;\">";
-      echo $svxrstatus."</div>";
-   }
-   if ($svxrstatus=="No status") {
-      echo "<td style=\"background:#ffffed;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#b0b0b0;font-weight:bold;\">"; 
-      echo $svxrstatus."</div>";
-   }
-   echo "</td></tr>";
-   echo "</table>\n";
 
    if ($modecho=="True") {
       $echolog = getEchoLog();

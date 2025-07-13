@@ -113,8 +113,6 @@ define("DL3EL_NOAUTH", "no");
 // ssh most likely will ot work on Android devices as clients
 define("DL3EL_SSH", "no");
 //define("DL3EL_SSH", "yes");
-// must be a number, must not be a string
-define("DL3EL_SPEC_TG", 99);
 define("DL3EL_RADIO", "Shari");
 //define("DL3EL_RADIO", "no Radio");
 //define("DL3EL_RADIO", "VX7");

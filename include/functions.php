@@ -101,13 +101,18 @@ function getSVXStatusLog() {
 //2021-07-22 19:07:03: RefLogic: Connection established to 127.0.0.1:5300
 //2021-07-22 19:07:03: RefLogic: Authentication OK
 
-function getSVXRstatus() {
+function getSVXRstatus($reflector) {
+// tail -10000 /var/log/svxlink | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | grep ReflectorLogicF49 | tail -1
+// Sat Jul 12 12:51:12 2025: ReflectorLogicF49: Authentication OK
+// tail -10000 /var/log/svxlink | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | grep ReflectorLogic | tail -1
+// Sat Jul 12 22:01:00 2025: ReflectorLogic: Authentication OK
+
 	if (file_exists(SVXLOGPATH.SVXLOGPREFIX)) {
            $logPath = SVXLOGPATH.SVXLOGPREFIX; 
-           $svxrstat = `tail -10000 $logPath | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | tail -1`;}
+           $svxrstat = `tail -10000 $logPath | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | grep $reflector: | tail -1`;}
 	if ($svxrstat=="" &&  file_exists(SVXLOGPATH.SVXLOGPREFIX.".1")) {
            $logPath = SVXLOGPATH.SVXLOGPREFIX.".1"; 
-           $svxrstat = `tail -10000 $logPath | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | tail -1`;}
+           $svxrstat = `tail -10000 $logPath | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | grep $reflector: | tail -1`;}
            if(strpos($svxrstat,"Authentication OK") || strpos($svxrstat,"Connection established") || strpos($svxrstat,"Activating link")){
               $svxrstatus="Connected";
             }
@@ -214,20 +219,20 @@ function getEchoLinkTX() {
         return $echotxing;
 }
 
-function getSVXTGSelect() {
+function getSVXTGSelect($reflector) {
         $logPath = SVXLOGPATH.SVXLOGPREFIX;
         $tgselect="0";
-        $logLine = `tail -10000 $logPath | egrep -a -h "Selecting" | tail -1`;
+        $logLine = `tail -10000 $logPath | egrep -a -h "Selecting" | grep $reflector: | tail -1`;
         if (strpos($logLine,"TG #")) {
           $tgselect=substr($logLine,strpos($logLine,"#")+1,12);
          }
         return $tgselect;
 }
 
-function getSVXTGTMP() {
+function getSVXTGTMP($reflector) {
         $logPath = SVXLOGPATH.SVXLOGPREFIX;
         $tgselect="0";
-        $logLine = `tail -10000 $logPath | egrep -a -h "emporary monitor" | tail -1`;
+        $logLine = `tail -10000 $logPath | egrep -a -h "emporary monitor" | grep $reflector: | tail -1`;
         if (strpos($logLine,"Add")) {
           $tgselect=substr($logLine,strpos($logLine,"#")+1,12);
          }
