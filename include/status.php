@@ -116,9 +116,19 @@ if ($reflectorlogic1 != "") {
    $tgselect = trim(getSVXTGSelect($reflectorlogic1));
    if ( $tgselect=="0") {
       $tgselect="";
+   } else {
+      if (defined('DL3EL')) {
+         $svxStatusFile = DL3EL . "/tg_status";
+         if ($tgselect != $tgselect_a){
+            $acttg= $tgselect . " >" . $svxStatusFile;
+            shell_exec("echo $acttg");
+            $tgselect_a = $tgselect;
+         }
+      }      
    }
    echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";
    echo "</table>";
+
 }
 if ($reflectorlogic2 != "") {
    $fmnetwork2 = $svxconfig[$reflectorlogic2]['HOSTS'];     

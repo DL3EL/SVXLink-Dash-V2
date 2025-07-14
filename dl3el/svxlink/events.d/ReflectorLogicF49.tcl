@@ -35,6 +35,9 @@ variable qsy_pending_active 0
 # established and to 0 if disconnected.
 variable reflector_connection_established 0
 
+variable announcement_cw 1
+variable announcement_voice 0
+
 #
 # Checking to see if this is the correct logic core
 #
@@ -83,17 +86,32 @@ proc command_failed {cmd} {
 #
 proc reflector_connection_status_update {is_established} {
   variable reflector_connection_established
+  variable announcement_cw
+  variable announcement_voice
+  
   if {$is_established != $reflector_connection_established} {
     set reflector_connection_established $is_established
-    playMsg "Core" "reflector"
+    if {$announcement_voice} {
+      playMsg "Core" "reflector"
+    }
     if {$is_established} {
       puts "RefF49: Ref connected"
-      playMsg "Core" "connected"
-#      CW::play "RC"
+      if {$announcement_cw} {
+        CW::play " F CT "
+        playSilence 250;
+      }  
+      if {$announcement_voice} {
+        playMsg "Core" "connected"
+      }  
     } else {
       puts "RefF49: Ref disconnected"
-      playMsg "Core" "disconnected"
-#      CW::play "RD"
+      if {$announcement_cw} {
+        CW::play " F SK "
+        playSilence 250;
+      }  
+      if {$announcement_voice} {
+        playMsg "Core" "disconnected"
+      }  
     }
   }
 }
@@ -108,12 +126,31 @@ proc report_tg_status {} {
   variable prev_announce_time
   variable prev_announce_tg
   variable reflector_connection_established
+  variable announcement_cw
+  variable announcement_voice
+
   playSilence 100
-  playMsg "Core" "reflector"
+  if {$announcement_voice} {
+    playMsg "Core" "reflector"
+  }  
   if {$reflector_connection_established} {
-    playMsg "Core" "connected"
+      puts "RefF49: Ref connected 1"
+      if {$announcement_cw} {
+        CW::play "F CT 1"
+        playSilence 250;
+      }  
+      if {$announcement_voice} {
+        playMsg "Core" "connected"
+      }  
   } else {
-    playMsg "Core" "disconnected"
+      if {$announcement_voice} {
+        playMsg "Core" "disconnected"
+      }  
+      if {$announcement_cw} {
+        CW::play "SK 1"
+        playSilence 250;
+      }  
+      puts "RefF49: Ref disconnected 1"
   }
   playSilence 200
   if {$selected_tg > 0} {
@@ -175,6 +212,8 @@ proc tg_local_activation {new_tg old_tg} {
   variable prev_announce_tg
   variable selected_tg
   variable reflector_connection_established
+  variable announcement_cw
+  variable announcement_voice
 
   #puts "### tg_local_activation"
   if {$new_tg != $old_tg} {
@@ -182,9 +221,16 @@ proc tg_local_activation {new_tg old_tg} {
     set prev_announce_tg $new_tg
     playSilence 100
     if {!$reflector_connection_established} {
-      playMsg "Core" "reflector"
-      playMsg "Core" "disconnected"
-      playSilence 200
+      if {$announcement_voice} {
+        playMsg "Core" "reflector"
+        playMsg "Core" "disconnected"
+        playSilence 200
+      }  
+      puts "RefF49: Ref disconnected 1"
+      if {$announcement_cw} {
+        CW::play "F SK 2"
+        playSilence 250;
+      }  
     }
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
@@ -249,15 +295,24 @@ proc tg_command_activation {new_tg old_tg} {
   variable prev_announce_time
   variable prev_announce_tg
   variable reflector_connection_established
+  variable announcement_cw
+  variable announcement_voice
 
   #puts "### tg_command_activation"
   set prev_announce_time [clock seconds]
   set prev_announce_tg $new_tg
   playSilence 100
   if {!$reflector_connection_established} {
-    playMsg "Core" "reflector"
-    playMsg "Core" "disconnected"
-    playSilence 200
+      if {$announcement_voice} {
+        playMsg "Core" "reflector"
+        playMsg "Core" "disconnected"
+        playSilence 200
+      }  
+      if {$announcement_vcw} {
+        CW::play "F SK 3"
+        playSilence 250;
+      }  
+      puts "RefF49: Ref disconnected 3"
   }
   playMsg "Core" "talk_group"
   say_talkgroup $new_tg
