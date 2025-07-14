@@ -76,6 +76,7 @@ if (isProcessRunning('svxlink')) {
    }
    echo "</table>\n";
 //#### neu
+if ($reflectorlogic1 != "") {
    $fmnetwork1 = $svxconfig[$reflectorlogic1]['HOSTS'];    
    if ($fmnetwork1 =="") {
       $fmnetwork1 = $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
@@ -118,7 +119,8 @@ if (isProcessRunning('svxlink')) {
    }
    echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";
    echo "</table>";
-
+}
+if ($reflectorlogic2 != "") {
    $fmnetwork2 = $svxconfig[$reflectorlogic2]['HOSTS'];     
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork2."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork2."</th></tr><tr>";
@@ -157,7 +159,7 @@ if (isProcessRunning('svxlink')) {
    }
    echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";
    echo "</table>";
-
+}
    if ($svxconfig["Rx1"]["PEAK_METER"] =="1") {
       $ispeak = true ;
    }   
