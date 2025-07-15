@@ -177,7 +177,7 @@ proc report_tg_status {} {
 #   old_tg -- The talk group that was active
 #
 proc tg_selected {new_tg old_tg} {
-#if {$new_tg != 0} {
+
 if {($new_tg != 0) && ($new_tg != $old_tg)} {
   puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
   exec echo "*910#" > /tmp/dtmf_svx
