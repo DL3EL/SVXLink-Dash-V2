@@ -98,7 +98,7 @@ proc reflector_connection_status_update {is_established} {
     if {$is_established} {
       puts "Ref: Ref connected"
       if {$announcement_cw} {
-        CW::play " R CO"
+        CW::play " R CT"
         playSilence 250;
       }  
       if {$announcement_voice} {
@@ -137,7 +137,7 @@ proc report_tg_status {} {
   if {$reflector_connection_established} {
       puts "Ref: Ref connected"
       if {$announcement_cw} {
-        CW::play "R CO 1"
+        CW::play " R CT 1"
         playSilence 250;
       }
       if {$announcement_voice} {
@@ -148,7 +148,7 @@ proc report_tg_status {} {
         playMsg "Core" "disconnected"
       }  
       if {$announcement_cw} {
-        CW::play "SK 1"
+        CW::play " R SK 1"
         playSilence 250;
       }  
       puts "Ref: Ref disconnected 1"
@@ -178,7 +178,7 @@ proc report_tg_status {} {
 #   old_tg -- The talk group that was active
 #
 proc tg_selected {new_tg old_tg} {
-if {$new_tg != 0} {
+if {($new_tg != 0) && ($new_tg != $old_tg)} {
   puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
   exec echo "*810#" > /tmp/dtmf_svx
   exec echo "*8#" > /tmp/dtmf_svx
@@ -187,7 +187,7 @@ if {$new_tg != 0} {
   exec echo "*91$new_tg#" > /tmp/dtmf_svx
   puts "Ref: dmtf *91$new_tg# geschickt (tg_sel)"
 } else {
-  puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
+  puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_sel -> no action"
 }
 
   #puts "### tg_selected #$new_tg (old #$old_tg)"
@@ -214,7 +214,7 @@ proc tg_local_activation {new_tg old_tg} {
   variable announcement_cw
   variable announcement_voice
 
-  #puts "### tg_local_activation"
+  puts "Ref: ### tg_local_activation"
   if {$new_tg != $old_tg} {
     set prev_announce_time [clock seconds]
     set prev_announce_tg $new_tg
@@ -226,17 +226,17 @@ proc tg_local_activation {new_tg old_tg} {
         playSilence 200
       }  
       if {$announcement_cw} {
-        CW::play "SK 2"
+        CW::play " SK 2"
         playSilence 250;
       }  
       puts "Ref: Ref disconnected 2"
     }
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
-  puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_local"
-  exec echo "*810#" > /tmp/dtmf_svx
-  exec echo "*8#" > /tmp/dtmf_svx
-  puts "Ref: dmtf *8# geschickt (tg_local)"
+    puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_local"
+    exec echo "*810#" > /tmp/dtmf_svx
+    exec echo "*8#" > /tmp/dtmf_svx
+    puts "Ref: dmtf *8# geschickt (tg_local)"
   }
 }
 
@@ -264,9 +264,10 @@ proc tg_remote_activation {new_tg old_tg} {
     playSilence 100
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
-  puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_rem"
-  exec echo "*8#" > /tmp/dtmf_svx
-  puts "Ref: *8# dmtf geschickt (tg_rem)"
+    puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_rem"
+    exec echo "*810#" > /tmp/dtmf_svx
+    exec echo "*8#" > /tmp/dtmf_svx
+    puts "Ref: *8# dmtf geschickt (tg_rem)"
   }
 }
 
