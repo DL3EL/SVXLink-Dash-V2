@@ -129,7 +129,8 @@ class SA818:
     logger.info('Firmware %s, version: %s', version[1], '_'.join(version[2:]))
     return version
 
-  def set_radio(self, frequency, offset, bw, squelch, ctcss, dcs, tail):
+#  def set_radio(self, frequency, offset, bw, squelch, ctcss, dcs, tail):
+  def set_radio(self, frequency, txfrequency, bw, squelch, ctcss, dcs, tail):
     # pylint: disable=too-many-locals,too-many-positional-arguments
     tone = ctcss if ctcss else dcs
     if tone:                # 0000 = No ctcss or dcs tone
@@ -137,11 +138,12 @@ class SA818:
     else:
       tx_tone, rx_tone = ['0000', '0000']
 
-    if offset == 0.0:
-      tx_freq = rx_freq = f"{frequency:.4f}"
-    else:
-      rx_freq = f"{frequency:.4f}"
-      tx_freq = f"{frequency + offset:.4f}"
+#    if offset == 0.0:
+#      tx_freq = rx_freq = f"{frequency:.4f}"
+#    else:
+    rx_freq = f"{frequency:.4f}"
+#     tx_freq = f"{frequency + offset:.4f}"
+    tx_freq = f"{txfrequency:.4f}"
 
     cmd = f"{self.SETGRP}={bw},{tx_freq},{rx_freq},{tx_tone},{squelch},{rx_tone}"
     self.send(cmd)
@@ -362,6 +364,8 @@ def command_parser():
                        help="Bandwidth 0=NARROW (12.5KHz), 1=WIDE (25KHx) [default: WIDE]")
   p_radio.add_argument("--frequency", required=True, type=type_frequency,
                        help="Receive frequency")
+  p_radio.add_argument("--txfrequency", required=True, type=type_frequency,
+                       help="Transmit frequency")
   p_radio.add_argument("--offset", default=0.0, type=float,
                        help="Offset in MHz, 0 for no offset [default: %(default)s]")
   p_radio.add_argument("--squelch", type=type_squelch, default=4,
@@ -425,7 +429,8 @@ def main():
   elif opts.func == 'radio':
     radio.set_radio(
       opts.frequency,
-      opts.offset,
+#      opts.offset,
+      opts.txfrequency,
       opts.bw,
       opts.squelch,
       opts.ctcss,

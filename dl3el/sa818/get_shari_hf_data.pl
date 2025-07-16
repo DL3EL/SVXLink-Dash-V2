@@ -19,19 +19,28 @@ my @CTCSS = (
 );
 
     my $log_time = act_time();
+    my $total = $#ARGV + 1;
+    my $counter = 1;
+    my $dir = "";
+    my $readmachine = "";
+    foreach my $a(@ARGV) {
+	print "Arg # $counter : $a\n" if ($verbose == 7);
+	$counter++;
+	if (substr($a,0,2) eq "v=") {
+	    $verbose = substr($a,2,1);
+	    print LOG "Debug On, Level: $verbose\n" if $verbose;
+	} 
+	if (substr($a,0,2) eq "d=") {
+	    $dir = substr($a,2,length($a));
+            print "Dir: $dir\n" if $verbose;
+	} 
+	if (substr($a,0,2) eq "r=") {
+	    $readmachine = substr($a,2,1);
+	} 
+    }
 
-    my $cmd = "pwd";
-    my $dir =`$cmd`;
-    my $dirr = trim_cr($dir);
-    $dir = ($dirr =~ /(.*)\/include/s)? $1 : "undef";
-
-    if ($dir eq "undef") {
-        $dir = $dirr;
-    }    
-
-    print "[$log_time] DIR $dir ($dirr)\n" if ($verbose >= 0);
-    $shari = $dir  . "/dl3el/sa818";
-    print "[$log_time] SHARI $shari\n" if ($verbose >= 0);
+    $shari = $dir  . "/sa818";
+    print "[$log_time] SHARI $shari\n" if ($verbose >= 1);
 
     $cmd = sprintf("python3 %s/sa818-running.py -q",$shari);
     print "[$log_time] [$cmd]\n" if ($verbose >= 1);
@@ -41,24 +50,38 @@ my @CTCSS = (
     $rssi = ($cmd =~ /.*RSSI=([\d]+)/s)? $1 : "undef";
 # +DMOREADGROUP:1,430.5750,430.5750,0000,1,0002
     $data = ($cmd =~ /.*\+DMOREADGROUP:(\d),([\d-|\.]+),([\d-|\.]+),([\w]+),(\d),([\w]+)/s)? $1 : "undef";
+    my $bandwidth = $1;
+    my $tx = $2;
+    my $rx = $2;
     $txctcss = $CTCSS[$4];
-    $txctcss = $txctcss . "Hz" if ($4 ne "0000");
+    my $squelch = $5;
     $rxctcss = $CTCSS[$6];
-    $rxctcss = $rxctcss . "Hz" if ($6 ne "0000");
-    printf "%s / RSSI:%s<br>RX:%s/TX:%s",$2,$rssi,$rxctcss,$txctcss;
     if (!$verbose) {
-	exit 0;
+	if ($readmachine eq "") {
+	    $txctcss = $txctcss . "Hz" if ($4 ne "0000");
+	    $rxctcss = $rxctcss . "Hz" if ($6 ne "0000");
+	    printf "%s / RSSI:%s<br>RX:%s/TX:%s",$2,$rssi,$rxctcss,$txctcss;
+	    exit 0;
+	} else {
+	    print "$tx,";
+	    print "$rx,";
+	    printf "%s,", $txctcss;
+	    print "$squelch,";
+	    printf "%s,", $rxctcss;
+	    print "$bandwidth\n";
+	    exit 0;
+	}
     } else {
-	print "\n$2\n" if ($verbose >= 0);
-	print "Channelspace: [$1]\n" if ($verbose >= 1);
-	print "QRG: [$2]\n" if ($verbose >= 0);
-	print "QRG_In: [$3]\n" if ($verbose >= 1);
-	printf "TXCTCSS: [%shz]\n", $txctcss;
-	print "Squelch: [$5]\n" if ($verbose >= 0);
-	printf "RXCTCSS: [%shz]\n", $rxctcss;
-	printf "CMD: %s\n",$cmd;
-	$data = ($cmd =~ /.*RSSI=([\d]+)/s)? $1 : "undef";
-	printf "RSSI: %s\n",$data;
+	    print "\n$2\n" if ($verbose >= 0);
+	    print "Channelspace: [$1]\n" if ($verbose >= 1);
+	    print "QRG: [$2]\n" if ($verbose >= 0);
+	    print "QRG_In: [$3]\n" if ($verbose >= 1);
+	    printf "TXCTCSS: [%shz]\n", $txctcss;
+	    print "Squelch: [$5]\n" if ($verbose >= 0);
+	    printf "RXCTCSS: [%shz]\n", $rxctcss;
+	    printf "CMD: %s\n",$cmd;
+	    $data = ($cmd =~ /.*RSSI=([\d]+)/s)? $1 : "undef";
+	    printf "RSSI: %s\n",$data;
     }
 
 sub trim_cr {

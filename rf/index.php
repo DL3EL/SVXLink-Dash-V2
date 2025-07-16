@@ -93,7 +93,52 @@ if (fopen($RfConfFile,'r'))
         $filedata = file_get_contents($RfConfFile);
         $RfData = json_decode($filedata,true);
 //        print_r($RfData);
+	list($txctcss, $rxctcss) = explode(",", $RfData['ctcss']);
+	$RfData['txctcss'] = $txctcss;
+	$RfData['rxctcss'] = $rxctcss;
+	$RfData['txfreq'] = $RfData['freq'];
+	if ($RfData['offset'] === 0) {
+	    $RfData['rxfreq'] = $RfData['txfreq'];
+	} else {
+	   $RfData['rxfreq'] = $RfData['txfreq'] + $RfData['offset'];
+	}   
+// SA818 works only in simplex mode, RX has to be equal to TX	
+	$RfData['rxfreq'] = $RfData['txfreq'];
+
+//        print_r($RfData);
 };
+	$command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL;
+	exec($command, $output, $retval);
+	$tx = "";
+	$rx = "";
+	$txctcss = "";
+	$squelch = "";
+	$rxctcss = "";
+	$bandwidth = "";
+
+	list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
+	echo "TX$tx, RX$rx, $txctcss, $squelch, $rxctcss, $bandwidth <br>";
+	
+	if ($tx !== "") {
+	    $RfData['txfreq'] = $tx;
+	}    
+	if ($rx !== "") {
+	    $RfData['rxfreq'] = $rx;
+	}    
+	if ($rxctcss !== "") {
+	    $RfData['rxctcss'] = $rxctcss;
+	}    
+	if ($txctcss !== "") {
+	    $RfData['txctcss'] = $txctcss;
+	}    
+	if ($squelch !== "") {
+	    $RfData['squelch'] = $squelch;
+	}    
+	if ($bandwidth !== "") {
+	    $RfData['bw'] = $bandwidth;
+	}    
+//        print_r($RfData);
+
 
 $screen[0] = "Welcome to SA818 RF MODULE configuration tool.";
 $screen[1] = "Please use buttons for actions.";
@@ -172,18 +217,29 @@ if (isset($_POST['btnRadio']))
         $screen = null;
         $port = $_POST['port'];
 	$freq = $_POST['freq'];
-	$offset = $_POST['offset'];
+	$rxfreq = $_POST['rxfreq'];
+	$txfreq = $_POST['txfreq'];
+// SA818 works only in simplex mode, RX has to be equal to TX	
+	$txfreq = $rxfreq;
 	$squelch = $_POST['squelch'];
 	$ctcss = $_POST['ctcss'];
+	$rxctcss = $_POST['rxctcss'];
+	$txctcss = $_POST['txctcss'];
 	$tail = $_POST['tail'];
 	$bw = $_POST['bw'];
-
+	$ctcss = $txctcss;
+	if ($rxctcss !== "") {
+		$ctcss = $txctcss . "," . $rxctcss;
+	}
 #        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --close-tail \"" .$tail. "\" 2>&1";
-        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
+#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
+        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
+//echo $command;
         if (!$retval) exec($command,$screen,$retval);
 
 	if (!$retval) {
-                $RfData['port']=$port;$RfData['freq']=$freq;$RfData['offset']=$offset;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
+//                $RfData['port']=$port;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['offset']=$offset;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
+                $RfData['port']=$port;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
                 $jsonRfData = json_encode($RfData);
                 file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
                 //archive the current config
@@ -252,7 +308,7 @@ if (isset($_POST['btnVol']))
 //load json
 
 $port = $RfData['port']; 
-$freq = $RfData['freq'];$offset=$RfData['offset'];$ctcss=$RfData['ctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
+$rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
 $fEmph = $RfData['fEmph'];$fLow=$RfData['fLow'];$fHigh=$RfData['fHigh'];
 $volume = $RfData['volume'];
 $tail = $RfData['tail'];
@@ -264,7 +320,8 @@ $bw = $RfData['bw'];
 if ($port === "" || is_null($port)) $port = "/dev/ttyUSB.shari";
 
 //radio
-if ($freq === "" || is_null($freq)) $freq = "433.025";
+if ($rxfreq === "" || is_null($freq)) $freq = "433.025";
+if ($txfreq === "" || is_null($txfreq)) $txfreq = "433.025";
 if ($offset === "" || is_null($offset)) $offset = "0.0";
 if ($ctcss === "" || is_null($ctcss)) $ctcss = "94.8";
 if ($tail === "" || is_null($tail)) $tail = "yes";
@@ -323,10 +380,15 @@ if ($volume === "" || is_null($volume)) $volume = "8";
         </tr>
 <tr>
 <td>
-   	Freq: <input type "text" name="freq" style = "width: 180px" value="<?php echo $freq;?>">
+   	RxTXFreq: <input type "text" name="rxfreq" style = "width: 60px" value="<?php echo $rxfreq;?>"><br>
+<!--
+   	TxFreq: <input type "text" name="txfreq" style = "width: 60px" value="<?php echo $txfreq;?>">
 	Shift: <input type "text" name="offset" style = "width: 50px" value="<?php echo $offset;?>"> <br>
    	Ctcss: <input type "text" name="ctcss" style = "width: 50px" value="<?php echo $ctcss;?>">
-	Squelch: <input type "text" name="squelch" style = "width: 50px" value="<?php echo $squelch;?>"><br>
+--->
+   	RXCtcss: <input type "text" name="rxctcss" style = "width: 50px" value="<?php echo $rxctcss;?>">
+   	TXCtcss: <input type "text" name="txctcss" style = "width: 50px" value="<?php echo $txctcss;?>"><br>
+	Squelch: <input type "text" name="squelch" style = "width: 50px" value="<?php echo $squelch;?>">
 	Tail: <input type "text" name="tail" style = "width: 50px" value="<?php echo $tail;?>">
 	Bandwidth: <input type "text" name="bw" style = "width: 50px" value="<?php echo $bw;?>">
 </TD>
