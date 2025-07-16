@@ -35,7 +35,7 @@ variable qsy_pending_active 0
 # established and to 0 if disconnected.
 variable reflector_connection_established 0
 
-variable announcement_cw 1
+variable announcement_cw 0
 variable announcement_voice 0
 
 #
