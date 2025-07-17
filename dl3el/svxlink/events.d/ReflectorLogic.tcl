@@ -307,7 +307,7 @@ proc tg_command_activation {new_tg old_tg} {
         playMsg "Core" "disconnected"
         playSilence 200
       }  
-      if {$announcement_vcw} {
+      if {$announcement_cw} {
         CW::play "SK 3"
         playSilence 250;
       }   
@@ -315,6 +315,10 @@ proc tg_command_activation {new_tg old_tg} {
   }
   playMsg "Core" "talk_group"
   say_talkgroup $new_tg
+  puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_cmd"
+  exec echo "*810#" > /tmp/dtmf_svx
+  exec echo "*8#" > /tmp/dtmf_svx
+  puts "Ref: *8# dmtf geschickt (tg_cmd)"
 }
 
 
