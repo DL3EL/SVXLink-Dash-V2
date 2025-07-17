@@ -180,7 +180,7 @@ proc report_tg_status {} {
 proc tg_selected {new_tg old_tg} {
 if {($new_tg != 0) && ($new_tg != $old_tg)} {
   puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
-  exec echo "*810#" > /tmp/dtmf_svx
+#  exec echo "*810#" > /tmp/dtmf_svx
   exec echo "*8#" > /tmp/dtmf_svx
   puts "Ref: dmtf *8# geschickt (tg_sel)"
 
@@ -234,7 +234,7 @@ proc tg_local_activation {new_tg old_tg} {
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
     puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_local"
-    exec echo "*810#" > /tmp/dtmf_svx
+#    exec echo "*810#" > /tmp/dtmf_svx
     exec echo "*8#" > /tmp/dtmf_svx
     puts "Ref: dmtf *8# geschickt (tg_local)"
   }
@@ -265,7 +265,7 @@ proc tg_remote_activation {new_tg old_tg} {
     playMsg "Core" "talk_group"
     say_talkgroup $new_tg
     puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_rem"
-    exec echo "*810#" > /tmp/dtmf_svx
+#    exec echo "*810#" > /tmp/dtmf_svx
     exec echo "*8#" > /tmp/dtmf_svx
     puts "Ref: *8# dmtf geschickt (tg_rem)"
   }
@@ -317,7 +317,7 @@ proc tg_command_activation {new_tg old_tg} {
   say_talkgroup $new_tg
   if {($new_tg != 0) && ($new_tg != $old_tg)} {
     puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_cmd"
-    exec echo "*810#" > /tmp/dtmf_svx
+#    exec echo "*810#" > /tmp/dtmf_svx
     exec echo "*8#" > /tmp/dtmf_svx
     puts "Ref: *8# dmtf geschickt (tg_cmd)"
   } else {
