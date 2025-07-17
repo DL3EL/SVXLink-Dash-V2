@@ -315,7 +315,6 @@ proc tg_command_activation {new_tg old_tg} {
   }
   playMsg "Core" "talk_group"
   say_talkgroup $new_tg
-#  if {$new_tg != $old_tg} {
   if {($new_tg != 0) && ($new_tg != $old_tg)} {
     puts "Ref: ### tg_selected #$new_tg (old #$old_tg), tg_cmd"
     exec echo "*810#" > /tmp/dtmf_svx

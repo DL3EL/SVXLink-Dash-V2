@@ -319,7 +319,6 @@ proc tg_command_activation {new_tg old_tg} {
   }
   playMsg "Core" "talk_group"
   say_talkgroup $new_tg
-#  if {$new_tg != $old_tg} {
   if {($new_tg != 0) && ($new_tg != $old_tg)} {
     puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_cmd"
     exec echo "*910#" > /tmp/dtmf_svx
@@ -327,13 +326,6 @@ proc tg_command_activation {new_tg old_tg} {
     puts "RefF49: dmtf *9# geschickt (tg_cmd)"
   } else {
     puts "Ref49: ### tg_selected #$new_tg (old #$old_tg), tg_sel -> no action"
-#    if {$new_tg == 0} {
-#      puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
-#      exec echo "*8#" > /tmp/dtmf_svx
-#      puts "RefF49: dmtf *8# geschickt (tg_sel)"
-#      exec echo "*91#" > /tmp/dtmf_svx
-#      puts "RefF49: dmtf *91# geschickt (tg_sel)"
-#    } 
   }
 }
 
