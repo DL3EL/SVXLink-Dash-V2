@@ -242,7 +242,7 @@ if ($reflectorlogic2 != "") {
          if ($svxRadio == "Shari") {
 //            echo "Mode: simplex";
             $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL;
-            echo "QRG: ",exec($command, $output, $retval);
+            echo "QRG:",exec($command, $output, $retval);
 //            echo "<br>QRG: ",exec('perl /home/svxlink/get_shari_hf_data.pl', $output, $retval);
          } else {
             echo " Radio: " . DL3EL_RADIO;
