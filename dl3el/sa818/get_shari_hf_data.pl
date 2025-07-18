@@ -60,7 +60,7 @@ my @CTCSS = (
 	if ($readmachine eq "") {
 	    $txctcss = $txctcss . "Hz" if ($4 ne "0000");
 	    $rxctcss = $rxctcss . "Hz" if ($6 ne "0000");
-	    printf "%s / RSSI:%s<br>RX:%s/TX:%s",$2,$rssi,$rxctcss,$txctcss;
+	    printf "%s/RSSI:%s<br>RX:%s/TX:%s",$2,$rssi,$rxctcss,$txctcss;
 	    exit 0;
 	} else {
 	    print "$tx,";
