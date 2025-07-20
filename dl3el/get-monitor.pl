@@ -85,8 +85,8 @@ my $version = "2.30";
     $vmt = $vmt_org;
     printf LOG "VMT Liste: (%s)\n",$vmt;
     while ($vmt) {
-        --$vmt;
         printf LOG "(2)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg;
+        --$vmt;
     }
 # exit;
 
@@ -226,9 +226,17 @@ my $curr_act = 0;
                 $mon_tg = $DataTabFN{$call}{'MTGS'}[$mm];
                 ++$nn;
                 $mon_tgi = sprintf ("%07d.%03d",$DataTabFN{$call}{'MTGS'}[$mm],$nn);
-                $DataTabMonTG{$mon_tgi}{'MONTG'} = $mon_tg;
-                $DataTabMonTG{$mon_tgi}{'CALL'} = $call;
-                printf LOG "NT: ($mm)%s [Index:%s] %s:NT ",$mon_tg,$mon_tgi,$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >3);
+                if (exists $DataTabMonTG{$mon_tg}{$call}{'CALL'}) {
+# skip call, as we have it already
+                    printf ">>%s [%s, %s]\n",$DataTabMonTG{$mon_tg}{$call}{'CALL'},$mon_tg,$call if ($verbose >=3);
+                } else {    
+                    $DataTabMonTG{$mon_tg}{$call}{'CALL'} = $call;
+                    printf "!!%s [%s, %s]\n",$DataTabMonTG{$mon_tg}{$call}{'CALL'},$mon_tg,$call if ($verbose >=3);
+                    printf "NT: ($mm)%s [Index:%s] %s:NT ",$mon_tg,$mon_tgi,$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=3);
+                    printf LOG "NT: ($mm)%s [Index:%s] %s:NT ",$mon_tg,$mon_tgi,$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >3);
+                    $DataTabMonTG{$mon_tgi}{'MONTG'} = $mon_tg;
+                    $DataTabMonTG{$mon_tgi}{'CALL'} = $call;
+                }    
             }    
         }
         if ($DataTabFN{$call}{'CURR_ACT'} == 1) {
@@ -291,24 +299,27 @@ my $ii = 0;
 #    printf "(Script Run: $log_time) Nutzer Monitor TGs (Netz Update %s)",$_[0];
     print "<tr><td>";
     foreach $mon_tgi (sort keys %DataTabMonTG) {
-        $mon_tg = $DataTabMonTG{$mon_tgi}{'MONTG'};
-        print LOG "$mon_tg_act eq $mon_tg? [Index: $mon_tgi]\n" if ($verbose >3);
-        if ($mon_tg_act ne $mon_tg) {
+        print "[next Index: $mon_tgi]\n" if ($verbose >2);
+        if (exists $DataTabMonTG{$mon_tgi}{'MONTG'}) {
+            $mon_tg = $DataTabMonTG{$mon_tgi}{'MONTG'};
+            print LOG "$mon_tg_act eq $mon_tg? [Index: $mon_tgi]\n" if ($verbose >3);
+            if ($mon_tg_act ne $mon_tg) {
 #            printf "</td></tr><tr><td><b>TG %s</b></td></tr><tr><td>", $mon_tg;
-            printf "</td></tr><tr><td><form method=\"post\"><button type=submit id=jmptoA name=jmptoA class=active_id value=%s>TG %s</button></form>",$mon_tg,$mon_tg;
-            printf LOG "\n%s\n ",$mon_tg;
-            $mon_tg_act = $mon_tg;
-            $nn = 0;
-            $zz = 0;
-        }   
-        if (++$zz > 11) {
-            print "<br>" ;
-            $zz = 0;
-        }    
+                printf "</td></tr><tr><td><form method=\"post\"><button type=submit id=jmptoA name=jmptoA class=active_id value=%s>TG %s</button></form>",$mon_tg,$mon_tg;
+                printf LOG "\n%s\n ",$mon_tg;
+                $mon_tg_act = $mon_tg;
+                $nn = 0;
+                $zz = 0;
+            }   
+            if (++$zz > 11) {
+                print "<br>" ;
+                $zz = 0;
+            }    
 #        print ", " if ($nn++);
-        printf LOG "%s ",$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=0);
-        printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
-        ++$ii;
+            printf LOG "%s ",$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=0);
+            printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
+            ++$ii;
+        }
     }	
     print "</td></tr>";
 }
