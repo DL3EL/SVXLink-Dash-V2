@@ -35,7 +35,7 @@ variable qsy_pending_active 0
 # established and to 0 if disconnected.
 variable reflector_connection_established 0
 
-variable announcement_cw 0
+variable announcement_cw 1
 variable announcement_voice 0
 
 #
@@ -182,9 +182,10 @@ if {($new_tg != 0) && ($new_tg != $old_tg)} {
   puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
 #  exec echo "*910#" > /tmp/dtmf_svx
   exec echo "*9#" > /tmp/dtmf_svx
-  puts "RefF49: dmtf *9# geschickt (tg_sel)"
+  puts "RefF49: dmtf *9# geschickt (tg_sel), waiting 1 sec "
+  exec sleep 2
   exec echo "*81$new_tg#" > /tmp/dtmf_svx
-  puts "RefF49: dmtf *81$new_tg# geschickt (tg_sel)"
+  puts "RefF49: dmtf *81$new_tg# geschickt (tg_sel) "
 } else {
     if {$new_tg == 0} {
       puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_sel"
@@ -240,6 +241,7 @@ proc tg_local_activation {new_tg old_tg} {
     puts "RefF49: ### tg_selected #$new_tg (old #$old_tg), tg_local"
 #    exec echo "*910#" > /tmp/dtmf_svx
     exec echo "*9#" > /tmp/dtmf_svx
+    exec sleep 2
     puts "RefF49: dmtf *9# geschickt (tg_local)"
   }
 }
@@ -272,6 +274,9 @@ proc tg_remote_activation {new_tg old_tg} {
 #  exec echo "*910#" > /tmp/dtmf_svx
   exec echo "*9#" > /tmp/dtmf_svx
   puts "RefF49: dmtf *9# geschickt (tg_rem)"
+  exec sleep 2
+  exec echo "*8$new_tg#" > /tmp/dtmf_svx
+  puts "RefF49: dmtf *8$new_tg# geschickt (tg_rem)"
   }
 }
 

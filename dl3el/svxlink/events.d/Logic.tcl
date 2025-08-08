@@ -484,9 +484,10 @@ proc dtmf_cmd_received {cmd} {
     exec sudo reboot &
     return 1
   }
-  if {$cmd == "95"} {
-    puts "95 received, playing metar"
-    playMsg "MetarInfo" "111420 AUTO VRB05KT CAVOK 23/05 Q1020 NOSIG"
+  if {$cmd == "96"} {
+    puts "96 received, shutting down"
+    exec sudo shutdown now &
+    return 1
   }
   return 0
 }
