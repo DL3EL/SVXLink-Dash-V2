@@ -59,7 +59,7 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
             $sc_port_raw = $svxconfig[$sc_port_name]['AUDIO_DEV']; 
             echo "Data old: " . $sc_port_raw;
             $sc_port_new = substr($svxconfig[$sc_port_name]['AUDIO_DEV'],0,12) . $sc; 
-            echo "will be changed to Data new: " . $sc_port_new . "<br>";
+            echo ", will be changed to Data new: " . $sc_port_new . "<br>";
             $content = file_get_contents($svxConfigFile);
             $backup_filename = $svxConfigFile . "." . date("YmdHis");
             exec('sudo cp -p ' . $svxConfigFile . ' ' . $backup_filename);
@@ -153,6 +153,7 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
 <!-- PTT button -->
 <?php 
 if (SHOWPTT=="TRUE") {
+// now including the volume buttons
     include "ptt.html";
 }
 ?>
@@ -237,6 +238,7 @@ if (isset($_POST['btn_DMR_only']))
     {
         if ($mode == "FM_only") {
             $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
+            exec($command,$screen,$retval);
         }
         $mode ="DMR_only";
         $color = "red";
