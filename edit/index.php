@@ -70,13 +70,19 @@ include_once "../include/config.php";
 
 // Read file contents
 if ($log) {
-//    $command = "tac $file";
-    $command = "tac $file > " . DL3EL . "/logfile.txt";
-    passthru($command);
-    $file = DL3EL . "/logfile.txt";
-//    $content = str_replace("X","<br>",$content2); 
-}    
-$content = file_get_contents($file);
+//    $command = "tac $file > " . DL3EL . "/logfile.txt";
+//    passthru($command);
+//    $file = DL3EL . "/logfile.txt";
+/////////////////////////// ohne Hilfsdatei logfile.txt // tnx Frank DL4EM  ///////////////////
+// Read Log File content
+      $content = file_get_contents($file);
+// reverse Log File reverse
+      $zeilen_array = explode("\n", $content);
+      $umgekehrte_zeilen = array_reverse($zeilen_array);
+      $content = implode("\n", $umgekehrte_zeilen);
+} else {   
+  $content = file_get_contents($file);
+}  
 // Display in textarea & edit
 echo '<form method="post">';
 echo '<textarea name="content" rows="35" cols="120">' . htmlspecialchars($content) . '</textarea><br>';
