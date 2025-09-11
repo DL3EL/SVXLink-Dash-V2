@@ -448,8 +448,10 @@ function get_string_between($string, $start, $end) {
 }
 
 $logLinesSVX = getSVXLog();
-$reverseLogLinesSVX = $logLinesSVX;
-array_multisort($reverseLogLinesSVX,SORT_DESC);
+//$reverseLogLinesSVX = $logLinesSVX;
+//array_multisort($reverseLogLinesSVX,SORT_DESC);
+$reverseLogLinesSVX = array_reverse($logLinesSVX);
+
 $lastHeard = getLastHeard($reverseLogLinesSVX);
 function build_ini_string(array $a) {
         $out = '';
