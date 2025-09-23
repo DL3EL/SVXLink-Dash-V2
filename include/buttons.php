@@ -155,9 +155,11 @@ if(array_key_exists('button11', $_POST)) {
             class=<?php echo KEY8[2] ?> value='<?php echo KEY8[0] ?>' />
 	<input type="submit" name="button9"
             class=<?php echo KEY9[2] ?> value='<?php echo KEY9[0] ?>' />
-	<input type="submit" name="button10"
-            class=<?php echo KEY10[2] ?> value='<?php echo KEY10[0] ?>' />
 <?php 
+if (defined('KEY10')) {
+    echo '	<input type="submit" name="button10"';
+    echo 'class=' . KEY10[2] . ' value="' . KEY10[0] . '" />';
+}    
 if (defined('KEY11')) {
     echo '	<input type="submit" name="button11"';
     echo 'class=' . KEY11[2] . ' value="' . KEY11[0] . '" />';
