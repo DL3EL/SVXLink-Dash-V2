@@ -116,6 +116,18 @@ include_once "../include/config.php";
                     Password:<input type="password" id="password" name="password" value="<?php echo $password; ?>"><br>
                     <input type="submit" value="Submit">
                 </form>
+
+                <?php
+                echo '<form method="post">';
+                echo '<input type="submit" name="logoff" value="Logoff">';  
+                echo '&nbsp;&nbsp;';
+                echo '</form>';
+
+                if (isset($_POST['logoff'])) {
+                    $_SESSION['auth'] = "UNAUTHORISED";
+                }
+                ?>
+
             </center>
         </div>
     </fieldset>

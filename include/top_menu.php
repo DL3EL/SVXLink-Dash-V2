@@ -58,16 +58,17 @@ if (session_status() === PHP_SESSION_NONE) {
 <?php
 	if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 	    echo ' ';
+            $_SESSION['auth'] = "AUTHORISED";
 	} else {    
 	    echo '| <a href="./authorise.php" style = "color: crimson;">Authorise</a>';
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
 	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;">| DV-Switch</a></p>';
 	}
-?>
-	</div>
-	<div id="full-edit-links"  align=right>
-<?php
+	echo '</div>';
+	echo '<div id="full-edit-links"  align=right>';
+
+   if ($_SESSION['auth'] === "AUTHORISED") {
 
 	echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) .'"> ';
 	echo '<button name="btn_expert" type="submit" >' . $kn_exp . '</button>';
@@ -112,8 +113,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> | ';
 	}
+	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
+}
 ?>
-	<a href="./editor.php?id=power" style = "color: green;">Power</a></p>
     </div>
     </form>
 <?php

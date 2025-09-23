@@ -253,35 +253,21 @@ if ($reflectorlogic2 != "") {
 
  
 
-   if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "no")) {
-      echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >Editing</th></tr><tr>";
-      if ($_SESSION['auth'] === "AUTHORISED") {
-         echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#0a7d29;font-weight: bold;\">";
-         echo "Authorised";
+   echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >Editing</th></tr><tr>";
+   echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#ff0000;font-weight: bold;\">";
+   if ($_SESSION['auth'] === "UNAUTHORISED") {
+      if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
+         echo "always logged in";
          echo "</div></td></tr>";
-      }
-      $ip = isset($_SERVER['REMOTE_ADDR']);
-      $net1= cidr_match($ip,"192.168.0.126/16");
-      $net2= cidr_match($ip,"192.175.43.91/8");
-      $net3= cidr_match($ip,"127.0.0.0/8");
-      $net4= cidr_match($ip,"192.168.1.0/8");
-      if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
-         $FULLACCESS_OUTSIDE = 1;
-      }	
-
-      if ($net1 == TRUE || $net2 == TRUE || $net3 == TRUE || $net4 == TRUE || $FULLACCESS_OUTSIDE == 1) {
-         echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#ff0000;font-weight: bold;\">";
-         echo "DB Access Level:<br>Full/Intranet/VPN";
-         echo "</div></td></tr>";
-      }
-   } else {
-      if ($_SESSION['auth'] === "UNAUTHORISED") {
-         echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >Editing</th></tr><tr>";
-         echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#ff0000;font-weight: bold;\">";
+         $_SESSION['auth'] = "AUTHORISED";
+      } else {
          echo "Not Authorised";
          echo "</div></td></tr>";
       }
-   }
+   } else {
+      echo "logged in";
+      echo "</div></td></tr>";
+   }   
    echo "</table>\n";
 } else {
    echo "<span style=\"color:red;font-size:13.5px;font-weight: bold;\">SvxLink is not <br>running</span>";
