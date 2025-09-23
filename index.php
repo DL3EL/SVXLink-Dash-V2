@@ -86,7 +86,7 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="generator" content="SVXLink" />
     <meta name="Author" content="G4NAB, SP2ONG, SP0DZ" />
-    <meta name="Description" content="Dashboard for SVXLink by G4NAB, SP2ONG, SP0DZ" />
+    <meta name="Description" content="Dashboard for SVXLink by G4NAB, SP2ONG, SP0DZ, DL3EL" />
     <meta name="KeyWords" content="SVXLink,G4NAB, SP2ONG, SP0DZ" />
     <meta http-equiv="cache-control" content="max-age=0" />
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
@@ -132,8 +132,8 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
 <span style = "font-size: 32px;letter-spacing:4px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:PaleBlue"><?php echo $callsign;?></span>
 <p style = "margin-top:0px;margin-bottom:0px;">
 <span style = "font-size: 18px;letter-spacing:4px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:PaleBlue"><?php echo $fmnetwork; ?></span>
-<span style = "font-size: 12px;letter-spacing:2px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:white">
-    <a href="https://github.com/DL3EL/SVXLink-Dash-V2">
+<span style = "font-size: 12px;letter-spacing:2px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:PaleBlue"> 
+    <a href="https://github.com/DL3EL/SVXLink-Dash-V2" target="github" style="color:#ffffff;">
     <?php echo $dbversion; ?>
     </a>
 </span>
