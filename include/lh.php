@@ -12,7 +12,7 @@ include_once "tgdb.php";
   <form method="post">
   <table style = "margin-top:0px;">
     <tr height=25px>
-      <th width=150px>Time (<?php echo date('T')?>)</th>
+      <th>Time (<?php echo date('T')?>)</th>
       <th width=100px>Callsign</th>
 <?php
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
