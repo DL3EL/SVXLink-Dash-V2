@@ -24,6 +24,7 @@ function getSVXLog() {
 		$logLines1 = explode("\n", `tail -10000 $logPath | egrep -a -h "Talker start on|Talker stop on" `);
 	}
 	$logLines1 = array_slice($logLines1, -250);
+  $reverselogLines1 = array_reverse($logLines1);
 	if (sizeof($logLines1) < 250) {
 		if (file_exists(SVXLOGPATH.SVXLOGPREFIX.".1")) {
 			$logPath = SVXLOGPATH.SVXLOGPREFIX.".1";
@@ -31,8 +32,10 @@ function getSVXLog() {
 		}
 	}
 	$logLines2 = array_slice($logLines2, -250);
+  $reverselogLines2 = array_reverse($logLines2);
 //	$logLines = $logLines1 + $logLines2;
-	$logLines = array_merge($logLines1,$logLines2);
+//	$logLines = array_merge($logLines1,$logLines2);
+	$logLines = array_merge($reverselogLines1,$reverselogLines2);
 	$logLines = array_slice($logLines, -500);
 	return $logLines;
 }
@@ -446,11 +449,11 @@ function get_string_between($string, $start, $end) {
     $len = strpos($string,$end,$ini) - $ini;
     return substr($string,$ini,$len);
 }
-
+// Change 24.09.2025 getSVXLog() now return the array in reverse order
 $logLinesSVX = getSVXLog();
-//$reverseLogLinesSVX = $logLinesSVX;
+$reverseLogLinesSVX = $logLinesSVX;
 //array_multisort($reverseLogLinesSVX,SORT_DESC);
-$reverseLogLinesSVX = array_reverse($logLinesSVX);
+//$reverseLogLinesSVX = array_reverse($logLinesSVX);
 
 $lastHeard = getLastHeard($reverseLogLinesSVX);
 function build_ini_string(array $a) {
