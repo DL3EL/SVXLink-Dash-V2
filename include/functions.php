@@ -162,16 +162,14 @@ function getEchoLog() {
       return $echolog;
 }
 
-function getConnectedEcholink($echolog) {
+function getConnectedEcholink($echolog,$timestamp) {
         $users = Array();
         foreach ($echolog as $ElogLine) {
             if (strpos($ElogLine,"state changed to CONNECTED")) {
                 $lineParts = explode(" ", $ElogLine);
-                if (!strlen($lineParts[2])) {
-                  $nn = 6;
-                } else {
-                  $nn = 5;
-                }
+//TIMESTAMP_FORMAT="%d.%m.%Y %H:%M:%S"
+// 24.09.2025 21:27:24: DL3EL: EchoLink QSO state changed to CONNECTED
+//TIMESTAMP_FORMAT = "%c"
 // Sun Jun  1 16:30:23 2025: DL3EL: EchoLink QSO state changed to CONNECTED
 // 01.06.:
 // vorher
@@ -190,9 +188,22 @@ function getConnectedEcholink($echolog) {
 //E4:16:30:23
 //E5:2025:
 //E6:DL3EL:/6/0
+//      $timestamp = $svxconfig['GLOBAL']['TIMESTAMP_FORMAT'];    
 
-// echo "E1:" . $lineParts[1]  . "<br>E2:(" . $lineParts[2] . ")<br>E3:"  . $lineParts[3]. "<br>";
-// echo "E4:" . $lineParts[4]  . "<br>E5:" . $lineParts[5] . "<br>E6:"  . $lineParts[6]. "/" . $nn . "/" .strlen($lineParts[2]) . "<br>";
+
+ echo "TS:" . $timestamp  . "<br>";
+ echo "E1:" . $lineParts[1]  . "<br>E2:(" . $lineParts[2] . ")<br>E3:"  . $lineParts[3]. "<br>";
+ echo "E4:" . $lineParts[4]  . "<br>E5:" . $lineParts[5] . "<br>E6:"  . $lineParts[6]. "/" . $nn . "/" .strlen($lineParts[2]) . "<br>";
+
+                if ($timestamp != "%d.%m.%Y %H:%M:%S") {
+                  if (!strlen($lineParts[2])) {
+                    $nn = 6;
+                  } else {
+                    $nn = 5;
+                  } 
+                } else {
+                  $nn = 2;
+                }  
                 if (!in_array(substr($lineParts[$nn],0,-1), $users)) {
                   array_push($users,trim(substr($lineParts[$nn],0,-1)));
                 }
