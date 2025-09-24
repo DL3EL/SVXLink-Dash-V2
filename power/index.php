@@ -110,7 +110,7 @@ if (isset($_POST['btnDashUpdate']))
         $owner = 'svxlink';
         $group = 'svxlink';
 
-        $command = "sudo chown $owner:$group ; " . escapeshellarg($file) . " >" . $log . " 2>&1";
+        $command = "sudo chown $owner:$group " . escapeshellarg($file) . " >" . $log . " 2>&1";
         $output = [];
         $return_var = 0;
         exec($command, $output, $return_var);
