@@ -188,12 +188,10 @@ function getConnectedEcholink($echolog,$timestamp) {
 //E4:16:30:23
 //E5:2025:
 //E6:DL3EL:/6/0
-//      $timestamp = $svxconfig['GLOBAL']['TIMESTAMP_FORMAT'];    
 
-
- echo "TS:" . $timestamp  . "<br>";
- echo "E1:" . $lineParts[1]  . "<br>E2:(" . $lineParts[2] . ")<br>E3:"  . $lineParts[3]. "<br>";
- echo "E4:" . $lineParts[4]  . "<br>E5:" . $lineParts[5] . "<br>E6:"  . $lineParts[6]. "/" . $nn . "/" .strlen($lineParts[2]) . "<br>";
+// echo "TS:" . $timestamp  . "<br>";
+// echo "E1:" . $lineParts[1]  . "<br>E2:(" . $lineParts[2] . ")<br>E3:"  . $lineParts[3]. "<br>";
+// echo "E4:" . $lineParts[4]  . "<br>E5:" . $lineParts[5] . "<br>E6:"  . $lineParts[6]. "/" . $nn . "/" .strlen($lineParts[2]) . "<br>";
 
                 if ($timestamp != "%d.%m.%Y %H:%M:%S") {
                   if (!strlen($lineParts[2])) {
