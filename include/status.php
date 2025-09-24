@@ -193,7 +193,8 @@ if ($reflectorlogic2 != "") {
       $echotxing = getEchoLinkTX();
       echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >EchoLink Users</th></tr><tr>";
       echo "<tr>";
-      $users = getConnectedEcholink($echolog);
+      $timestamp = $svxconfig['GLOBAL']['TIMESTAMP_FORMAT'];    
+      $users = getConnectedEcholink($echolog,$timestamp);
       if (count($users)!=0){
          echo "<td colspan=2 style=\"background:#f6f6bd;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#0065ff;font-weight: bold;\">";
          foreach ($users as $user) {
