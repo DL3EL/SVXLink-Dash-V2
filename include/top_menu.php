@@ -75,7 +75,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<button name="btn_normal" type="submit" >' . $kn_nor . '</button>';
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
 	if ($knowledge == "Expert") {
-	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Full Edit <b>(Expert)</b></a> | ';
+	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Full</b> Edit</a> | ';
 	    echo '<a href="./edit.php?file=' . SVXCONFPATH . SVXCONFIG . '" style = "color: black;" id="svxlink">SVXLink</a> | ';
 	    if (file_exists('/var/log/svxreflector')) {
 		echo '<a href="./edit.php?file=' . SVXCONFPATH . 'svxreflector.conf" style = "color: black;" id="svxlink">SVXRef</a> | ';
@@ -101,7 +101,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	    echo '<a href="./edit.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
 	} else {
-	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Full Edit (normal)</a> | ';
+	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Edit</a> | ';
 	    echo '<a href="./editor.php?id=svxlink" style = "color: black;" id="svxlink">SVXLink</a> | ';
 	    echo '<a href="./editor.php?id=echolink" style = "color: black;" id="echolink">EchoLink</a> | ';
 	    echo '<a href="./editor.php?id=metarinfo" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
