@@ -84,6 +84,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./edit.php?file=' . MODULEPATH . '/' . METARINFO . '" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
 	    echo '<a href="./edit.php?file=' . SVXCONFPATH . 'node_info.json" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
 	    if (file_exists('/var/log/svxreflector')) {
+		echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
 		echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> | ';
 	    } else {
 		echo '<a href="./edit.php?file=log" style = "color: black;" id="log">Log</a> | ';
