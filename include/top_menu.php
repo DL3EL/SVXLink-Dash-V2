@@ -77,7 +77,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ($knowledge == "Expert") {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Full Edit <b>(Expert)</b></a> | ';
 	    echo '<a href="./edit.php?file=' . SVXCONFPATH . SVXCONFIG . '" style = "color: black;" id="svxlink">SVXLink</a> | ';
-	    if (file_exists('/etc/svxlink/svxreflector.conf')) {
+	    if (file_exists('/var/log/svxreflector')) {
 		echo '<a href="./edit.php?file=' . SVXCONFPATH . 'svxreflector.conf" style = "color: black;" id="svxlink">SVXRef</a> | ';
 	    }
 	    echo '<a href="./edit.php?file=' . MODULEPATH . '/' . ECHOLINKCONFIG . '" style = "color: black;" id="echolink">EchoLink</a> | ';
