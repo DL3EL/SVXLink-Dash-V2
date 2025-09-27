@@ -67,6 +67,18 @@ if (isset($_POST['btnSvxlink']))
         exec($command,$screen,$retval);
 }
 
+if (isset($_POST['btnSvxRef']))
+    {
+
+        $retval = null;
+        $screen = null;
+        //$sAconn = $_POST['sAconn'];
+        //$password = $_POST['password'];
+        //exec('sudo nmcli dev wifi rescan');
+        $command = "sudo systemctl restart svxreflector 2>&1";
+        exec($command,$screen,$retval);
+}
+
 if (isset($_POST['btnSvxlinkoff']))
     {
 
@@ -153,6 +165,10 @@ if (isset($_POST['btnrstc710']))
         <br>
 	<button name="btnPower" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Power OFF</button>
 <?php
+   if (file_exists('/var/log/svxreflector')) {
+        echo '<button name="btnSvxRef" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart SVXReflector Service</button>';
+        echo '<br>';
+   }
    if (defined('DL3EL_RADIO') && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
       $svxRadio = DL3EL_RADIO;
       if ($svxRadio == "Shari") {

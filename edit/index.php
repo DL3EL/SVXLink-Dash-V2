@@ -27,12 +27,18 @@ if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'
 
 // Get filename from query parameter
 $file = $_GET['file']; 
-if (($file == "log") || ($file == "msg")) {
-  if ($file == "log") {
-    $file = SVXLOGPATH . SVXLOGPREFIX;
+if (($file == "log") || ($file == "ref") || ($file == "msg")) {
+  if (($file == "log")  || ($file == "ref")) {
+    if ($file == "log") {
+      $file = SVXLOGPATH . SVXLOGPREFIX;
+      $zipfile = SVXLOGPATH . SVXLOGPREFIX . ".1.gz";
+    } else {  
+      $file = SVXLOGPATH . "svxreflector";
+      $zipfile = SVXLOGPATH . "svxreflector.1.gz";
+    }
     $log = 1;
     if (!filesize($file)) {
-      $zipfile = SVXLOGPATH . SVXLOGPREFIX . ".1.gz";
+//      $zipfile = SVXLOGPATH . SVXLOGPREFIX . ".1.gz";
       if (file_exists($zipfile)) {
 // to getthis working, you have to add 
 // svxlink ALL=NOPASSWD: /usr/bin/gunzip
@@ -40,13 +46,15 @@ if (($file == "log") || ($file == "msg")) {
         exec('sudo gunzip ' . $zipfile,$output,$retval);
         if ($retval === 0) {
           echo "unzip sucessfull:";
-          $file = SVXLOGPATH . SVXLOGPREFIX . ".1";
+//          $file = SVXLOGPATH . SVXLOGPREFIX . ".1";
+          $file = $file . ".1";
           echo $file;
         } else {
           echo "unzip failure";
         }
       } else {
-          $file = SVXLOGPATH . SVXLOGPREFIX . ".1";
+//          $file = SVXLOGPATH . SVXLOGPREFIX . ".1";
+          $file = $file . ".1";
       }
     }
     echo ">Log Display: " . $file . " (reverse order)</h1>";
@@ -112,9 +120,15 @@ if (!$log) {
     echo "<script type='text/javascript'> reloadPage(); </script>";
     if (isset($_POST['save_reload'])) {
   // Reload on submit//
-      echo "restarting SVXLink ...";
+      if ($file == "/etc/svxlink/svxreflector.conf") {
+        $prog = "svxreflector";
+        $command = "sudo systemctl restart svxreflector 2>&1";
+      } else {
+        $command = "sudo systemctl restart svxlink 2>&1";
+      }    
+      echo "restarting $prog ...";
       sleep(1);
-      exec('sudo systemctl restart svxlink 2>&1', $screen, $retval);
+      exec($command,$screen,$retval);
       if ($retval === 0) {
         echo "SVXLink sucessfull restartet";
       } else {
