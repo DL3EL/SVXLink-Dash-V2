@@ -65,6 +65,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
 	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;">| DV-Switch</a></p>';
 	}
+	if (file_exists('/var/log/svxreflector')) {
+	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
+	}
 	echo '</div>';
 	echo '<div id="full-edit-links"  align=right>';
 
