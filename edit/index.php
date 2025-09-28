@@ -31,11 +31,13 @@ if (($file == "log") || ($file == "ref") || ($file == "msg")) {
   if (($file == "log")  || ($file == "ref")) {
     if ($file == "log") {
       $file = SVXLOGPATH . SVXLOGPREFIX;
-      $zipfile = SVXLOGPATH . SVXLOGPREFIX . ".1.gz";
     } else {  
       $file = SVXLOGPATH . "svxreflector";
-      $zipfile = SVXLOGPATH . "svxreflector.1.gz";
+	    if (!file_exists($file)) {
+        $file = SVXLOGPATH . "svxreflector.log";
+      }
     }
+    $zipfile = $file . ".1.gz";
     $log = 1;
     if (!filesize($file)) {
 //      $zipfile = SVXLOGPATH . SVXLOGPREFIX . ".1.gz";
