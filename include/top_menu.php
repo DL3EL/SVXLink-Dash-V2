@@ -65,7 +65,6 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
 	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;">| DV-Switch</a></p>';
 	}
-//	if (file_exists('/var/log/svxreflector')) {
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
 	}
@@ -81,13 +80,13 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ($knowledge == "Expert") {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Full</b> Edit</a> | ';
 	    echo '<a href="./edit.php?file=' . SVXCONFPATH . SVXCONFIG . '" style = "color: black;" id="svxlink">SVXLink</a> | ';
-	    if (file_exists('/var/log/svxreflector')) {
+	    if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 		echo '<a href="./edit.php?file=' . SVXCONFPATH . 'svxreflector.conf" style = "color: black;" id="svxlink">SVXRef</a> | ';
 	    }
 	    echo '<a href="./edit.php?file=' . MODULEPATH . '/' . ECHOLINKCONFIG . '" style = "color: black;" id="echolink">EchoLink</a> | ';
 	    echo '<a href="./edit.php?file=' . MODULEPATH . '/' . METARINFO . '" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
 	    echo '<a href="./edit.php?file=' . SVXCONFPATH . 'node_info.json" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
-	    if (file_exists('/var/log/svxreflector')) {
+	    if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 		echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
 		echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> | ';
 	    } else {

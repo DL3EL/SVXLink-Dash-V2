@@ -165,7 +165,7 @@ if (isset($_POST['btnrstc710']))
         <br>
 	<button name="btnPower" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Power OFF</button>
 <?php
-   if (file_exists('/var/log/svxreflector')) {
+   if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
         echo '<button name="btnSvxRef" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart SVXReflector Service</button>';
         echo '<br>';
    }
