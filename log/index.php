@@ -9,7 +9,10 @@ include '../include/functions.php';
 // Check if the action parameter is set to fetch_log
 if (isset($_GET['action']) && $_GET['action'] === 'fetch_log') {
     // Output the log content and exit to avoid rendering the rest of the page
-    echo getLogContent();
+//    echo getLogContent();
+      $content = getLogContent();
+      $content = str_replace("\n","",$content); 
+      echo $content;
     exit();
 }
 ?>
