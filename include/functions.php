@@ -54,7 +54,7 @@ function getLogContent() {
       $numLines = count($lines);
 
       // Determine where to start showing the last 10 lines
-      $startLine = max(0, $numLines - 10);
+      $startLine = max(0, $numLines - 20);
 
       // Slice the array to get the last 10 lines
       $last10Lines = array_slice($lines, $startLine);

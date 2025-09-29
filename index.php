@@ -94,7 +94,7 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     <meta http-equiv="pragma" content="no-cache" />
 <link rel="shortcut icon" href="images/favicon.ico" sizes="16x16 32x32" type="image/png">    
 
-<?php echo ("<title>" . $callsign ." Ver 2.1 Dashboard</title>" ); ?>
+<?php echo ("<title>" . $callsign . " Dashboard " . $dbversion . "</title>" ); ?>
 
 <?php include_once "include/browserdetect.php"; ?>
     <script type="text/javascript" src="scripts/jquery.min.js"></script>
