@@ -39,7 +39,11 @@ include "include/settings.php";
 if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 // always stay logged on
     $_SESSION['auth'] = "AUTHORISED";
-}
+} else {
+   if (empty($_SESSION['auth'])) {
+      $_SESSION['auth'] = "UNAUTHORISED";
+   }
+}    
 if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
     if (fopen($svxConfigFile,'r')) {
