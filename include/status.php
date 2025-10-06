@@ -269,7 +269,7 @@ if ($reflectorlogic2 != "") {
          echo "</div></td></tr>";
       }
    } else {
-      echo "logged in: ";
+      echo "logged in";
       echo "</div></td></tr>";
    }   
    echo "</table>\n";
