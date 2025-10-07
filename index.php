@@ -171,10 +171,15 @@ if (MENUBUTTON=="TOP") {
 include_once "include/buttons.php"; 
 }
 
-if (defined('DL3EL')) {
+if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
+    $dmr_support = "1";
+    $dmrtg = "off";
+//    if (defined('DL3EL')) {
 ######## DVSwitch Stati
     $DMRStatusFile = DL3EL . "/dmr_status";
     $dmrstatus = trim(shell_exec('cat ' . $DMRStatusFile));
+    $DVSModeFile = DL3EL . "/dvs_mode";
+    $dvsmode = trim(shell_exec('cat ' . $DVSModeFile));
     $color = "blue";
     $colorb = "blue";
 //    if (strncmp($dmrstatus, "DMR_FM", 6) === 0) {
@@ -207,6 +212,7 @@ if (defined('DL3EL')) {
         $colorb = "blue";
         $dmrtg = "off";
     }
+/*
 	if (file_exists('/usr/bin/dvs')) {
        $dmr_support = "1";
        $dmrtg = "off";
@@ -214,12 +220,18 @@ if (defined('DL3EL')) {
        $dmr_support = "0";
        $dmrtg = "no DMR";
     }   
+*/
+} else {
+    $dmr_support = "0";
+    $dmrtg = "no DMR";
+}    
+// for debug, switch off dmr_support
+//    $dmr_support = "0";
 
-}   
 ?>
 <?php
-if (isset($_POST['btn_DMR_FM']))
-    {
+if ($dmr_support) {
+    if (isset($_POST['btn_DMR_FM'])) {
         if ($mode == "FM_only") {
 // aktuelle svxlink.conf sollte Kopie von svxlink.conf.dmr_fm sein
             $mode ="DMR_FM";
@@ -238,11 +250,14 @@ if (isset($_POST['btn_DMR_FM']))
                 shell_exec("echo $dmrstatus");
                 $dmrtgsel = $dmrtg . " >" . $DMRTGFile;
                 shell_exec("echo $dmrtgsel");
+                $dvsmode = "DMR >" . $DVSModeFile;
+                shell_exec("echo $dvsmode");
+                $dvsmode = "DMR";
             }    
         }
-}
+    }
 
-if (isset($_POST['btn_DMR_only']))
+    if (isset($_POST['btn_DMR_only']))
     {
         if ($mode == "FM_only") {
             $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
@@ -264,12 +279,15 @@ if (isset($_POST['btn_DMR_only']))
             shell_exec("echo $dmrstatus");
             $dmrtgsel = $dmrtg . " >" . $DMRTGFile;
             shell_exec("echo $dmrtgsel");
+            $dvsmode = "DMR >" . $DVSModeFile;
+            shell_exec("echo $dvsmode");
+            $dvsmode = "DMR";
         }    
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DMR 2>&1";
         exec($command,$screen,$retval);
-}
+    }
 
-if (isset($_POST['btn_DMR_91']))
+    if (isset($_POST['btn_DMR_91']))
     {
         if (strncmp($mode, "DMR", 3) === 0) {
             $color = "red";
@@ -281,11 +299,14 @@ if (isset($_POST['btn_DMR_91']))
             if (defined('DL3EL')) {
                 $dmrtgsel = $dmrtg ." >" . $DMRTGFile;
                 shell_exec("echo $dmrtgsel");
+                $dvsmode = "DMR >" . $DVSModeFile;
+                shell_exec("echo $dvsmode");
+                $dvsmode = "DMR";
             }    
         }
     }
 
-if (isset($_POST['btn_DMR_262649']))
+    if (isset($_POST['btn_DMR_262649']))
     {
         if (strncmp($mode, "DMR", 3) === 0) {
             $color = "red";
@@ -297,10 +318,13 @@ if (isset($_POST['btn_DMR_262649']))
             if (defined('DL3EL')) {
                 $dmrtgsel = $dmrtg ." >" . $DMRTGFile;
                 shell_exec("echo $dmrtgsel");
+                $dvsmode = "DMR >" . $DVSModeFile;
+                shell_exec("echo $dvsmode");
+                $dvsmode = "DMR";
             }    
         }
     }
-if (isset($_POST['btn_DMR_only_DISC']))
+    if (isset($_POST['btn_DMR_only_DISC']))
     {
         if ($mode == "DMR_FM") {
             $command = "echo '*7#' > /tmp/dtmf_svx";
@@ -308,8 +332,10 @@ if (isset($_POST['btn_DMR_only_DISC']))
             $command = "echo '*91262649#' > /tmp/dtmf_svx";
             exec($command,$screen,$retval);
         } else {
-            $command = "/opt/MMDVM_Bridge/dvswitch.sh tune 4000 2>&1";
-            exec($command,$screen,$retval);
+            if ($dvsmode == "DMR") {
+                $command = "/opt/MMDVM_Bridge/dvswitch.sh tune 4000 2>&1";
+                exec($command,$screen,$retval);
+            }    
             $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_only 2>&1";
             exec($command,$screen,$retval);
             $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_fm /etc/svxlink/svxlink.conf 2>&1";
@@ -324,77 +350,144 @@ if (isset($_POST['btn_DMR_only_DISC']))
         if (defined('DL3EL')) {
             $dmrstatus = "FM_only >" . $DMRStatusFile;
             shell_exec("echo $dmrstatus");
+            $dvsmode = "Off >" . $DVSModeFile;
+            shell_exec("echo $dvsmode");
+            $dvsmode = "OFF";
         }    
         if ($dmr_support == "1") {
             $dmrtg = "off";
         } else {
             $dmrtg = "no DMR";
         }    
-}
+    }
 
 // YSF
-if (isset($_POST['btn_YSF']))
+    if (isset($_POST['btn_YSF_only']))
     {
-        $mode ="YSF";
+        if ($mode == "FM_only") {
+            $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
+            exec($command,$screen,$retval);
+        }
+        $mode ="DMR_only";
+        $color = "red";
+        $colorb = "blue";
+        $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
+        exec($command,$screen,$retval);
+        $command = "sudo service svxlink restart 2>&1";
+        exec($command,$screen,$retval);
+        $dvsmode ="YSF";
         $kanal = " ";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode YSF 2>&1";
         exec($command,$screen,$retval);
+
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+           $dmrstatus = "DMR_only >" . $DMRStatusFile;
+           shell_exec("echo $dmrstatus");
+        }    
+    }
+
+    if (isset($_POST['btn_YSF']))
+    {
+        $dvsmode ="YSF";
+        $kanal = " ";
+        $command = "/opt/MMDVM_Bridge/dvswitch.sh mode YSF 2>&1";
+        exec($command,$screen,$retval);
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+        }    
 //        echo "YSF: " . $command;
 //        echo '<pre>YSF'; print_r($screen); echo '</pre>';
-}
+    }
 
 
-if (isset($_POST['btn_YSF_DISC']))
+    if (isset($_POST['btn_YSF_DISC']))
     {
-        $mode ="YSF";
+        $dvsmode ="YSF";
         $kanal = "disconnect";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune disconnect 2>&1";
         exec($command,$screen,$retval);
-}
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+        }    
+    }
 
-if (isset($_POST['btn_YSF_HES']))
+    if (isset($_POST['btn_YSF_HES']))
     {
-        $mode ="YSF";
+        $dvsmode ="YSF";
         $kanal = "Hessen";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune c4fm.dehessen.de:42000 2>&1";
         exec($command,$screen,$retval);
-}
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+        }    
+    }
 
-if (isset($_POST['btn_YSF_26269']))
+    if (isset($_POST['btn_YSF_26269']))
     {
-        $mode ="YSF";
+        $dvsmode ="YSF";
         $kanal = "Hessen";
-        $command = "/opt/MMDVM_Bridge/dvswitch.sh tune dc9vq.ysf-deutschland.de/ysf2:42001 2>&1";
+//        $command = "/opt/MMDVM_Bridge/dvswitch.sh tune dc9vq.ysf-deutschland.de/ysf2:42001 2>&1";
+//        $command = "/opt/MMDVM_Bridge/dvswitch.sh tune 85.215.138.68:42376 2>&1";
+        $command = "/opt/MMDVM_Bridge/dvswitch.sh tune ysf-deutschland.de:42376 2>&1";
         exec($command,$screen,$retval);
-}
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+        }    
+    }
 // DSTAR
-if (isset($_POST['btn_DSTAR']))
+    if (isset($_POST['btn_DSTAR']))
     {
-        $mode ="DSTAR";
+        $dvsmode ="DSTAR";
         $kanal = " ";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DSTAR 2>&1";
         exec($command,$screen,$retval);
-}
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+        }    
+    }
 
 
-if (isset($_POST['btn_DSTAR_DISC']))
+    if (isset($_POST['btn_DSTAR_DISC']))
     {
-        $mode ="DSTAR";
+        $dvsmode ="DSTAR";
         $kanal = "disconnect";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune disconnect 2>&1";
         exec($command,$screen,$retval);
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+        }    
 //        echo '<pre>D* 1KL'; print_r($screen); echo '</pre>';
-}
+    }
 
-if (isset($_POST['btn_DSTAR_HES']))
+    if (isset($_POST['btn_DSTAR_HES']))
     {
-        $mode ="DSTAR";
+        $dvsmode ="DSTAR";
         $kanal = "Hessen";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune DCS001KL 2>&1";
         exec($command,$screen,$retval);
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+        }    
+    }
 }
-
-if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
+    if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && ($dmr_support == "1")) {
 // always stay logged on
 //    $_SESSION['auth'] = "AUTHORISED";
     ?>
@@ -405,34 +498,38 @@ if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) 
         <button name="btn_DMR" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>DMR ein</b></button>
 --->
         <?php 
-        if ($dmr_support == "1") {
             echo '<button  style = "border-radius:8px; color:white;border-color:transparent; background-color:orange; height:30px; font-size:12px;"><b>';
             echo $dmrtg . '/';
             echo $mode;
             echo '</b></button>';
-        }    
         ?>
         &nbsp;&nbsp;&nbsp;
 <!---
         <button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:<?php echo $color;?>; height:30px; font-size:12px;"><b>DMR ein</b></button>
 --->
         <?php
-            if ($dmr_support == "1") {
+//            if ($dmr_support == "1") {
                 if ($mode == "FM_only") {
                     echo '<button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR ein</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                     echo '<button name="btn_DMR_FM" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $colorb .'; height:30px; font-size:12px;"><b>DMR Bridge ein</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
+                    echo '<button name="btn_YSF_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF ein</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
                 }
-                if ($mode == "DMR_only") {
+                if (($mode == "DMR_only")  && ($dvsmode == "DMR")) {
                     echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR aus</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                }
+                if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
+                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF aus</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                 }
                 if ($mode == "DMR_FM") {
                     echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR Bridge aus</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                 }    
-                if (($mode == "DMR_only") || ($mode == "DMR_FM")) {
+                if ((($mode == "DMR_only") || ($mode == "DMR_FM")) && ($dvsmode == "DMR")) {
                     echo '<button name="btn_DMR_262649" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; font-size:12px;"><b>OV F49</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                     echo '<button name="btn_DMR_91" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:blue; height:30px; font-size:12px;"><b>DMR WW</b></button>';
@@ -447,14 +544,17 @@ if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) 
                     echo '<input type="hidden" name="form_submitted" value="1">';
                     echo '</form>';
                 }
-                echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]). '">';
-                if ($mode == "DMR_only") {
+                if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
+                        include "include/dvs_functions.php";
+                        getYSFHosts();
+                    echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]). '">';
+//                if ($mode == "DMR_only") {
                     $DVSStatusFile = DL3EL . "/dvs_status";
                     $dvsstatus = shell_exec('cat ' . $DVSStatusFile);
                     if (strncmp($dvsstatus, "DMR_DSTAR_YSF", 13) === 0) {
-                        echo '	<button name="btn_YSF" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '	<button name="btn_YSF_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Hessen</b></button>';
+//                        echo '<br><button name="btn_YSF" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF</b></button>';
+//                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '<br><br><button name="btn_YSF_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Hessen</b></button>';
                         echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                         echo '	<button name="btn_YSF_26269" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF 26269</b></button>';
                         echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -468,14 +568,15 @@ if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) 
                         echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     }
                 }    
+                echo "<br>DMR Mode: $mode / DVS Mode: $dvsmode";
                 echo '</form>';
             }
         ?>
     </table>    
     <?php
-}
+//}
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted']) && $dmr_support) {
         if (isset($_POST['dmrtg'])) {
             $dmrtg = $_POST['dmrtg'];
             $command = "/opt/MMDVM_Bridge/dvswitch.sh tune " . $dmrtg . " 2>&1";

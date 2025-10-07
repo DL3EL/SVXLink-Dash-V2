@@ -15,30 +15,25 @@ include_once "tgdb.php";
       <th>Time (<?php echo date('T')?>)</th>
       <th width=100px>Callsign</th>
 <?php
+// prüfen ob tgdb.php aktualisiert werden muss
+      $tgdb_File = DL3EL_BASE . "include/tgdb.php";
+      if (file_exists($tgdb_File)) {
+	$tgdb_File_save = DL3EL_BASE . "include/tgdb.php.save";
+	$update_script = DL3EL_BASE . "include/tgdb_update.sh";
+	$logfile = DL3EL_BASE . "include/tgdb_update.log";
+	update_file($tgdb_File, $update_script, $logfile, 86400);
+      } else {
+	echo "TGDB: $tgdb_File does not exist<br>";
+      }
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
       if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
 	$DMRIDFile = "/var/lib/mmdvm/DMRIds.dat";
       } else {
 	$DMRIDFile = DL3EL . "/DMRIds.dat";
 	$DMRIDFile_save = DL3EL . "/DMRIds.dat.save";
-	if (file_exists($DMRIDFile)) {
-	  $delta = time() - filemtime($DMRIDFile);
-	  // echo "$DMRIDFile was last modified: " . date ("F d Y H:i:s ", filemtime($DMRIDFile)) . "(Delta: $delta) <br>";
-	  if ($delta > 86400) {
-// einmal am Tag wird die Datei neu geholt
-// mal prüfen, ob es Überhohlvorgänge gibt ....
-	    // echo "$DMRIDFile too old: " . filemtime($DMRIDFile) . " / " . time()- filemtime($DMRIDFile) . "<br>"; 
-	    $file = DL3EL .'/DMRID_update.sh';
-	    $log = DL3EL .'/DMRID_update.log';
-	    $owner = 'svxlink';
-	    $group = 'svxlink';
-	    $command = "sudo chown $owner:$group ; " . escapeshellarg($file) . " >" . $log . " 2>&1";
-	    // echo "cmd: $command";
-	    exec($command, $output, $return_var);
-	  } else {
-	    // echo "$DMRIDFile ok: " . filemtime($DMRIDFile) . " / " . time() - filemtime($DMRIDFile) . "<br>"; 
-	  }  
-	}
+	$update_script = DL3EL .'/DMRID_update.sh';
+	$logfile =  DL3EL .'/DMRID_update.log';
+	update_file($DMRIDFile, $update_script, $logfile, 86400);
       }  
       $dmrIDline = file_get_contents($DMRIDFile);
       IF (strlen($dmrIDline) > 1000000) {

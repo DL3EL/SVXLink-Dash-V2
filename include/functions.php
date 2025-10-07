@@ -811,4 +811,24 @@ function display_config($config) {
         echo "Configuration saved and restarted";
     }
 
+    function update_file($updFile, $update_script, $logfile, $timer) {
+
+        $delta = time() - filemtime($updFile);
+        //echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
+        if ($delta > $timer) {
+          // einmal am Tag wird die Datei neu geholt
+          // mal prüfen, ob es Überhohlvorgänge gibt ....
+           echo "$updFile too old: " . filemtime($updFile) . " / " . time()- filemtime($updFile) . "<br>"; 
+//          $file = DL3EL .'/DMRID_update.sh';
+//          $log = DL3EL .'/DMRID_update.log';
+          $owner = 'svxlink';
+          $group = 'svxlink';
+          $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " 2>&1";
+          //echo "cmd: $command";
+          exec($command, $output, $return_var);
+        } else {
+           //echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
+        }  
+      }
+
 ?>

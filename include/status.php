@@ -256,9 +256,6 @@ if ($reflectorlogic2 != "") {
 
    echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >Editing</th></tr><tr>";
    echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#ff0000;font-weight: bold;\">";
-//   if (empty($_SESSION['auth'])) {
-//      $_SESSION['auth'] = "UNAUTHORISED";
-//   }
    if ($_SESSION['auth'] === "UNAUTHORISED") {
       if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
          echo "always logged in";
