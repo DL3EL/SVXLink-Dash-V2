@@ -6,7 +6,7 @@
 // syntax: 'KEY number,'Description','DTMF code','color button'.
 // should be synched with svxlink.conf, for ease of use
 //
-define("KEY1", array(' TG262 ','91262#','green'));
+if (!defined('KEY1')) define('KEY1', array(' TG262 ','91262#','green'));
 define("KEY2", array(' TG26269 ','9126269#','green'));
 define("KEY3", array(' TG777 ','91777#','green'));
 define("KEY4", array(' Disconnect ','910#','red'));
