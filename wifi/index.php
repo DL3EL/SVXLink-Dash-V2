@@ -176,6 +176,10 @@ if (isset($_POST['btnWifiOn'])) {
                         <button name="btnWifiStatus" type="submit" class="red" style="height:30px; width:105px; font-size:12px;">WiFi Status</button>
                     </td>
                     <td>
+<?php 
+    if (!isset($password)) { $password = "";}
+    if (!isset($ssid)) { $ssid = "";}
+?>
                         SSID (network name): <input type="text" name="ssid" value="<?php echo $ssid;?>">
                         <br>
                         Password: <input type="password" name="password" value="<?php echo $password;?>">

@@ -47,8 +47,8 @@ if (file_exists('/usr/local/sbin/platformDetect.sh')) {
 $svxConfigFile = SVXCONFPATH.SVXCONFIG;
 if (fopen($svxConfigFile,'r')) {
     $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
-    $default_tg = $svxconfig['ReflectorLogic']['DEFAULT_TG'];     
-    $ctcss_to_tg = $svxconfig['SimplexLogic']['CTCSS_TO_TG'];     
+    $default_tg = isset($svxconfig['ReflectorLogic']['DEFAULT_TG']) ? $svxconfig['ReflectorLogic']['DEFAULT_TG'] : '';     
+    $ctcss_to_tg = isset($svxconfig['SimplexLogic']['CTCSS_TO_TG']) ? $svxconfig['SimplexLogic']['CTCSS_TO_TG'] : '';     
     if (($ctcss_to_tg != "") && ($default_tg == "0")) {
         echo '<fieldset style="box-shadow:5px 5px 20px #999;background-color:#e8e8e8e8; width:855px;margin-top:0px;margin-bottom:10px;margin-left:6px;margin-right:0px;font-size:12px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">';
         echo '<table style="margin-top:2px;"><tr>';

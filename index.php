@@ -29,12 +29,13 @@ if ((!file_exists('include/config.php')) && (file_exists('include/config.php.exa
     sleep(3); 
 }
 
-if ((!file_exists('include/buttos.php')) && (file_exists('include/buttons.php.example')) ) {
+if ((!file_exists('include/buttons.php')) && (file_exists('include/buttons.php.example')) ) {
     copy('include/buttons.php.example', 'include/buttons.php');
     sleep(3); 
 }
 
-include "include/settings.php";
+include_once "include/settings.php";
+include_once "include/functions.php";
 
 if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 // always stay logged on
@@ -147,7 +148,6 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     <div class="text"style = "padding-right:230px">
 </div>
 <?php include_once "include/top_menu.php"; ?>
-
 <div class="content"><center>
 <div style = "margin-top:0px;">
 </div></center>
@@ -162,7 +162,7 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
 <?php 
 if (SHOWPTT=="TRUE") {
 // now including the volume buttons
-    include "ptt.html";
+    include_once "ptt.html";
 }
 ?>
 
@@ -545,7 +545,7 @@ if ($dmr_support) {
                     echo '</form>';
                 }
                 if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
-                        include "include/dvs_functions.php";
+                        include_once "include/dvs_functions.php";
                         getYSFHosts();
                     echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]). '">';
 //                if ($mode == "DMR_only") {
@@ -601,7 +601,7 @@ if ($dmr_support) {
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
     echo '<div id="statusInfo" style = "margin-bottom:30px;">'."\n";
-    include "include/status.php";
+    include_once "include/status.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
     echo '</td>'."\n";
@@ -631,11 +631,11 @@ if ($dmr_support) {
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
     echo '<center><div id="LastHeard" style = "margin-bottom:30px;">'."\n";
-    include "include/lh.php";
+    include_once "include/lh.php";
     echo '</div></center>'."\n";
     if ($dmr_support == "1") {
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
-        include "/DVSwitch/include/lh.php";
+        include_once "/DVSwitch/include/lh.php";
         echo '</div></center>'."\n";
     }    
     echo "<br />\n";
@@ -662,7 +662,7 @@ include_once "include/buttons.php"; }
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
     echo '<div id="sysInfo">'."\n";
-    include "include/system.php";
+    include_once "include/system.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
 ?>

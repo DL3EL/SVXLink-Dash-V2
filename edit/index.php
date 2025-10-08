@@ -27,6 +27,8 @@ if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'
 
 // Get filename from query parameter
 $file = $_GET['file']; 
+$log = 0;
+
 if (($file == "log") || ($file == "ref") || ($file == "msg")) {
   if (($file == "log")  || ($file == "ref")) {
     if ($file == "log") {
@@ -126,15 +128,16 @@ if (!$log) {
         $prog = "svxreflector";
         $command = "sudo systemctl restart svxreflector 2>&1";
       } else {
+        $prog = "svxlink";
         $command = "sudo systemctl restart svxlink 2>&1";
       }    
       echo "restarting $prog ...";
       sleep(1);
       exec($command,$screen,$retval);
       if ($retval === 0) {
-        echo "SVXLink sucessfull restartet";
+        echo "$prog sucessfull restartet";
       } else {
-        echo "SVXLink restart failure, check log";
+        echo "$prog restart failure, check log";
       }
     }   
   }

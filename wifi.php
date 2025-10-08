@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include_once "include/config.php";
 include_once "include/tools.php";
-include_once "include/editor.php";
+//include_once "include/editor.php";
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

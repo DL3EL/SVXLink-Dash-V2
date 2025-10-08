@@ -9,17 +9,24 @@ include_once "functions.php";
 $url=URLSVXRAPI;
 if ($url!="") {
 //  Initiate curl
-$ch = curl_init();
-// Will return the response, if false it print the response
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-// Set the url
-curl_setopt($ch, CURLOPT_URL,$url);
-// Execute
-$result=curl_exec($ch);
-// Closing
-curl_close($ch);
-$nodes = json_decode($result, true);
- } else { $nodes="";}
+	if (function_exists("curl_init")) {
+		echo "CURL: $url<br>";
+		$ch = curl_init();
+		// Will return the response, if false it print the response
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		// Set the url
+		curl_setopt($ch, CURLOPT_URL,$url);
+		// Execute
+		$result=curl_exec($ch);
+		// Closing
+		curl_close($ch);
+		$nodes = json_decode($result, true);
+		} else { $nodes="";}
+	} else{
+		echo "php-curl n/s:<br>";
+		echo "apt-get install php-curl to installö it <br>";
+		$nodes="";
+}
 if ($nodes!="") {
 if(array_key_exists('Name', $nodes)) {
     $name=$nodes['Name'];

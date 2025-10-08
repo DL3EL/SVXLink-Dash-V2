@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $progname = basename($_SERVER['SCRIPT_FILENAME'],".php");
 include "include/settings.php";
-include_once "include/config.inc.php";
+//include_once "include/config.inc.php";
 include_once "include/functions.php";
 
 ?>
@@ -100,6 +100,9 @@ if($_GET['id']=="logic") {
 if($_GET['id']=="power") {
     $edit_file = "power/index.php";
 }
+if($_GET['id']=="msg") {
+    $edit_file = "aprs/index.php";
+}
 // check if form has been submitted
 //$filename = by choice;
 
@@ -119,7 +122,7 @@ if($_GET['id']=="power") {
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
     echo '<div id="statusInfo" style = "margin-bottom:30px;">'."\n";
-    include "include/status.php";
+    include_once "include/status.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
     echo '</td>'."\n";
@@ -151,7 +154,7 @@ include_once "include/buttons.php"; }
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
     echo '<div id="sysInfo">'."\n";
-    include "include/system.php";
+    include_once "include/system.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
 ?>

@@ -66,19 +66,19 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
         //$local_time = date("%e F Y", strtotime('2010-01-08'))
       echo"<tr height=24px style=\"font-size:12.5px;>\">";
       echo"<td align=\"center\"> $local_time </td>";
-      if ($listElem[3] == "OFF" ) {$bgcolor=""; $tximg="";}
+      if ($listElem[3] == "OFF" ) {$bgcolor="";}
 //      if ($listElem[3] == "ON" ) {$bgcolor=""; $tximg="<img src=images/tx.gif height=21 alt='TXing' title='TXing' style=\"vertical-align: middle;\">";}
       if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       $ref = substr($listElem[1],0,3);
       $call=$listElem[1];
       $ssid = strpos($listElem[1],"-");
       if ((!preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $listElem[1]) or $ref=="XLX" or $ref=="YSF" or $ref=="M17" or substr($listElem[1],0,3)=="TG" )) {
-	echo "<td $bgcolor align='left' valign='middle' class=mh_call>&nbsp;&nbsp;<b>$listElem[1]</b>&nbsp;$tximg</td>";
+	echo "<td $bgcolor align='left' valign='middle' class=mh_call>&nbsp;&nbsp;<b>$listElem[1]</b>&nbsp;</td>";
       } else {
 	if ($ssid){
 	  $call = substr($listElem[1],0,$ssid);
 	}
-	echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;$tximg</td>";
+	echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
       }
 //////////////////// NEU //////////////Add Name ///////////////////////////////////////////////////////////////////////////////////////
       if ($use_names) {
@@ -124,7 +124,7 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////      //echo "<td align=\"left\">&nbsp;<span style=\"color:#b5651d;font-weight:bold;\">$listElem[2]</span></td>";
       $tgnumber = substr($listElem[2],3);
-      $name=$tgdb_array[$tgnumber];
+      $name=isset($tgdb_array[$tgnumber])? $tgdb_array[$tgnumber] : '';
       echo "<td align=\"left\">&nbsp;<span style=\"color:#b5651d;font-weight:bold;\">$tgnumber</span></td>";
       echo "<td><button type=submit id=jumptoM name=jmptoM class=monitor_id value=\"$listElem[2]\"><i class=\"material-icons\"style=\"font-size:12px;\">$listElem[3]</i></button></td>";
       //echo "<td onlick='monitorTmpTG(".$tgnumber.")'> M </a></td>";

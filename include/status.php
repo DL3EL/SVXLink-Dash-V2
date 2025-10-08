@@ -23,7 +23,7 @@ if (isProcessRunning('svxlink')) {
    if (fopen($svxConfigFile,'r')) {
       $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
    }
-   $callsign = $svxconfig['ReflectorLogic']['CALLSIGN'];     
+   $callsign = isset($svxconfig['ReflectorLogic']['CALLSIGN']) ? $svxconfig['ReflectorLogic']['CALLSIGN'] : 'NoCall';     
    $check_logics = explode(",",$svxconfig['GLOBAL']['LOGICS']);
     
     
@@ -52,7 +52,7 @@ if (isProcessRunning('svxlink')) {
       //$modules=""; 
       $modecho = "False";
    }
-   $inReflectorDefaultLang = explode(",", $svxconfig[$reflectorlogic1]['DEFAULT_LANG']);
+//   $inReflectorDefaultLang = explode(",", $svxconfig[$reflectorlogic1]['DEFAULT_LANG']);
 
    if ($modules!="") {
       define("SVXMODULES",$modules);
@@ -77,10 +77,8 @@ if (isProcessRunning('svxlink')) {
    echo "</table>\n";
 //#### neu
 if ($reflectorlogic1 != "") {
-   $fmnetwork1 = $svxconfig[$reflectorlogic1]['HOSTS'];    
-   if ($fmnetwork1 =="") {
-      $fmnetwork1 = $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
-   }
+   $fmnetwork1 = isset($svxconfig[$reflectorlogic1]['HOSTS']) ? $svxconfig[$reflectorlogic1]['HOSTS'] : $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
+   
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork1."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork1."</th></tr><tr>";
    $svxrstatus = getSVXRstatus($reflectorlogic1);
@@ -113,6 +111,7 @@ if ($reflectorlogic1 != "") {
    echo "<span style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgtmp."</span>";
    echo "</div></td></tr>\n";
 
+   if (!isset($tgselect_a)) { $tgselect_a = "";}
    $tgselect = trim(getSVXTGSelect($reflectorlogic1));
    if ( $tgselect=="0") {
       $tgselect="";
@@ -209,7 +208,7 @@ if ($reflectorlogic2 != "") {
       $svxEchoConfigFile = "/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
       if (fopen($svxEchoConfigFile,'r')) { 
          $svxeconfig = parse_ini_file($svxEchoConfigFile,true,INI_SCANNER_RAW);
-         $eproxyd= $svxeconfig['PROXY_SERVER']; 
+         $eproxyd= isset($svxeconfig['PROXY_SERVER']) ? $svxeconfig['PROXY_SERVER'] : ''; 
       } else {
          $eproxyd= ""; 
       }

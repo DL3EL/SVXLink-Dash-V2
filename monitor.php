@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include "include/settings.php";
+include_once "include/settings.php";
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -80,6 +80,7 @@ include_once "include/buttons.php";
 
 //    $tgselect = trim(getSVXTGSelect());
     $tgmon = explode(",",$svxconfig['ReflectorLogic']['MONITOR_TGS']);
+    $tgmons = "";
     foreach ($tgmon as $key) {
         $tgmons = $tgmons . $key . " ";
     }

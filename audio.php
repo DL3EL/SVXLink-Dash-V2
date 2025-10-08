@@ -2,11 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include "include/settings.php";
-include_once "include/config.php";
-include_once "include/tools.php";
-
-
+include_once "include/settings.php";
 
 // migrate to external class tbc
 ?>

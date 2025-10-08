@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include "include/settings.php";
+include_once "include/settings.php";
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -69,6 +69,7 @@ include_once "include/buttons.php";
 }
 ?>
 <?php
+if (!isset($_GET['id'])) { $_GET['id'] = "";}
 if($_GET['id']=="log")  {
     $edit_file = SVXLOGPATH . SVXLOGPREFIX;
 }
@@ -91,7 +92,7 @@ elseif($_GET['id']=="metarinfo"){
 }
 elseif($_GET['id']=="nodeInfo"){
     $edit_file = SVXCONFPATH . "node_info.json";
-}
+} else { $edit_file = ""; }
 
 // check if form has been submitted
 //$filename = by choice;

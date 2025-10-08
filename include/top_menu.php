@@ -133,7 +133,7 @@ if (session_status() === PHP_SESSION_NONE) {
     </form>
 <?php
 
-include_once('parse_svxconf.php');
+//include_once('parse_svxconf.php');
 
 
 /*if (fopen($svxConfigFile,'r'))

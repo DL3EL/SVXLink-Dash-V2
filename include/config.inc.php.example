@@ -212,7 +212,6 @@ define("CW_PITCH","inCwPitch");
 define("CW_CPM","inCwCpm");
 define("LINKS","null");
 define("AUTH_KEY","password");
-define("FMNETWORK","inFmnetwork");
 define("DEFAULT_LANG","inReflectorDefaultLang");
 define("RGR_DELAY","inRgrDelay");
 define("IDLE_INTERVAL_TIME","inIdleIntervalTime");

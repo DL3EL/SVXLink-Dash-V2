@@ -25,6 +25,8 @@ function parse_amixer_value($output) {
 
 // Function to calculate percentage relative to maximum permitted value and return as whole number
 function calculate_percentage($current_value, $max_value) {
+    if (!is_numeric($current_value)) { $current_value = 0; }    
+    if (!is_numeric($max_value)) { $max_value = 1; }    
     return round(($current_value / $max_value) * 100);
 }
 
@@ -35,7 +37,7 @@ function get_current_amixer_values() {
     $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
     $mic_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=4");
     $capture_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=8");
-    $autogain_output = execute_amixer("sudo amixer -c" . $sc . " sget numid=9");
+//    $autogain_output = execute_amixer("sudo amixer -c" . $sc . " sget numid=9");
     $current_values = [
         'headphone' => parse_amixer_value($headphone_output),
         'mic' => parse_amixer_value($mic_output),
@@ -43,6 +45,7 @@ function get_current_amixer_values() {
         'autogain' => null
     ];
 
+/* currently autogain does not work, needs eyes on
     if ($autogain_output) {
         foreach ($autogain_output as $line) {
             if (strpos($line, ": values=") !== false) {
@@ -51,7 +54,7 @@ function get_current_amixer_values() {
             }
         }
     }
-
+*/
     return $current_values;
 }
 
@@ -66,6 +69,7 @@ $max_values = [
 $sc = 'aplay -l | grep "Audio Device"';
 $sc = substr(shell_exec($sc),5,1);
 $current_values = get_current_amixer_values();
+//$current_autogain = 'Off';
 ?>
 
 <!DOCTYPE html>
@@ -157,13 +161,15 @@ $current_values = get_current_amixer_values();
                         <label for="capture">(0-100) Set for 25:</label>
                         <input type="number" id="capture" name="capture" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); ?>" required>
                         <br>
+<!---- currently autogain does not work, needs eyes on
                         <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>
                         <label for="autogain">Set to OFF for optimum control</label>
                         <select id="autogain" name="autogain" required>
-                            <option value="0" <?php if ($current_autogain === '0' || $current_autogain === 'off') echo 'selected'; ?>>Off</option>
-                            <option value="1" <?php if ($current_autogain === '1' || $current_autogain === 'on') echo 'selected'; ?>>On</option>
+                        <option value="0" <?php if (isset($current_autogain)) { if ($current_autogain === '0' || $current_autogain === 'off')  echo 'selected';} ?>>Off</option>
+                        <option value="1" <?php if (isset($current_autogain)) { if ($current_autogain === '1' || $current_autogain === 'on')  echo 'selected';} ?>>On</option>
                         </select>
-                        <?php 
+ --->
+                         <?php 
                             $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
                             if (fopen($svxConfigFile,'r')) {
                                 $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
@@ -209,12 +215,12 @@ $current_values = get_current_amixer_values();
             $capture_value = ($capture_percentage / 100) * $max_values['capture'];
             exec("sudo amixer -c" . $sc . " cset numid=8 " . escapeshellarg($capture_value));
         }
-
+/*
         if (isset($_POST['autogain'])) {
             $autogain = $_POST['autogain'] === '1' ? '1' : '0';
             exec("sudo amixer -c" . $sc . " sset numid=9 " . escapeshellarg($autogain));
         }
-
+*/
         // Refresh the page to show updated values
         echo "<script type='text/javascript'>
         reloadPage();
