@@ -10,6 +10,7 @@ my $shari = "";
 my $rssi = "";
 my $txctcss = "";
 my $rxctcss = "";
+my $port = "";
 my @CTCSS = (
   "None", "67.0", "71.9", "74.4", "77.0", "79.7", "82.5", "85.4", "88.5",
   "91.5", "94.8", "97.4", "100.0", "103.5", "107.2", "110.9", "114.8", "118.8",
@@ -37,12 +38,16 @@ my @CTCSS = (
 	if (substr($a,0,2) eq "r=") {
 	    $readmachine = substr($a,2,1);
 	} 
+	if (substr($a,0,2) eq "p=") {
+	    $port = substr($a,2,length($a));
+            print "Dir: $port\n" if $verbose;
+	} 
     }
 
     $shari = $dir  . "/sa818";
     print "[$log_time] SHARI $shari\n" if ($verbose >= 1);
 
-    $cmd = sprintf("python3 %s/sa818-running.py -q",$shari);
+    $cmd = sprintf("python3 %s/sa818-running.py -p %s -q",$shari,$port);
     print "[$log_time] [$cmd]\n" if ($verbose >= 1);
     $cmd = qx($cmd);
     print "[$log_time] [$cmd]\n" if ($verbose >= 1);

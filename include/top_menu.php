@@ -48,7 +48,7 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a href="./audio.php" style = "color: #0000ff;">Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #0000ff;">Wifi</a> | ';
 		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> | ';
-		echo '<a href="/nodeInfo.php" style = "color: #0000ff;">Node Info</a> | ';
+//		echo '<a href="/nodeInfo.php" style = "color: #0000ff;">Node Info</a> | ';
 	}	
 
 

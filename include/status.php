@@ -25,8 +25,7 @@ if (isProcessRunning('svxlink')) {
    }
    $callsign = isset($svxconfig['ReflectorLogic']['CALLSIGN']) ? $svxconfig['ReflectorLogic']['CALLSIGN'] : 'NoCall';     
    $check_logics = explode(",",$svxconfig['GLOBAL']['LOGICS']);
-    
-    
+   
  // $inReflectorDefaultLang = explode(",", $svxconfig['ReflectorLogic']['DEFAULT_LANG']);
    $reflectorlogic1 = "";
    $reflectorlogic2 = "";
@@ -240,8 +239,17 @@ if ($reflectorlogic2 != "") {
       if (defined('DL3EL_RADIO')) {
          $svxRadio = DL3EL_RADIO;
          if ($svxRadio == "Shari") {
+            $RfConfFile = DL3EL . '/sa818/sa818.json';
+            if (fopen($RfConfFile,'r')) {
+               $filedata = file_get_contents($RfConfFile);
+               $RfData = json_decode($filedata,true);
+               $radioport = $RfData['port'];
+            } else {
+               $radioport = "/dev/ttyUSB0";
+            }
 //            echo "Mode: simplex";
-            $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL;
+//            $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=/dev/ttyUSB.shari";
+            $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=" . $radioport;
             echo "QRG:",exec($command, $output, $retval);
 //            echo "<br>QRG: ",exec('perl /home/svxlink/get_shari_hf_data.pl', $output, $retval);
          } else {

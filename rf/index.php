@@ -90,62 +90,87 @@ $RfConfFile = DL3EL . '/sa818/sa818.json';
 
 if (fopen($RfConfFile,'r'))
 {
-        $filedata = file_get_contents($RfConfFile);
-        $RfData = json_decode($filedata,true);
-//        print_r($RfData);
-	list($txctcss, $rxctcss) = explode(",", $RfData['ctcss']);
-	$RfData['txctcss'] = $txctcss;
-	$RfData['rxctcss'] = $rxctcss;
-	$RfData['txfreq'] = $RfData['freq'];
-	if ($RfData['offset'] === 0) {
-	    $RfData['rxfreq'] = $RfData['txfreq'];
-	} else {
-	   $RfData['rxfreq'] = $RfData['txfreq'] + $RfData['offset'];
-	}   
-// SA818 works only in simplex mode, RX has to be equal to TX	
+    $filedata = file_get_contents($RfConfFile);
+    $RfData = json_decode($filedata,true);
+    if (debug) echo "Data from File: ";
+    if (debug) print_r($RfData);
+    if (debug) echo "<br>";
+    list($txctcss, $rxctcss) = explode(",", $RfData['ctcss']);
+    $RfData['txctcss'] = $txctcss;
+    $RfData['rxctcss'] = $rxctcss;
+    $RfData['txfreq'] = $RfData['freq'];
+    if ($RfData['offset'] === 0) {
 	$RfData['rxfreq'] = $RfData['txfreq'];
+    } else {
+	$RfData['rxfreq'] = $RfData['txfreq'] + $RfData['offset'];
+    }   
+// SA818 works only in simplex mode, RX has to be equal to TX	
+    $RfData['rxfreq'] = $RfData['txfreq'];
 
-//        print_r($RfData);
-};
-	$command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL;
-	exec($command, $output, $retval);
-	$tx = "";
-	$rx = "";
-	$txctcss = "";
-	$squelch = "";
-	$rxctcss = "";
-	$bandwidth = "";
+//  print_r($RfData);
+} else {
+    $RfData['txctcss'] = "";
+    $RfData['rxctcss'] = "";
+    $RfData['txfreq'] = "";
+    $RfData['offset'] = 0;
+    $RfData['port'] = "";
+}    
+    $radioport = $RfData['port'];
 
-	list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
-	echo "TX$tx, RX$rx, $txctcss, $squelch, $rxctcss, $bandwidth <br>";
+    $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL . " p=" . $radioport;
+    if (debug) echo "ShariCall: $command<br>";
+    exec($command, $output, $retval);
+    $tx = "";
+    $rx = "";
+    $txctcss = "";
+    $squelch = "";
+    $rxctcss = "";
+    $bandwidth = "";
+
+    list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
+    if (debug) echo "current data from shari: TX$tx, RX$rx, $txctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
 	
-	if ($tx !== "") {
-	    $RfData['txfreq'] = $tx;
-	}    
-	if ($rx !== "") {
-	    $RfData['rxfreq'] = $rx;
-	}    
-	if ($rxctcss !== "") {
-	    $RfData['rxctcss'] = $rxctcss;
-	}    
-	if ($txctcss !== "") {
-	    $RfData['txctcss'] = $txctcss;
-	}    
-	if ($squelch !== "") {
-	    $RfData['squelch'] = $squelch;
-	}    
-	if ($bandwidth !== "") {
-	    $RfData['bw'] = $bandwidth;
-	}    
+    if ($tx !== "") {
+	$RfData['txfreq'] = $tx;
+	if ($tx !== $RfData['freq']) {
+	    echo "different freq, save the corret one<br>";
+	}	
+    }    
+    if ($rx !== "") {
+	$RfData['rxfreq'] = $rx;
+    }    
+    if ($rxctcss !== "") {
+	if ($rxctcss !== $RfData['rxctcss']) {
+	    echo "different rxctcss, Shari: $rxctcss, sa818.json: " . $RfData['rxctcss'] . ", save the correct one<br>";
+	}	
+	$RfData['rxctcss'] = $rxctcss;
+    }    
+    if ($txctcss !== "") {
+	if ($txctcss !== $RfData['txctcss']) {
+	    echo "different txctcss, Shari: $txctcss, sa818.json: " . $RfData['txctcss'] . ", save the correct one<br>";
+	}	
+	$RfData['txctcss'] = $txctcss;
+    }    
+    if ($squelch !== "") {
+	if ($squelch !== $RfData['squelch']) {
+	    echo "different squelch, Shari: $squelch, sa818.json: " . $RfData['squelch'] . ", save the correct one<br>";
+	}	
+	$RfData['squelch'] = $squelch;
+    }    
+    if ($bandwidth !== "") {
+	if ($bandwidth !== $RfData['bw']) {
+	    echo "different bandwidth, Shari: $bandwidth, sa818.json: " . $RfData['bw'] . ", save the correct one<br>";
+	}	
+	$RfData['bw'] = $bandwidth;
+    }    
 //        print_r($RfData);
 
-
+$device = device_detection($radioport);
+    if (debug) print_r($device);
 $screen[0] = "Welcome to SA818 RF MODULE configuration tool.";
 $screen[1] = "Please use buttons for actions.";
 $screen[2] = "Actions are limited to section data only.";
 $screen[3] = "";
-
-
 
 
 if (isset($_POST['btnDetect']))
@@ -189,7 +214,10 @@ if (isset($_POST['btnVersion']))
     {
         $retval = null;
         $screen = null;
+
         $port = $_POST['port'];
+        $port = $device[$port];
+	if (debug) echo "selected Port: $port<br>";  
         $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
 
 	if (!$retval) exec($command,$screen,$retval);
@@ -216,6 +244,8 @@ if (isset($_POST['btnRadio']))
         $retval = null;
         $screen = null;
         $port = $_POST['port'];
+        $port = $device[$port];
+	if (debug) echo "selected Radio Port: $port<br>";  
 	$freq = $_POST['freq'];
 	$rxfreq = $_POST['rxfreq'];
 	$txfreq = $_POST['txfreq'];
@@ -257,6 +287,8 @@ if (isset($_POST['btnFilters']))
 	$retval = null;
         $screen = null;
 	$port = $_POST['port'];
+        $port = $device[$port];
+	if (debug) echo "selected Radio Port: $port<br>";  
         $fEmph = $_POST['fEmph'];
         $fLow = $_POST['fLow'];
         $fHigh = $_POST['fHigh'];
@@ -286,6 +318,8 @@ if (isset($_POST['btnVol']))
 	 $retval = null;
         $screen = null;
         $port = $_POST['port'];
+        $port = $device[$port];
+	if (debug) echo "selected Radio Port: $port<br>";  
         $volume = $_POST['volume'];
 
         $command = "python3 sa818.py --port \"" .$port. "\" volume  --level \"" .$volume. "\" 2>&1";
@@ -308,6 +342,7 @@ if (isset($_POST['btnVol']))
 //load json
 
 $port = $RfData['port']; 
+if (debug) echo "Port at start: $port <br>";
 $rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
 $fEmph = $RfData['fEmph'];$fLow=$RfData['fLow'];$fHigh=$RfData['fHigh'];
 $volume = $RfData['volume'];
@@ -318,6 +353,8 @@ $bw = $RfData['bw'];
 // port
 #if ($port === "" || is_null($port)) $port = "/dev/ttyS1";
 if ($port === "" || is_null($port)) $port = "/dev/ttyUSB.shari";
+
+if (debug) echo "Port after start: $port <br>";
 
 //radio
 if ($rxfreq === "" || is_null($freq)) $freq = "433.025";
@@ -364,8 +401,33 @@ if ($volume === "" || is_null($volume)) $volume = "8";
         </tr>
 <tr>
 <td> 
+<!--
    <button name="btnDetect" type="submit" class="red"style = "height:30px; width:105px; font-size:12px;">Detect</button> 
 	Port: <input type "text" name="port" style = "width: 150px" value="<?php echo $port;?>"
+--->
+<?php
+
+    echo '<form method="post" action="">';
+    echo '<select id="port" name="port" required>';
+    $pn = 0;
+    $port = $device[0];
+    foreach ($device as $portnr) {
+	$portLine = "<option value=" . $pn . ">" . $portnr . "</option><br>\n";
+	echo $portLine;
+	++$pn;
+    }
+    echo "</select>";
+    echo '<button type="submit">Port</button>';
+    echo '<input type="hidden" name="port_submitted" value="1">';
+    echo "</form>&nbsp;&nbsp;";
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['port_submitted'])) {
+        if (isset($_POST['port'])) {
+	    $port = $device[$_POST['port']];
+	    if (debug) echo "selected Port: $port<br>";  
+	}
+    }
+?>
 </TD>
 <td>
 <button name="btnVersion" type="submit" class="red" style = "height:30px; width:105px; font-size:12px;">Get Version</button>
@@ -438,3 +500,50 @@ if ($volume === "" || is_null($volume)) $volume = "8";
 
 </body>
 </html>
+<?php
+
+function device_detection($radioport) {
+        $retval = null;
+        $screen_top = null;
+	$screen = null;
+	$screen_small = null;
+	
+// RFGuru: /dev/ttyS*
+// Shari: /dev/ttyUSB* 
+        $port = $_POST['port'];
+
+	$command_top = "ls -1 /dev/ttyS* /dev/ttyUSB* 2>&1";
+	exec($command_top,$screen_top,$retval);
+	
+	if (debug) print_r($screen_top); 
+	if (debug) print_r("<br>");
+	$retval = null;
+	
+	if ($radioport !== '') {
+	    $command = "python3 sa818.py --port \"" .$radioport. "\" version 2>&1";
+	    exec($command,$screen_small,$retval);
+	    if (!$retval) {
+		$screen[0] = $radioport;
+		$i = 1;	
+	    } else {
+		$i = 0;
+	    }
+	}
+	foreach ($screen_top as $port_test)
+	{ 
+		$screen[$i] = $port_test; 
+		$command = "python3 sa818.py --port \"" .$port_test. "\" version 2>&1";
+        	exec($command,$screen_small,$retval);
+		
+		if (debug) print_r($screen_small);
+		if (!$retval)
+		{
+		    $port = $port_test;
+//		    $screen[$i] = $screen[$i] . " BINGO !"; 
+		    $i = $i+1;
+		    if (debug) echo "Dev ($i): " . $screen[$i] . "<br>";
+		}
+	};
+    return($screen);
+}
+?>

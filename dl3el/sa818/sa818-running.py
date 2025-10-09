@@ -37,9 +37,16 @@ def writeSerial(ser, string):
 
 ### MAIN PROGRAM STATEMENTS ###
 
-ser = serial.Serial(serport, baud, timeout=2)
 
-if '-v' in sys.argv:
+if '-p' in sys.argv[1]:
+# serport = '/dev/ttyUSB.shari'
+	serport = sys.argv[2]
+	ser = serial.Serial(serport, baud, timeout=2)
+else: 
+	print ("Shari Port is missing " + str(number_of_args))
+	quit()
+
+if '-v' in sys.argv[3]:
 #	print('Opening port: ' + ser.name)
 #	print ('Connecting...')
 	ser.write(b'AT+DMOCONNECT\r\n')
@@ -73,28 +80,28 @@ print (output.decode("utf-8"))
 # Go into loop that outputs radio signal strength. Invoke this by using SA818-prog -r
 number_of_args = len(sys.argv) -1
 # print ("ARGS:" + str(number_of_args))
-if '-q' in sys.argv:
+if '-q' in sys.argv[3]:
 	print ("Quit")
 	quit()
 
-if '-r' in sys.argv:
+if '-r' in sys.argv[3]:
 	print ("Monitoring Radio Signal Strength (press Ctl+c to exit)")
 	while True:
 		response = writeSerial(ser,"RSSI?")
 		print (response)
 	quit()
 
-if number_of_args == 4:
+if number_of_args == 6:
 	print ("ARGS:" + str(number_of_args))
 	
-	if '-f' in sys.argv:
-		rxfreq = sys.argv[2]         # Same as rx freq - we work simplex
+	if '-f' in sys.argv[3]:
+		rxfreq = sys.argv[4]         # Same as rx freq - we work simplex
 		print ("qrg:" + rxfreq)
 		txfreq = rxfreq         # Same as rx freq - we work simplex
 
-	if '-c' in sys.argv:
+	if '-c' in sys.argv[5]:
 		txcxcss = '0000'        # CTCSS 71.9Hz
-		rxcxcss = sys.argv[4]   # CTCSS 71.9Hz
+		rxcxcss = sys.argv[6]   # CTCSS 71.9Hz
 		squelch = '1'           # 0-8 (0 = open)
 		print ("ctcss:" + rxcxcss)
 else: 
