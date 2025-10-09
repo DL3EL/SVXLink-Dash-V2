@@ -41,6 +41,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	<a href="./echolink_dl3el.php" style = "color: #0000ff;">Echolink</a> | 
 	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
 	<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | 
+	<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | 
 	<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
 <?php
