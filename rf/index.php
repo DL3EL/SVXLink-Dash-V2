@@ -126,6 +126,7 @@ if (fopen($RfConfFile,'r'))
     $squelch = "";
     $rxctcss = "";
     $bandwidth = "";
+    $offset = 0;
 
     list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
     if (debug) echo "current data from shari: TX$tx, RX$rx, $txctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
@@ -510,7 +511,6 @@ function device_detection($radioport) {
 	
 // RFGuru: /dev/ttyS*
 // Shari: /dev/ttyUSB* 
-        $port = $_POST['port'];
 
 	$command_top = "ls -1 /dev/ttyS* /dev/ttyUSB* 2>&1";
 	exec($command_top,$screen_top,$retval);
@@ -538,8 +538,6 @@ function device_detection($radioport) {
 		if (debug) print_r($screen_small);
 		if (!$retval)
 		{
-		    $port = $port_test;
-//		    $screen[$i] = $screen[$i] . " BINGO !"; 
 		    $i = $i+1;
 		    if (debug) echo "Dev ($i): " . $screen[$i] . "<br>";
 		}

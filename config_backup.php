@@ -66,7 +66,7 @@ include_once "include/settings.php";
 			    exec("sudo cp  /etc/svxlink/svxlink.d/* $backupDir > /dev/null");
 			    exec("sudo cp  /usr/share/svxlink/* $backupDir > /dev/null");
 			    exec("sudo cp  /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
-				exec("sudo cp  /var/www/html/include/config.php $backupDir > /dev/null");
+			    exec("sudo cp  /var/www/html/include/config.php $backupDir > /dev/null");
 
 			    chdir($backupDir);
 			    exec("sudo zip -r $backupZip * > /dev/null");
