@@ -120,7 +120,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}	
 	if (defined('DL3EL_RADIO')) {
 	    $svxRadio = DL3EL_RADIO;
-	    if ($svxRadio == "Shari") {
+	    if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
 		echo '<a href="./rf.php" style = "color: black;" id="radio">Radio</a> | ';
 	    }
 	}
