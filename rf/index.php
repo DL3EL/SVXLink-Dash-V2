@@ -67,7 +67,7 @@ textarea {
 <center>
 <?php 
 if (defined('DL3EL_RADIO')) {
-  if (($DL3EL_RADIO == "Shari") || ($DL3EL_RADIO == "RFGuru")) {
+  if ((DL3EL_RADIO == "Shari") || (DL3EL_RADIO == "RFGuru")) {
     $svxRadio = DL3EL_RADIO;
   } else {
     echo "No supported Radio <br>";
