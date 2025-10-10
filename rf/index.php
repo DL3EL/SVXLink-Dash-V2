@@ -353,7 +353,13 @@ $bw = $RfData['bw'];
 // default section
 // port
 #if ($port === "" || is_null($port)) $port = "/dev/ttyS1";
-if ($port === "" || is_null($port)) $port = "/dev/ttyUSB.shari";
+$svxRadio = DL3EL_RADIO;
+if ($svxRadio == "Shari") {
+  if ($port === "" || is_null($port)) $port = "/dev/ttyUSB0";
+}  
+if ($svxRadio == "RFGuru") {
+  if ($port === "" || is_null($port)) $port = "/dev/ttyS0";
+}  
 
 if (debug) echo "Port after start: $port <br>";
 
