@@ -610,7 +610,7 @@ if ($dmr_support) {
     echo '<div class="content">'."\n";
     echo '<script type="text/javascript">'."\n";
 
-    if (URLSVXRAPI!="") {
+    if ((defined('URLSVXRAPI')) && (URLSVXRAPI !="")) {
         echo 'function reloadSVXREF(){'."\n";
         echo '  $("#svxref").load("include/svxref.php",function(){ setTimeout(reloadSVXREF,90000) });'."\n";
         echo '}'."\n";
@@ -639,7 +639,7 @@ if ($dmr_support) {
         echo '</div></center>'."\n";
     }    
     echo "<br />\n";
-    if (URLSVXRAPI!="") {
+    if ((defined('URLSVXRAPI')) && (URLSVXRAPI !="")) {
     echo '<center><div id="svxref" style = "margin-bottom:30px;">'."\n";
     //include "include/svxref.php";
     echo '</div></center>'."\n";

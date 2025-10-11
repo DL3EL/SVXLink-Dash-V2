@@ -60,7 +60,9 @@ textarea {
 </style>
 </head>
 <body style = "background-color: #e1e1e1;font: 11pt arial, sans-serif;">
+<!---
 <script src="web-audio-peak-meter.js"></script>
+-->
 <center>
 <fieldset style = "border:#3083b8 2px groove;box-shadow:5px 5px 20px #999; background-color:#f1f1f1; width:555px;margin-top:15px;margin-left:0px;margin-right:5px;font-size:13px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
 <div style = "padding:0px;width:550px;background-image: linear-gradient(to bottom, #e9e9e9 50%, #bcbaba 100%);border-radius: 10px;-moz-border-radius:10px;-webkit-border-radius:10px;border: 1px solid LightGrey;margin-left:0px; margin-right:0px;margin-top:4px;margin-bottom:0px;line-height:1.6;white-space:normal;">
@@ -70,30 +72,19 @@ if (defined('DL3EL_RADIO')) {
   if ((DL3EL_RADIO == "Shari") || (DL3EL_RADIO == "RFGuru")) {
     $svxRadio = DL3EL_RADIO;
   } else {
-    echo "No supported Radio <br>";
+    echo "No supported Radio defined (valid: Shari/RFGuru)<br>";
     $svxRadio = "";
   }  
 } else {
-   echo "No Radio <br>";
+   echo "No Radio defined (valid: Shari/RFGuru)<br>";
    $svxRadio = "";
-   exit();
 }
 ?>
 <h1 id="web-audio-peak-meters" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">RF Module Configurator (<?php echo $svxRadio; ?>)</h1>
 
 <?php 
-if ($svxRadio == "") {
-   exit();
-}
-
-// load the connlist
-$retval = null;
-$conns = null;
-
 $RfConfFile = DL3EL . '/sa818/sa818.json';
-
-if (fopen($RfConfFile,'r'))
-{
+if (fopen($RfConfFile,'r')) {
     $filedata = file_get_contents($RfConfFile);
     $RfData = json_decode($filedata,true);
     if (debug > 10) echo "Data from File: ";
@@ -111,131 +102,208 @@ if (fopen($RfConfFile,'r'))
 // SA818 works only in simplex mode, RX has to be equal to TX	
     $RfData['rxfreq'] = $RfData['txfreq'];
 
-//  print_r($RfData);
-} else {
-    $RfData['txctcss'] = "";
-    $RfData['rxctcss'] = "";
-    $RfData['txfreq'] = "";
-    $RfData['offset'] = 0;
-    $RfData['port'] = "";
-}    
+    if (debug > 0) echo "sa818.jason:<br>";
+    if (debug > 0) print_r($RfData);
     $radioport = $RfData['port'];
+    if (substr($radioport,0,8) !== "/dev/tty") {
+// saved port not valid      
+      echo "saved port not valid: $radioport<br>";
+      $RfData['port'] = "";
+    } else {  
+// check if saved data match radio data
+      $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL . " p=" . $radioport;
+      if (debug > 10) echo "ShariCall: $command<br>";
+      exec($command, $output, $retval);
+      $tx = "";
+      $rx = "";
+      $txctcss = "";
+      $squelch = "";
+      $rxctcss = "";
+      $bandwidth = "";
+      $offset = 0;
 
-    if (debug > 10) echo "Check: $svxRadio -> $radioport <br>";
-    if (($svxRadio == "Shari") && (substr($radioport,0,11) !== "/dev/ttyUSB")) {
-      echo "really??: $svxRadio -> $radioport <br>";
-    }
-    if (($svxRadio == "RFGuru") && (substr($radioport,0,9) !== "/dev/ttyS")) {
-      echo "really??: $svxRadio -> $radioport <br>";
-    }
+      list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
+      if (debug > 0)echo "current data from shari: TX$tx, RX$rx, $txctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
 
-    $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL . " p=" . $radioport;
-    if (debug > 10) echo "ShariCall: $command<br>";
-    exec($command, $output, $retval);
-    $tx = "";
-    $rx = "";
-    $txctcss = "";
-    $squelch = "";
-    $rxctcss = "";
-    $bandwidth = "";
-    $offset = 0;
-
-    list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
-    if (debug > 10) echo "current data from shari: TX$tx, RX$rx, $txctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
-	
-    if ($tx !== "") {
+      if ($tx !== "") {
 	$RfData['txfreq'] = $tx;
 	if ($tx !== $RfData['freq']) {
 	    echo "different freq, save the corret one<br>";
 	}	
-    }    
-    if ($rx !== "") {
+      }    
+      if ($rx !== "") {
 	$RfData['rxfreq'] = $rx;
-    }    
-    if ($rxctcss !== "") {
+      }    
+      if (($rxctcss !== "")  && ($rxctcss !== "None")) {
 	if ($rxctcss !== $RfData['rxctcss']) {
 	    echo "different rxctcss, Shari: $rxctcss, sa818.json: " . $RfData['rxctcss'] . ", save the correct one<br>";
 	}	
 	$RfData['rxctcss'] = $rxctcss;
-    }    
-    if ($txctcss !== "") {
+      }    
+      if (($txctcss !== "")  && ($txctcss !== "None")) {
 	if ($txctcss !== $RfData['txctcss']) {
 	    echo "different txctcss, Shari: $txctcss, sa818.json: " . $RfData['txctcss'] . ", save the correct one<br>";
 	}	
 	$RfData['txctcss'] = $txctcss;
-    }    
-    if ($squelch !== "") {
+      }    
+      if ($squelch !== "") {
 	if ($squelch !== $RfData['squelch']) {
 	    echo "different squelch, Shari: $squelch, sa818.json: " . $RfData['squelch'] . ", save the correct one<br>";
 	}	
 	$RfData['squelch'] = $squelch;
-    }    
-    if ($bandwidth !== "") {
+      }    
+      if ($bandwidth !== "") {
 	if ($bandwidth !== $RfData['bw']) {
 	    echo "different bandwidth, Shari: $bandwidth, sa818.json: " . $RfData['bw'] . ", save the correct one<br>";
 	}	
 	$RfData['bw'] = $bandwidth;
-    }    
-//        print_r($RfData);
+      }    
+    }
+} else {
+// no config File, try to find the radio
+    $device = device_detection("-9");
+    echo "found device?<br>";
+    print_r($device);
+    $radioport = $device[0];
+    if (substr($radioport,0,8) == "/dev/tty") {
+      echo "found it!!: [$radioport]<br>";
+      $RfData['port'] = $radioport;
+      $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL . " p=" . $radioport;
+      if (debug > 0) echo "ShariCall: $command<br>";
+      exec($command, $output, $retval);
+      $tx = "";
+      $rx = "";
+      $rxctcss = "";
+      $txctcss = "";
+      $squelch = 1;
+      $rxctcss = "";
+      $bandwidth = "";
+      $offset = 0;
+      $volume = 6;
+      $fEmph = "disable";
+      $fLow = "disable";
+      $fHigh = "enable";
+      $tail = "close";
+      list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
+      if (debug > 0) echo "current data from shari: TX$tx, RX$rx, $txctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
+      $RfData['freq'] = $tx;
+      $RfData['txfreq'] = $tx;
+      $RfData['rxfreq'] = $rx;
+      $RfData['rxctcss'] = $rxctcss;
+      $RfData['txctcss'] = $txctcss;
+      $ctcss = $txctcss;
+      if ($rxctcss !== "") {
+	$ctcss = $txctcss . "," . $rxctcss;
+      }
+      $RfData['squelch'] = $squelch;
+      $RfData['bw'] = $bandwidth;
+      $RfData['fEmph'] = $fEmph;
+      $RfData['fLow'] = $fLow;
+      $RfData['fHigh'] = $fHigh;
+      $RfData['ctcss']=$ctcss;
+      $RfData['tail']=$tail;
+      $RfData['offset']=$offset;
+      $RfData['volume']=$volume;
 
+      if (debug > 0) print_r($RfData);
+// save init config file
+      $jsonRfData = json_encode($RfData);
+      file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
+      //move generated file to current config
+      exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+    } else {  
+      $port = substr($radioport,0,8);
+      echo "not found!!: [$radioport]:[$port] <br>";
+      $RfData['port'] = "";
+      $RfData['txctcss'] = "67.0";
+      $RfData['rxctcss'] = "67.0";
+      $RfData['txfreq'] = "433.025";
+      $RfData['freq'] = "433.025";
+      $RfData['offset'] = 0;
+      $RfData['fEmph'] = "disable";
+      $RfData['fLow'] = "disable";
+      $RfData['fHigh'] = "enable";
+      $RfData['tail'] = "close";
+      $RfData['bw'] = "1";
+      $RfData['squelch'] = "1";
+      $RfData['volume'] = "6";
+    }  
+}    
+if ($RfData['port'] == "") {
+  $RfData['port'] = ($svxRadio === "Shari")? "/dev/ttyUSB0" : "/dev/ttyS0";
+  $radioport = $RfData['port'];
+} else {
+  $radioport = $RfData['port'];
+}  
+//
+// test, hier was ungültiges eintragen und prüfen, ob etwas gültiges gefunden wird
+// getestet wird, ob eine Frequezu zurückgeliefert wird
+//$radioport = "/dev/ttyS0";
+//
+//        print_r($RfData);
+// Devicetabelle mit verfügabren Ports füllen
+$device[0] = $radioport;
+if (debug) echo "device_detection with current port: $radioport<br>";
 $device = device_detection($radioport);
-    if (debug > 10) print_r($device);
+if (debug > 10) print_r($device);
+// Ports zählen
+$pn = 0;
+foreach ($device as $portnr) {
+  ++$pn;
+}
+if (debug) echo "Port at start: $device[0] of $pn <br>";
+$port = $device[0]; 
+
 $screen[0] = "Welcome to SA818 RF MODULE configuration tool.";
 $screen[1] = "Please use buttons for actions.";
 $screen[2] = "Actions are limited to section data only.";
-$screen[3] = "";
+$screen[3] = "Port in use: " . $device[0] ;
 
 
-if (isset($_POST['btnDetect']))
+if (isset($_POST['btnDetectn'])) {
+  $device = device_detection($radioport);
+}
+
+if (isset($_POST['btnSave']))
     {
 
         $retval = null;
-        $screen_top = null;
-	$screen = null;
-	$screen_small = null;
-	
+        $screen = null;
+echo "btnSave: <br>";
         $port = $_POST['port'];
+	if (debug > 0) echo "0 selected Port: $port<br>";  
+        $port = $device[$port];
+      if (debug) print_r($device);
+	if (debug > 0) echo "1 selected Port: $port<br>";  
+        $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
+	if (debug > 0) echo "testing with $command<br>";  
 
-	$command_top = "ls -1 /dev/ttyS* /dev/ttyUSB* 2>&1";
-	exec($command_top,$screen_top,$retval);
-	
-	//print_r($screen_top); 
-	//print_r("<br>");
-	$retval = null;
-	
-	$i = 0;
-	foreach ($screen_top as $port_test)
-	{ 
-		$screen[$i] = "Detection for:" .$port_test; 
-		$command = "python3 sa818.py --port \"" .$port_test. "\" version 2>&1";
-        	exec($command,$screen_small,$retval);
-		
-		//print_r($screen_small);
-		if (!$retval)
-		{
-			$port = $port_test;
-			$screen[$i] = $screen[$i] . " BINGO !"; 
-		}
-		$i = $i+1;
-	};
-
+	exec($command,$screen,$retval);
+	if (!$retval) {
+	if (debug > 0) echo "selected Port works: $port<br>";  
+//		$RfData['port']=$port;
+		$jsonRfData = json_encode($RfData);
+        	file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
+                //archive the current config
+                exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
+                //move generated file to current config
+                exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+	}
 }
-
-
-
 if (isset($_POST['btnVersion']))
     {
         $retval = null;
         $screen = null;
 
         $port = $_POST['port'];
-        $port = $device[$port];
-	if (debug > 10) echo "selected Port: $port<br>";  
+	if (debug > 0) echo "using port: $port<br>";  
+	if (debug > 10) print_r($device);
         $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
 
 	if (!$retval) exec($command,$screen,$retval);
 //	echo "<br>SHARI: $retval";
   	//if ($retval) echo("NOK");
+/*
 	if (!$retval) {
 		$RfData['port']=$port;
 		$jsonRfData = json_encode($RfData);
@@ -247,17 +315,13 @@ if (isset($_POST['btnVersion']))
 //                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
                 exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
 	}
+*/
 }
-
-
 
 if (isset($_POST['btnRadio']))
     {
-
         $retval = null;
         $screen = null;
-        $port = $_POST['port'];
-        $port = $device[$port];
 	if (debug > 10) echo "selected Radio Port: $port<br>";  
 	$freq = $_POST['freq'];
 	$rxfreq = $_POST['rxfreq'];
@@ -277,7 +341,7 @@ if (isset($_POST['btnRadio']))
 #        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --close-tail \"" .$tail. "\" 2>&1";
 #        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
         $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
-//echo $command;
+	if (debug > 10) echo $command;
         if (!$retval) exec($command,$screen,$retval);
 
 	if (!$retval) {
@@ -292,6 +356,7 @@ if (isset($_POST['btnRadio']))
 //                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
                 exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
         }
+	echo "new Data saved to device on $port, please reload page<br>";  
 }
 
 if (isset($_POST['btnFilters']))
@@ -299,8 +364,6 @@ if (isset($_POST['btnFilters']))
 
 	$retval = null;
         $screen = null;
-	$port = $_POST['port'];
-        $port = $device[$port];
 	if (debug > 10) echo "selected Radio Port: $port<br>";  
         $fEmph = $_POST['fEmph'];
         $fLow = $_POST['fLow'];
@@ -319,6 +382,7 @@ if (isset($_POST['btnFilters']))
 //                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
                 exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
         }
+	echo "new filter settings saved to device on $port, please reload page<br>";  
 
 }
 
@@ -328,10 +392,8 @@ if (isset($_POST['btnFilters']))
 if (isset($_POST['btnVol']))
     {
 	
-	 $retval = null;
+	$retval = null;
         $screen = null;
-        $port = $_POST['port'];
-        $port = $device[$port];
 	if (debug > 10) echo "selected Radio Port: $port<br>";  
         $volume = $_POST['volume'];
 
@@ -348,53 +410,22 @@ if (isset($_POST['btnVol']))
 //                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
                 exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
         }
-
+	echo "new volume saved to device on $port, please reload page<br>";  
 }
 
 
 //load json
 
-$port = $RfData['port']; 
-if (debug) echo "Port at start: $port <br>";
 $rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
 $fEmph = $RfData['fEmph'];$fLow=$RfData['fLow'];$fHigh=$RfData['fHigh'];
 $volume = $RfData['volume'];
 $tail = $RfData['tail'];
 $bw = $RfData['bw'];
 
-// default section
-// port
-#if ($port === "" || is_null($port)) $port = "/dev/ttyS1";
-$svxRadio = DL3EL_RADIO;
-if ($svxRadio == "Shari") {
-  if ($port === "" || is_null($port)) $port = "/dev/ttyUSB0";
-}  
-if ($svxRadio == "RFGuru") {
-  if ($port === "" || is_null($port)) $port = "/dev/ttyS0";
-}  
-
-if (debug > 10) echo "Port after start: $port <br>";
-
-//radio
-if ($rxfreq === "" || is_null($freq)) $freq = "433.025";
-if ($txfreq === "" || is_null($txfreq)) $txfreq = "433.025";
-if ($offset === "" || is_null($offset)) $offset = "0.0";
-if ($ctcss === "" || is_null($ctcss)) $ctcss = "94.8";
-if ($tail === "" || is_null($tail)) $tail = "yes";
-if ($squelch === "" || is_null($squelch)) $squelch = "1";
-if ($bw === "" || is_null($bw)) $bw = "1";
-
-//filter
-if ($fEmph === "" || is_null($fEmph)) $fEmph = "enable";
-if ($fLow === "" || is_null($fLow)) $fLow = "enable";
-if ($fHigh === "" || is_null($fHigh)) $fHigh = "enable";
-
-//
-if ($volume === "" || is_null($volume)) $volume = "8";
-
 ?>
 
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
+
 <DIV style = "height:77px">
 <table>
 	<tr>
@@ -420,40 +451,58 @@ if ($volume === "" || is_null($volume)) $volume = "8";
         </tr>
 <tr>
 <td> 
-<!--
-   <button name="btnDetect" type="submit" class="red"style = "height:30px; width:105px; font-size:12px;">Detect</button> 
+
+   <button name="btnDetectn" type="submit" class="red"style = "height:30px; width:105px; font-size:12px;">Detect</button> 
 	Port: <input type "text" name="port" style = "width: 150px" value="<?php echo $port;?>"
---->
-<?php
-
-    echo '<form method="post" action="">';
-    echo '<select id="port" name="port" required>';
-    $pn = 0;
-    $port = $device[0];
-    foreach ($device as $portnr) {
-	$portLine = "<option value=" . $pn . ">" . $portnr . "</option><br>\n";
-	echo $portLine;
-	++$pn;
-    }
-    echo "</select>";
-    echo '<button type="submit">Port</button>';
-    echo '<input type="hidden" name="port_submitted" value="1">';
-    echo "</form>&nbsp;&nbsp;";
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['port_submitted'])) {
-        if (isset($_POST['port'])) {
-	    $port = $device[$_POST['port']];
-	    if (debug > 10) echo "selected Port: $port<br>";  
-	}
-    }
-?>
 </TD>
 <td>
 <button name="btnVersion" type="submit" class="red" style = "height:30px; width:105px; font-size:12px;">Get Version</button>
-</TD>
+</TD></tr>
+</form>
+<tr>
+<td> 
+
+<?php
+    if ($pn > 1) {
+      $pn = 0;
+      $port = $device[0];
+      echo '<form method="post" action="">';
+      echo '<select id="port" name="port" required>';
+      foreach ($device as $portnr) {
+	  $portLine = "<option value=" . $pn . ">" . $portnr . "</option><br>\n";
+	  echo $portLine;
+	  if (!$pn) {
+	    echo "<option value=" . $pn . ">------</option><br>\n";
+	  }  
+	  ++$pn;
+      }
+      echo "</select>";
+      echo " Einträge in Liste: $pn ";
+      echo '</TD><TD><button type="submit" class="red" style = "height:30px; width:105px; font-size:12px;">save Port</button></TD>';
+      echo '<input type="hidden" name="port_submitted" value="1">';
+      echo "</form>&nbsp;&nbsp;";
+
+      if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['port_submitted'])) {
+        if (isset($_POST['port'])) {
+	  $port = $device[$_POST['port']];
+
+	  if (debug > 0) echo "selected Port: $port <br>";  
+		$RfData['port']=$port;
+		echo "</tr><td>new Port $port, saving .. ";
+		$jsonRfData = json_encode($RfData);
+        	file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
+                //archive the current config
+                exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
+                //move generated file to current config
+                exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+		echo "done, please reload page </td><td></td>";
+	}
+      } 
+    }
+?>
 </tr>
 </table>
-
+<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
 <table>
         <tr>
         <th width = "380px">Radio</th>
@@ -533,39 +582,54 @@ function device_detection($radioport) {
 	$command_top = "ls -1 /dev/ttyS* /dev/ttyUSB* 2>&1";
 	exec($command_top,$screen_top,$retval);
 	
-	if (debug) echo "Output ls -1 /dev/ttyS* /dev/ttyUSB*<br>"; 
-	if (debug) print_r($screen_top); 
-	if (debug) echo "<br>";
+	if (debug>10) echo "Output ls -1 /dev/ttyS* /dev/ttyUSB*<br>"; 
+	if (debug>10) print_r($screen_top); 
+	if (debug>10) echo "<br>";
 	$retval = null;
 	
+	$i = 0;
 	if ($radioport !== '') {
+	  if (debug>0) echo " test port $radioport mit Version<br>"; 
+	  if ($radioport == '-9') {
+	    echo "trying to find the raido and stop on first hit<br>";
+	  } else {
 	    $command = "python3 sa818.py --port \"" .$radioport. "\" version 2>&1";
 	    exec($command,$screen_small,$retval);
 	    if (!$retval) {
-		$screen[0] = $radioport;
-		$i = 1;	
+	      $screen[0] = $radioport;
+	      $i = 1;	
 	    } else {
-		$i = 0;
-	    }
-	  if (debug) echo " get defined port from $command<br>"; 
-	  if (debug) print_r($screen_small);
-	  if (debug) echo "<br>";
-	}
+	      echo "given port is invalid<br>";
+	      $radioport = "-1";
+	    } 
+	    if (debug>10) echo " get defined port from $command<br>"; 
+	    if (debug>10) print_r($screen_small);
+	    if (debug>10) echo "<br>";
+	  }
+	}    
 	foreach ($screen_top as $port_test)
 	{ 
 		$screen[$i] = $port_test; 
 		$command = "python3 sa818.py --port \"" .$port_test. "\" version 2>&1";
         	exec($command,$screen_small,$retval);
 		
-		if (debug>1) echo " ($i) Output from $command<br>"; 
-		if (debug>1) print_r($screen_small);
-		if (debug>1) echo "<br>";
-		if (!$retval)
-		{
-		    if (debug) echo "Dev ($i): " . $screen[$i] . "<br>";
-		    $i = $i+1;
+		if (debug>10) echo " ($i) Output from $command<br>"; 
+		if (debug>10) print_r($screen_small);
+		if (debug>10) echo "<br>";
+		if (!$retval) {
+		    if (debug>10) echo "Portfile: $PortFile adding: $screen[$i]<br>"; 
+		    if (debug>10) echo "Dev ($i): " . $screen[$i] . "<br>";
+		    if ($radioport == '-9') {
+		      break;
+		    } else { 
+		      $i = $i+1;
+		    }  
 		}
 	};
+    if (($radioport == '-1') && (!$i)) {
+      echo "no Radio found<br>";
+      $screen[0] = "no Radio found";
+    }  
     return($screen);
 }
 ?>
