@@ -140,6 +140,44 @@ if(array_key_exists('button11', $_POST)) {
 <p style = "margin-bottom:0px;"></p>
 <form method="post">
     <center>
+<?php 
+if ($_SESSION['auth'] !== "AUTHORISED") {
+	    $auth = 0;
+	} else {
+        $auth = 1;
+    }
+ /*   
+    if ((isset(KEY1[3])) && (KEY1[3] == "auth") && $auth) {
+        echo "auth ok, display Button:" . KEY1[1];
+    } else {
+        echo "auth not ok (" . KEY1[3] . ", $auth), do not display Button:" . KEY1[1];
+    }
+*/    
+    $button = (defined('KEY1'))? KEY1 : "";
+    display_button($button,$auth,"button1");
+    $button = (defined('KEY21'))? KEY21 : "";
+    display_button($button,$auth,"button2");
+    $button = (defined('KEY2'))? KEY2 : ""; display_button($button,$auth,"button2");
+    $button = (defined('KEY3'))? KEY3 : ""; display_button($button,$auth,"button3");
+    $button = (defined('KEY4'))? KEY4 : ""; display_button($button,$auth,"button4");
+    $button = (defined('KEY5'))? KEY5 : ""; display_button($button,$auth,"button5");
+    $button = (defined('KEY6'))? KEY6 : ""; display_button($button,$auth,"button6");
+    $button = (defined('KEY7'))? KEY7 : ""; display_button($button,$auth,"button7");
+    $button = (defined('KEY8'))? KEY8 : ""; display_button($button,$auth,"button8");
+    $button = (defined('KEY9'))? KEY9 : ""; display_button($button,$auth,"button9");
+    $button = (defined('KEY10'))? KEY10 : ""; display_button($button,$auth,"button10");
+    $button = (defined('KEY11'))? KEY11 : ""; display_button($button,$auth,"button11");
+    $button = (defined('KEY12'))? KEY12 : ""; display_button($button,$auth,"button12");
+    $button = (defined('KEY13'))? KEY13 : ""; display_button($button,$auth,"button13");
+    $button = (defined('KEY14'))? KEY14 : ""; display_button($button,$auth,"button14");
+    $button = (defined('KEY15'))? KEY15 : ""; display_button($button,$auth,"button15");
+    $button = (defined('KEY16'))? KEY16 : ""; display_button($button,$auth,"button16");
+    $button = (defined('KEY17'))? KEY17 : ""; display_button($button,$auth,"button17");
+    $button = (defined('KEY18'))? KEY18 : ""; display_button($button,$auth,"button18");
+    $button = (defined('KEY19'))? KEY19 : ""; display_button($button,$auth,"button19");
+    $button = (defined('KEY20'))? KEY20 : ""; display_button($button,$auth,"button20");
+?>        
+<!---
         <input type="submit" name="button1"
             class=<?php echo KEY1[2] ?>  value='<?php echo KEY1[0] ?>' />
         <input type="submit" name="button2"
@@ -158,7 +196,9 @@ if(array_key_exists('button11', $_POST)) {
             class=<?php echo KEY8[2] ?> value='<?php echo KEY8[0] ?>' />
 	<input type="submit" name="button9"
             class=<?php echo KEY9[2] ?> value='<?php echo KEY9[0] ?>' />
+--->
 <?php 
+/*
 if (defined('KEY10')) {
     echo '	<input type="submit" name="button10"';
     echo 'class=' . KEY10[2] . ' value="' . KEY10[0] . '" />';
@@ -202,7 +242,8 @@ if (defined('KEY19')) {
 if (defined('KEY20')) {
     echo '	<input type="submit" name="button20"';
     echo 'class=' . KEY20[2] . ' value="' . KEY20[0] . '" />';
-}    
+} 
+*/   
 ?>
 
 <?php	
@@ -256,4 +297,26 @@ if (isset($_POST["jmptoM"])) {
 <p style = "margin-bottom:-2px;"></p>
 </div>
 </fieldset>
-
+<?php
+function display_button($button,$auth,$button_name) {
+    if (isset($button[1])) {
+        if (isset($button[3])) {
+            $key_auth = $button[3];
+            if (($key_auth == "auth") && $auth) {
+//                if ((defined ('debug')) && (debug)) echo "sub auth ok, display Button:" . $button[1] ."<br>";
+                $display = 1;
+            } else {
+                $display = 0;
+//                if ((defined ('debug')) && (debug)) echo "sub auth not ok (" . $button[3] . ", $auth), do not display Button:" . $button[1] ."<br>";
+            }
+        } else {
+//            if ((defined ('debug')) && (debug)) echo "sub auth not necessary(!), display Button: $button[1] <br>";
+            $display = 1;
+        }    
+        if ($display) {
+            echo '<input type="submit" name="' . $button_name . '" ';
+            echo 'class=' . $button[2] . ' value="' . $button[0] . '"/>';
+        }    
+    }
+}
+?>
