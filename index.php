@@ -622,11 +622,12 @@ if ($dmr_support) {
     echo '}'."\n";
     echo 'setTimeout(reloadLastHeard,3000);'."\n";
 
-    echo 'function reloadLastHeardDMR(){'."\n";
-    echo '  $("#LastHeardDMR").load("/DVSwitch/include/lh.php",function(){ setTimeout(reloadLastHeardDMR,3000) });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadLastHeardDMR,3000);'."\n";
-
+    if ($dmr_support == "1") {
+        echo 'function reloadLastHeardDMR(){'."\n";
+        echo '  $("#LastHeardDMR").load("/DVSwitch/include/lh.php",function(){ setTimeout(reloadLastHeardDMR,3000) });'."\n";
+        echo '}'."\n";
+        echo 'setTimeout(reloadLastHeardDMR,3000);'."\n";
+    }
 
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
@@ -635,7 +636,6 @@ if ($dmr_support) {
     echo '</div></center>'."\n";
     if ($dmr_support == "1") {
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
-        include_once "/DVSwitch/include/lh.php";
         echo '</div></center>'."\n";
     }    
     echo "<br />\n";
