@@ -1,10 +1,11 @@
 
 <div class="content">
 <?php
+/*
 if ($_SESSION['auth'] !== "AUTHORISED") {
 	    return;
 	}
-
+*/
  if(array_key_exists('button1', $_POST)) {
         $exec= "echo '" . KEY1[1] . "' > /tmp/dtmf_svx";
         exec($exec,$output);
