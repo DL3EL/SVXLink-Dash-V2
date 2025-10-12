@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include_once "include/settings.php";
+include_once "include/tgdb.php";    
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -58,13 +59,7 @@ include_once "include/settings.php";
 </p></center>
 </div></div>
 </div>
-
 <?php include_once "include/top_menu.php"; ?>
-
-<div class="content"><center>
-<div style = "margin-top:0px;">
-</div></center>
-</div>
 <?php
 if (MENUBUTTON=="TOP") {
 include_once "include/buttons.php"; 
@@ -72,17 +67,14 @@ include_once "include/buttons.php";
 ?>
 <?php
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
-    echo '<div class="nav" style = "margin-bottom:1px;margin-top:1px;">'."\n";
-
-    echo '</div>'."\n";
-    echo '</td>'."\n";
-
 //    $tgselect = trim(getSVXTGSelect());
     $tgmon = explode(",",$svxconfig['ReflectorLogic']['MONITOR_TGS']);
     $tgmons = "";
+    $tgnames = "";
     foreach ($tgmon as $key) {
         $tgmons = $tgmons . $key . " ";
+        $tg = trim($key,"+");
+        $tgnames = $tgnames . $tg . "^" . $tgdb_array[$tg] . ";";
     }
     if (defined('DL3EL')) {
         $svxStatusFile = DL3EL . "/tg_status";
@@ -90,8 +82,9 @@ include_once "include/buttons.php";
         $tgmons = $tgmons . $svxdata . " ";
     }    
 // wichtig, SVXLink muss für das Verzeichnis berechtigt  sein. Am besten auch noch chmod 755 setzen.
-    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 " . $tgmons;
-//    echo "Aufruf: " . $cmd;
+    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 \"TGNames:" . $tgnames . "\"" . $tgmons;
+//    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 ". $tgmons . "\"TGNames:" . $tgnames . "\"";
+    if (debug) echo "Aufruf: " . $cmd;
     echo "",exec($cmd, $output, $retval);
     echo "<tr> <td>&nbsp;</td></tr>";
 

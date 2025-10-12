@@ -26,13 +26,15 @@ my $vmt = 0;
 my $reload = 0;
 my $acttg = 0;
 my $at_least_one_curr = 0;
+my $tgnames = "";
+my %DataTG;
 
 my $verbose = 0;
 # prüfen ob Heimnetz erreichbar ist, keine Aktion, falls aktiv
 # 10.3.0.1 ist das ggü liegende tun interface
 my $tm = localtime(time);
 my $tgdatei_upd = 0;
-my $version = "2.30";
+my $version = "2.40";
 
     my $cmd = "pwd";
 	my $dir =`$cmd`;
@@ -48,8 +50,9 @@ my $version = "2.30";
 
 	my $total = $#ARGV + 1;
 	my $counter = 1;
+    print LOG "Parameter ($total):\n";
 	foreach my $a(@ARGV) {
-		print "Arg # $counter : $a\n" if ($verbose == 7);
+		print "Arg # $counter : $a\n"if ($verbose == 1);
 		$counter++;
 		if (substr($a,0,2) eq "v=") {
 		    $verbose = substr($a,2,1);
@@ -58,6 +61,8 @@ my $version = "2.30";
             if (substr($a,0,2) eq "r=") {
                 $reload = substr($a,2,1);
                 print LOG "Reload: $reload\n" if $verbose;
+            } elsif (substr($a,0,8) eq "TGNames:") {
+                $tgnames = substr($a,8,length($a)-8);
             } else {
                 print "ARG_b: $a\n" if $verbose;
                 print LOG "ARG_b: $a\n" if $verbose;
@@ -70,6 +75,7 @@ my $version = "2.30";
     --$vmt;
     $acttg = $valid_mon_tgs[$vmt];
     printf LOG "$counter (0)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg if $verbose;
+    prepare_tgnames($tgnames);
     $acttg = $valid_mon_tgs[$vmt];
 #    --$vmt;
     while ($vmt) {
@@ -304,8 +310,8 @@ my $ii = 0;
             $mon_tg = $DataTabMonTG{$mon_tgi}{'MONTG'};
             print LOG "$mon_tg_act eq $mon_tg? [Index: $mon_tgi]\n" if ($verbose >3);
             if ($mon_tg_act ne $mon_tg) {
-#            printf "</td></tr><tr><td><b>TG %s</b></td></tr><tr><td>", $mon_tg;
-                printf "</td></tr><tr><td><form method=\"post\"><button type=submit id=jmptoA name=jmptoA class=active_id value=%s>TG %s</button></form>",$mon_tg,$mon_tg;
+#            printf "</td></tr><tr><td><b>TG %s %s</b></td></tr><tr><td>", $mon_tg, $DataTG{$mon_tg};
+                printf "</td></tr><tr><td><form method=\"post\"><button type=submit id=jmptoA name=jmptoA class=active_id value=%s>TG %s (%s)</button></form>",$mon_tg,$mon_tg,$DataTG{$mon_tg};;
                 printf LOG "\n%s\n ",$mon_tg;
                 $mon_tg_act = $mon_tg;
                 $nn = 0;
@@ -389,6 +395,36 @@ sub read_content {
     }    
     close INPUT;
 }
+
+sub prepare_tgnames {
+    my $verbose = 1;
+	my $tgnames = $_[0];
+	my $tgname = "";
+	my $tg = "";
+	my $tgn = "";
+    
+
+    printf LOG "TGNames: %s\n",$tgnames if $verbose;
+    my @tg_array = split (/;/, $tgnames);
+    foreach $tgname (@tg_array) {
+        printf LOG "TGName: %s\n",$tgname if $verbose;
+        $tg = ($tgname =~ /([\d]+)\^([\w ]+)/)? $1 : "undef";
+        if ($tg ne "undef") {
+            $tgn = $2;
+        } else {
+            $tg = ($tgname =~ /([\d]+)\^/)? $1 : "undef";
+            $tgn = "---";
+        }
+        $DataTG{$tg} = $tgn;
+    }
+    $tg = "777";
+    printf LOG "Test 1 TG:%s Name:%s\n",$tg, $DataTG{$tg} if $verbose;
+    $tg = "262649";
+    printf LOG "Test 2 TG:%s Name:%s\n",$tg, $DataTG{$tg} if $verbose;
+    $tg = "60431";
+    printf LOG "Test 3 TG:%s Name:%s\n",$tg, $DataTG{$tg} if $verbose;
+
+}    
 
 sub trim_plus {
 	my $string = $_[0];
