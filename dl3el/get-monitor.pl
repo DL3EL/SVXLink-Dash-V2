@@ -417,13 +417,6 @@ sub prepare_tgnames {
         }
         $DataTG{$tg} = $tgn;
     }
-    $tg = "777";
-    printf LOG "Test 1 TG:%s Name:%s\n",$tg, $DataTG{$tg} if $verbose;
-    $tg = "262649";
-    printf LOG "Test 2 TG:%s Name:%s\n",$tg, $DataTG{$tg} if $verbose;
-    $tg = "60431";
-    printf LOG "Test 3 TG:%s Name:%s\n",$tg, $DataTG{$tg} if $verbose;
-
 }    
 
 sub trim_plus {
