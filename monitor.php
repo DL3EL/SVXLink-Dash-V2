@@ -89,7 +89,7 @@ include_once "include/buttons.php";
 // wichtig, SVXLink muss für das Verzeichnis berechtigt  sein. Am besten auch noch chmod 755 setzen.
     $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 \"TGNames:" . $tgnames . "\"" . $tgmons;
 //    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 ". $tgmons . "\"TGNames:" . $tgnames . "\"";
-    if (debug) echo "Aufruf: " . $cmd;
+    if ((defined ('debug')) && (debug)) echo "Aufruf: " . $cmd;
     echo "",exec($cmd, $output, $retval);
     echo "<tr> <td>&nbsp;</td></tr>";
 
