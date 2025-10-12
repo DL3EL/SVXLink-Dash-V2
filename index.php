@@ -635,7 +635,7 @@ if ($dmr_support) {
     echo '</div></center>'."\n";
     if ($dmr_support == "1") {
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
-        include_once "/DVSwitch/include/lh.php";
+        include_once "/var/www/html/DVSwitch/include/lh.php";
         echo '</div></center>'."\n";
     }    
     echo "<br />\n";

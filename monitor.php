@@ -72,6 +72,7 @@ include_once "include/buttons.php";
     $tgmons = "";
     $tgnames = "";
     foreach ($tgmon as $key) {
+        $key = str_replace(" ","",$key);
         $tgmons = $tgmons . $key . " ";
         $tg = trim($key,"+");
         $tgnames = $tgnames . $tg . "^" . $tgdb_array[$tg] . ";";
