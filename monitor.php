@@ -76,7 +76,8 @@ include_once "include/buttons.php";
         $tgmons = $tgmons . $key . " ";
         $tg = trim($key,"+");
         if (isset($tgdb_array[$tg])) {
-            $tgnames = $tgnames . $tg . "^" . $tgdb_array[$tg] . ";";
+            $tgn = str_replace("`","'",$tgdb_array[$tg]);
+            $tgnames = $tgnames . $tg . "^" . $tgn . ";";
         } else {
             $tgnames = $tgnames . $tg . "^??;";
         }
@@ -87,7 +88,7 @@ include_once "include/buttons.php";
         $tgmons = $tgmons . $svxdata . " ";
     }    
 // wichtig, SVXLink muss für das Verzeichnis berechtigt  sein. Am besten auch noch chmod 755 setzen.
-    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 \"TGNames:" . $tgnames . "\"" . $tgmons;
+    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 \"TGNames:" . $tgnames . "\" " . $tgmons;
 //    $cmd = "perl " . DL3EL . "/get-monitor.pl v=0 r=1 ". $tgmons . "\"TGNames:" . $tgnames . "\"";
     if ((defined ('debug')) && (debug)) echo "Aufruf: " . $cmd;
     echo "",exec($cmd, $output, $retval);

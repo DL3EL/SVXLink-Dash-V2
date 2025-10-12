@@ -34,7 +34,7 @@ my $verbose = 0;
 # 10.3.0.1 ist das ggü liegende tun interface
 my $tm = localtime(time);
 my $tgdatei_upd = 0;
-my $version = "2.40";
+my $version = "2.42";
 
     my $cmd = "pwd";
 	my $dir =`$cmd`;
@@ -311,6 +311,7 @@ my $ii = 0;
             print LOG "$mon_tg_act eq $mon_tg? [Index: $mon_tgi]\n" if ($verbose >3);
             if ($mon_tg_act ne $mon_tg) {
 #            printf "</td></tr><tr><td><b>TG %s %s</b></td></tr><tr><td>", $mon_tg, $DataTG{$mon_tg};
+#            printf "Mon %s, Name: %s", $mon_tg, $DataTG{$mon_tg};
                 printf "</td></tr><tr><td><form method=\"post\"><button type=submit id=jmptoA name=jmptoA class=active_id value=%s>TG %s (%s)</button></form>",$mon_tg,$mon_tg,$DataTG{$mon_tg};;
                 printf LOG "\n%s\n ",$mon_tg;
                 $mon_tg_act = $mon_tg;
@@ -402,13 +403,11 @@ sub prepare_tgnames {
 	my $tgname = "";
 	my $tg = "";
 	my $tgn = "";
-    
 
     printf LOG "TGNames: %s\n",$tgnames if $verbose;
     my @tg_array = split (/;/, $tgnames);
     foreach $tgname (@tg_array) {
-        printf LOG "TGName: %s\n",$tgname if $verbose;
-        $tg = ($tgname =~ /([\d]+)\^([\w ]+)/)? $1 : "undef";
+        $tg = ($tgname =~ /([\d]+)\^(.*)/)? $1 : "undef";
         if ($tg ne "undef") {
             $tgn = $2;
         } else {
