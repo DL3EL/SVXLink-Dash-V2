@@ -75,7 +75,11 @@ include_once "include/buttons.php";
         $key = str_replace(" ","",$key);
         $tgmons = $tgmons . $key . " ";
         $tg = trim($key,"+");
-        $tgnames = $tgnames . $tg . "^" . $tgdb_array[$tg] . ";";
+        if (isset($tgdb_array[$tg])) {
+            $tgnames = $tgnames . $tg . "^" . $tgdb_array[$tg] . ";";
+        } else {
+            $tgnames = $tgnames . $tg . "^??;";
+        }
     }
     if (defined('DL3EL')) {
         $svxStatusFile = DL3EL . "/tg_status";
