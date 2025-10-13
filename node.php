@@ -83,7 +83,7 @@ include_once "include/buttons.php";
     echo '<div class="content">'."\n";
     echo '<script type="text/javascript">'."\n";
 
-    if (URLSVXRAPI!="") {
+    if ((defined('URLSVXRAPI')) && (URLSVXRAPI !="")) {
     echo 'function reloadSVXREF(){'."\n";
     echo '  $("#svxref").load("include/svxref.php",function(){ setTimeout(reloadSVXREF,90000) });'."\n";
     echo '}'."\n";

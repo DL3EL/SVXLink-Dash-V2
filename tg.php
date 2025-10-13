@@ -104,10 +104,10 @@ include_once "include/buttons.php";
     include "include/tg.php";
     echo '</div></center>'."\n";
     echo "<br />\n";
-    if (URLSVXRAPI!="") {
-    echo '<center><div id="svxref" style = "margin-bottom:30px;">'."\n";
-    //include "include/svxref.php";
-    echo '</div></center>'."\n";
+    if ((defined('URLSVXRAPI')) && (URLSVXRAPI !="")) {
+        echo '<center><div id="svxref" style = "margin-bottom:30px;">'."\n";
+        //include "include/svxref.php";
+        echo '</div></center>'."\n";
     }
     echo '</td></tr></table>';
 ?>
