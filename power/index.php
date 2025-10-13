@@ -21,7 +21,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "YES")) || ($_SESSION['auth'] === 'AUTHORISED')) {
 
-include_once  '../include/config.php';
+include_once  '../include/settings.php';
 include_once  '../include/functions.php';
 
 
@@ -180,9 +180,19 @@ if (isset($_POST['btnrstc710']))
         echo '<button name="btnrstc710" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Reset Sound C710</button>';
       }    
    }   
-  if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "yes"))) {
-      echo '<br><br><br>';
-      echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub)</button>';
+  if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
+        $cmd = "wget -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
+        echo "",exec($cmd, $output, $retval);
+        $content = trim(shell_exec('cat versioncheck'));
+        list($gitversion, $rest) = explode(" ", $content);
+        list($version, $rest) = explode(" ", $dbversion);
+        echo '<br><br><br>';
+        if (($gitversion !== $version) || (DL3EL_GIT_UPDATE === "nocheck"))  {
+            echo "<br>Github Version:$gitversion installierte Version:$version, bitte Update ausführen<br>";
+            echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+        } else {
+            echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+        }
   }
 
 ?>   
