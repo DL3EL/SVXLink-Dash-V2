@@ -40,7 +40,7 @@ include_once "tgdb.php";
       IF (strlen($dmrIDline) > 1000000) {
 	echo '<th>Name</th>';
 	$use_names = 1;
-	$command = "sudo cp -p " . $DMRIDFile $DMRIDFile_save 2>&1";
+	$command = "sudo cp -p " . $DMRIDFile . " " . $DMRIDFile_save 2>&1";
 	exec($command,$screen,$retval);
       } else {
 	$use_names = 0;
