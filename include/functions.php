@@ -164,6 +164,7 @@ function getEchoLog() {
 
 function getConnectedEcholink($echolog,$timestamp) {
         $users = Array();
+        $nn = 0;
         foreach ($echolog as $ElogLine) {
             if (strpos($ElogLine,"state changed to CONNECTED")) {
                 $lineParts = explode(" ", $ElogLine);
