@@ -105,7 +105,11 @@ if (!$log) {
   echo '<input type="submit" name="save" value="Save only">';  
   echo '&nbsp;&nbsp;';
 // Save &reload button
-  echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
+  if (substr($file, -3) !== "php") {
+    echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
+  } else {
+    echo "after saving, please reload the dashboard to see the changes. Reloading svxlink is not necessary";
+  }    
   echo '&nbsp;&nbsp;';
 // cancel button
   echo '<input type="submit" name="cancel" value="Cancel">';  
