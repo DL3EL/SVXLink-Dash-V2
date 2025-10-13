@@ -101,13 +101,15 @@ echo '<textarea name="content" rows="35" cols="120">' . htmlspecialchars($conten
 
 if (!$log) {
   echo '<div style = "text-align:center">Make your changes here</div>';  
-// Save button
-  echo '<input type="submit" name="save" value="Save only">';  
-  echo '&nbsp;&nbsp;';
-// Save &reload button
   if (substr($file, -3) !== "php") {
+// Save button
+    echo '<input type="submit" name="save" value="Save only">';  
+    echo '&nbsp;&nbsp;';
+// Save &reload button
     echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
   } else {
+    echo '<input type="submit" name="save" value="Save">';  
+    echo '&nbsp;&nbsp;';
     echo "after saving, please reload the dashboard to see the changes. Reloading svxlink is not necessary";
   }    
   echo '&nbsp;&nbsp;';
