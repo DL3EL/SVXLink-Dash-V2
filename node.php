@@ -101,10 +101,10 @@ include_once "include/buttons.php";
     include_once "include/lh_small.php";
     echo '</div></center>'."\n";
     echo "<br />\n";
-    if (URLSVXRAPI!="") {
-    echo '<center><div id="svxref" style = "margin-bottom:30px;">'."\n";
-    //include "include/svxref.php";
-    echo '</div></center>'."\n";
+    if ((defined('URLSVXRAPI')) && (URLSVXRAPI !="")) {
+        echo '<center><div id="svxref" style = "margin-bottom:30px;">'."\n";
+        //include "include/svxref.php";
+        echo '</div></center>'."\n";
     }
     echo '</td></tr></table>';
 ?>

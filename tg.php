@@ -86,11 +86,11 @@ include_once "include/buttons.php";
     echo '<div class="content">'."\n";
     echo '<script type="text/javascript">'."\n";
 
-    if (URLSVXRAPI!="") {
-    echo 'function reloadSVXREF(){'."\n";
-    //echo '  $("#svxref").load("include/svxref.php",function(){ setTimeout(reloadSVXREF,90000) });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadSVXREF,90000);'."\n";
+    if ((defined('URLSVXRAPI')) && (URLSVXRAPI !="")) {
+        echo 'function reloadSVXREF(){'."\n";
+        //echo '  $("#svxref").load("include/svxref.php",function(){ setTimeout(reloadSVXREF,90000) });'."\n";
+        echo '}'."\n";
+        echo 'setTimeout(reloadSVXREF,90000);'."\n";
      }
 
     echo 'function reloadTalkGroups(){'."\n";
