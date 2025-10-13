@@ -337,35 +337,69 @@ if (isset($_POST['btnRadio']))
 	$tail = $_POST['tail'];
 	$bw = $_POST['bw'];
 	$ctcss = $txctcss;
-	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")){
+	$ctcss_type = "invalid";
+	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")) {
 	  $ctcss_type = "dcs";
+	  $tail_cmd = "";
 	} else {    
-	  $ctcss_type = "ctcss";
+	  if ((substr($txctcss,-2,1) === ".") || ($txctcss = "0000")) {
+	    $ctcss_type = "ctcss";
+	    $tail_cmd = "--tail \"" . $tail . "\"";
+	  } else {  
+	    $ctcss_type = "invalid";
+	    $txctcss = "?" . $txctcss . "?";
+	    $retval = 1;
+	  }  
 	}
-	if ($rxctcss !== "") {
-		$ctcss = $txctcss . "," . $rxctcss;
-	}
-#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --close-tail \"" .$tail. "\" 2>&1";
-#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
-#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --dcs \"023N,023N" . "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
-#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
-        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
-	if ((defined ('debug')) && (debug > 10)) echo $command;
-        if (!$retval) exec($command,$screen,$retval);
+	if (!$retval) {
+	  if ((substr($rxctcss,-1) === "N") || (substr($rxctcss,-1) === "I")) {
+	    if ($ctcss_type !== "dcs") {
+	      $ctcss_type = "invalid";
+	      $txctcss = "?" . $txctcss . "?";
+	      $rxctcss = "?" . $rxctcss . "?";
+	      $retval = 1;
+	    } else {  
+	      $ctcss_type = "dcs";
+	      $tail_cmd = "";
+	    }
+	  } else {    
+	    if ((substr($rxctcss,-2,1) === ".") || ($rxctcss = "0000")) {
+	      if ($ctcss_type !== "ctcss") {
+		$ctcss_type = "invalid";
+		$txctcss = "?" . $txctcss . "?";
+		$rxctcss = "?" . $rxctcss . "?";
+		$retval = 1;
+	      } else {
+		$ctcss_type = "ctcss";
+		$tail_cmd = "--tail \"" . $tail . "\"";
+	      }
+	    } else {  
+	      $ctcss_type = "invalid";
+	      $rxctcss = "?" . $rxctcss . "?";
+	      $retval = 1;
+	    }  
+	  }
+	  if ($rxctcss !== "") {
+	    $ctcss = $txctcss . "," . $rxctcss;
+	  }
+	}  
 
 	if (!$retval) {
-//                $RfData['port']=$port;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['offset']=$offset;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
-                $RfData['port']=$port;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
-                $jsonRfData = json_encode($RfData);
-                file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
-                //archive the current config
-//                exec('sudo cp /opt/sa818/sa818.json /opt/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                //move generated file to current config
-//                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
-                exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
-        }
-	echo "new Data saved to device on $port, please reload page<br>";  
+        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
+	if ((defined ('debug')) && (debug > 10)) echo $command;
+	  exec($command,$screen,$retval);
+	  $RfData['port']=$port;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
+	  $jsonRfData = json_encode($RfData);
+	  file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
+	  //archive the current config
+	  exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
+	  //move generated file to current config
+	  exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+	  echo "new Data saved to device on $port, please reload page<br>";  
+        } else {
+	  $command = "python3 sa818.py  2>&1";
+	  exec($command,$screen,$retval);
+       }  
 }
 
 if (isset($_POST['btnFilters']))
@@ -525,8 +559,8 @@ $bw = $RfData['bw'];
 	Shift: <input type "text" name="offset" style = "width: 50px" value="<?php echo $offset;?>"> <br>
    	Ctcss: <input type "text" name="ctcss" style = "width: 50px" value="<?php echo $ctcss;?>">
 --->
-   	RXCtcss: <input type "text" name="rxctcss" style = "width: 50px" value="<?php echo $rxctcss;?>">
-   	TXCtcss: <input type "text" name="txctcss" style = "width: 50px" value="<?php echo $txctcss;?>"><br>
+   	CTCSS: z.B. 67.0, DCS z.B. 023[N/I]<br>RX-Code: <input type "text" name="rxctcss" style = "width: 50px" value="<?php echo $rxctcss;?>">
+   	TX-Code: <input type "text" name="txctcss" style = "width: 50px" value="<?php echo $txctcss;?>"><br>
 	Squelch: <input type "text" name="squelch" style = "width: 50px" value="<?php echo $squelch;?>">
 	Tail: <input type "text" name="tail" style = "width: 50px" value="<?php echo $tail;?>">
 	Bandwidth: <input type "text" name="bw" style = "width: 50px" value="<?php echo $bw;?>">
