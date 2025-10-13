@@ -31,7 +31,8 @@ include_once "tgdb.php";
       } else {
 	$DMRIDFile = DL3EL . "/DMRIds.dat";
 	$DMRIDFile_save = DL3EL . "/DMRIds.dat.save";
-	$update_script = DL3EL .'/DMRID_update.sh';
+	$update_script = DL3EL .'/DMRID_update.sh ';
+	$update_script = DL3EL . "/DMRID_update.sh";
 	$logfile =  DL3EL .'/DMRID_update.log';
 	update_file($DMRIDFile, $update_script, $logfile, 86400);
       }  
@@ -39,9 +40,12 @@ include_once "tgdb.php";
       IF (strlen($dmrIDline) > 1000000) {
 	echo '<th>Name</th>';
 	$use_names = 1;
+	$command = "sudo cp -p " . $DMRIDFile $DMRIDFile_save 2>&1";
+	exec($command,$screen,$retval);
       } else {
 	$use_names = 0;
       }
+     
 ?>
       <th width=100px>TG #</th>
 	<th width=30px> M </th>
