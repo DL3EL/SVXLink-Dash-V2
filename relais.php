@@ -164,7 +164,7 @@ include_once "include/buttons.php";
         }
         fclose($handle);
         $cmd = "wget -O- -q \"http://relais.dl3el.de/cgi-bin/metar.pl?sel=gridsq&gs=" . $loc . "\"";
-        echo "",exec($cmd, $output, $retval);
+//        echo "",exec($cmd, $output, $retval);
         echo '</form>';
     } else {
       echo "wrong file: " . $RelaisFile ."<br>";  

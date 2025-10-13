@@ -38,35 +38,53 @@ if (session_status() === PHP_SESSION_NONE) {
 	<a style = "color: black;">Display</a> |
 	<a href="./index.php" style = "color: #000000;">Dashboard</a> | 
 	<a href="./node.php" style = "color: #000000;">Nodes</a> | 
-	<a href="./echolink_dl3el.php" style = "color: #0000ff;">Echolink</a> | 
 	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
-	<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | 
-	<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | 
-	<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
-	<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
+	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls</a> 
+<?php
+
+    if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
+	$show_top_menu = 1;
+    } else {    
+	if ($_SESSION['auth'] === "AUTHORISED") {
+	    $show_top_menu = 1;
+	} else {
+	    $show_top_menu = 0;
+	}
+    } 	
+    if ($show_top_menu) {
+	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;"> | Echolink</a> | ';
+	echo '<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | ';
+	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> ';
+	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
+	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
+    }
+?>
 <?php
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
-		echo '<a href="./audio.php" style = "color: #0000ff;">Audio </a> | ';
+		echo '<a href="./audio.php" style = "color: #0000ff;"> | Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #0000ff;">Wifi</a> | ';
-		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> | ';
+		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> ';
 //		echo '<a href="/nodeInfo.php" style = "color: #0000ff;">Node Info</a> | ';
 	}	
 
 
 	if ($_SESSION['auth'] === "AUTHORISED") {
-	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log">Log</a> | ';
+	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log"> | Log</a> ';
 	}
 ?>
-	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls</a> 
 <?php
 	if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 	    echo ' ';
             $_SESSION['auth'] = "AUTHORISED";
 	} else {    
-	    echo '| <a href="./authorise.php" style = "color: crimson;">Authorise</a>';
+	    if ((defined('MENUTOPAUTH')) && (MENUTOPAUTH === "no")) {
+		// do not show Authorise
+	    } else {
+		echo ' | <a href="./authorise.php" style = "color: crimson;"> | Authorise</a>';
+	    }
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
-	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;">| DV-Switch</a></p>';
+	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;"> | DV-Switch</a></p>';
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
