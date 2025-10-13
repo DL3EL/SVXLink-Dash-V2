@@ -185,6 +185,7 @@ if (fopen($RfConfFile,'r')) {
       $fLow = "disable";
       $fHigh = "enable";
       $tail = "close";
+echo "Shari: " . $output[0] . "<br>";
       list($tx, $rx, $txctcss, $squelch, $rxctcss, $bandwidth) = explode(",", $output[0]);
       if ((defined ('debug')) && (debug > 0)) echo "current data from shari: TX$tx, RX$rx, $txctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
       $RfData['freq'] = $tx;
@@ -330,18 +331,25 @@ if (isset($_POST['btnRadio']))
 // SA818 works only in simplex mode, RX has to be equal to TX	
 	$txfreq = $rxfreq;
 	$squelch = $_POST['squelch'];
-	$ctcss = $_POST['ctcss'];
+//	$ctcss = $_POST['ctcss'];
 	$rxctcss = $_POST['rxctcss'];
 	$txctcss = $_POST['txctcss'];
 	$tail = $_POST['tail'];
 	$bw = $_POST['bw'];
 	$ctcss = $txctcss;
+	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")){
+	  $ctcss_type = "dcs";
+	} else {    
+	  $ctcss_type = "ctcss";
+	}
 	if ($rxctcss !== "") {
 		$ctcss = $txctcss . "," . $rxctcss;
 	}
 #        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --close-tail \"" .$tail. "\" 2>&1";
 #        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$freq. "\" --offset \"" .$offset. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
-        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
+#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --dcs \"023N,023N" . "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
+#        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --ctcss \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
+        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" --tail \"" .$tail. "\" --bw \"" .$bw. "\" 2>&1";
 	if ((defined ('debug')) && (debug > 10)) echo $command;
         if (!$retval) exec($command,$screen,$retval);
 

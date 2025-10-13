@@ -58,13 +58,26 @@ my @CTCSS = (
     my $bandwidth = $1;
     my $tx = $2;
     my $rx = $2;
+    my $ctcss = 0;
+    $txctcss = $4;
+print "TXCTCSS: $txctcss\n" if ($verbose >= 1);
+if ((substr($txctcss,3,1) ne "N") && (substr($txctcss,3,1) ne "I")) {
     $txctcss = $CTCSS[$4];
+    $ctcss = 1;
+} 
     my $squelch = $5;
+    $rxctcss = $6;
+print "RXCTCSS: $txctcss\n" if ($verbose >= 1);
+if ((substr($rxctcss,3,1) ne "N") && (substr($rxctcss,3,1) ne "I")) {
     $rxctcss = $CTCSS[$6];
+    $ctcss = 1;
+} 
     if (!$verbose) {
 	if ($readmachine eq "") {
-	    $txctcss = $txctcss . "Hz" if ($4 ne "0000");
-	    $rxctcss = $rxctcss . "Hz" if ($6 ne "0000");
+	    if ($ctcss) {
+		$txctcss = $txctcss . "Hz" if ($4 ne "0000");
+		$rxctcss = $rxctcss . "Hz" if ($6 ne "0000");
+	    }
 	    printf "%s/RSSI:%s<br>RX:%s/TX:%s",$2,$rssi,$rxctcss,$txctcss;
 	    exit 0;
 	} else {
@@ -81,9 +94,17 @@ my @CTCSS = (
 	    print "Channelspace: [$1]\n" if ($verbose >= 1);
 	    print "QRG: [$2]\n" if ($verbose >= 0);
 	    print "QRG_In: [$3]\n" if ($verbose >= 1);
-	    printf "TXCTCSS: [%shz]\n", $txctcss;
+	    if ($ctcss) {
+		printf "TXCTCSS: [%shz]\n", $txctcss;
+	    } else {
+		printf "TX_DCS: [%s]\n", $txctcss;
+	    }
 	    print "Squelch: [$5]\n" if ($verbose >= 0);
-	    printf "RXCTCSS: [%shz]\n", $rxctcss;
+	    if ($ctcss) {
+		printf "RXCTCSS: [%shz]\n", $rxctcss;
+	    } else {
+		printf "RX_DCS: [%s]\n", $rxctcss;
+	    }
 	    printf "CMD: %s\n",$cmd;
 	    $data = ($cmd =~ /.*RSSI=([\d]+)/s)? $1 : "undef";
 	    printf "RSSI: %s\n",$data;

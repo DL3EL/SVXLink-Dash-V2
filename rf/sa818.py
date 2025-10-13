@@ -56,7 +56,8 @@ class SA818:
   VOLUME = "AT+DMOSETVOLUME"
   TAIL = "AT+SETTAIL"
   NARROW = 0
-  PORTS = ('/dev/serial0', '/dev/ttyUSB0')
+#  PORTS = ('/dev/serial0', '/dev/ttyUSB0')
+  PORTS = ('/dev/ttyS0', '/dev/ttyUSB0')
   READ_TIMEOUT = 3.0
 
   def __init__(self, port=None, baud=DEFAULT_BAUDRATE):
@@ -116,7 +117,7 @@ class SA818:
       logger.error('Character decode error: Check your baudrate')
     return line.rstrip()
 
-  def version(self):
+  def version(self, port):
     self.send("AT+VERSION")
     time.sleep(0.5)
     reply = self.readline()
@@ -126,7 +127,7 @@ class SA818:
       logger.error('Unable to decode the firmware version')
       return None
 
-    logger.info('Firmware %s, version: %s', version[1], '_'.join(version[2:]))
+    logger.info('Port: %s, Firmware %s, version: %s', port, version[1], '_'.join(version[2:]))
     return version
 
 #  def set_radio(self, frequency, offset, bw, squelch, ctcss, dcs, tail):
@@ -136,7 +137,7 @@ class SA818:
     if tone:                # 0000 = No ctcss or dcs tone
       tx_tone, rx_tone = tone
     else:
-      tx_tone, rx_tone = ['0000', '0000']
+      tx_tone, rx_tone = dcs
 
 #    if offset == 0.0:
 #      tx_freq = rx_freq = f"{frequency:.4f}"
@@ -425,7 +426,7 @@ def main():
     raise SystemExit(err) from None
 
   if opts.func == 'version':
-    radio.version()
+    radio.version(opts.port)
   elif opts.func == 'radio':
     radio.set_radio(
       opts.frequency,
