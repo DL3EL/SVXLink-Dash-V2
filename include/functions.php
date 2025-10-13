@@ -815,7 +815,7 @@ function display_config($config) {
     function update_file($updFile, $update_script, $logfile, $timer) {
 
         $delta = time() - filemtime($updFile);
-        //echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
+        if ((defined ('debug')) && (debug > 0)) echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
         if ($delta > $timer) {
           // einmal am Tag wird die Datei neu geholt
           // mal prüfen, ob es Überhohlvorgänge gibt ....
@@ -825,10 +825,10 @@ function display_config($config) {
           $owner = 'svxlink';
           $group = 'svxlink';
           $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " 2>&1";
-          //echo "cmd: $command";
+//          echo "cmd: $command";
           exec($command, $output, $return_var);
         } else {
-           //echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
+          if ((defined ('debug')) && (debug > 0)) echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
         }  
       }
 
