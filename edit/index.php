@@ -17,17 +17,21 @@ include_once "../include/config.php";
 <h1 id="conf-editor" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;"
 <?php
 
+// Get filename from query parameter
+$file = $_GET['file']; 
+$log = 0;
+
 if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'] === 'AUTHORISED')) {
   // ok, go ahead, set to authorized :-)
   $_SESSION['auth'] = "AUTHORISED";
 } else {
-    echo "not authorized";
-    return;
+    if ($file === "info") {
+      echo "ausnahmsweise";
+    } else {
+      echo "not authorized";
+      return;
+    }  
 }  
-
-// Get filename from query parameter
-$file = $_GET['file']; 
-$log = 0;
 
 if (($file == "log") || ($file == "ref") || ($file == "msg") || ($file == "info")) {
   if (($file == "log")  || ($file == "ref")) {
