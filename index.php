@@ -164,6 +164,7 @@ if (SHOWPTT=="TRUE") {
 // now including the volume buttons
     include_once "ptt.html";
 }
+    echo '<a href="./edit.php?file=info" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:18px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
 ?>
 
 <?php
