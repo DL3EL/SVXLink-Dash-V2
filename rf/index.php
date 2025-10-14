@@ -342,7 +342,7 @@ if (isset($_POST['btnRadio']))
 	  $ctcss_type = "dcs";
 	  $tail_cmd = "";
 	} else {    
-	  if ((substr($txctcss,-2,1) === ".") || ($txctcss = "0000")) {
+	  if ((substr($txctcss,-2,1) === ".") || ($txctcss = "None")) {
 	    $ctcss_type = "ctcss";
 	    $tail_cmd = "--tail \"" . $tail . "\"";
 	  } else {  
@@ -363,7 +363,7 @@ if (isset($_POST['btnRadio']))
 	      $tail_cmd = "";
 	    }
 	  } else {    
-	    if ((substr($rxctcss,-2,1) === ".") || ($rxctcss = "0000")) {
+	    if ((substr($rxctcss,-2,1) === ".") || ($rxctcss = "None")) {
 	      if ($ctcss_type !== "ctcss") {
 		$ctcss_type = "invalid";
 		$txctcss = "?" . $txctcss . "?";
