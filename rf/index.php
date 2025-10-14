@@ -559,7 +559,7 @@ $bw = $RfData['bw'];
 	Shift: <input type "text" name="offset" style = "width: 50px" value="<?php echo $offset;?>"> <br>
    	Ctcss: <input type "text" name="ctcss" style = "width: 50px" value="<?php echo $ctcss;?>">
 --->
-   	CTCSS: z.B. 67.0, DCS z.B. 023[N/I]<br>RX-Code: <input type "text" name="rxctcss" style = "width: 50px" value="<?php echo $rxctcss;?>">
+   	CTCSS: z.B. 67.0, DCS z.B. 023[N/I] oder "None"<br>RX-Code: <input type "text" name="rxctcss" style = "width: 50px" value="<?php echo $rxctcss;?>">
    	TX-Code: <input type "text" name="txctcss" style = "width: 50px" value="<?php echo $txctcss;?>"><br>
 	Squelch: <input type "text" name="squelch" style = "width: 50px" value="<?php echo $squelch;?>">
 	Tail: <input type "text" name="tail" style = "width: 50px" value="<?php echo $tail;?>">

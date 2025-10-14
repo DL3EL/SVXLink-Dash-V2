@@ -29,7 +29,7 @@ if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'
 $file = $_GET['file']; 
 $log = 0;
 
-if (($file == "log") || ($file == "ref") || ($file == "msg")) {
+if (($file == "log") || ($file == "ref") || ($file == "msg") || ($file == "info")) {
   if (($file == "log")  || ($file == "ref")) {
     if ($file == "log") {
       $file = SVXLOGPATH . SVXLOGPREFIX;
@@ -63,9 +63,15 @@ if (($file == "log") || ($file == "ref") || ($file == "msg")) {
     }
     echo ">Log Display: " . $file . " (reverse order)</h1>";
   } else {
-    $file = DL3EL . "/aprs-is.msg";
-    $log = 1;
-    echo ">Message Display: " . $file . " (reverse order)</h1>";
+    if ($file == "msg") {
+      $file = DL3EL . "/aprs-is.msg";
+      $log = 1;
+      echo ">Message Display: " . $file . " (reverse order)</h1>";
+    } else {  
+      $file = DL3EL . "/readme.info";
+      $log = 2;
+      echo ">Info Display: " . $file . " </h1>";
+    }
   }  
 } else {
     echo ">Expert-Editor " . $file . "</h1>";
@@ -89,9 +95,11 @@ if ($log) {
 // Read Log File content
       $content = file_get_contents($file);
 // reverse Log File reverse
+  if ($log === 1) {
       $zeilen_array = explode("\n", $content);
       $umgekehrte_zeilen = array_reverse($zeilen_array);
       $content = implode("\n", $umgekehrte_zeilen);
+  }    
 } else {   
   $content = file_get_contents($file);
 }  
