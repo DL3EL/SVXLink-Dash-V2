@@ -6,7 +6,6 @@ include_once "config.php";
 include_once "tools.php";        
 include_once "functions.php";
 
-
 ?>
 <div style = "width:180px;"><span style = "font-weight: bold;font-size:14px;">SVXLink Info</span></div>
 <fieldset style = "width:175px;background-color:#e8e8e8e8;margin-top:6px;;margin-bottom:0px;margin-left:0px;margin-right:3px;font-size:12px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
@@ -204,19 +203,23 @@ if ($reflectorlogic2 != "") {
       echo "</div></td></tr>";
       echo "<tr><th width=50%>TXing</th><td style=\"background:#ffffed;color:red;font-weight: bold;\">".$echotxing."</td></tr>";
       echo "</table>\n";
+
       $svxEchoConfigFile = "/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
       if (fopen($svxEchoConfigFile,'r')) { 
          $svxeconfig = parse_ini_file($svxEchoConfigFile,true,INI_SCANNER_RAW);
-         $eproxyd= isset($svxeconfig['PROXY_SERVER']) ? $svxeconfig['PROXY_SERVER'] : ''; 
+//         $eproxyd= isset($svxeconfig['PROXY_SERVER']) ? $svxeconfig['PROXY_SERVER'] : ''; 
+         $eproxyd= isset($svxeconfig['ModuleEchoLink']['PROXY_SERVER']) ? $svxeconfig['ModuleEchoLink']['PROXY_SERVER'] : 'X'; 
       } else {
          $eproxyd= ""; 
       }
+//      echo "Proxy(alt): ($eproxyd) <br>";
       $eproxy = getEchoLinkProxy();
+//      echo "Proxy(neu): [$eproxy]";
       if ($eproxy!="" and $eproxyd!="") {
          echo "<table style=\"margin-top:4px;margin-bottom:4px;\"><tr><th>EchoLink Proxy</th></tr><tr>"; 
          echo "<tr><td style=\"background:#ffffed;\">";
          echo "<div style=\"margin-top:2px;margin-bottom:2px;white-space:normal;color:black;font-weight:500;\">";
-         if ($eproxy!="Access denied to proxy") {
+         if ($eproxy!="Access denied to proxy ") {
             echo $eproxy;
          } else { 
             echo "<div style=\"margin-top:2px;margin-bottom:2px;color:red;font-weight: bold;\">".$eproxy; 

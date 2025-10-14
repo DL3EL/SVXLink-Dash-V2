@@ -28,6 +28,8 @@ include_once "tgdb.php";
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
       if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
 	$DMRIDFile = "/var/lib/mmdvm/DMRIds.dat";
+	$use_names = 1;
+	$dmrIDline = file_get_contents($DMRIDFile);
       } else {
 	$DMRIDFile = DL3EL . "/DMRIds.dat";
 	$DMRIDFile_save = DL3EL . "/DMRIds.dat.save";
@@ -35,17 +37,16 @@ include_once "tgdb.php";
 	$update_script = DL3EL . "/DMRID_update.sh";
 	$logfile =  DL3EL .'/DMRID_update.log';
 	update_file($DMRIDFile, $update_script, $logfile, 86400);
+	$dmrIDline = file_get_contents($DMRIDFile);
+	if (strlen($dmrIDline) > 1000000) {
+	  echo '<th>Name</th>';
+	  $use_names = 1;
+	  $command = "sudo cp -p " . $DMRIDFile . " " . $DMRIDFile_save . " 2>&1";
+	  exec($command,$screen,$retval);
+	} else {
+	  $use_names = 0;
+	}
       }  
-      $dmrIDline = file_get_contents($DMRIDFile);
-      IF (strlen($dmrIDline) > 1000000) {
-	echo '<th>Name</th>';
-	$use_names = 1;
-	$command = "sudo cp -p " . $DMRIDFile . " " . $DMRIDFile_save . " 2>&1";
-	exec($command,$screen,$retval);
-      } else {
-	$use_names = 0;
-      }
-     
 ?>
       <th width=100px>TG #</th>
 	<th width=30px> M </th>

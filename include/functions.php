@@ -132,25 +132,79 @@ function getSVXRstatus($reflector) {
 
 function getEchoLinkProxy() {
 	if (file_exists(SVXLOGPATH.SVXLOGPREFIX)) {
-           $elogPath = SVXLOGPATH.SVXLOGPREFIX; 
-           $echoproxy = `tail -10000 $elogPath | grep -a -h "EchoLink proxy" | tail -1`;}
+    $elogPath = SVXLOGPATH.SVXLOGPREFIX; 
+    $echoproxy = `tail -10000 $elogPath | grep -a -h "EchoLink proxy" | tail -1`;}
 	if ($echoproxy=="" && file_exists(SVXLOGPATH.SVXLOGPREFIX.".1")) {
-           $elogPath = SVXLOGPATH.SVXLOGPREFIX.".1"; 
-           $echoproxy = `tail -10000 $elogPath | grep -a -h "EchoLink proxy" | tail -1`;}
-           if(strpos($echoproxy,"Connected to EchoLink proxy")){
-              $proxy=substr($echoproxy,strpos($echoproxy,"Connected to EchoLink proxy")+27);
-              $eproxy="Connected to proxy<br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
-            }
-           elseif(strpos($echoproxy,"Disconnected from EchoLink proxy")){
-              $proxy=substr($echoproxy,strpos($echoproxy,"Disconnected from EchoLink proxy")+32);
-              $eproxy="<span style=\"color:red;font-weight:bold;\">Disconnected proxy</span><br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
-            }
-           elseif(strpos($echoproxy,"Access denied to EchoLink proxy")){
-              $eproxy="Access denied to proxy";
-            }
-           else { $eproxy="";}
+    $elogPath = SVXLOGPATH.SVXLOGPREFIX.".1"; 
+    $echoproxy = `tail -10000 $elogPath | grep -a -h "EchoLink proxy" | tail -1`;}
+    if(strpos($echoproxy,"Connected to EchoLink proxy")){
+      $proxy=substr($echoproxy,strpos($echoproxy,"Connected to EchoLink proxy")+27);
+      $eproxy="Connected to proxy<br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
+    }
+    elseif(strpos($echoproxy,"Disconnected from EchoLink proxy")){
+      $proxy=substr($echoproxy,strpos($echoproxy,"Disconnected from EchoLink proxy")+32);
+// if public proxy configured, selet one, which is free
+      $svxEchoConfigFile = "/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
+      if (fopen($svxEchoConfigFile,'r')) { 
+        $svxeconfig = parse_ini_file($svxEchoConfigFile,true,INI_SCANNER_RAW);
+        $eproxypw= isset($svxeconfig['ModuleEchoLink']['PROXY_PASSWORD']) ? $svxeconfig['ModuleEchoLink']['PROXY_PASSWORD'] : 'no'; 
+        $eproxyport= isset($svxeconfig['ModuleEchoLink']['PROXY_PORT']) ? $svxeconfig['ModuleEchoLink']['PROXY_PORT'] : '0'; 
+        if (($eproxypw === "PUBLIC") && ($eproxyport === "8100")) {
+          if ((defined ('debug')) && (debug > 0)) echo "$eproxypw<br>";
+          $cmd = "perl " . DL3EL . "/get-echolink-proxy.pl v=0 d="  . DL3EL ;
+          exec($cmd, $output, $retval);
+          $eproxy="$output[0]";
+          if ((defined ('debug')) && (debug > 0)) echo "new $eproxy<br>";
+          // Backup file
+          $backup_filename = $svxEchoConfigFile . "." . date("YmdHis");
+          exec('sudo cp -p ' . $svxEchoConfigFile . ' ' . $backup_filename);
+          $svxeconfig['ModuleEchoLink']['PROXY_SERVER'] = $eproxy;
+          $svxeconfig['active']['ModuleEchoLink']['PROXY_SERVER'] = $eproxy;
+          // save change
+          if (file_exists($svxEchoConfigFile)) {
+            $svxconfig = custom_parse_ini_file($svxEchoConfigFile);
+          } else {
+              die("File not found: $file");
+          }
 
-      return $eproxy;
+          $content = "";  
+          foreach ($svxconfig as $section => $entries) {
+            $content = "[$section]\n";
+            foreach ($entries as $key => $data) {
+              if ($key === "PROXY_SERVER") {
+                $svxconfig[$section][$key]['value'] = $eproxy;
+                if ((defined ('debug')) && (debug > 0)) echo $svxconfig[$section][$key]['value'];
+                if ((defined ('debug')) && (debug > 0)) echo "<br>";
+              }  
+              if (!$svxconfig[$section][$key]['active']) {
+                $content = $content . "#";
+              }  
+              $content = $content . "$key = " . $svxconfig[$section][$key]['value'] . "\n";
+            }  
+          }  
+          file_put_contents($svxEchoConfigFile, $content);
+////
+          // restart svxlink
+          $command = "sudo systemctl restart svxlink 2>&1";
+          echo "restarting svxlink ...<br>";
+          sleep(1);
+          exec($command,$screen,$retval);
+          if ($retval === 0) {
+            echo "$prog sucessfull restartet";
+          } else {
+            echo "$prog restart failure, check log";
+          }
+        }
+      } else {
+          $eproxy="<span style=\"color:red;font-weight:bold;\">Disconnected proxy</span><br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
+      }
+    }
+    elseif(strpos($echoproxy,"Access denied to EchoLink proxy")){
+      $eproxy="Access denied to proxy";
+    }
+    else { $eproxy="";}
+
+    return $eproxy;
 }
 
 
