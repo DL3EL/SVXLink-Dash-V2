@@ -27,6 +27,7 @@ include_once "tgdb.php";
       }
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
       if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
+	echo '<th>Name</th>';
 	$DMRIDFile = "/var/lib/mmdvm/DMRIds.dat";
 	$use_names = 1;
 	$dmrIDline = file_get_contents($DMRIDFile);

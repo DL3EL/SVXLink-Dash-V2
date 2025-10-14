@@ -1,5 +1,9 @@
+Neues in der Version 4.55
+- jetzt gibt es diese Infos :-)
+
 Neues in der Version 4.54
-- automatischer Echolink Proxy. Wenn man in der Echolink Konfiguration (/etc/svxlink/svxlink.d//ModuleEchoLink.conf) einen öffentlichen Proxy ausgewählt hat
+- automatischer Echolink Proxy. Wenn man in der Echolink Konfiguration (/etc/svxlink/svxlink.d//ModuleEchoLink.conf) 
+	einen öffentlichen Proxy ausgewählt hat
 	PROXY_SERVER = 192.68.17.154 (Beispiel)
 	PROXY_PORT = 8100 (Pflicht)
 	PROXY_PASSWORD = PUBLIC (Pflicht)
@@ -12,7 +16,8 @@ Neues in der Version 4.49
 
 Neues in der Version 4.45
 - Vorbereitung für den Einsatz bei Relais.
-	wenn Nutzern die Steuerung des FM-Funknetzteils eines Relais gestattet wird (z.B. Auswahl von TGs), dann gibt es jetzt die Möglichkeuit die Buttosn am unteren Dasboardrand 
+	wenn Nutzern die Steuerung des FM-Funknetzteils eines Relais gestattet wird (z.B. Auswahl von TGs), 
+	dann gibt es jetzt die Möglichkeuit die Buttosn am unteren Dasboardrand 
 	pro Button frei anzuzeigen oder durch das Adminpasswort zu schützen
 	Das geschieht über den zusätzlichen Parameter "auth" inder config.php
 	define("KEY2", array(' 26269 ','*9126269#','green','auth'));
@@ -30,9 +35,11 @@ Neues in der Version 4.34
 	eingetragen werden. Beide Radios können über eine Maske im Dashboard konfiguriert werden
 - RSSI Wert des empfangenen Signal im linken Statusfenster
 	es ist nur ein numerischer Wert, der die Stäkre des empfangenen SIgnals anzeigt
-	wenn das Radio kein Signal empfängt, wird das Grundrauschen angezeigt, Signale die ab etwa 15 darüber liegen werden gut ins Funknetz übergeben.
-	Normalerweise sollte der RSSI Wert ohne empfangenes Signal unter 20 liegen. Ist er deutlich höher (z.B. wenn das Radio an eine gfute Antenne angeschlossen ist, 
-	empfiehlt sich der Einsatz einen zusätzlichen BAndfilters
+	wenn das Radio kein Signal empfängt, wird das Grundrauschen angezeigt, Signale die ab etwa 15 
+	darüber liegen werden gut ins Funknetz übergeben.
+	Normalerweise sollte der RSSI Wert ohne empfangenes Signal unter 20 liegen. Ist er deutlich 
+	höher (z.B. wenn das Radio an eine gfute Antenne angeschlossen ist, empfiehlt sich der Einsatz 
+	einen zusätzlichen Bandfilters
 
 Neues in der Version 4.32
 - Dashboard ist jetzt ein Teil vom DC9CQ FM-Funknetz Image 
