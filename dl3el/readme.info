@@ -1,5 +1,5 @@
 Neues in der Version 4.58
-- Nachdem die automatische Proxy Einstellung bei Echolink so gut angekommen ist, habe ich mit JOnathan, K1RFD, 
+- Nachdem die automatische Proxy Einstellung bei Echolink so gut angekommen ist, habe ich mit Jonathan, K1RFD, 
 	gesprochen. Er hat mir jetzt eine Seite zur Verfügung gestellt, die die Proxyinformationen in XML beinhaltet. 
 	Dadurch konnte ich einerseits den Code wesentlich schlanker und schneller machen und zusätzlich noch einen 
 	Zufallsmechanismus einführen. Jetzt wird also nicht der erste freie Proxy genommen, sondern aus der Menge 
