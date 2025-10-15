@@ -85,7 +85,7 @@ if (session_status() === PHP_SESSION_NONE) {
 		$show_auth = 1;
 	    }
 // seems not to work, as the IP is always "1", currently this code does not do any harm
-	    $ip = isset($_SERVER['REMOTE_ADDR']);
+	    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
 	    if ((defined ('debug')) && (debug > 0)) echo "<br>RemoteIP: $ip";
 	    $net1= cidr_match($ip,"192.168.0.0/16");
 	    $net2= cidr_match($ip,"44.128.0.0/10");

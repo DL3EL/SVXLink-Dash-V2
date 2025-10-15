@@ -210,6 +210,7 @@ if ($reflectorlogic2 != "") {
 //         $eproxyd= isset($svxeconfig['PROXY_SERVER']) ? $svxeconfig['PROXY_SERVER'] : ''; 
          $eproxyd= isset($svxeconfig['ModuleEchoLink']['PROXY_SERVER']) ? $svxeconfig['ModuleEchoLink']['PROXY_SERVER'] : 'X'; 
       } else {
+         if ((defined ('debug')) && (debug > 0)) echo "$svxEchoConfigFile not found";
          $eproxyd= ""; 
       }
 //      echo "Proxy(alt): ($eproxyd) <br>";
@@ -267,22 +268,25 @@ if ($reflectorlogic2 != "") {
    }  
 
  
+   $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+   if ((defined ('debug')) && (debug > 0)) echo "REMOTE_ADDR: $_SERVER[REMOTE_ADDR]<br>$ip";
+   //$net1= cidr_match($ip,"192.168.0.0/16");
+   //$net2= cidr_match($ip,"44.128.0.0/10");
 
    echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >Editing</th></tr><tr>";
    echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#ff0000;font-weight: bold;\">";
    if ($_SESSION['auth'] === "UNAUTHORISED") {
       if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
          echo "always logged in";
-         echo "</div></td></tr>";
          $_SESSION['auth'] = "AUTHORISED";
       } else {
          echo "Not Authorised";
-         echo "</div></td></tr>";
       }
    } else {
       echo "logged in";
-      echo "</div></td></tr>";
    }   
+   echo " from<br>[$ip]";
+   echo "</div></td></tr>";
    echo "</table>\n";
 } else {
    echo "<span style=\"color:red;font-size:13.5px;font-weight: bold;\">SvxLink is not <br>running</span>";
