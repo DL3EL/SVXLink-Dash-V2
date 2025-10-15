@@ -39,6 +39,7 @@ my $version = "1.00";
 	STDOUT->autoflush(1);
 	my $total = $#ARGV + 1;
 	my $counter = 1;
+	my $xml_data = "";
 	foreach my $a(@ARGV) {
 		print "Arg # $counter : $a\n" if ($verbose == 1);
 		$counter++;
@@ -50,16 +51,20 @@ my $version = "1.00";
 		    $dir = substr($a,2,length($a));
 		    print "Dir: $dir\n" if $verbose;
 		} 
+		if (substr($a,0,3) eq "xml") {
+		    $xml_data = "?xml";
+		    print "XML Data: $xml_data\n" if $verbose;
+		} 
 	}
  
 	my $logdatei = $dir  . "/get-echolink-proxy.log";
 	my $eldatei = $dir  . "/get-echolink-proxy.lst";
 	open(LOG, ">$logdatei") or die "Fehler bei Logdatei: $logdatei ($dir)\n";
 	printf LOG "DL3EL Echolink GProxy Finder [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
-	printf LOG "Par: V%s D%\n",$verbose, $dir;
+	printf LOG "Par: V%s D%s\n",$verbose, $dir;
 
-    read_echolink_proxies($eldatei);
-    my $freeproxyip = find_el_proxy();
+    read_echolink_proxies($eldatei,$xml_data);
+    my $freeproxyip = ($xml_data eq "?xml")? find_el_proxy_xml() : find_el_proxy();
     print "$freeproxyip\n";
     close LOG;
     exit 0;
@@ -126,12 +131,55 @@ my $srch_pref = "ready";
 	    return (-1);;
 	}
 }
+sub find_el_proxy_xml {
+my $status = "";
+my $address = "";
+my $port = "";
+
+my %ProxyTab;
+my $ProxyTab;
+my @ProxyTab;
+my $proxyip = "";
+my $free_proxies = 0;
+my $free_proxy_found = 0;
+	my $nn = 0;
+
+    printf "\n\nLese Echolink Proxy: %s<br>\n",$el_content if ($verbose >=2);
+    printf "Start, free_proxies: %s\n",$free_proxies if ($verbose >=1);
+
+    @array = split (/<\/proxy>/, $el_content);
+    foreach $entry (@array) {
+	printf "Read Record [%s]\n",$entry if ($verbose >=2);
+	$status = ($entry =~ /<status>(Ready)<\/status>/i)? $1 : "undef";
+	if ($status eq "Ready") {
+	    $address = ($entry =~ /<address>([\d\w.\-\_]+)<\/address>/i)? $1 : $entry;
+	    $port = ($entry =~ /<port>([\d]+\.[\d]+\.[\d]+\.[\d]+)<\/port>/i)? $1 : "undef";
+	    $ProxyTab{$free_proxies}{'IP'} = $address;
+	    $ProxyTab{$free_proxies}{'PORT'} = $port;
+	    printf "Nr:%s ADR:%s\n",$free_proxies,$ProxyTab{$free_proxies}{'IP'} if ($verbose);
+	    ++$free_proxies;
+	}
+	++$nn;
+#	    last if ($free_proxies > 10);
+    }
+    --$free_proxies;
+    $free_proxy_found = int(rand($free_proxies)); # Random integer at least 0 and below 10
+    print "gelesen: $nn, davon frei: $free_proxies, Zufallszahl: $free_proxy_found\n" if ($verbose);
+    $proxyip = $ProxyTab{$free_proxy_found}{'IP'};
+
+    if ($free_proxy_found) {
+	return $proxyip;
+    } else {
+	print "gelesen: $nn\n" if ($verbose);
+	return (-1);
+    }
+}
 
 sub read_echolink_proxies {
     my $eldatei = $_[0];
+    my $xml = $_[1];
 
-    my $cmd = "wget --tries=2 --timeout=5 -O " . $eldatei . " -q http://www.echolink.org/proxylist.jsp";
-#    my $tx ="";
+    my $cmd = "wget --tries=2 --timeout=5 -O " . $eldatei . " -q http://www.echolink.org/proxylist.jsp" . $xml;
     my $tx =`$cmd`;
     printf "$log_time aktuelle Echolink Proxies<br>\n($cmd)\n($eldatei)\n" if ($verbose>2);
 
@@ -142,7 +190,8 @@ sub read_echolink_proxies {
         printf "$log_time Echolink Daten aus Cache geholt<br>%s\n",$el_content if ($verbose>3);
     }    
     close(INPUT);
-}    
+}   
+
 sub file_date_time {
 	my $eldatei = $_[0];
     my $tm = localtime(stat($eldatei)->mtime);

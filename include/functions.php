@@ -151,7 +151,7 @@ function getEchoLinkProxy() {
         $eproxyport= isset($svxeconfig['ModuleEchoLink']['PROXY_PORT']) ? $svxeconfig['ModuleEchoLink']['PROXY_PORT'] : '0'; 
         if (($eproxypw === "PUBLIC") && ($eproxyport === "8100")) {
           if ((defined ('debug')) && (debug > 0)) echo "$eproxypw<br>";
-          $cmd = "perl " . DL3EL . "/get-echolink-proxy.pl v=0 d="  . DL3EL ;
+          $cmd = "perl " . DL3EL . "/get-echolink-proxy.pl v=0 d="  . DL3EL . " xml";
           exec($cmd, $output, $retval);
           $eproxy="$output[0]";
           if ((defined ('debug')) && (debug > 0)) echo "new $eproxy<br>";
