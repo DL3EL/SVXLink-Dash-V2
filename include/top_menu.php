@@ -78,7 +78,7 @@ if (session_status() === PHP_SESSION_NONE) {
             $_SESSION['auth'] = "AUTHORISED";
 	    $show_auth = 1;
 	} else {    
-	    if ((defined('MENUTOPAUTH')) && (MENUTOPAUTH === "no")) {
+	    if ((defined('MENUTOPAUTH')) && (MENUTOPAUTH === "no") || ($_SESSION['auth'] !== "AUTHORISED")) {
 		$show_auth = 0;
 		// do not show Authorise
 	    } else {
@@ -160,10 +160,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 }
-?>
-    </div>
-    </form>
-<?php
+
+    echo '</div>';
+    echo '<div id="display-links" align=center>';
+    echo '<a href="./edit.php?file=info" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
+    echo '</div>';
+    echo '</form>';
 
 //include_once('parse_svxconf.php');
 

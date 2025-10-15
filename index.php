@@ -164,7 +164,10 @@ if (SHOWPTT=="TRUE") {
 // now including the volume buttons
     include_once "ptt.html";
 }
-    echo '<a href="./edit.php?file=info" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:18px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
+//    echo '<table>';
+//    echo '<a href="./edit.php?file=info" align="right" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
+//    echo '<a href="./edit.php?file=info" align="right" style = "border-radius:18px; color:white;border-color:black; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
+//    echo '</table>';
 ?>
 
 <?php
