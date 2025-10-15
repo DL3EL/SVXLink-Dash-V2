@@ -17,7 +17,49 @@ define("KEY7", array(' D7 ','*D7#','purple'));
 define("KEY8", array(' D8 ','*D8#','blue'));
 define("KEY9", array(' D9 ','*D9#','blue'));
 define("KEY10", array(' D10 ','*D10#','red'));
+// additional DTMF keys
+// define("KEY11", array(' D11 ','*D11#','green'));
+// define("KEY12", array(' D12 ','*D12#','orange'));
+// define("KEY13", array(' D13 ','*D13#','orange'));
+// define("KEY14", array(' D14 ','*D14#','orange'));
+// define("KEY15", array(' D15 ','*D15#','purple'));
+// define("KEY16", array(' D16 ','*D16#','purple'));
+// define("KEY17", array(' D17 ','*D17#','orange'));
+// define("KEY18", array(' D18 ','*D18#','blue'));
+// define("KEY19", array(' D19 ','*D19#','blue'));
+// define("KEY20", array(' D20 ','*D20#','red'));
 
+if (file_exists(__DIR__."/config.inc.php") ) { 
+    include_once __DIR__."/config.inc.php"; 
+} else {
+// header lines for information
+    define("HEADER_CAT","FM-Repeater");
+    define("HEADER_QTH",'$qth');
+    define("HEADER_QRG",'$freq');
+    define("HEADER_SYSOP","");
+    define("FMNETWORK_EXTRA","");
+    define("FULLACCESS_OUSIDE", "Full Access Outside");
+    define("EL_NODE_NR",'$EL_node');
+    define("CALLSIGN","");
+    define("LOGICS","");
+    define("REPORT_CTCSS","");
+    define("DTMF_CTRL_PTY","");
+    define("API","");
+    define("FMNET","");
+    define("TG_URI","NULL");
+    define("NODE_INFO_FILE","");
+    define("RF_MODULE","");
+    define("GLOBAL","");
+    define("ReflectorLogic","");
+    define("LinkToReflector","");
+    define("Rx1","");
+    define("Tx1","");
+    define("Macros","");
+    define("LocationInfo","");
+    define("RepeaterLogic","");
+    define("SimplexLogic","");
+}
+        
 // Path and file name of confguration
 define("SVXCONFPATH", "/etc/svxlink/");
 define("SVXCONFIG", "svxlink.conf");
@@ -31,8 +73,20 @@ define("ECHOLINKCONFIG", "ModuleEchoLink.conf");
 define("METARINFO", "ModuleMetarInfo.conf");
 define("TclVoiceMail", "no");
         
+// include_once "parse_svxconf.php";
+        
+//
+// Select only one URL for SVXReflector API to get connected Nodes
+//
+// FM SVXLink-UK
+//define("URLSVXRAPI", $refApi);
+//
 // Empty address API do not show connected nodes to svxreflector 
-define("URLSVXRAPI", "");
+//define("URLSVXRAPI", "");
+//
+// Put url address to your svxreflector which offer information of status
+//define("URLSVXRAPI", "http://192.168.1.33:9999/status");
+//
 //
 // Orange Pi Zero LTS version requires CPU_TEMP_OFFSET value 30 
 // to display CPU TEMPERATURE correctly
@@ -76,4 +130,23 @@ define("DL3EL_GIT_UPDATE", "yes");
 //
 define("DL3EL_APRS_MSG", "no");
 //
+$svxConfigFile = SVXCONFPATH . SVXCONFIG;
+if (fopen($svxConfigFile,'r')) { 
+    $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+    $callsign = isset($svxconfig['ReflectorLogic']['CALLSIGN']) ? $svxconfig['ReflectorLogic']['CALLSIGN'] : 'NOCALL';
+    $refApi = isset($svxconfig['ReflectorLogic']['API']) ? $svxconfig['ReflectorLogic']['API'] : '';
+    $fmnetwork = isset($svxconfig['ReflectorLogic']['HOSTS']) ? $svxconfig['ReflectorLogic']['HOSTS'] : $fmnetwork =$svxconfig['ReflectorLogic']['DNS_DOMAIN'];
+    $qth = isset($svxconfig['LocationInfo']['QTH']) ? $svxconfig['LocationInfo']['QTH'] : '';
+    $freq = isset($svxconfig['Rx1']['FREQ']) ? $svxconfig['Rx1']['FREQ'] : '';
+    $EL_node = isset($svxconfig['LocationInfo']['LOCATION']) ? $svxconfig['LocationInfo']['LOCATION'] : '';
+    $node_password = isset($svxconfig['ReflectorLogic']['AUTH_KEY']) ? $svxconfig['ReflectorLogic']['AUTH_KEY'] : '';
+    $node_user = $callsign;
+    }
+else { 
+     $callsign="NOCALL";
+     $fmnetwork="not registered";
+     $EL_node = "unknown";
+}
+define("FMNETWORK", $fmnetwork);
+
 ?>
