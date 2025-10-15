@@ -16,9 +16,9 @@ include_once "include/settings.php";
 	    <meta http-equiv="pragma" content="no-cache" />
 	    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 	    <meta http-equiv="Expires" content="0" />
-	    <link rel="stylesheet" type="text/css" href="css/font-awesome-4.7.0/css/font-awesome.min.css" />
+	    <!-- <link rel="stylesheet" type="text/css" href="css/font-awesome-4.7.0/css/font-awesome.min.css" />
 		<link href="css/featherlight.css" type="text/css" rel="stylesheet" />
-		<script src="scripts/featherlight.js" type="text/javascript" charset="utf-8"></script>
+		<script src="scripts/featherlight.js" type="text/javascript" charset="utf-8"></script> -->
 	</head>
 
 <?php
@@ -43,12 +43,11 @@ include_once "include/settings.php";
 </div>
 	</div>
 		</div>
-
-
+		
 <?php include_once "include/top_menu.php"; ?>
 
-
-		
+<div id="display-links" align=right>
+		<center>
 		<h2><?php echo ('Backup/Restore');?></h2>
 		    <?php if (!empty($_POST)) {
 			echo '<table width="100%">'."\n";
@@ -61,12 +60,12 @@ include_once "include/settings.php";
 			    exec("sudo rm -rf $backupZip > /dev/null");
 			    exec("sudo rm -rf $backupDir > /dev/null");
 			    exec("sudo mkdir $backupDir > /dev/null");
-			    exec("sudo cp  /etc/NetworkManager/system-connections/*.nmconnection $backupDir > /dev/null");
-			    exec("sudo cp  /etc/svxlink/* $backupDir > /dev/null");
-			    exec("sudo cp  /etc/svxlink/svxlink.d/* $backupDir > /dev/null");
-			    exec("sudo cp  /usr/share/svxlink/* $backupDir > /dev/null");
-			    exec("sudo cp  /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
-			    exec("sudo cp  /var/www/html/include/config.php $backupDir > /dev/null");
+			    exec("sudo cp -p -r /etc/NetworkManager/system-connections/*.nmconnection $backupDir > /dev/null");
+			    exec("sudo cp -p -r /etc/svxlink/* $backupDir > /dev/null");
+			    exec("sudo cp -p -r /etc/svxlink/svxlink.d/* $backupDir > /dev/null");
+			    //exec("sudo cp -r /usr/share/svxlink/* $backupDir > /dev/null");
+			    exec("sudo cp -p -r /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
+			    exec("sudo cp -p -r /var/www/html/include/config.php $backupDir > /dev/null");
 
 			    chdir($backupDir);
 			    exec("sudo zip -r $backupZip * > /dev/null");
@@ -142,7 +141,7 @@ include_once "include/settings.php";
 			    	exec('sudo systemctl stop svxlink > /dev/null');
 
 				// Overwrite the configs
-				exec("sudo mv -f /tmp/config_restore/tmp/config_backup/* /tmp/config_restore/ > /dev/null");
+				//exec("sudo mv -f /tmp/config_backup/* /tmp/config_restore/ > /dev/null");
 				exec("sudo rm -rf /tmp/config_restore/tmp > /dev/null");
 		        exec("sudo mv -f /tmp/config_restore/Module* /etc/svxlink/svxlink.d/ > /dev/null");
 				//exec("sudo mv -f /tmp/config_restore/ca-hook.py /usr/share/svxlink/ > /dev/null");
