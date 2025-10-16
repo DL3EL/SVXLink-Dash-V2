@@ -44,9 +44,16 @@ include_once "include/settings.php";
 	</div>
 		</div>
 		
-<?php include_once "include/top_menu.php"; ?>
-
+<?php // include_once "include/top_menu.php"; ?>
 <div id="display-links" align=right>
+	<p style = "padding-right: 5px; text-align: right; color: #000000;">
+	<a style = "color: black;">Display</a> |
+	<a href="./index.php" style = "color: #000000;">Dashboard</a> | 
+	<a href="./node.php" style = "color: #000000;">Nodes</a> | 
+	<a href="./echolink_dl3el.php" style = "color: #0000ff;">Echolink</a> | 
+	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
+	<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | 
+	<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | 
 		<center>
 		<h2><?php echo ('Backup/Restore');?></h2>
 		    <?php if (!empty($_POST)) {
