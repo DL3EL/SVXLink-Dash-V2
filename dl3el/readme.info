@@ -1,7 +1,8 @@
 Neues in der Version 4.60
-- Die Dateien, die vom Github Update angefasst, dürfen auf keinen Fall lokale geändert werden. Wenn das trotzdem passiert, 
-	dann wird der Update abgrochen. Es ist jetzt ein kleiner Workaround eingebaut, der in genau diesem Fall, die betroffenen 
-	Daten in .bak umbebennt und dann darum bittet, den Update noch einmal auszuführen. In den meisten Fällen hilft das.
+- Die Dateien, die vom Github Update angefasst, dürfen auf keinen Fall lokal geändert werden. Wenn das trotzdem 
+	passiert, dann wird der Update abgrochen. Es ist jetzt ein kleiner Workaround eingebaut, der in genau 
+	diesem Fall, die betroffenen Daten in .bak umbebennt und dann darum bittet, den Update noch einmal 
+	auszuführen. In den meisten Fällen hilft das.
 
 Neues in der Version 4.58
 - Nachdem die automatische Proxy Einstellung bei Echolink so gut angekommen ist, habe ich mit Jonathan, K1RFD, 
