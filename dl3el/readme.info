@@ -1,3 +1,8 @@
+Neues in der Version 4.60
+- Die Dateien, die vom Github Update angefasst, dürfen auf keinen Fall lokale geändert werden. Wenn das trotzdem passiert, 
+	dann wird der Update abgrochen. Es ist jetzt ein kleiner Workaround eingebaut, der in genau diesem Fall, die betroffenen 
+	Daten in .bak umbebennt und dann darum bittet, den Update noch einmal auszuführen. In den meisten Fällen hilft das.
+
 Neues in der Version 4.58
 - Nachdem die automatische Proxy Einstellung bei Echolink so gut angekommen ist, habe ich mit Jonathan, K1RFD, 
 	gesprochen. Er hat mir jetzt eine Seite zur Verfügung gestellt, die die Proxyinformationen in XML beinhaltet. 
@@ -24,7 +29,7 @@ Neues in der Version 4.49
 Neues in der Version 4.45
 - Vorbereitung für den Einsatz bei Relais.
 	wenn Nutzern die Steuerung des FM-Funknetzteils eines Relais gestattet wird (z.B. Auswahl von TGs), 
-	dann gibt es jetzt die Möglichkeuit die Buttosn am unteren Dasboardrand 
+	dann gibt es jetzt die Möglichkeit die Buttons am unteren Dashboardrand 
 	pro Button frei anzuzeigen oder durch das Adminpasswort zu schützen
 	Das geschieht über den zusätzlichen Parameter "auth" inder config.php
 	define("KEY2", array(' 26269 ','*9126269#','green','auth'));
