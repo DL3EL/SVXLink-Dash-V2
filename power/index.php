@@ -142,9 +142,9 @@ if (isset($_POST['btnDashUpdate']))
                 $str = str_replace("\r\n","\n",$str); 
                 $str = str_replace("\t","\n",$str); 
                 $str_array = explode("\n",$str);
-                $nn = 1;
+                $nn = 1; 
                 foreach ($str_array as $file) {
-                  if (($file !== "") && ($file !== "merge:")) {
+                  if (($file !== "") && ($file !== "merge:") && ($file !== "power/index.php")) {
                     $file = DL3EL_BASE . $file;
                     $mvfile = $nn . ": [" . $file . "]\n";
                     $content = $content . $mvfile;
