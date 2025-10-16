@@ -134,6 +134,31 @@ if (isset($_POST['btnDashUpdate']))
         exec($command,$output,$retval);
         $content = file_get_contents($log);
         exec("find " . DL3EL_BASE . "* ! -exec sudo chown $owner:$group {} +");
+        if (str_contains($content,'error: Your local changes to the following files would be overwritten')) {
+                $content = $content . "\nDatei Inkonsistenz zu Github \n";
+                $pos1 = stripos($content, "merge:");
+                $pos2 = stripos($content, "Please");
+                $str = substr($content,$pos1,$pos2-$pos1);
+                $str = str_replace("\r\n","\n",$str); 
+                $str = str_replace("\t","\n",$str); 
+                $str_array = explode("\n",$str);
+                $nn = 1;
+                foreach ($str_array as $file) {
+                  if (($file !== "") && ($file !== "merge:")) {
+                    $file = DL3EL_BASE . $file;
+                    $mvfile = $nn . ": [" . $file . "]\n";
+                    $content = $content . $mvfile;
+                    $cmd = $file . " " . $file . ".bak\n";
+                    $content = $content . "Datei wird umbenannt:\nrename " . $cmd;
+                    rename($file, $file. ".bak");
+                    $content = $content . "\n";
+                    ++$nn;
+                  }
+                }        
+                $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
+        } else {       
+                $content = $content . "\nGithub Update erfolgreich.";
+        }
         // Display in textarea           
         echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($content) . '</textarea><br>';
 
