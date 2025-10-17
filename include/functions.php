@@ -881,8 +881,10 @@ function display_config($config) {
           $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " 2>&1";
 //          echo "cmd: $command";
           exec($command, $output, $return_var);
+          return (1);
         } else {
           if ((defined ('debug')) && (debug > 0)) echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
+          return (0);
         }  
       }
 

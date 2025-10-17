@@ -37,13 +37,15 @@ include_once "tgdb.php";
 	$update_script = DL3EL .'/DMRID_update.sh ';
 	$update_script = DL3EL . "/DMRID_update.sh";
 	$logfile =  DL3EL .'/DMRID_update.log';
-	update_file($DMRIDFile, $update_script, $logfile, 86400);
+	$upd = update_file($DMRIDFile, $update_script, $logfile, 86400);
 	$dmrIDline = file_get_contents($DMRIDFile);
 	if (strlen($dmrIDline) > 1000000) {
 	  echo '<th>Name</th>';
 	  $use_names = 1;
-	  $command = "sudo cp -p " . $DMRIDFile . " " . $DMRIDFile_save . " 2>&1";
-	  exec($command,$screen,$retval);
+	  if ($upd) {
+	    $command = "sudo cp -p " . $DMRIDFile . " " . $DMRIDFile_save . " 2>&1";
+	    exec($command,$screen,$retval);
+	  }  
 	} else {
 	  $use_names = 0;
 	}

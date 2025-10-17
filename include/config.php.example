@@ -76,4 +76,5 @@ define("DL3EL_GIT_UPDATE", "yes");
 //
 define("DL3EL_APRS_MSG", "no");
 //
+include_once __DIR__."/config.inc.php"; 
 ?>
