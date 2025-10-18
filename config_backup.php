@@ -86,10 +86,10 @@ include_once "include/settings.php";
                 		$local_time = $dt->format('Y-M-d');
 					header('Content-Type: application/zip');
 						if ($hostNameInfo != "pi-star") {
-				    		header('Content-Disposition: attachment; filename="'.basename("SVXLINK_GURU_Config_".$hostNameInfo."_".$local_time.".zip").'"');
+				    		header('Content-Disposition: attachment; filename="'.basename("SVXLINK_Config_".$hostNameInfo."_".$local_time.".zip").'"');
 						}
 						else {
-				    		header('Content-Disposition: attachment; filename="'.basename("SVXLINK_GURU_Config_$local_time.zip").'"');
+				    		header('Content-Disposition: attachment; filename="'.basename("SVXLINK_Config_$local_time.zip").'"');
 						}
 					header('Content-Length: ' . filesize($backupZip));
 					ob_clean();
