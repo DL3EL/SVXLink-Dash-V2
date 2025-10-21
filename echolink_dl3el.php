@@ -2,14 +2,12 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 include "include/settings.php";
 include_once "include/page_top.php";
 ?>
-
 <?php
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
+//    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
     echo '<div class="nav" style = "margin-bottom:1px;margin-top:1px;">'."\n";
 
     echo '</div>'."\n";
@@ -23,14 +21,13 @@ include_once "include/page_top.php";
 <!--- 
     <form method="post" action=""> 
 -->
+   <p style = "padding-left: 5px; text-align: left;"> &nbsp;
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
         <label for="prefix">Prefix abfragen (DL für Deutschland)</label>
         <input type="text" id="prefix" name="prefix" value=<?php echo $elquery;?> required>
         <button type="submit">Query</button>
         <input type="hidden" name="form_submitted" value="1">
-    </form>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
+        &nbsp;&nbsp;&nbsp;&nbsp;
         <button type=submit id=jmptoE name=jmptoE class=active_id value=9999>*Echotest*</button>
     </form>
     <?php
