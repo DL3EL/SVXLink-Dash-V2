@@ -1,6 +1,5 @@
 <?php
     $dmrtg = "off";
-//    if (defined('DL3EL')) {
 ######## DVSwitch Stati
     $DMRStatusFile = DL3EL . "/dmr_status";
     $dmrstatus = trim(shell_exec('cat ' . $DMRStatusFile));
@@ -8,13 +7,11 @@
     $dvsmode = trim(shell_exec('cat ' . $DVSModeFile));
     $color = "blue";
     $colorb = "blue";
-//    if (strncmp($dmrstatus, "DMR_FM", 6) === 0) {
     if ($dmrstatus == "DMR_FM") {
         $mode ="DMR_FM";
         $color = "blue";
         $colorb = "green";
     }
-//    if (strncmp($dmrstatus, "DMR_only", 8) === 0) {
     if ($dmrstatus == "DMR_only") {
         $mode ="DMR_only";
         $color = "red";
@@ -31,22 +28,12 @@
         $dmrtg = $DMRdefTG;
     }    
 
-//    if (strncmp($dmrstatus, "FM_only", 7) === 0) {
     if ($dmrstatus == "FM_only") {
         $mode ="FM_only";
         $color = "blue";
         $colorb = "blue";
         $dmrtg = "off";
     }
-/*
-	if (file_exists('/usr/bin/dvs')) {
-       $dmr_support = "1";
-       $dmrtg = "off";
-    } else {
-       $dmr_support = "0";
-       $dmrtg = "no DMR";
-    }   
-*/
 
     if (isset($_POST['btn_DMR_FM'])) {
         if ($mode == "FM_only") {
@@ -322,7 +309,6 @@
         <button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:<?php echo $color;?>; height:30px; font-size:12px;"><b>DMR ein</b></button>
 --->
         <?php
-//            if ($dmr_support == "1") {
                 if ($mode == "FM_only") {
                     echo '<button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR ein</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
@@ -362,7 +348,6 @@
                         include_once "include/dvs_functions.php";
                         getYSFHosts();
                     echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]). '">';
-//                if ($mode == "DMR_only") {
                     $DVSStatusFile = DL3EL . "/dvs_status";
                     $dvsstatus = shell_exec('cat ' . $DVSStatusFile);
                     if (strncmp($dvsstatus, "DMR_DSTAR_YSF", 13) === 0) {
@@ -384,11 +369,9 @@
                 }    
                 echo "<br>DMR Mode: $mode / DVS Mode: $dvsmode";
                 echo '</form>';
-            }
     ?>
     </table>    
     <?php
-//}
 
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted']) && $dmr_support) {
         if (isset($_POST['dmrtg'])) {
