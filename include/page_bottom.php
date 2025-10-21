@@ -6,7 +6,7 @@ include_once "include/buttons.php"; }
     echo '<div class="content2">'."\n";
     echo '<script type="text/javascript">'."\n";
     echo 'function reloadSysInfo(){'."\n";
-    echo '  $("#sysInfo").load("../include/system.php",function(){ setTimeout(reloadSysInfo,15000) });'."\n";
+    echo '  $("#sysInfo").load("./system.php",function(){ setTimeout(reloadSysInfo,15000) });'."\n";
     echo '}'."\n";
     echo 'setTimeout(reloadSysInfo,15000);'."\n";
     echo '$(window).trigger(\'resize\');'."\n";
