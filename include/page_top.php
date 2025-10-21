@@ -29,7 +29,7 @@
       $.ajaxSetup({ cache: false });
     </script>
     <link href="css/featherlight.css" type="text/css" rel="stylesheet" />
-    <script src="../scripts/featherlight.js" type="text/javascript" charset="utf-8"></script>
+    <script src="scripts/featherlight.js" type="text/javascript" charset="utf-8"></script>
 <!----
 <link rel="stylesheet" href="">
  <script type="text/javascript">
