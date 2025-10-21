@@ -83,9 +83,28 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     }
 }
 include_once "include/page_top.php";
+//<!-- PTT button -->
+//<?php 
+if (SHOWPTT=="TRUE") {
+// now including the volume buttons
+    include_once "ptt.html";
+}
+
+
 
 if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
     $dmr_support = "1";
+} else {
+    $dmr_support = "0";
+    $dmrtg = "no DMR";
+}    
+// for debug, switch off dmr_support
+//    $dmr_support = "0";
+echo "DVS Support: $dmr_support";
+
+if ($dmr_support) {
+    include_once "dvs_code.php";
+/*
     $dmrtg = "off";
 //    if (defined('DL3EL')) {
 ######## DVSwitch Stati
@@ -125,25 +144,7 @@ if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
         $colorb = "blue";
         $dmrtg = "off";
     }
-/*
-	if (file_exists('/usr/bin/dvs')) {
-       $dmr_support = "1";
-       $dmrtg = "off";
-    } else {
-       $dmr_support = "0";
-       $dmrtg = "no DMR";
-    }   
-*/
-} else {
-    $dmr_support = "0";
-    $dmrtg = "no DMR";
-}    
-// for debug, switch off dmr_support
-//    $dmr_support = "0";
 
-?>
-<?php
-if ($dmr_support) {
     if (isset($_POST['btn_DMR_FM'])) {
         if ($mode == "FM_only") {
 // aktuelle svxlink.conf sollte Kopie von svxlink.conf.dmr_fm sein
@@ -399,10 +400,9 @@ if ($dmr_support) {
            $dvsmode = "DSTAR";
         }    
     }
+*/
 }
     if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && ($dmr_support == "1")) {
-// always stay logged on
-//    $_SESSION['auth'] = "AUTHORISED";
     ?>
 
     <table>
