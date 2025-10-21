@@ -2,15 +2,14 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include_once "config.php";          
-include_once "tools.php";       
-include_once "functions.php";    
+include_once "include/settings";          
+include_once "include/functions.php";    
 
 $url=URLSVXRAPI;
 if ($url!="") {
 //  Initiate curl
 	if (function_exists("curl_init")) {
-		echo "CURL: $url<br>";
+		if ((defined ('debug')) && (debug > 0)) echo "CURL: $url<br>";
 		$ch = curl_init();
 		// Will return the response, if false it print the response
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -21,10 +20,12 @@ if ($url!="") {
 		// Closing
 		curl_close($ch);
 		$nodes = json_decode($result, true);
-		} else { $nodes="";}
-	} else{
+		} else { 
 		echo "php-curl n/s:<br>";
 		echo "apt-get install php-curl to installö it <br>";
+		$nodes="";
+		}
+	} else{
 		$nodes="";
 }
 if ($nodes!="") {
@@ -48,7 +49,7 @@ $count=0;
 foreach ($nodes['nodes'] as $key =>$value)
  { $count=$count+1;}
 echo "<span style=\"line-height:1.8;font-weight:600;font-size:16px;color:black;\">Number of connected nodes:&nbsp;&nbsp;</span>
-      <span style=\"line-height:1.8;font-weight:600;font-size:15px;color:brown;\">";
+      <span style=\"line-height:1.8;font-weight:600;font-size:15px;color:blue;\">";
 echo $count;
 echo "</span></p>";
 ?>
@@ -56,13 +57,32 @@ echo "</span></p>";
 <div style = "text-align:left;font:9pt arial,sans-serif;margin-left:25px; margin-right:25px;margin-top:15px;margin-bottom:30px;line-height:1.6;white-space:normal;">
 <center>
 <?php
+//print_r($nodes);
 foreach ($nodes['nodes'] as $key =>$value)
  { 
+   if ($nodes['nodes'][$key]['isTalker']) {
+	$bold_s = "<b>";
+	$bold_e = "</b>";
+   } else {
+	$bold_s = "";
+	$bold_e = "";
+   }
    echo "<span class=\"tooltip\" style=\"border-bottom: 1px dotted white;\">";
-   echo "<span class=\"node\">".$key."<span class=\"tooltiptext\" style=\"top:100%;left:25%;margin-left:-50%;max-width:200px;width:195px;word-wrap: break-word;white-space: pre-wrap; padding: 3px 0;\">";
+//   echo $bold_s . "&nbsp;&nbsp;&nbsp;" . $key . "$bold_e" . "&nbsp;&nbsp;&nbsp;";
+//   echo "&nbsp;&nbsp;&nbsp;" . $key . "&nbsp;&nbsp;&nbsp;";
+   echo "<span class=\"node\">$bold_s". $key . "$bold_e";
+//   echo '<span style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;">' . $bold_s. $key . $bold_e . '</span>';
+//     echo '<span style = "border-radius:8px; color:white;border-color:transparent; background-color:blue;">&nbsp;' . $key . '&nbsp;</span>&nbsp;&nbsp;&nbsp;';
+   echo "<span class=\"tooltiptext\" style=\"top:100%;left:25%;margin-left:-50%;max-width:200px;width:195px;word-wrap: break-word;white-space: pre-wrap; padding: 3px 0;\">";
    if ($nodes['nodes'][$key]['nodeLocation']!=""){
-   echo "&nbsp;&nbsp;Info:<br><span style=\"color:gold;margin-left:10px;margin-right:10px;\"><b>";
-   echo $nodes['nodes'][$key]['nodeLocation']."</span><br>";
+	echo "&nbsp;&nbsp;Info:<br><span style=\"color:gold;margin-left:10px;margin-right:10px;\"><b>";
+	echo $nodes['nodes'][$key]['nodeLocation']."<br>";
+	if ($nodes['nodes'][$key]['isTalker']) {
+		echo "Talker: true<br>";
+	}	
+	echo "Echolink: " . $nodes['nodes'][$key]['Echolink']."<br>";
+	echo "ActiveTG: " . $nodes['nodes'][$key]['tg']."<br>";
+	echo "DefaultTG: " . $nodes['nodes'][$key]['DefaultTG']."</span><br>";
       }
    echo "&nbsp;&nbsp;Monitored TGs:<br><span style='color:yellow;margin-left:10px;margin-right:10px;'>";
    echo "<form method=\"post\">";

@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once "include/settings.php";
 include_once "include/page_top.php";
 ?>
+
 <?php
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
     echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
@@ -22,24 +23,9 @@ include_once "include/page_top.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
     echo '</td>'."\n";
-
     echo '<td valign="top"  style = "height:500px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
-    echo '<iframe src="./rf"  style = "width:615px; height:600px"></iframe>';
-    echo '</td>';
-?>
-</tr></table>
-<?php
-    echo '<div class="content2">'."\n";
-    echo '<script type="text/javascript">'."\n";
-    echo 'function reloadSysInfo(){'."\n";
-    echo '  $("#sysInfo").load("include/system.php",function(){ setTimeout(reloadSysInfo,15000) });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadSysInfo,15000);'."\n";
-    echo '$(window).trigger(\'resize\');'."\n";
-    echo '</script>'."\n";
-    echo '<div id="sysInfo">'."\n";
-    include "include/system.php";
-    echo '</div>'."\n";
-    echo '</div>'."\n";
+    echo '<div class="content">'."\n";
+    echo '<iframe src="./svx2mqtt"  style = "width:615px; height:690px"></iframe>';
+    echo '</td></tr></table>';
 ?>
 <?php include_once "include/page_bottom.php"; ?>

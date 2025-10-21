@@ -37,7 +37,13 @@ if (session_status() === PHP_SESSION_NONE) {
 	<p style = "padding-right: 5px; text-align: right; color: #000000;">
 	<a style = "color: black;">Display</a> |
 	<a href="./index.php" style = "color: #000000;">Dashboard</a> | 
-	<a href="./node.php" style = "color: #000000;">Nodes</a> | 
+<?php
+	if ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "yes")) {
+	    echo '<a href="/svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
+	} else {    
+	    echo '<a href="./node.php" style = "color: #000000;">Nodes</a> | ';
+	}    
+?>
 	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
 	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls</a> 
 <?php
@@ -64,7 +70,6 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a href="./audio.php" style = "color: #0000ff;"> | Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #0000ff;">Wifi</a> | ';
 		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> ';
-//		echo '<a href="/nodeInfo.php" style = "color: #0000ff;">Node Info</a> | ';
 	}	
 
 

@@ -1,3 +1,11 @@
+Neues in der Version 4.64
+- Weitere Aufräumaktionen im Code
+- erster Versuch einer MQTT Implementierung des Live Dashboards von Jens, DJ1JAY. Im Moment wird 
+	sein Code mit etwas angepasst Farben verwendet. Leider geht das direkte Auswählen 
+	einer TG noch nicht. Für diese Funktion muss in der config.php die Variable 
+	DL3EL_LIVEDB auf yes gesetzt werden:
+	define("DL3EL_LIVEDB", "yes");
+
 Neues in der Version 4.62
 - Im Rahmen einer Aufräumaktion vor der Bereitstellung des Iamges (V1.20d) von Michael, DC9VQ sind die beiden Dateien 
 	include/config.inc.php und config.php ziemlich aufgeräumt worden. Die Größe wurde fast halbiert, 

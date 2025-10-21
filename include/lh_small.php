@@ -62,7 +62,6 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 		}
 	}
 }
-
 ?>
   </table></form>
 </fieldset>
