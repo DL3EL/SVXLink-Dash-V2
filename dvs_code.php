@@ -304,3 +304,101 @@
         }    
     }
 ?>
+    
+
+    <table>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+<!---
+        <button name="btn_DMR" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>DMR ein</b></button>
+--->
+        <?php 
+            echo '<button  style = "border-radius:8px; color:white;border-color:transparent; background-color:orange; height:30px; font-size:12px;"><b>';
+            echo $dmrtg . '/';
+            echo $mode;
+            echo '</b></button>';
+        ?>
+        &nbsp;&nbsp;&nbsp;
+<!---
+        <button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:<?php echo $color;?>; height:30px; font-size:12px;"><b>DMR ein</b></button>
+--->
+        <?php
+//            if ($dmr_support == "1") {
+                if ($mode == "FM_only") {
+                    echo '<button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR ein</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                    echo '<button name="btn_DMR_FM" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $colorb .'; height:30px; font-size:12px;"><b>DMR Bridge ein</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                    echo '<button name="btn_YSF_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF ein</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                }
+                if (($mode == "DMR_only")  && ($dvsmode == "DMR")) {
+                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR aus</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                }
+                if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
+                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF aus</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                }
+                if ($mode == "DMR_FM") {
+                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR Bridge aus</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                }    
+                if ((($mode == "DMR_only") || ($mode == "DMR_FM")) && ($dvsmode == "DMR")) {
+                    echo '<button name="btn_DMR_262649" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; font-size:12px;"><b>OV F49</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                    echo '<button name="btn_DMR_91" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:blue; height:30px; font-size:12px;"><b>DMR WW</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;';
+
+                    echo '</form>';
+                    echo '<form method="post" action="">';
+
+                    echo '<label for="dmrtg">DMR TG</label>';
+                    echo '<input type="text" id="dmrtg" name="dmrtg" value="">';
+                    echo '<button type="submit">ausw&auml;hlen</button>';
+                    echo '<input type="hidden" name="form_submitted" value="1">';
+                    echo '</form>';
+                }
+                if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
+                        include_once "include/dvs_functions.php";
+                        getYSFHosts();
+                    echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]). '">';
+//                if ($mode == "DMR_only") {
+                    $DVSStatusFile = DL3EL . "/dvs_status";
+                    $dvsstatus = shell_exec('cat ' . $DVSStatusFile);
+                    if (strncmp($dvsstatus, "DMR_DSTAR_YSF", 13) === 0) {
+//                        echo '<br><button name="btn_YSF" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF</b></button>';
+//                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '<br><br><button name="btn_YSF_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Hessen</b></button>';
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '	<button name="btn_YSF_26269" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF 26269</b></button>';
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '	<button name="btn_YSF_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Discon</b></button>';
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '	<button name="btn_DSTAR" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR</b></button>';
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '	<button name="btn_DSTAR_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>D* Hessen</b></button>';
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        echo '	<button name="btn_DSTAR_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR Discon</b></button>';
+                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    }
+                }    
+                echo "<br>DMR Mode: $mode / DVS Mode: $dvsmode";
+                echo '</form>';
+            }
+    ?>
+    </table>    
+    <?php
+//}
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted']) && $dmr_support) {
+        if (isset($_POST['dmrtg'])) {
+            $dmrtg = $_POST['dmrtg'];
+            $command = "/opt/MMDVM_Bridge/dvswitch.sh tune " . $dmrtg . " 2>&1";
+            exec($command,$screen,$retval);
+            if (defined('DL3EL')) {
+                $dmrtgsel = $dmrtg . " >" . $DMRTGFile;
+                shell_exec("echo $dmrtgsel");
+            }    
+        }
+    }    
+    ?>
