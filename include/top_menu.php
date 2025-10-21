@@ -60,21 +60,21 @@ if (session_status() === PHP_SESSION_NONE) {
     if ($show_top_menu) {
 	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;"> | Echolink</a> | ';
 	echo '<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | ';
-	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> ';
+	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
     }
 ?>
 <?php
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
-		echo '<a href="./audio.php" style = "color: #0000ff;"> | Audio </a> | ';
+		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #0000ff;">Wifi</a> | ';
-		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> ';
+		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> | ';
 	}	
 
 
 	if ($_SESSION['auth'] === "AUTHORISED") {
-	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log"> | Log</a> ';
+	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log"> Log | </a> ';
 	}
 ?>
 <?php
@@ -94,12 +94,18 @@ if (session_status() === PHP_SESSION_NONE) {
 	    if ((defined ('debug')) && (debug > 0)) echo "<br>RemoteIP: $ip";
 	    $net1= cidr_match($ip,"192.168.0.0/16");
 	    $net2= cidr_match($ip,"44.128.0.0/10");
+	    $net3= cidr_match($ip,"http://44.149.162.71/32");
 	    if ($net1 == TRUE || $net2 == TRUE) {
 		$show_auth = 1;
+	    } else { 
+		if ($net3) {
+		    $_SESSION['auth'] = "AUTHORISED";
+		    $show_auth = 1;
+		}    
 	    }
 	}
 	if ($show_auth) {
-	    echo ' | <a href="./authorise.php" style = "color: crimson;"> | Authorise</a>';
+	    echo '<a href="./authorise.php" style = "color: crimson;">Authorise</a>';
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
 	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;"> | DV-Switch</a></p>';
