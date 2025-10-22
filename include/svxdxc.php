@@ -2,7 +2,6 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 // last 1000 Spots
 $url="https://dxc.jo30.de/dxcache/spots";
     $result  = file_get_contents($url);
@@ -35,13 +34,17 @@ $spotter[$dx]['spotted']
 	    $dxc = (array_key_exists('spotted',$spotter[$dx]))? $spotter[$dx]['spotted'] : "n/a";
 	    $tme = (array_key_exists('when',$spotter[$dx]))? $spotter[$dx]['when'] : "n/a";
 	    $qrg = (array_key_exists('frequency',$spotter[$dx]))? $spotter[$dx]['frequency'] : "n/a";
+	    $dx_spotter = (array_key_exists('dxcc_spotter',$spotter[$dx]))? $spotter[$dx]['dxcc_spotter'] : "n/a";
 	    $ll = 40;
 	    $llm = strlen($msg);
 	    if (strlen($msg) > $ll) {
 		$msg_array = explode(" ",$msg);
 		$msgn = "";
 		foreach ($msg_array as $msg_word) {
-		    $msgn = $msgn . $msg_word . " ";;
+		    if (strlen($msg_word) > $ll) {
+			$msg_word = "";
+		    }
+		    $msgn = $msgn . $msg_word . " ";
 		    if (strlen($msgn) > $ll) {
 			$msgn = $msgn . "<br>";
 			$ll = $ll + 40;
@@ -51,9 +54,19 @@ $spotter[$dx]['spotted']
 		if ((defined ('debug')) && (debug > 0)) $msg = $msg . "<br>[" . $msgn . "]," . $llm;
 	    } 
 	           
-//	    $time = substr($tme,0,strlen($tme)-8);
 	    $time = substr($tme,11,8);
-	    echo "<tr><td>" . $spt . "</td><td>" . $qrg . "</td><td>" . $dxc . "</td><td>" . $msg . "</td><td>" .  $time . "</td></tr>";
+	    $dx_spotter_ctry = $spotter[$dx]['dxcc_spotter']['cont'];
+	    $spt = $spt . " (" . $dx_spotter_ctry . ")";
+	    if (defined('DL3EL_DXCLUSTER_CONT')) {
+		$cont = DL3EL_DXCLUSTER_CONT;
+	    } else {
+		$cont = "WRLD";
+	    }
+	    if (($dx_spotter_ctry === $cont) || ($cont === "WRLD")) {
+		echo "<tr><td>" . $spt . "</td><td>" . $qrg . "</td><td>" . $dxc . "</td><td>" . $msg . "</td><td>" .  $time . "</td></tr>";
+	    } else {
+		--$dx_min;
+	    }	
 	 }   
 	--$dx;
     }
