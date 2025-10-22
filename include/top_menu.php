@@ -60,6 +60,9 @@ if (session_status() === PHP_SESSION_NONE) {
     if ($show_top_menu) {
 	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;"> | Echolink</a> | ';
 	echo '<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | ';
+	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
+	    echo '<a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
+	}    
 	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
