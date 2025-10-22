@@ -249,17 +249,15 @@ if ($reflectorlogic2 != "") {
                $RfData = json_decode($filedata,true);
                $radioport = $RfData['port'];
             } else {
-               if ($svxRadio == "Shari") {
-                  $radioport = "/dev/ttyUSB0";
-               } else {
-                  $radioport = "/dev/ttyS0";
-               }
+              $radioport = "";
             }
-//            echo "Mode: simplex";
-//            $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=/dev/ttyUSB.shari";
-            $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=" . $radioport;
-            echo "QRG:",exec($command, $output, $retval);
-//            echo "<br>QRG: ",exec('perl /home/svxlink/get_shari_hf_data.pl', $output, $retval);
+            if ($radioport !== "") {
+               $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=" . $radioport;
+               echo "QRG:",exec($command, $output, $retval);
+            } else {
+               echo " no Radio found";
+            }   
+               
          } else {
             echo " Radio: " . DL3EL_RADIO;
          }   
