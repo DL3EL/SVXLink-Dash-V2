@@ -5,15 +5,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // last 1000 Spots
 $url="https://dxc.jo30.de/dxcache/spots";
-if ($url!="") {
-//  Initiate curl
-        $cmd = "wget -T 10  -O svxdxc_data " . $url;
-        echo "",exec($cmd, $output, $retval);
-        $result = trim(shell_exec('cat svxdxc_data'));
-	$spotter = json_decode($result, true);
-}
-?>
-<?php
+    $result  = file_get_contents($url);
+    $spotter = json_decode($result, true);
     
     $dx_max = 0;
     foreach ($spotter as $dx_array) {
@@ -26,7 +19,7 @@ if ($url!="") {
     $dx_min = $dx_max - $nn;
     $dx = $dx_max;
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo "<tr></H1></b><td><b>DX de</b></td><td><b>DX</b></td><td><b>Freq</b></td><td><b>Comments</b></td><td><b>UTC</b></td></tr>";
+    echo "<tr><td><b>DX de</b></td><td><b>Freq</b></td><td><b>DX</b></td><td><b>Comments</b></td><td><b>UTC</b></td></tr>";
 /* Array Felder
 $spotter[$dx]['spotter']
 $spotter[$dx]['message']
@@ -37,12 +30,12 @@ $spotter[$dx]['spotted']
 
     while ($dx > $dx_min) { 
 	if (strlen($spotter[$dx]['spotter'])) {
-	    $msg = (array_key_exists('message',$spotter[$dx]))? $spotter[$dx]['message'] : "n/a";
+	    $msg = (array_key_exists('message',$spotter[$dx]))? $spotter[$dx]['message'] : " ";
 	    $spt = (array_key_exists('spotter',$spotter[$dx]))? $spotter[$dx]['spotter'] : "n/a";
 	    $dxc = (array_key_exists('spotted',$spotter[$dx]))? $spotter[$dx]['spotted'] : "n/a";
 	    $tme = (array_key_exists('when',$spotter[$dx]))? $spotter[$dx]['when'] : "n/a";
 	    $qrg = (array_key_exists('frequency',$spotter[$dx]))? $spotter[$dx]['frequency'] : "n/a";
-	    $ll = 30;
+	    $ll = 40;
 	    $llm = strlen($msg);
 	    if (strlen($msg) > $ll) {
 		$msg_array = explode(" ",$msg);
@@ -51,15 +44,16 @@ $spotter[$dx]['spotted']
 		    $msgn = $msgn . $msg_word . " ";;
 		    if (strlen($msgn) > $ll) {
 			$msgn = $msgn . "<br>";
-			$ll = $ll + 30;
+			$ll = $ll + 40;
 		    }
 		}
 		$msg = $msgn;
 		if ((defined ('debug')) && (debug > 0)) $msg = $msg . "<br>[" . $msgn . "]," . $llm;
 	    } 
 	           
-	    $time = substr($tme,0,strlen($tme)-8);
-	    echo "<tr><td>" . $spt . "</td><td>" . $qrg . "</td><td>" . $dxc . "</td><td> " . $msg . "</td><td>" .  $tme . "</td></tr>";
+//	    $time = substr($tme,0,strlen($tme)-8);
+	    $time = substr($tme,11,8);
+	    echo "<tr><td>" . $spt . "</td><td>" . $qrg . "</td><td>" . $dxc . "</td><td>" . $msg . "</td><td>" .  $time . "</td></tr>";
 	 }   
 	--$dx;
     }

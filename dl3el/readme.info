@@ -2,8 +2,8 @@ Neues in der Version 4.66
 - DX-Cluster Interface implementiert
 	Jörg, DJ7NT, bekannt als Entwickler von Wavelog, bietet eine leicht zu bedienende API, mit der 
 	DX-Meldungen in Anwendungen integriert werden können. Da ich das Dashboard langsam dahin entwickeln 
-	möchte, dass alle wichtigen Amateurfunk Informationen im Shack dort abrufbar sind, habe ich dieses Intefrace implementiert,
-	Auch hier muss die Funktion erst wieder in config.php durch Eintragen der Konstante
+	möchte, dass alle wichtigen Amateurfunk Informationen im Shack dort abrufbar sind, habe ich dieses 
+	Intefrace implementiert. Auch hier muss die Funktion erst wieder in config.php durch Eintragen der Konstante
 	define("DL3EL_DXCLUSTER", "yes");
 	aktiviert werden. Die Seite aktualisiert sich alle 15 Sekunden.
 
