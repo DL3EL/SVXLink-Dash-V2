@@ -18,7 +18,12 @@ $url="https://dxc.jo30.de/dxcache/spots";
     $dx_min = $dx_max - $nn;
     $dx = $dx_max;
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo "<tr><td><b>DX de</b></td><td><b>Freq</b></td><td><b>DX</b></td><td><b>Comments</b></td><td><b>UTC</b></td></tr>";
+	    if (defined('DL3EL_DXCLUSTER_CONT')) {
+		$cont = DL3EL_DXCLUSTER_CONT;
+	    } else {
+		$cont = "WRLD";
+	    }
+    echo "<tr><td><b>DX de $cont</b></td><td><b>Freq</b></td><td><b>DX</b></td><td><b>Comments</b></td><td><b>UTC</b></td></tr>";
 /* Array Felder
 $spotter[$dx]['spotter']
 $spotter[$dx]['message']
@@ -56,12 +61,7 @@ $spotter[$dx]['spotted']
 	           
 	    $time = substr($tme,11,8);
 	    $dx_spotter_ctry = $spotter[$dx]['dxcc_spotter']['cont'];
-	    $spt = $spt . " (" . $dx_spotter_ctry . ")";
-	    if (defined('DL3EL_DXCLUSTER_CONT')) {
-		$cont = DL3EL_DXCLUSTER_CONT;
-	    } else {
-		$cont = "WRLD";
-	    }
+//	    $spt = $spt . " (" . $dx_spotter_ctry . ")";
 	    if (($dx_spotter_ctry === $cont) || ($cont === "WRLD")) {
 		echo "<tr><td>" . $spt . "</td><td>" . $qrg . "</td><td>" . $dxc . "</td><td>" . $msg . "</td><td>" .  $time . "</td></tr>";
 	    } else {
