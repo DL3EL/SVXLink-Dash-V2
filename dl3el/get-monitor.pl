@@ -324,7 +324,8 @@ my $ii = 0;
             }    
 #        print ", " if ($nn++);
             printf LOG "%s ",$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=0);
-            printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
+#            printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
+            printf "<a href=\"https://dashboard.fm-funknetz.de/node.html?call=%s\" target=\"FM-Funknetz\" style=\"color:#blue;\">%s </a>",$DataTabMonTG{$mon_tgi}{'CALL'},$DataTabMonTG{$mon_tgi}{'CALL'};
             ++$ii;
         }
     }	
