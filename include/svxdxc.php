@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+include_once "settings.php";
 // last 1000 Spots
 $url="https://dxc.jo30.de/dxcache/spots";
     $result  = file_get_contents($url);
@@ -9,7 +10,7 @@ $url="https://dxc.jo30.de/dxcache/spots";
     
     $dx_max = 0;
     foreach ($spotter as $dx_array) {
-	if ((defined ('debug')) && (debug > 0)) echo "($nn): " . $spotter[$nn]['spotted'] . "<br>";
+	if ((defined ('debug')) && (debug > 0)) echo "($dx_max): " . $spotter[$dx_max]['spotted'] . "<br>";
     ++$dx_max;
     }
     --$dx_max;

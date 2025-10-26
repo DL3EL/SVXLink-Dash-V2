@@ -25,7 +25,7 @@ include_once "include/page_top.php";
     echo '</td>'."\n";
     echo '<td valign="top"  style = "height:500px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
     echo '<div class="content">'."\n";
-    echo '<iframe src="./svx2mqtt"  style = "width:615px; height:690px"></iframe>';
+    echo '<iframe src="svx2mqtt/index.php"  style = "width:615px; height:690px"></iframe>';
     echo '</td></tr></table>';
 ?>
 <?php include_once "include/page_bottom.php"; ?>

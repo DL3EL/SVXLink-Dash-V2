@@ -5,16 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>FM‑Funknetz.de – Live</title>
   <style>
-    :root { color-scheme: light dark; }
-    body { margin:0; font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial; background:#edf0f5; color:#0f1011; }
-<!--
-    header { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:14px 16px; background:#edf0f5; position:sticky; top:0; z-index:5; }
--->
     h1 { margin:0; font-size:25px; }
     .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-<!--
-    .pill { padding:4px 10px; border-radius:999px; background:#edf0f5; font-size:12px; border:1px solid #374151; }
--->
     .pill { padding:4px 10px; border-radius:999px; background:#ffffff; font-size:12px; border:1px solid #374151; }
     .ok { color:#10b981; }
     .warn { color:#f59e0b; }
@@ -26,17 +18,13 @@
     .card h2 { margin:0; font-size:15px; padding:10px 12px; border-bottom:1px solid #0f1011; }
     .card .body { padding:12px; }
     table { width:100%; border-collapse:collapse; }
-<!--
-    th, td { padding:8px; border-bottom:1px solid #1f2937; text-align:left; }
--->
-    th, td { padding:8px; border-bottom:1px solid #374151; text-align:left; }
-    th { font-weight:600; font-size:13px; }
-    td { font-size:13px; }
-    .small { font-size:12px; color:#0f1011; }
-    .tag { font-size:12px; background:blue; border:1px solid #374151; color:#ffffff; padding:2px 6px; border-radius:999px; }
-    .call { font-weight:700; }
+    th, td { padding:3px; border-bottom:0px solid #374151; text-align:left; }
+    th { font-weight:bold; font-size:13px; }
+    td { font-size:15px; }
+    .small { font-size:14px; color:#0f1011; }
+    .tag { font-size:14px; background:blue; border:1px solid #374151; color:#ffffff; padding:2px 6px; border-radius:999px; }
+    .call { font-weight:bold; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    button { background:#1f2937; border:1px solid #374151; color:#e5e7eb; padding:6px 10px; border-radius:8px; cursor:pointer; }
     button:disabled { opacity:.6; cursor:not-allowed; }
     #error { white-space:pre-wrap; color:#ef4444; font-size:12px; margin-top:8px; }
   </style>
@@ -46,21 +34,19 @@
 <body>
 <header>
   <center>
-  <h1>FM‑Funknetz.de – Live</h1>
+  <h1>FM Funknetz.de – Live</h1>
   </center>
 </header>
   <div class="row">
     <span id="clients" class="pill">Verbundene Clients: —</span>
-
     <span id="conn" class="pill">Getrennt</span>
-<!--
-    <span class="pill">Broker: <b class="small">wss://status.thueringen.link/mqtt</b></span> 
-    <span class="pill">Topic: <b class="small">/server/statethr/1</b></span> 
--->
     <button hidden id="btnConnect">Verbinden</button>
     <button hidden id="btnDisconnect" disabled>Trennen</button>
     <button hidden id="btnTGConn" enabled>TGConn</button>
   </div>
+
+<form method="post">
+
 <main>
   <div class="grid">
     <section class="card">
@@ -284,39 +270,32 @@
       elActiveEmpty.style.display = "none";
       elActiveTable.style.display = "table";
       const now = Date.now();
+
       for (const a of arr) {
         const durSec = Math.max(0, Math.round((now - a.startMs)/1000));
         const group = tgName(a.tg);
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td class="call">${escapeHtml(a.call)}</td>
-          <td><span class="tag mono">${escapeHtml(a.tg || "—")}</span></td>
-          <td>${escapeHtml(group || "—")}</td>
-          <td class="mono">${new Date(a.startMs).toLocaleTimeString()}</td>
-          <td class="mono">${durSec}s</td>
-        `;
+        <td class="call">${escapeHtml(a.call)}</td>
+        <td><button type=submit id=dtmfsvx name=dtmfsvx class=active_id value="${escapeHtml(a.tg || "—")}">${escapeHtml(a.tg || "—")}</button></td
+        <td>${escapeHtml(group || "—")}</td>
+        <td class="mono">${new Date(a.startMs).toLocaleTimeString()}</td>
+        <td class="mono">${durSec}s</td>
+      `;
         elActiveBody.appendChild(tr);
       }
     }
 
     // LastHeard
     elLHBody.innerHTML = "";
+
     for (const h of lastHeard) {
       const group = tgName(h.tg);
       const tr = document.createElement("tr");
       tgConn.textContent = h.tg;
       tr.innerHTML = `
         <td class="call">${escapeHtml(h.call)}</td>
-        <td><span class="tag mono">${escapeHtml(h.tg || "—")}</span></td>
-<!--
-      <button type=submit id=jumptoA name=jmptoA class=active_id value=\"$listElem[2]\"><i class=\"material-icons\"style=\"font-size:15px;\">cell_tower</i></button>
-
-        <td>
-        <button type=submit id=btnTGConn name=jmptoA class=active_id value=h.tg>
-                <span class="tag mono">${escapeHtml(h.tg || "—")}</span>
-        </button>
-        </td>
--->
+        <td><button type=submit id=dtmfsvx name=dtmfsvx class=active_id value="${escapeHtml(h.tg || "—")}">${escapeHtml(h.tg || "—")}</button></td>
         <td>${escapeHtml(group || "—")}</td>
         <td class="mono">${new Date(h.endMs).toLocaleTimeString()}</td>
         <td class="mono">${h.durationSec}s</td>
@@ -342,6 +321,16 @@
   document.getElementById("btnDisconnect").addEventListener("click", disconnect);
   connect();
 </script>
+
+</form>
+
+<?php
+            if (isset($_POST["dtmfsvx"])) {
+                $exec = "echo '*91" . $_POST['dtmfsvx'] . "#' > /tmp/dtmf_svx";	//FM Funknetz TG Link Ausführung
+                exec($exec, $output);
+                echo "<meta http-equiv='refresh' content='0'>";
+            }
+?>
 <center><small><br><br>FM-Funknetz.de - MQTT Livedashboard Version 0.0.5 by DJ1JAY</small></center>
 </body>
 </html>
