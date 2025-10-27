@@ -1,3 +1,16 @@
+Neues in der Version 4.72
+- Änderung bei der Auswahl von EcholinkProxies
+	wenn man die öffentlichen Proxies für Echolink nutzen möchte, reicht es jetzt in der Datei
+	/etc/svxlink/svxlink.d//ModuleEchoLink.conf 
+	als Proxy PUBLIC einzutragen:
+	PROXY_SERVER = PUBLIC
+	es wird dann automatisch ein freier Proxy gesucht.
+	Achtung, damit dioe Konfig korrekt gespeichert wird, müssen auch in diesem Fall die Einträge
+	PROXY_PASSWORD = 
+	PROXY_PORT = 
+	in der Datei vorhanden sein (siehe Version 4.54). Der Inhalt rechts vom = ist egal und wird 
+	durch die korrekten Werte überschrieben.
+
 Neues in der Version 4.71
 - MQTT LIvemap jetzt mit klickbarer Talkgroup
 	Frank, DL4EM, hat mir bei dem Problem geholfen, die angezeigten Talkgroups in der LiveDB Ansicht per Klick anzuwähen. Er hat mir vorhin den Code geschickt,
