@@ -45,7 +45,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 ?>
 	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
-	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls</a> 
+	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls | </a> 
 <?php
 
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
@@ -97,7 +97,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    if ((defined ('debug')) && (debug > 0)) echo "<br>RemoteIP: $ip";
 	    $net1= cidr_match($ip,"192.168.0.0/16");
 	    $net2= cidr_match($ip,"44.128.0.0/10");
-	    $net3= cidr_match($ip,"http://44.149.162.71/32");
+	    $net3= cidr_match($ip,"http://44.149.160.87/32");
 	    if ($net1 == TRUE || $net2 == TRUE) {
 		$show_auth = 1;
 	    } else { 
