@@ -131,7 +131,6 @@ function getSVXRstatus($reflector) {
 //2021-06-19 20:53:19: Connected to EchoLink proxy 44.137.75.82:8100
 
 function getEchoLinkProxy() {
-	$eproxy = "";
   if (file_exists(SVXLOGPATH.SVXLOGPREFIX)) {
     $elogPath = SVXLOGPATH.SVXLOGPREFIX; 
     $echoproxy = `tail -10000 $elogPath | grep -a -h "EchoLink proxy" | tail -1`;}
@@ -143,8 +142,6 @@ function getEchoLinkProxy() {
     $eproxy="Connected to proxy<br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
     $eproxy = $proxy;
   } else {
-//  elseif(strpos($echoproxy,"Disconnected from EchoLink proxy")) {
-//      $proxy=substr($echoproxy,strpos($echoproxy,"Disconnected from EchoLink proxy")+32);
 // if public proxy configured, selet one, which is free
       if(strpos($echoproxy,"Disconnected from EchoLink proxy")) {
         $eproxy = "PUBLIC";
@@ -163,7 +160,7 @@ function getEchoLinkProxy() {
           $eproxypw= isset($svxeconfig['ModuleEchoLink']['PROXY_PASSWORD']) ? $svxeconfig['ModuleEchoLink']['PROXY_PASSWORD'] : 'no'; 
           $eproxyport= isset($svxeconfig['ModuleEchoLink']['PROXY_PORT']) ? $svxeconfig['ModuleEchoLink']['PROXY_PORT'] : '0'; 
         } 
-         if ((defined ('debug')) && (debug > 0)) echo "EP4: $eproxy<br>$eproxypw $eproxyport<br>";
+        if ((defined ('debug')) && (debug > 0)) echo "EP4: $eproxy<br>$eproxypw $eproxyport<br>";
         if (($eproxypw === "PUBLIC") && ($eproxyport === "8100")) {
           if ((defined ('debug')) && (debug > 0)) echo "$eproxypw<br>";
           $cmd = "perl " . DL3EL . "/get-echolink-proxy.pl v=0 d="  . DL3EL . " xml";
@@ -202,7 +199,6 @@ function getEchoLinkProxy() {
             }  
           }  
           file_put_contents($svxEchoConfigFile, $content);
-////
           // restart svxlink
           $command = "sudo systemctl restart svxlink 2>&1";
           echo "restarting svxlink ...<br>";
@@ -218,10 +214,6 @@ function getEchoLinkProxy() {
           $eproxy="<span style=\"color:red;font-weight:bold;\">Disconnected proxy</span><br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
       }
     }
-//    elseif(strpos($echoproxy,"Access denied to EchoLink proxy")){
-//      $eproxy="Access denied to proxy";
-//    }
-//    else { $eproxy="";}
 
     return $eproxy;
 }

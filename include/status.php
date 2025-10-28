@@ -204,7 +204,8 @@ if ($reflectorlogic2 != "") {
       echo "<tr><th width=50%>TXing</th><td style=\"background:#ffffed;color:red;font-weight: bold;\">".$echotxing."</td></tr>";
       echo "</table>\n";
 
-      $svxEchoConfigFile = "/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
+//      $svxEchoConfigFile = "/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
+      $svxEchoConfigFile = MODULEPATH . ECHOLINKCONFIG;
       if (fopen($svxEchoConfigFile,'r')) { 
          $svxeconfig = parse_ini_file($svxEchoConfigFile,true,INI_SCANNER_RAW);
 //         $eproxyd= isset($svxeconfig['PROXY_SERVER']) ? $svxeconfig['PROXY_SERVER'] : ''; 
@@ -214,7 +215,11 @@ if ($reflectorlogic2 != "") {
          $eproxyd= ""; 
       }
 //      echo "Proxy(alt): ($eproxyd) <br>";
-      $eproxy = getEchoLinkProxy();
+         if ($eproxyd === "X") {
+            $eproxy = "not in use";
+         } else {
+            $eproxy = getEchoLinkProxy();
+         }
 //      echo "Proxy(neu): [$eproxy]";
       if ($eproxy!="" and $eproxyd!="") {
          echo "<table style=\"margin-top:4px;margin-bottom:4px;\"><tr><th>EchoLink Proxy</th></tr><tr>"; 

@@ -4,12 +4,16 @@ Neues in der Version 4.72
 	/etc/svxlink/svxlink.d//ModuleEchoLink.conf 
 	als Proxy PUBLIC einzutragen:
 	PROXY_SERVER = PUBLIC
-	es wird dann automatisch ein freier Proxy gesucht.
-	Achtung, damit die Konfig korrekt gespeichert wird, müssen auch in diesem Fall die Einträge
+	es wird dann automatisch ein freier Proxy gesucht. Dessen Adresse ersetz dann PUBLIC in 
+	der .conf Datei. Achtung, damit die Konfig korrekt gespeichert wird, müssen auch in 
+	diesem Fall die Einträge
 	PROXY_PASSWORD = 
 	PROXY_PORT = 
 	in der Datei vorhanden sein (siehe Version 4.54). Der Inhalt rechts vom = ist egal und wird 
 	durch die korrekten Werte überschrieben.
+	Diese Vorgehensweise ist aber nur dann notwendig, wenn man das System komplett neu aufsetzt 
+	oder von einem privaten Proxy zu einem öffentlichen Proxy wechseln möchte. In einer laufenden
+	Installation muss man diese Funktion nicht benutzen.
 
 Neues in der Version 4.71
 - MQTT LIvemap jetzt mit klickbarer Talkgroup
