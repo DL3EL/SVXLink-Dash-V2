@@ -1,5 +1,6 @@
 Neues in der Version 4.74
-- Info nur für Nutzer des Dashboard ausserhalb des DC9VQ Images: In der Github Version von svxlink wird 
+- Info nur für Nutzer des Dashboard mit einer eigenen Installation von SVXLink oder älteren Versionen des 
+	Images von DC9VQ: In der Github Version von svxlink wird 
 	die Datei /etc/svxlink/svxlink.d/ModuleEchoLink.conf mit einer Variablen "Description" ausgeliefert,
 	die folgenden Inhalt hat:
 	DESCRIPTION="You have connected to a SvxLink node,\n"
