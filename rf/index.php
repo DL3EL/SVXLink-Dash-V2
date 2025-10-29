@@ -272,7 +272,7 @@ if (isset($_POST['btnSave']))
         $retval = null;
         $screen = null;
 echo "btnSave: <br>";
-        $port = $_POST['port'];
+	$port = (isset($_POST['port']))? $_POST['port'] : "";
 	if ((defined ('debug')) && (debug > 0)) echo "0 selected Port: $port<br>";  
         $port = $device[$port];
       if (debug) print_r($device);
@@ -297,7 +297,7 @@ if (isset($_POST['btnVersion']))
         $retval = null;
         $screen = null;
 
-        $port = $_POST['port'];
+	$port = (isset($_POST['port']))? $_POST['port'] : "";
 	if ((defined ('debug')) && (debug > 0)) echo "using port: $port<br>";  
 	if ((defined ('debug')) && (debug > 10)) print_r($device);
         $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
@@ -325,17 +325,17 @@ if (isset($_POST['btnRadio']))
         $retval = null;
         $screen = null;
 	if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: $port<br>";  
-	$freq = $_POST['freq'];
-	$rxfreq = $_POST['rxfreq'];
-	$txfreq = $_POST['txfreq'];
+
+	$rxfreq = (isset($_POST['rxfreq']))? $_POST['rxfreq'] : "";
+	$txfreq = (isset($_POST['txfreq']))? $_POST['txfreq'] : "";
 // SA818 works only in simplex mode, RX has to be equal to TX	
 	$txfreq = $rxfreq;
-	$squelch = $_POST['squelch'];
+	$squelch = (isset($_POST['squelch']))? $_POST['squelch'] : "";
 //	$ctcss = $_POST['ctcss'];
-	$rxctcss = $_POST['rxctcss'];
-	$txctcss = $_POST['txctcss'];
-	$tail = $_POST['tail'];
-	$bw = $_POST['bw'];
+	$rxctcss = (isset($_POST['rxctcss']))? $_POST['rxctcss'] : "";
+	$txctcss = (isset($_POST['txctcss']))? $_POST['txctcss'] : "";
+	$tail = (isset($_POST['tail']))? $_POST['tail'] : "";
+	$bw = (isset($_POST['bw']))? $_POST['bw'] : "";
 	$ctcss = $txctcss;
 	$ctcss_type = "invalid";
 	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")) {
@@ -408,9 +408,9 @@ if (isset($_POST['btnFilters']))
 	$retval = null;
         $screen = null;
 	if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: $port<br>";  
-        $fEmph = $_POST['fEmph'];
-        $fLow = $_POST['fLow'];
-        $fHigh = $_POST['fHigh'];
+	$fEmph = (isset($_POST['fEmph']))? $_POST['fEmph'] : "";
+	$fLow = (isset($_POST['fLow']))? $_POST['fLow'] : "";
+	$fHigh = (isset($_POST['fHigh']))? $_POST['fHigh'] : "";
 
         $command = "python3 sa818.py --port \"" .$port. "\" filters  --emphasis \"" .$fEmph. "\" --lowpass \"" .$fLow. "\" --highpass \"" .$fHigh. "\" 2>&1";
         if (!$retval) exec($command,$screen,$retval);
@@ -438,7 +438,7 @@ if (isset($_POST['btnVol']))
 	$retval = null;
         $screen = null;
 	if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: $port<br>";  
-        $volume = $_POST['volume'];
+	$volume = (isset($_POST['volume']))? $_POST['volume'] : "";
 
         $command = "python3 sa818.py --port \"" .$port. "\" volume  --level \"" .$volume. "\" 2>&1";
         if (!$retval) exec($command,$screen,$retval);
