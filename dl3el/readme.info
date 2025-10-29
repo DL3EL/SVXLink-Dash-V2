@@ -1,3 +1,25 @@
+Neues in der Version 4.74
+- Info nur für Nutzer des Dashboard ausserhalb des DC9VQ Images: In der Github Version von svxlink wird 
+	die Datei /etc/svxlink/svxlink.d/ModuleEchoLink.conf mit einer Variablen "Description" ausgeliefert,
+	die folgenden Inhalt hat:
+	DESCRIPTION="You have connected to a SvxLink node,\n"
+	    "a voice services system for Linux with EchoLink\n"
+	    "support.\n"
+	    "Check out http://svxlink.sf.net/ for more info\n"
+	    "\n"
+	    "QTH:     My_QTH\n"
+	    "QRG:     Simplex link on ???.??? MHz\n"
+	    "CTCSS:   My_CTCSS_fq_if_any Hz\n"
+	    "Trx:     My_transceiver_type\n"
+	    "Antenna: My_antenna_brand/type/model\n"
+	Die Standardfunktion in PHP zum Einlesen und Verarbeiten von .ini oder .conf Dateien ist 
+	parse_ini_file(). Das verwendete Format ist mit dieser Funktion nicht kompatibel und nicht erlaubt. 
+	Leider wird dieses Format nicht nur mit einer Warnung bestraft, sondern die Funktion wird an 
+	der Stelle auch abgebrochen. Daher verwende ich jetzt eine ähnliche Routine, unabhängig von der PHP 
+	Standardbibliothek. Jetzt wird der Fehler abgefangen und korrigiert.
+	"Abgefangen" bedeutet, die Funktion funktioiert wie erwartet
+	"korrigiert" bedeutet, dass die Zeilen, die nicht mit DESCRIPTION=" beginnen, gelöscht werden.
+
 Neues in der Version 4.72
 - Änderung bei der Auswahl von EcholinkProxies
 	wenn man die öffentlichen Proxies für Echolink nutzen möchte, reicht es jetzt in der Datei

@@ -207,21 +207,23 @@ if ($reflectorlogic2 != "") {
 //      $svxEchoConfigFile = "/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
       $svxEchoConfigFile = MODULEPATH . ECHOLINKCONFIG;
       if (fopen($svxEchoConfigFile,'r')) { 
-         $svxeconfig = parse_ini_file($svxEchoConfigFile,true,INI_SCANNER_RAW);
-//         $eproxyd= isset($svxeconfig['PROXY_SERVER']) ? $svxeconfig['PROXY_SERVER'] : ''; 
-         $eproxyd= isset($svxeconfig['ModuleEchoLink']['PROXY_SERVER']) ? $svxeconfig['ModuleEchoLink']['PROXY_SERVER'] : 'X'; 
+         $svxconfig = custom_parse_ini_file($svxEchoConfigFile);
+         $key = "PROXY_SERVER";
+         $section = "ModuleEchoLink";
+         $eproxyd = $svxconfig[$section][$key]['value'];
+         $eproxyd_state = ($svxconfig[$section][$key]['active'])? 1 : 0;
+         if ((defined ('debug')) && (debug > 0)) echo "EP0: $eproxyd ($eproxyd_state)<br>";
       } else {
          if ((defined ('debug')) && (debug > 0)) echo "$svxEchoConfigFile not found";
          $eproxyd= ""; 
       }
-//      echo "Proxy(alt): ($eproxyd) <br>";
-         if ($eproxyd === "X") {
+      if ((defined ('debug')) && (debug > 0)) echo "EP2: $eproxyd<br>";
+         if (!$eproxyd_state) {
             $eproxy = "not in use";
          } else {
             $eproxy = getEchoLinkProxy();
          }
-//      echo "Proxy(neu): [$eproxy]";
-      if ($eproxy!="" and $eproxyd!="") {
+      if ($eproxy!="" and $eproxyd_state) {
          echo "<table style=\"margin-top:4px;margin-bottom:4px;\"><tr><th>EchoLink Proxy</th></tr><tr>"; 
          echo "<tr><td style=\"background:#ffffed;\">";
          echo "<div style=\"margin-top:2px;margin-bottom:2px;white-space:normal;color:black;font-weight:500;\">";

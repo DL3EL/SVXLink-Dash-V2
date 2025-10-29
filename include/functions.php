@@ -143,6 +143,7 @@ function getEchoLinkProxy() {
     $eproxy = $proxy;
   } else {
 // if public proxy configured, selet one, which is free
+     if ((defined ('debug')) && (debug > 0)) echo "EP0: $echoproxy<br>";
       if(strpos($echoproxy,"Disconnected from EchoLink proxy")) {
         $eproxy = "PUBLIC";
       }  
@@ -151,14 +152,19 @@ function getEchoLinkProxy() {
       }
       $svxEchoConfigFile = MODULEPATH . ECHOLINKCONFIG;
       if (fopen($svxEchoConfigFile,'r')) { 
-        $svxeconfig = parse_ini_file($svxEchoConfigFile,true,INI_SCANNER_RAW);
-        $eproxy= isset($svxeconfig['ModuleEchoLink']['PROXY_SERVER']) ? $svxeconfig['ModuleEchoLink']['PROXY_SERVER'] : 'no'; 
+        $svxconfig = custom_parse_ini_file($svxEchoConfigFile);
+        $key = "PROXY_SERVER";
+        $section = "ModuleEchoLink";
+        $eproxy = ($svxconfig[$section][$key]['value'])? $svxconfig[$section][$key]['value'] : "no";
+        $eproxy_state = ($svxconfig[$section][$key]['active'])? 1 : 0;
         if ($eproxy === "PUBLIC") {
           $eproxypw = "PUBLIC";
           $eproxyport = "8100";
         } else {
-          $eproxypw= isset($svxeconfig['ModuleEchoLink']['PROXY_PASSWORD']) ? $svxeconfig['ModuleEchoLink']['PROXY_PASSWORD'] : 'no'; 
-          $eproxyport= isset($svxeconfig['ModuleEchoLink']['PROXY_PORT']) ? $svxeconfig['ModuleEchoLink']['PROXY_PORT'] : '0'; 
+          $key = "PROXY_PASSWORD";
+          $eproxypw = ($svxconfig[$section][$key]['value'])? $svxconfig[$section][$key]['value'] : "no";
+          $key = "PROXY_PORT";
+          $eproxyport = ($svxconfig[$section][$key]['value'])? $svxconfig[$section][$key]['value'] : "no";
         } 
         if ((defined ('debug')) && (debug > 0)) echo "EP4: $eproxy<br>$eproxypw $eproxyport<br>";
         if (($eproxypw === "PUBLIC") && ($eproxyport === "8100")) {
@@ -170,8 +176,6 @@ function getEchoLinkProxy() {
           // Backup file
           $backup_filename = $svxEchoConfigFile . "." . date("YmdHis");
           exec('sudo cp -p ' . $svxEchoConfigFile . ' ' . $backup_filename);
-          $svxeconfig['ModuleEchoLink']['PROXY_SERVER'] = $eproxy;
-          $svxeconfig['active']['ModuleEchoLink']['PROXY_SERVER'] = $eproxy;
           // save change
           if (file_exists($svxEchoConfigFile)) {
             $svxconfig = custom_parse_ini_file($svxEchoConfigFile);
