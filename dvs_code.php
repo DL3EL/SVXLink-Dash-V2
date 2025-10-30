@@ -1,6 +1,19 @@
 <?php
     $dmrtg = "off";
-######## DVSwitch Stati
+//######## DVSwitch Stati
+/*
+$mode = FM_only | DMR_only | DMR_FM   -> steuert das kopieren con .conf 
+	DMR_only = dvs Modes
+	FM_only normal FM
+	DMR_FM = Bridge Mode : normale FM .conf Datei dmr_fm
+    * [DVLink]
+        CONNECT_LOGICS = SimplexLogic:7:,UsrpLogic
+        DEFAULT_ACTIVE = 0
+    DEFAULT_ACTIVE muss irgendwie 1 werden. Muss noch getestet werden
+
+$dvsmode = OFF | DMR | YSF | DSTAR
+
+*/
     $DMRStatusFile = DL3EL . "/dmr_status";
     $dmrstatus = trim(shell_exec('cat ' . $DMRStatusFile));
     $DVSModeFile = DL3EL . "/dvs_mode";
@@ -154,7 +167,7 @@
         if (defined('DL3EL')) {
             $dmrstatus = "FM_only >" . $DMRStatusFile;
             shell_exec("echo $dmrstatus");
-            $dvsmode = "Off >" . $DVSModeFile;
+            $dvsmode = "OFF >" . $DVSModeFile;
             shell_exec("echo $dvsmode");
             $dvsmode = "OFF";
         }    
