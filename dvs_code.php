@@ -2,8 +2,8 @@
     $dmrtg = "off";
 //######## DVSwitch Stati
 /*
-$mode = FM_only | DMR_only | DMR_FM   -> steuert das kopieren con .conf 
-	DMR_only = dvs Modes
+$mode = FM_only | DVS_only | DMR_FM   -> steuert das kopieren con .conf 
+	DVS_only = dvs Modes
 	FM_only normal FM
 	DMR_FM = Bridge Mode : normale FM .conf Datei dmr_fm
     * [DVLink]
@@ -13,7 +13,17 @@ $mode = FM_only | DMR_only | DMR_FM   -> steuert das kopieren con .conf
 
 $dvsmode = OFF | DMR | YSF | DSTAR
 
+//                    $DVSStatusFile = DL3EL . "/dvs_status";
+//                    $dvsstatus = shell_exec('cat ' . $DVSStatusFile);
 */
+    $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
+    if (fopen($svxConfigFile,'r')) {
+        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
+//      print_r($svxconfig);  
+        $file = isset($svxconfig['File_Description']['FILE']) ? $svxconfig['File_Description']['FILE'] : 'no';     
+        $radio = isset($svxconfig['File_Description']['RADIO']) ? $svxconfig['File_Description']['RADIO'] : 'no';     
+    }
+
     $DMRStatusFile = DL3EL . "/dmr_status";
     $dmrstatus = trim(shell_exec('cat ' . $DMRStatusFile));
     $DVSModeFile = DL3EL . "/dvs_mode";
@@ -25,8 +35,8 @@ $dvsmode = OFF | DMR | YSF | DSTAR
         $color = "blue";
         $colorb = "green";
     }
-    if ($dmrstatus == "DMR_only") {
-        $mode ="DMR_only";
+    if ($dmrstatus == "DVS_only") {
+        $mode ="DVS_only";
         $color = "red";
         $colorb = "blue";
     }
@@ -74,25 +84,26 @@ $dvsmode = OFF | DMR | YSF | DSTAR
         }
     }
 
-    if (isset($_POST['btn_DMR_only']))
+    if (isset($_POST['btn_DVS_only']))
     {
-        if ($mode == "FM_only") {
+        if (($mode == "FM_only")  && ($file === "dmr_fm")) {
             $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
             exec($command,$screen,$retval);
         }
-        $mode ="DMR_only";
+        $mode ="DVS_only";
         $color = "red";
         $colorb = "blue";
         $kanal = "OV F49";
         $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
         exec($command,$screen,$retval);
+        $file = "dmr_only";
         $command = "sudo service svxlink restart 2>&1";
         exec($command,$screen,$retval);
         $dmrtg = $DMRdefTG;
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune " . $dmrtg . " 2>&1";
         exec($command,$screen,$retval);
         if (defined('DL3EL')) {
-            $dmrstatus = "DMR_only >" . $DMRStatusFile;
+            $dmrstatus = "DVS_only >" . $DMRStatusFile;
             shell_exec("echo $dmrstatus");
             $dmrtgsel = $dmrtg . " >" . $DMRTGFile;
             shell_exec("echo $dmrtgsel");
@@ -141,24 +152,34 @@ $dvsmode = OFF | DMR | YSF | DSTAR
             }    
         }
     }
-    if (isset($_POST['btn_DMR_only_DISC']))
+    if (isset($_POST['btn_DVS_only_DISC']))
     {
         if ($mode == "DMR_FM") {
             $command = "echo '*7#' > /tmp/dtmf_svx";
             exec($command,$screen,$retval);
             $command = "echo '*91262649#' > /tmp/dtmf_svx";
             exec($command,$screen,$retval);
+            if ($file !== "dmr_fm") {
+                $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_fm /etc/svxlink/svxlink.conf 2>&1";
+                exec($command,$screen,$retval);
+                $file = "dmr_fm";
+                $command = "sudo service svxlink restart 2>&1";
+                exec($command,$screen,$retval);
+            }
         } else {
             if ($dvsmode == "DMR") {
                 $command = "/opt/MMDVM_Bridge/dvswitch.sh tune 4000 2>&1";
                 exec($command,$screen,$retval);
             }    
-            $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_only 2>&1";
-            exec($command,$screen,$retval);
-            $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_fm /etc/svxlink/svxlink.conf 2>&1";
-            exec($command,$screen,$retval);
-            $command = "sudo service svxlink restart 2>&1";
-            exec($command,$screen,$retval);
+            if ($file === "dmr_only") {
+                $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_only 2>&1";
+                exec($command,$screen,$retval);
+                $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_fm /etc/svxlink/svxlink.conf 2>&1";
+                exec($command,$screen,$retval);
+                $command = "sudo service svxlink restart 2>&1";
+                exec($command,$screen,$retval);
+                $file = "dmr_fm";
+            }
         }
         $mode ="FM_only";
         $color = "blue";
@@ -181,15 +202,16 @@ $dvsmode = OFF | DMR | YSF | DSTAR
 // YSF
     if (isset($_POST['btn_YSF_only']))
     {
-        if ($mode == "FM_only") {
+        if (($mode == "FM_only") && ($file === "dmr_fm")) {
             $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
             exec($command,$screen,$retval);
         }
-        $mode ="DMR_only";
+        $mode ="DVS_only";
         $color = "red";
         $colorb = "blue";
         $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
         exec($command,$screen,$retval);
+        $file = "dmr_only";
         $command = "sudo service svxlink restart 2>&1";
         exec($command,$screen,$retval);
         $dvsmode ="YSF";
@@ -201,7 +223,7 @@ $dvsmode = OFF | DMR | YSF | DSTAR
            $dvsmode = "YSF >" . $DVSModeFile;
            shell_exec("echo $dvsmode");
            $dvsmode = "YSF";
-           $dmrstatus = "DMR_only >" . $DMRStatusFile;
+           $dmrstatus = "DVS_only >" . $DMRStatusFile;
            shell_exec("echo $dmrstatus");
         }    
     }
@@ -263,6 +285,34 @@ $dvsmode = OFF | DMR | YSF | DSTAR
         }    
     }
 // DSTAR
+    if (isset($_POST['btn_DSTAR_only']))
+    {
+        if (($mode == "FM_only") && ($file === "dmr_fm")) {
+            $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
+            exec($command,$screen,$retval);
+        }
+        $mode ="DVS_only";
+        $color = "red";
+        $colorb = "blue";
+        $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
+        exec($command,$screen,$retval);
+        $file = "dmr_only";
+        $command = "sudo service svxlink restart 2>&1";
+        exec($command,$screen,$retval);
+        $dvsmode ="DSTAR";
+        $kanal = " ";
+        $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DSTAR 2>&1";
+        exec($command,$screen,$retval);
+
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+           $dmrstatus = "DVS_only >" . $DMRStatusFile;
+           shell_exec("echo $dmrstatus");
+        }    
+    }
+
     if (isset($_POST['btn_DSTAR']))
     {
         $dvsmode ="DSTAR";
@@ -319,30 +369,34 @@ $dvsmode = OFF | DMR | YSF | DSTAR
         ?>
         &nbsp;&nbsp;&nbsp;
 <!---
-        <button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:<?php echo $color;?>; height:30px; font-size:12px;"><b>DMR ein</b></button>
+        <button name="btn_DVS_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:<?php echo $color;?>; height:30px; font-size:12px;"><b>DMR ein</b></button>
 --->
         <?php
                 if ($mode == "FM_only") {
-                    echo '<button name="btn_DMR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR ein</b></button>';
-                    echo "&nbsp;&nbsp;&nbsp;";
-                    echo '<button name="btn_DMR_FM" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $colorb .'; height:30px; font-size:12px;"><b>DMR Bridge ein</b></button>';
+                    echo '<button name="btn_DVS_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR ein</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                     echo '<button name="btn_YSF_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF ein</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
-                }
-                if (($mode == "DMR_only")  && ($dvsmode == "DMR")) {
-                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR aus</b></button>';
+                    echo '<button name="btn_DSTAR_only" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DSTAR ein</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                    echo '<button name="btn_DMR_FM" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color: grey; height:30px; font-size:12px;"><b>DVS Bridge ein</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                 }
-                if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
-                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF aus</b></button>';
+                if ($mode == "DVS_only") {
+                    echo '<button name="btn_DVS_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DVS aus</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                 }
                 if ($mode == "DMR_FM") {
-                    echo '<button name="btn_DMR_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR Bridge aus</b></button>';
+                    echo '<button name="btn_DMR_FM" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DMR</b></button>';
+                    echo "&nbsp;&nbsp;&nbsp;";
+                    echo '<button name="btn_YSF" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>YSF</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    echo '<button name="btn_DSTAR" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:30px; font-size:12px;"><b>DSTAR</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    echo '<button name="btn_DVS_only_DISC" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color: red; height:30px; font-size:12px;"><b>DVS Bridge aus</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                 }    
-                if ((($mode == "DMR_only") || ($mode == "DMR_FM")) && ($dvsmode == "DMR")) {
+                if ((($mode == "DVS_only") || ($mode == "DMR_FM")) && ($dvsmode == "DMR")) {
                     echo '<button name="btn_DMR_262649" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; font-size:12px;"><b>OV F49</b></button>';
                     echo "&nbsp;&nbsp;&nbsp;";
                     echo '<button name="btn_DMR_91" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:blue; height:30px; font-size:12px;"><b>DMR WW</b></button>';
@@ -357,30 +411,26 @@ $dvsmode = OFF | DMR | YSF | DSTAR
                     echo '<input type="hidden" name="form_submitted" value="1">';
                     echo '</form>';
                 }
-                if (($mode == "DMR_only")  && ($dvsmode == "YSF")) {
+//                if (($mode == "DVS_only")  && ($dvsmode == "YSF")) {
+                if ($dvsmode == "YSF") {
                         include_once "include/dvs_functions.php";
                         getYSFHosts();
                     echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]). '">';
-                    $DVSStatusFile = DL3EL . "/dvs_status";
-                    $dvsstatus = shell_exec('cat ' . $DVSStatusFile);
-                    if (strncmp($dvsstatus, "DMR_DSTAR_YSF", 13) === 0) {
-//                        echo '<br><button name="btn_YSF" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF</b></button>';
-//                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '<br><br><button name="btn_YSF_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Hessen</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '	<button name="btn_YSF_26269" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF 26269</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '	<button name="btn_YSF_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Discon</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '	<button name="btn_DSTAR" type="submit" style="border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '	<button name="btn_DSTAR_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>D* Hessen</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        echo '	<button name="btn_DSTAR_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR Discon</b></button>';
-                        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    }
+                    echo '<br><br><button name="btn_YSF_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Hessen</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    echo '	<button name="btn_YSF_26269" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF 26269</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    echo '	<button name="btn_YSF_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>YSF Discon</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                 }    
-                echo "<br>DMR Mode: $mode / DVS Mode: $dvsmode";
+//                if (($mode == "DVS_only")  && ($dvsmode == "DSTAR")) {
+                if ($dvsmode == "DSTAR") {
+                    echo '	<button name="btn_DSTAR_HES" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>D* Hessen</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    echo '	<button name="btn_DSTAR_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR Discon</b></button>';
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                }
+                echo "<br>Config:$file($radio) / mode:$mode / DVS Mode:$dvsmode";
                 echo '</form>';
     ?>
     </table>    
