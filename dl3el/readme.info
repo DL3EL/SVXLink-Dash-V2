@@ -1,15 +1,15 @@
 Neues in der Version 4.76
 - internes Cleanup eingeführt
-	bislang musst bei der Installation vom DAshboard ein manueller Eintrag in der Crontab erstellt werden, um ein 
-	Skript zu starten, welches regelmässig alte Backups löscht. Nutzer des Images von DC9VQ brauchten sich nicht
-	darum zu kümmern, das war bereits enthalten und richtig konfiguriert
-	Wir haben jetzt diese Funktionm das Dashboard verlagert, das Script "cleanup.sh" ist jetzt nicht mehr notwendig.
-	Sofern das Dashboard läuft, wird die "Cleanup" Funktion wird automatisch alle 24 aufgerufen. Läuft das DB 
-	nicht, z.B. über Nacht, so wird die Funktion beim nächsten Aufruf gestartet (sofern 24h seit dem letzten Aufruf
-	vergangen sind).
-	Aktuelle werden bis auf 10 Versionen alle Sicherungskopien der config.php, svxlink.conf, ModuleMetarInfo.conf 
-	und ModuleEchoLink.conf gelöscht. 
-	Ausserdem werden aus dem Verzeichnis "backups" alle Datuien entfernt, die älter als 7 Tage sind.
+	bislang musst bei der Installation vom Dashboard ein manueller Eintrag in der Crontab erstellt werden, 
+	um ein 	Skript zu starten, welches regelmässig alte Backups löscht. Nutzer des Images von DC9VQ 
+	brauchen sich nicht darum zu kümmern, das war bereits enthalten und richtig konfiguriert.
+	Wir haben jetzt diese Funktionm das Dashboard verlagert, das Script "cleanup.sh" ist jetzt nicht 
+	mehr notwendig.	Sofern das Dashboard läuft, wird die "Cleanup" Funktion wird automatisch alle 24 Stunden 
+	aufgerufen. Läuft das DB nicht, z.B. über Nacht, so wird die Funktion beim nächsten Aufruf gestartet 
+	(sofern 24h seit dem letzten Aufruf vergangen sind).
+	Aktuelle werden bis auf 10 Versionen alle Sicherungskopien der config.php, svxlink.conf, 
+	ModuleMetarInfo.conf und ModuleEchoLink.conf gelöscht. 
+	Ausserdem werden aus dem Verzeichnis "backups" alle Datien entfernt, die älter als 7 Tage sind.
 
 Neues in der Version 4.74
 - Info nur für Nutzer des Dashboard mit einer eigenen Installation von SVXLink oder älteren Versionen des 

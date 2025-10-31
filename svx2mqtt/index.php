@@ -331,6 +331,6 @@
                 echo "<meta http-equiv='refresh' content='0'>";
             }
 ?>
-<center><small><br><br>FM-Funknetz.de - MQTT Livedashboard Version 0.0.5 by DJ1JAY</small></center>
+<center><small><br><br>FM-Funknetz.de - basierend auf dem MQTT Livedashboard von DJ1JAY</small></center>
 </body>
 </html>
