@@ -884,7 +884,7 @@ function display_config($config) {
     function update_file($updFile, $update_script, $logfile, $timer) {
 
         $delta = time() - filemtime($updFile);
-        if ((defined ('debug')) && (debug > 0)) echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
+        if ((defined ('debug')) && (debug > 5)) echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
         if ($delta > $timer) {
           // einmal am Tag wird die Datei neu geholt
           // mal prüfen, ob es Überhohlvorgänge gibt ....
@@ -898,9 +898,97 @@ function display_config($config) {
           exec($command, $output, $return_var);
           return (1);
         } else {
-          if ((defined ('debug')) && (debug > 0)) echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
+          if ((defined ('debug')) && (debug > 5)) echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
           return (0);
         }  
       }
 
+    function start_cron($cron_File) {
+      $jetzt = date("Y-m-d H:i:s");
+      if ((defined ('debug')) && (debug > 0)) echo "Start cron Job um $jetzt <br>";
+
+      $max_kept = 10;
+// 1. delete copies of full screen editor
+// 1.1 delete copies of full screen editor: include/config.php
+      $test = 0;
+      $globber = DL3EL_BASE . "include/config.php.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+// 1.2 delete copies of full screen editor: svxlink.conf
+      $test = 0;
+      $globber = SVXCONFPATH.SVXCONFIG . ".20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+// 1.3 delete copies of full screen editor: MOduleEcholink.conf
+      $test = 0;
+      $globber = MODULEPATH.ECHOLINKCONFIG . ".20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+// 1.4 delete copies of full screen editor: ModuleMetarInfo.conf
+      $test = 0;
+      $globber = MODULEPATH.METARINFO . ".20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+// 2. delete all files in "backups" directory,which are older than 7 days
+      $test = 0;
+      $globber = DL3EL_BASE . "backups";
+      $max_days = '-7 DAYS';
+      delete_old_files($globber,$max_days,$cron_File,$test);
+    }  
+
+    function delete_old_copies($globber,$max_kept,$cron_File,$test) {
+      if ((defined ('debug')) && (debug > 0)) echo "GL: $globber, max: $max_kept <br>";
+      $numberoffiles = 0;
+      $file_array = glob($globber);
+      foreach ($file_array as $filename) {
+        if ((defined ('debug')) && (debug > 2)) echo "F:$filename<br>";
+        ++$numberoffiles;
+      }
+      $jetzt = date("Y-m-d H:i:s");
+      if ((defined ('debug')) && (debug > 0)) echo "Files found: $numberoffiles<br>";
+      $max_kept = 10;
+      $files2delete = $numberoffiles - $max_kept;
+      $nn = 0;
+      $jetzt = date("Y-m-d H:i:s");
+
+      while ($nn++ < $files2delete) { 
+        if (!$test) {
+          if (unlink($file_array[$nn])) {
+            if ((defined ('debug')) && (debug > 0)) echo $file_array[$nn] . " deleted ($nn)<BR>";
+            $cron_log = "'$jetzt: " . $file_array[$nn] . " deleted ($nn)'";
+            $add2log = $cron_log . " >>" . $cron_File;
+            shell_exec("echo $add2log");
+          }  
+        } else {  
+            if ((defined ('debug')) && (debug > 0)) echo $file_array[$nn] . " would be deleted ($nn)<BR>";
+        }
+      }   
+    }  
+
+    function delete_old_files($globber,$max_days,$cron_File,$test) {
+      $expire = strtotime($max_days);
+      $files = glob($globber . '/*');
+
+      $jetzt = date("Y-m-d H:i:s");
+      foreach ($files as $file) {
+      // Skip anything that is not a file
+        if (!is_file($file)) {
+          continue;
+        }
+
+        // Skip any files that have not expired
+        if (filemtime($file) > $expire) {
+          continue;
+        }
+
+        if (!$test) {
+          if (unlink($file)) {
+            if ((defined ('debug')) && (debug > 0)) echo $file_array[$nn] . " deleted ($nn)<BR>";
+            $cron_log = "'$jetzt: " . $file . " deleted'";
+            $add2log = $cron_log . " >>" . $cron_File;
+            shell_exec("echo $add2log");
+          }  
+        } else {  
+            if ((defined ('debug')) && (debug > 0)) echo $file . " would be deleted<BR>";
+        }
+      }
+    }
+    
 ?>
+    

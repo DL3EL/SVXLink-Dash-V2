@@ -32,6 +32,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	$kn_exp = "Expert";
 	$kn_nor = "<b>Normal</b>";
     }
+   if (empty($_SESSION['auth'])) {
+      $_SESSION['auth'] = "UNAUTHORISED";
+   }
 ?>
    <div id="display-links" align=right>
 	<p style = "padding-right: 5px; text-align: right; color: #000000;">

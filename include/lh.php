@@ -49,7 +49,30 @@ include_once "tgdb.php";
 	} else {
 	  $use_names = 0;
 	}
-      }  
+      }
+      $cron_File = DL3EL . "/crontab.log";
+      if (file_exists($cron_File)) {
+	$timer = 86400;
+//	$timer = 10;
+	$delta = time() - filemtime($cron_File);
+
+	$cron_File_size = filesize($cron_File);
+	if ($cron_File_size > 10000) {
+          rename($cron_File, $cron_File . ".bak");
+	  touch($cron_File);
+	}
+	if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>";
+	if ($delta > $timer) {
+	    $cron = start_cron($cron_File);
+	}  
+      } else {
+	$time = time() - 86400;
+	// Anlegen der Datei
+        touch($cron_File, $time);
+	$cron_log = "$cron_File created, timestamp: " . filemtime($cron_File) . "\n"; 
+	$dmrtgsel = $cron_log . " >" . $cron_File;
+	shell_exec("echo $dmrtgsel");
+      }
 ?>
       <th width=100px>TG #</th>
 <!--
