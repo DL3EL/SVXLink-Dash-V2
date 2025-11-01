@@ -1,3 +1,9 @@
+Neues in der Version 4.77
+- bessere IPv6 UNterstützung
+	Nach einem HInweis inkl. Codeschnipsel von Kim, DG9VH, konnte ich die Darstellung von iPv6 Adressen im 
+	Statusbereich verbessern. Wenn der Browser auf einem IPv6 Client läuft steht dort IPV6, 
+	die eigentliche Adresse ist jetzt im Tooltip.und sprengt nicht mehr die Breite des Fensters.
+
 Neues in der Version 4.76
 - internes Cleanup eingeführt
 	bislang musst bei der Installation vom Dashboard ein manueller Eintrag in der Crontab erstellt werden, 

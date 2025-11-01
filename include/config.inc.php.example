@@ -52,16 +52,25 @@ define("HOSTS","null");
 $svxConfigFile = SVXCONFPATH . SVXCONFIG;
 if (fopen($svxConfigFile,'r')) { 
     $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
-    $callsign = isset($svxconfig['ReflectorLogic']['CALLSIGN']) ? $svxconfig['ReflectorLogic']['CALLSIGN'] : 'NOCALL';
-    $refApi = isset($svxconfig['ReflectorLogic']['API']) ? $svxconfig['ReflectorLogic']['API'] : '';
-    $fmnetwork = isset($svxconfig['ReflectorLogic']['HOSTS']) ? $svxconfig['ReflectorLogic']['HOSTS'] : $fmnetwork =$svxconfig['ReflectorLogic']['DNS_DOMAIN'];
+	if (isset($svxconfig['ReflectorLogic'])) {
+		$section = 'ReflectorLogic';
+	} else {
+		$section = 'SimplexLogic';
+	}	 
+    $callsign = isset($svxconfig[$section]['CALLSIGN']) ? $svxconfig[$section]['CALLSIGN'] : 'NOCALL';
+    $refApi = isset($svxconfig[$section]['API']) ? $svxconfig[$section]['API'] : '';
     $qth = isset($svxconfig['LocationInfo']['QTH']) ? $svxconfig['LocationInfo']['QTH'] : '';
     $freq = isset($svxconfig['Rx1']['FREQ']) ? $svxconfig['Rx1']['FREQ'] : '';
     $EL_node = isset($svxconfig['LocationInfo']['LOCATION']) ? $svxconfig['LocationInfo']['LOCATION'] : '';
-    $node_password = isset($svxconfig['ReflectorLogic']['AUTH_KEY']) ? $svxconfig['ReflectorLogic']['AUTH_KEY'] : '';
+    $node_password = isset($svxconfig[$section]['AUTH_KEY']) ? $svxconfig[$section]['AUTH_KEY'] : '';
     $node_user = $callsign;
+    $file = isset($svxconfig['File_Description']['FILE']) ? $svxconfig['File_Description']['FILE'] : 'no';     
+    if ($file === "dmr_only") {
+        $fmnetwork = "Digital Modes only";
+    } else {
+        $fmnetwork = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
     }
-else { 
+} else { 
      $callsign="NOCALL";
      $fmnetwork="not registered";
      $EL_node = "unknown";

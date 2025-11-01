@@ -290,7 +290,12 @@ if ($reflectorlogic2 != "") {
    } else {
       echo "logged in";
    }   
-   echo " from<br>[$ip]";
+//   $ip = "2003:fb:8734:5600:7d73:c34b:8b35:e900";
+   if (strlen($ip) < 16) {
+      echo '<span title="[IP Address of Browser Client]"> from<br>['. $ip . ']</span>';
+   } else {   
+      echo '<span title="[' . $ip .']"> from<br>IPV6</span>';
+   }   
    echo "</div></td></tr>";
    echo "</table>\n";
 } else {
