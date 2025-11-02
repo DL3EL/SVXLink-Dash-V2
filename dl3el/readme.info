@@ -1,5 +1,10 @@
+Neues in der Version 4.80 (02.11.2025)
+- Verbesserungen bei Backup/Restore
+	Die im Dashboard eingebaute Sicherungsfunktion berücksichtigt jetzt die aktuellen Verzeichnis, wie in der 
+	config.php eingetragen.
+
 Neues in der Version 4.79 (02.11.2025)
-- Änderung in der URL im FM-Funknetez
+- Änderung in der URL im FM-Funknetz
 	Im FM-Funknetz hat sich eine URL im Zuge der Umstellung auf php geändert. Die V4.79 berücksichtigt das
 
 Neues in der Version 4.78 (01.11.2025)

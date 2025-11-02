@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include_once "include/settings.php";
+include_once "include/functions.php";
 
 ?>
 
@@ -54,10 +55,12 @@ include_once "include/settings.php";
 	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
 	<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | 
 	<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | 
+
 		<center>
 		<h2><?php echo ('Backup/Restore');?></h2>
 		    <?php if (!empty($_POST)) {
 			echo '<table width="100%">'."\n";
+			addlog("L","Start Backup\n");
 
 			if ( escapeshellcmd($_POST["action"]) == "download" ) {
 			    $backupDir = "/tmp/config_backup";
@@ -68,11 +71,27 @@ include_once "include/settings.php";
 			    exec("sudo rm -rf $backupDir > /dev/null");
 			    exec("sudo mkdir $backupDir > /dev/null");
 			    exec("sudo cp -p -r /etc/NetworkManager/system-connections/*.nmconnection $backupDir > /dev/null");
-			    exec("sudo cp -p -r /etc/svxlink/* $backupDir > /dev/null");
-			    exec("sudo cp -p -r /etc/svxlink/svxlink.d/* $backupDir > /dev/null");
+/*
+define("SVXCONFPATH", "/etc/svxlink/");
+define("MODULEPATH", "/etc/svxlink/svxlink.d/");
+*/
+//			    exec("sudo cp -p -r /etc/svxlink/* $backupDir > /dev/null");
+				$command = "sudo cp -p -r " . SVXCONFPATH . "* $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
+//			    exec("sudo cp -p -r /etc/svxlink/svxlink.d/* $backupDir > /dev/null");
+				$command = "sudo cp -p -r " . MODULEPATH . "* $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
 			    //exec("sudo cp -r /usr/share/svxlink/* $backupDir > /dev/null");
-			    exec("sudo cp -p -r /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
-			    exec("sudo cp -p -r /var/www/html/include/config.php $backupDir > /dev/null");
+//			    exec("sudo cp -p -r /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
+
+//			    exec("sudo cp -p -r /var/www/html/include/config.php $backupDir > /dev/null");
+				$command = "sudo cp -p " . DL3EL_BASE . "include/config.php $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
 
 			    chdir($backupDir);
 			    exec("sudo zip -r $backupZip * > /dev/null");
@@ -150,12 +169,31 @@ include_once "include/settings.php";
 				// Overwrite the configs
 				//exec("sudo mv -f /tmp/config_backup/* /tmp/config_restore/ > /dev/null");
 				exec("sudo rm -rf /tmp/config_restore/tmp > /dev/null");
-		        exec("sudo mv -f /tmp/config_restore/Module* /etc/svxlink/svxlink.d/ > /dev/null");
+/*
+define("SVXCONFPATH", "/etc/svxlink/");
+define("MODULEPATH", "/etc/svxlink/svxlink.d/");
+*/
+//		        exec("sudo mv -f /tmp/config_restore/Module* /etc/svxlink/svxlink.d/ > /dev/null");
+				$command = "sudo mv -f /tmp/config_restore/Module* " . MODULEPATH . " > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
 				//exec("sudo mv -f /tmp/config_restore/ca-hook.py /usr/share/svxlink/ > /dev/null");
 				exec("sudo mv -f /tmp/config_restore/events.tcl /usr/share/svxlink/ > /dev/null");
-				exec("sudo mv -f /tmp/config_restore/node_info.json /etc/svxlink/ > /dev/null");
-				exec("sudo mv -f /tmp/config_restore/svxlink.conf /etc/svxlink/ > /dev/null");
-				exec("sudo mv -f /tmp/config_restore/config.php /var/www/html/include/ > /dev/null");
+//				exec("sudo mv -f /tmp/config_restore/node_info.json /etc/svxlink/ > /dev/null");
+				$command = "sudo mv -f /tmp/config_restore/node_info.json  " . SVXCONFPATH . " > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
+//				exec("sudo mv -f /tmp/config_restore/svxlink.conf /etc/svxlink/ > /dev/null");
+				$command = "sudo mv -f /tmp/config_restore/svxlink.conf " . SVXCONFPATH . " > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
+//				exec("sudo mv -f /tmp/config_restore/config.php /var/www/html/include/ > /dev/null");
+				$command = "sudo mv -f /tmp/config_restore/config.php " . DL3EL_BASE . "include/ > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
 
 				// Start the services
 			    	exec('sudo systemctl restart svxlink > /dev/null &');
