@@ -930,6 +930,13 @@ function display_config($config) {
       $globber = DL3EL_BASE . "backups";
       $max_days = '-7 DAYS';
       delete_old_files($globber,$max_days,$cron_File,$test);
+// 3. Clear LogFile
+      $db_File = DL3EL . "/db.log";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
     }  
 
     function delete_old_copies($globber,$max_kept,$cron_File,$test) {
@@ -989,6 +996,17 @@ function display_config($config) {
         }
       }
     }
-    
+
+    function addlog ($logfile,$logtext) {
+      if ($logfile === "L") {
+        $db_File = DL3EL . "/db.log";
+      } else {
+        $db_File = $logfile;
+      }  
+      date_default_timezone_set('Europe/Berlin');
+      $jetzt = date("Y-m-d H:i:s");
+      $add2log = "$jetzt: " . $logtext;
+			file_put_contents($db_File, $add2log,FILE_APPEND);
+    }
 ?>
     
