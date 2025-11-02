@@ -3,11 +3,11 @@ Neues in der Version 4.81 (02.11.2025)
 	Die Relaisbetreiber, die deses Dashboard öffentlich einsetzen, können jetzt die Zugriffsrechte granular steuern.
 	Das erfolgt im Einzelnen über Einträge in der config.php
 	define("KEY6", array('Spenden Info','*992#','purple','auth'));
-		der letzte Parameter ist entweder 'auth' oder nicht vorhanden. Ist er 'auth', so wird der Button nur angezeigt
-		wenn der aktuelle Benutzer authorisiert ist
+		der letzte Parameter ist entweder 'auth' oder nicht vorhanden. Ist er 'auth', so wird der Button nur 
+		angezeigt wenn der aktuelle Benutzer authorisiert ist
 	define("DTMF", "auth");
-		Mit DTMF wird vorgegeben ob die Eingabezeile für die freie DTMF Eingabe immer oder nur für einen authorisierten 
-		Nutzer angezeigt werden soll.
+		Mit DTMF wird vorgegeben ob die Eingabezeile für die freie DTMF Eingabe immer oder nur für einen 
+		authorisierten Nutzer angezeigt werden soll.
 	define("MENUTOPAUTH", "yes");
 	define("MENUTOPAUTH", "no");
 		Hier wird eingestellt, ob der Button zur Authorizierung überhaupt angezeigt werden soll
