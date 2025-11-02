@@ -100,11 +100,11 @@ define("MODULEPATH", "/etc/svxlink/svxlink.d/");
 
 //			    exec("sudo cp -p -r /etc/svxlink/svxlink.d/* $backupDir > /dev/null");
 				$command = "sudo cp -p -r " . MODULEPATH . "* $backupDir > /dev/null";
-				exec($command,$screen,$retval);
-				addlog("L","$command\n");
+//				exec($command,$screen,$retval);
+//				addlog("L","$command\n");
 
 			    //exec("sudo cp -r /usr/share/svxlink/* $backupDir > /dev/null");
-//			    exec("sudo cp -p -r /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
+			    exec("sudo cp -p -r /usr/share/svxlink/events.d/local/* $backupDir > /dev/null");
 
 //			    exec("sudo cp -p -r /var/www/html/include/config.php $backupDir > /dev/null");
 				$command = "sudo cp -p " . DL3EL_BASE . "include/config.php $backupDir > /dev/null";

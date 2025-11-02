@@ -264,14 +264,26 @@ if (defined('KEY20')) {
  </center>
     </form>
 <p style = "margin: 0 auto;"></p>
-<form action="" method="POST" style = "margin-top:4px;">
-  <center>
-  <label style = "text-shadow: 1px 1px 1px Lightgrey, 0 0 0.5em LightGrey, 0 0 1em whitesmoke;font-weight:bold;color:#464646;" for="dtmfsvx">DTMF command (must end with #):</label>  
-  <input type="text" id="dtmfsvx" name="dtmfsvx">
-  <input type="submit" value="Send DTMF code" class="green"><br>
-  </center>
-</form>
+
 <?php
+    if ((defined('DTMF')) && (DTMF === "auth")) {
+        if ($auth) {
+            $display = 1;
+        } else {
+            $display = 0;
+        }
+    } else {
+        $display = 1;
+    }
+    if ($display) {
+        echo '<form action="" method="POST" style = "margin-top:4px;">';
+        echo '<center>';
+        echo '<label style = "text-shadow: 1px 1px 1px Lightgrey, 0 0 0.5em LightGrey, 0 0 1em whitesmoke;font-weight:bold;color:#464646;" for="dtmfsvx">DTMF command (must end with #):</label>  ';
+        echo '<input type="text" id="dtmfsvx" name="dtmfsvx">';
+        echo '<input type="submit" value="Send DTMF code" class="green"><br>';
+        echo '</center>';
+        echo '</form>';
+    }    
   if (isset($_POST["dtmfsvx"])){
    $exec= "echo '" . $_POST['dtmfsvx'] . "' > /tmp/dtmf_svx";
    exec($exec,$output);
