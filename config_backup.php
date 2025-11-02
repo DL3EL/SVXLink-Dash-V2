@@ -67,10 +67,24 @@ include_once "include/functions.php";
 			    $backupZip = "/tmp/config_backup.zip";
 			    $hostNameInfo = exec('cat /etc/hostname');
 
+/*
 			    exec("sudo rm -rf $backupZip > /dev/null");
 			    exec("sudo rm -rf $backupDir > /dev/null");
 			    exec("sudo mkdir $backupDir > /dev/null");
 			    exec("sudo cp -p -r /etc/NetworkManager/system-connections/*.nmconnection $backupDir > /dev/null");
+*/
+				$command = "sudo rm -rf $backupZip > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+				$command = "sudo rm -rf $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+				$command = "sudo mkdir $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+				$command = "sudo cp -p -r /etc/NetworkManager/system-connections/*.nmconnection $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
 /*
 define("SVXCONFPATH", "/etc/svxlink/");
 define("MODULEPATH", "/etc/svxlink/svxlink.d/");
