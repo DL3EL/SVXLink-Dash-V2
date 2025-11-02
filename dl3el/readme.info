@@ -1,3 +1,7 @@
+Neues in der Version 4.79 (02.11.2025)
+- Änderung in der URL im FM-Funknetez
+	Im FM-Funknetz hat sich eine URL im Zuge der Umstellung auf php geändert. Die V4.79 berücksichtigt das
+
 Neues in der Version 4.78 (01.11.2025)
 - weniger IP Adressen in der Anzeige Hardware Info möglich
 	Unter Umständen werden sehr viele IP Adressen bei Hardware Info angezeigt. Wenn man das auf eine Adresse 

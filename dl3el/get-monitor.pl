@@ -91,6 +91,7 @@ my $version = "2.42";
     $vmt = $vmt_org;
     printf LOG "VMT Liste: (%s)\n",$vmt;
     while ($vmt) {
+#        $valid_mon_tgs[$vmt] = "0" if (not exists $valid_mon_tgs[$vmt]);
         printf LOG "(2)TG%s: %s [%s]\n",$vmt,$valid_mon_tgs[$vmt],$acttg;
         --$vmt;
     }
@@ -325,7 +326,7 @@ my $ii = 0;
 #        print ", " if ($nn++);
             printf LOG "%s ",$DataTabMonTG{$mon_tgi}{'CALL'} if ($verbose >=0);
 #            printf "%s ",$DataTabMonTG{$mon_tgi}{'CALL'};
-            printf "<a href=\"https://dashboard.fm-funknetz.de/node.html?call=%s\" target=\"FM-Funknetz\" style=\"color:#blue;\">%s </a>",$DataTabMonTG{$mon_tgi}{'CALL'},$DataTabMonTG{$mon_tgi}{'CALL'};
+            printf "<a href=\"https://dashboard.fm-funknetz.de/node.php?call=%s\" target=\"FM-Funknetz\" style=\"color:#blue;\">%s </a>",$DataTabMonTG{$mon_tgi}{'CALL'},$DataTabMonTG{$mon_tgi}{'CALL'};
             ++$ii;
         }
     }	
