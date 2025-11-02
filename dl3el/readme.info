@@ -1,10 +1,17 @@
-Neues in der Version 4.77
+Neues in der Version 4.78 (01.11.2025)
+- weniger IP Adressen in der Anzeige Hardware Info möglich
+	Unter Umständen werden sehr viele IP Adressen bei Hardware Info angezeigt. Wenn man das auf eine Adresse 
+	einschränken möchte, so muss in der config.php eine neue Konstante definiert werden:
+	define("DL3EL_SHOW_ONLY_ONE_IP", "yes");
+	Fehlt diese Konstate oder steht sie auf "no", werden, wie bisher, alle IP Adressen des Rechnefrs angezeigt.
+
+Neues in der Version 4.77 (01.11.2025)
 - bessere IPv6 UNterstützung
-	Nach einem HInweis inkl. Codeschnipsel von Kim, DG9VH, konnte ich die Darstellung von iPv6 Adressen im 
+	Nach einem Hinweis inkl. Codeschnipsel von Kim, DG9VH, konnte ich die Darstellung von iPv6 Adressen im 
 	Statusbereich verbessern. Wenn der Browser auf einem IPv6 Client läuft steht dort IPV6, 
 	die eigentliche Adresse ist jetzt im Tooltip.und sprengt nicht mehr die Breite des Fensters.
 
-Neues in der Version 4.76
+Neues in der Version 4.76 (31.10.2025)
 - internes Cleanup eingeführt
 	bislang musst bei der Installation vom Dashboard ein manueller Eintrag in der Crontab erstellt werden, 
 	um ein 	Skript zu starten, welches regelmässig alte Backups löscht. Nutzer des Images von DC9VQ 
@@ -17,7 +24,7 @@ Neues in der Version 4.76
 	ModuleMetarInfo.conf und ModuleEchoLink.conf gelöscht. 
 	Ausserdem werden aus dem Verzeichnis "backups" alle Datien entfernt, die älter als 7 Tage sind.
 
-Neues in der Version 4.74
+Neues in der Version 4.74 (29.10.2025)
 - Info nur für Nutzer des Dashboard mit einer eigenen Installation von SVXLink oder älteren Versionen des 
 	Images von DC9VQ: In der Github Version von svxlink wird 
 	die Datei /etc/svxlink/svxlink.d/ModuleEchoLink.conf mit einer Variablen "Description" ausgeliefert,
@@ -40,7 +47,7 @@ Neues in der Version 4.74
 	"Abgefangen" bedeutet, die Funktion funktioiert wie erwartet
 	"korrigiert" bedeutet, dass die Zeilen, die nicht mit DESCRIPTION=" beginnen, gelöscht werden.
 
-Neues in der Version 4.72
+Neues in der Version 4.72 (27.10.2025)
 - Änderung bei der Auswahl von EcholinkProxies
 	wenn man die öffentlichen Proxies für Echolink nutzen möchte, reicht es jetzt in der Datei
 	/etc/svxlink/svxlink.d//ModuleEchoLink.conf 
@@ -57,12 +64,12 @@ Neues in der Version 4.72
 	oder von einem privaten Proxy zu einem öffentlichen Proxy wechseln möchte. In einer laufenden
 	Installation muss man diese Funktion nicht benutzen.
 
-Neues in der Version 4.71
-- MQTT LIvemap jetzt mit klickbarer Talkgroup
+Neues in der Version 4.71 (26.10.2025)
+- MQTT Livemap jetzt mit klickbarer Talkgroup
 	Frank, DL4EM, hat mir bei dem Problem geholfen, die angezeigten Talkgroups in der LiveDB Ansicht per Klick anzuwähen. Er hat mir vorhin den Code geschickt,
 	den ich jetzt in die Version 4.71 integriert habe. Danke Frank.
 
-Neues in der Version 4.68
+Neues in der Version 4.68(23.10.2025)
 - DX-Cluster Interface jetzt mit Filter auf Herkunft
 	Die angezeigten Clustermeldungen können jetzt, mit einer Einstellung in der config.php, auf 
 	Meldungen aus Europa (oder AS, SA,AF und NA) eingeschränkt werden.
@@ -70,7 +77,7 @@ Neues in der Version 4.68
 	define("DL3EL_DXCLUSTER_CONT", "EU");
 	eingefügt und auf den geünschten Kontinent eingestellt werden. Ansonsten werden alle Meldungen angezeigt
 
-Neues in der Version 4.66
+Neues in der Version 4.66 (22.10.2025)
 - DX-Cluster Interface implementiert
 	Jörg, DJ7NT, bekannt als Entwickler von Wavelog, bietet eine leicht zu bedienende API, mit der 
 	DX-Meldungen in Anwendungen integriert werden können. Da ich das Dashboard langsam dahin entwickeln 
@@ -79,7 +86,7 @@ Neues in der Version 4.66
 	define("DL3EL_DXCLUSTER", "yes");
 	aktiviert werden. Die Seite aktualisiert sich alle 15 Sekunden.
 
-Neues in der Version 4.64
+Neues in der Version 4.64 (21.10.2025)
 - Weitere Aufräumaktionen im Code
 - erster Versuch einer MQTT Implementierung des Live Dashboards von Jens, DJ1JAY. Im Moment wird 
 	sein Code mit etwas angepasst Farben verwendet. Leider geht das direkte Auswählen 
@@ -90,7 +97,7 @@ Neues in der Version 4.64
 	eingefügt werden. Am einfachsten geht das über den Editor im Expert Mode. 
 	Dabei wird auch eine Sicherheitskopie der config.php erstellt.
 
-Neues in der Version 4.62
+Neues in der Version 4.62 (18.10.2025)
 - Im Rahmen einer Aufräumaktion vor der Bereitstellung des Iamges (V1.20d) von Michael, DC9VQ sind die beiden Dateien 
 	include/config.inc.php und config.php ziemlich aufgeräumt worden. Die Größe wurde fast halbiert, 
 	alle nicht mehr notwendigen Konstanten wurden entfernt.
@@ -147,23 +154,23 @@ Neues in der Version 4.62
 		richtig funktionieren, bitte die beiden geänderten Datein sichern, die beiden Backups 
 		wieder einspielen und Kontak zu mir aufnehmen
 	  
-Neues in der Version 4.60
+Neues in der Version 4.60 (16.10.2025)
 - Die Dateien, die vom Github Update angefasst, dürfen auf keinen Fall lokal geändert werden. Wenn das trotzdem 
 	passiert, dann wird der Update abgrochen. Es ist jetzt ein kleiner Workaround eingebaut, der in genau 
 	diesem Fall, die betroffenen Daten in .bak umbebennt und dann darum bittet, den Update noch einmal 
 	auszuführen. In den meisten Fällen hilft das.
 
-Neues in der Version 4.58
+Neues in der Version 4.58 (16.10.2025)
 - Nachdem die automatische Proxy Einstellung bei Echolink so gut angekommen ist, habe ich mit Jonathan, K1RFD, 
 	gesprochen. Er hat mir jetzt eine Seite zur Verfügung gestellt, die die Proxyinformationen in XML beinhaltet. 
 	Dadurch konnte ich einerseits den Code wesentlich schlanker und schneller machen und zusätzlich noch einen 
 	Zufallsmechanismus einführen. Jetzt wird also nicht der erste freie Proxy genommen, sondern aus der Menge 
 	der freien Proxies wird einer per Zufall ausgewählt.
 
-Neues in der Version 4.55
+Neues in der Version 4.55 (15.10.2025)
 - jetzt gibt es diese Infos :-)
 
-Neues in der Version 4.54
+Neues in der Version 4.54 (14.10.2025)
 - automatischer Echolink Proxy. Wenn man in der Echolink Konfiguration (/etc/svxlink/svxlink.d//ModuleEchoLink.conf) 
 	einen öffentlichen Proxy ausgewählt hat
 	PROXY_SERVER = 192.68.17.154 (Beispiel)
@@ -172,11 +179,11 @@ Neues in der Version 4.54
 	dann wählt das Dashboard jetzt autoatisch einen freien Proxy aus
 	den Erfolg sieht man links unten im Statusfenster unter "Echolink Proxy"
 
-Neues in der Version 4.49
+Neues in der Version 4.49 (12.10.2025)
 - Unterstützung von DCS bei den Radios. Vor Nutzung bitte den Artikel von Michael dazu lesen:
 	https://dc9vq.de/erfahrungen-mit-ctcss-und-dcs-mit-meinen-svxlink-hotspots/
 
-Neues in der Version 4.45
+Neues in der Version 4.46 (11.10.2025)
 - Vorbereitung für den Einsatz bei Relais.
 	wenn Nutzern die Steuerung des FM-Funknetzteils eines Relais gestattet wird (z.B. Auswahl von TGs), 
 	dann gibt es jetzt die Möglichkeit die Buttons am unteren Dashboardrand 
@@ -184,11 +191,11 @@ Neues in der Version 4.45
 	Das geschieht über den zusätzlichen Parameter "auth" inder config.php
 	define("KEY2", array(' 26269 ','*9126269#','green','auth'));
 	
-Neues in der Version 4.45
+Neues in der Version 4.45 (10.10.2025)
 - Anzeige der Talkgroup Namen in der Anzeige "Monitorcalls"
 	für die abonnierten TGs wird jetzt zuätzlich zur TG Nummer noch der vom FM-Funknetz gelieferte Name angezeigt
 
-Neues in der Version 4.34
+Neues in der Version 4.34 (10.10.2025)
 - Unterstützung von RFGuru
 	in der config.php kann jetzt 
 		define("DL3EL_RADIO", "Shari");
@@ -203,6 +210,6 @@ Neues in der Version 4.34
 	höher (z.B. wenn das Radio an eine gfute Antenne angeschlossen ist, empfiehlt sich der Einsatz 
 	einen zusätzlichen Bandfilters
 
-Neues in der Version 4.32
+Neues in der Version 4.32 (09.10.2025)
 - Dashboard ist jetzt ein Teil vom DC9CQ FM-Funknetz Image 
 - die wichtigsten Erweiterungen sind hier beschrieben: https://26269.de/neues-dashboard-bei-db0htv/
