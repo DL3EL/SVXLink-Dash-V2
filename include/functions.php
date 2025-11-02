@@ -1003,6 +1003,9 @@ function display_config($config) {
       } else {
         $db_File = $logfile;
       }  
+      if (!file_exists($db_File)) {
+        touch($db_File);
+      }
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       $add2log = "$jetzt: " . $logtext;
