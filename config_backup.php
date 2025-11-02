@@ -75,15 +75,19 @@ include_once "include/functions.php";
 */
 				$command = "sudo rm -rf $backupZip > /dev/null";
 				exec($command,$screen,$retval);
+				$command = $command . " RV:" . $retval;
 				addlog("L","$command\n");
 				$command = "sudo rm -rf $backupDir > /dev/null";
 				exec($command,$screen,$retval);
+				$command = $command . " RV:" . $retval;
 				addlog("L","$command\n");
 				$command = "sudo mkdir $backupDir > /dev/null";
 				exec($command,$screen,$retval);
+				$command = $command . " RV:" . $retval;
 				addlog("L","$command\n");
 				$command = "sudo cp -p -r /etc/NetworkManager/system-connections/*.nmconnection $backupDir > /dev/null";
 				exec($command,$screen,$retval);
+				$command = $command . " RV:" . $retval;
 				addlog("L","$command\n");
 /*
 define("SVXCONFPATH", "/etc/svxlink/");
