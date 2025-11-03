@@ -113,7 +113,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./authorise.php" style = "color: crimson;">Authorise</a>';
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
-	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;"> | DV-Switch</a></p>';
+	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;"> | DVS</a></p>';
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
