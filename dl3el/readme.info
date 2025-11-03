@@ -1,3 +1,15 @@
+Neues in der Version 4.83 (03.11.2025)
+- Farbauswahl für die Butons beim FM-Funknetz Dashboard jetzt konfigurierbar
+	Frank, DL4EM, hat sich noch einmal mit dem LiveDAshboard befasst. Die Farben der 
+	Buttons (zum Auswählen der TG) können jetzt über die config.php konfiguriert werden. Dazu sind zwei neue 
+	Varablen notwendig:
+	define ("SVXMQTT_COLOR_active", "green");
+	define ("SVXMQTT_COLOR_passive", "blue");
+	SVXMQTT_COLOR_active ist der Butto der gerade aktive TG 
+	SVXMQTT_COLOR_passive ist der Butto der gerade TG aus der LH Liste
+	Schöne Farben sind green, silver oder blue. Es findet keine Systaxprüfung statt, d.h. alle Farben 
+	können probiert werden.
+
 Neues in der Version 4.81 (02.11.2025)
 - Verbesserungen für Relaisbetreiber
 	Die Relaisbetreiber, die deses Dashboard öffentlich einsetzen, können jetzt die Zugriffsrechte granular steuern.
@@ -33,7 +45,7 @@ Neues in der Version 4.78 (01.11.2025)
 	Fehlt diese Konstate oder steht sie auf "no", werden, wie bisher, alle IP Adressen des Rechnefrs angezeigt.
 
 Neues in der Version 4.77 (01.11.2025)
-- bessere IPv6 UNterstützung
+- bessere IPv6 Unterstützung
 	Nach einem Hinweis inkl. Codeschnipsel von Kim, DG9VH, konnte ich die Darstellung von iPv6 Adressen im 
 	Statusbereich verbessern. Wenn der Browser auf einem IPv6 Client läuft steht dort IPV6, 
 	die eigentliche Adresse ist jetzt im Tooltip.und sprengt nicht mehr die Breite des Fensters.

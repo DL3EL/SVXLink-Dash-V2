@@ -29,7 +29,32 @@
     #error { white-space:pre-wrap; color:#ef4444; font-size:12px; margin-top:8px; }
   </style>
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-  
+
+<?php
+include_once  '../include/settings.php';
+
+if (defined ('SVXMQTT_COLOR_active')) {
+  $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";
+} else {  
+  $SVXMQTT_COLOR1_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR2_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR3_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
+  $svxmqtt_color_active = $SVXMQTT_COLOR2_active;
+}  
+
+if (defined ('SVXMQTT_COLOR_passive')) {
+  $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;";
+} else {  
+  $SVXMQTT_COLOR1_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR2_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR3_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
+  $svxmqtt_color_passive = $SVXMQTT_COLOR3_passive;
+}
+  if ((defined ('debug')) && (debug > 0)) echo "CA: $svxmqtt_color_active, CP: $svxmqtt_color_passive<BR>";
+
+?>
+
+
 </head>
 <body>
 <header>
@@ -276,11 +301,13 @@
         const group = tgName(a.tg);
         const tr = document.createElement("tr");
         tr.innerHTML = `
+
         <td class="call">${escapeHtml(a.call)}</td>
-        <td><button type=submit id=dtmfsvx name=dtmfsvx class=active_id value="${escapeHtml(a.tg || "—")}">${escapeHtml(a.tg || "—")}</button></td
+        <td><button <?php echo $svxmqtt_color_active; ?>; type=submit id=dtmfsvx name=dtmfsvx class=active_id value="${escapeHtml(a.tg || "—")}">${escapeHtml(a.tg || "—")}</button></td
         <td>${escapeHtml(group || "—")}</td>
         <td class="mono">${new Date(a.startMs).toLocaleTimeString()}</td>
         <td class="mono">${durSec}s</td>
+
       `;
         elActiveBody.appendChild(tr);
       }
@@ -295,7 +322,7 @@
       tgConn.textContent = h.tg;
       tr.innerHTML = `
         <td class="call">${escapeHtml(h.call)}</td>
-        <td><button type=submit id=dtmfsvx name=dtmfsvx class=active_id value="${escapeHtml(h.tg || "—")}">${escapeHtml(h.tg || "—")}</button></td>
+        <td><button <?php echo $svxmqtt_color_passive; ?>;  type=submit id=dtmfsvx name=dtmfsvx class=active_id value="${escapeHtml(h.tg || "—")}">${escapeHtml(h.tg || "—")}</button></td>
         <td>${escapeHtml(group || "—")}</td>
         <td class="mono">${new Date(h.endMs).toLocaleTimeString()}</td>
         <td class="mono">${h.durationSec}s</td>
@@ -331,6 +358,6 @@
                 echo "<meta http-equiv='refresh' content='0'>";
             }
 ?>
-<center><small><br><br>FM-Funknetz.de - basierend auf dem MQTT Livedashboard von DJ1JAY</small></center>
+<center><small><br><br>FM-Funknetz.de - basierend auf dem MQTT Livedashboard von DJ1JAY (integriert von Frank, DL4EM)</small></center>
 </body>
 </html>
