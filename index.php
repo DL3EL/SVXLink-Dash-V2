@@ -37,6 +37,11 @@ if ((!file_exists('include/buttons.php')) && (file_exists('include/buttons.php.e
 include_once "include/settings.php";
 include_once "include/functions.php";
 
+// gather some statistics
+$cmd = "wget -q -O " . DL3EL . "/db-log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "\"";
+if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+exec($cmd);
+
 if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 // always stay logged on
     $_SESSION['auth'] = "AUTHORISED";

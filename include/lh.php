@@ -64,10 +64,18 @@ include_once "tgdb.php";
 	if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>";
 	if ($delta > $timer) {
 	    $cron = start_cron($cron_File);
+	    touch($cron_File);
+	    // gather some statistics
+	    $dbversionFile = DL3EL . "/dbversion";
+	    $dbversion = file_get_contents($dbversionFile);
+	    $cmd = "wget -q -O " . DL3EL . "/db-log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
+	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+	    exec($cmd);
 	}  
       } else {
 	$time = time() - 86400;
 	// Anlegen der Datei
+	// touch -m -t 202508101421 crontab.log
         touch($cron_File, $time);
 	$cron_log = "$cron_File created, timestamp: " . filemtime($cron_File) . "\n"; 
 	$dmrtgsel = $cron_log . " >" . $cron_File;
