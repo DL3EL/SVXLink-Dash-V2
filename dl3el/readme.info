@@ -1,3 +1,16 @@
+Neues in der Version 4.84 (04.11.2025)
+- Servicerelease
+	wie bei der Version 4.62 (18.10.2025) beschrieben haben sich die config.php und die config.inc.php stark geändert. Dieses Dashboard ist ja keine Neuentwicklung 
+	sondern im Kern einige Jahre alt. Da hatte sich jede Menge Ballast angesammelt, den wir entfernt haben. Die Idee war, dass jeder selbst die Dateien 
+	bei sich lt. der Anleitung unten bereinigt. Beide Dateien können nicht per Github verteilt werden können. Einige Fehlermeldungen in den letzen Tagen haben mir 
+	gezeigt, dass das anscheinend nicht fuktioniert. Daher habe ich jetzt eine Routine gebaut, die diese Bereiigung automatisch macht.
+	Änderungen an den beiden Dateien sind aber nicht ungefährlich. Daher möchte ich folgendermassen vorgehen:
+	Mit dieser Version sammelt das Dashboard als Test drei Paranmeter ein (Rufzeichen der Installation, Versionsnummer und Name des genutze Funknetzes). 
+	Diese Infos werden auf einem meiner Server gespeichert. Wenn ich sicher bin dass das vernünftig funktioniert und nicht zu viel Last erzeugt, dann 
+	wird das dahingehend erweitert, das auch noch die config.php an den Server geschickt wird.
+	Ich werde dann versuchen alle Besonderheiten der Dateien zu berücksichtigen, bevor ich die Bereinigungsroutine verteile.
+	Sollte jemand mit der Vorgehensweise nicht einverstanden sein, so möge er sich bei mir melden, ich kann durchaus ein "opt out" einbauen.
+	
 Neues in der Version 4.83 (03.11.2025)
 - Farbauswahl für die Butons beim FM-Funknetz Dashboard jetzt konfigurierbar
 	Frank, DL4EM, hat sich noch einmal mit dem LiveDAshboard befasst. Die Farben der 
@@ -8,7 +21,8 @@ Neues in der Version 4.83 (03.11.2025)
 	SVXMQTT_COLOR_active ist der Butto der gerade aktive TG 
 	SVXMQTT_COLOR_passive ist der Butto der gerade TG aus der LH Liste
 	Schöne Farben sind green, silver oder blue. Es findet keine Systaxprüfung statt, d.h. alle Farben 
-	können probiert werden.
+	können probiert werden. Es wird auch der HEX Code akzepitiert:
+	define ("SVXMQTT_COLOR_passive", "#CECECE");
 
 Neues in der Version 4.81 (02.11.2025)
 - Verbesserungen für Relaisbetreiber
