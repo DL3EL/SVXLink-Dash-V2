@@ -38,9 +38,9 @@ include_once "include/settings.php";
 include_once "include/functions.php";
 
 // gather some statistics
-$cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "\"";
-if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
-exec($cmd);
+//$cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "\"";
+//if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+//exec($cmd);
 
 if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 // always stay logged on
