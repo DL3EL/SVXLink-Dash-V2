@@ -158,6 +158,11 @@ if (isset($_POST['btnDashUpdate']))
                 $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
         } else {       
                 $content = $content . "\nGithub Update erfolgreich.";
+                $dbversionFile = DL3EL . "/dbversion";
+                //$dbversion = file_get_contents($dbversionFile);
+                //$cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&upd\"";
+                //if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+                //exec($cmd);
         }
         // Display in textarea           
         echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($content) . '</textarea><br>';
@@ -212,11 +217,16 @@ if (isset($_POST['btnrstc710']))
         list($gitversion, $rest) = explode(" ", $content);
         list($version, $rest) = explode(" ", $dbversion);
         echo '<br><br><br>';
-        if (($gitversion !== $version) || (DL3EL_GIT_UPDATE === "nocheck"))  {
+        if ($gitversion !== $version) {
             echo "<br>Github Version:$gitversion installierte Version:$version, bitte Update ausführen<br>";
             echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
         } else {
-            echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+            if (DL3EL_GIT_UPDATE === "nocheck") {
+              echo "<br>Github Version:$gitversion installierte Version:$version,<br>Versionscheck abgeschaltet, Update ist möglich<br>";
+              echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+            } else{
+              echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+            }  
         }
   }
 
