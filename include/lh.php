@@ -52,25 +52,25 @@ include_once "tgdb.php";
       }
       $cron_File = DL3EL . "/crontab.log";
       if (file_exists($cron_File)) {
-	$timer = 86400;
-//	$timer = 10;
+	if ((defined ('DL3EL_CRON_TIMER')) && (DL3EL_CRON_TIMER > 0)) {
+	  $timer = DL3EL_CRON_TIMER;
+	} else {
+	  $timer = 86400;
+	}
 	$delta = time() - filemtime($cron_File);
-
+        $target = filemtime($cron_File) + $timer;
+        if ((defined ('DL3EL_NEXT_RUN') && (DL3EL_NEXT_RUN === "yes")) || (($target - time()) <600)) {
+	  echo "Next Cron Run $updFile " . date ("F d Y H:i:s ", $target) . "<br>";;
+	}
 	$cron_File_size = filesize($cron_File);
 	if ($cron_File_size > 10000) {
           rename($cron_File, $cron_File . ".bak");
 	  touch($cron_File);
 	}
-	if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>";
+	if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>x";
 	if ($delta > $timer) {
-	    $cron = start_cron($cron_File);
+	    $cron = start_cron($cron_File,$callsign,$fmnetwork);
 	    touch($cron_File);
-	    // gather some statistics
-	    $dbversionFile = DL3EL . "/dbversion";
-	    $dbversion = file_get_contents($dbversionFile);
-	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
-	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
-	    exec($cmd);
 	}  
       } else {
 	$time = time() - 86400;

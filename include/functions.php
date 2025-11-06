@@ -885,6 +885,10 @@ function display_config($config) {
 
         $delta = time() - filemtime($updFile);
         if ((defined ('debug')) && (debug > 5)) echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
+        $target = filemtime($updFile) + $timer;
+        if ((defined ('DL3EL_NEXT_RUN') && (DL3EL_NEXT_RUN === "yes")) || (($target - time()) <600)) {
+          echo "Next Update $updFile @ " . date ("F d Y H:i:s ", $target) . "<br>";;
+        }  
         if ($delta > $timer) {
           // einmal am Tag wird die Datei neu geholt
           // mal prüfen, ob es Überhohlvorgänge gibt ....
@@ -903,7 +907,7 @@ function display_config($config) {
         }  
       }
 
-    function start_cron($cron_File) {
+    function start_cron($cron_File,$callsign,$fmnetwork) {
       $jetzt = date("Y-m-d H:i:s");
       if ((defined ('debug')) && (debug > 0)) echo "Start cron Job um $jetzt <br>";
 
@@ -937,6 +941,28 @@ function display_config($config) {
           rename($db_File, $db_File . ".bak");
           touch($db_File);
       }
+// 4. gather some statistics
+	    $dbversionFile = DL3EL . "/dbversion";
+	    $dbversion = file_get_contents($dbversionFile);
+	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
+	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+	    exec($cmd);
+/*
+	    exec("sudo zip config.zip config.php > /dev/null");
+      $owner = 'svxlink';
+      $group = 'svxlink';
+      $command = "sudo chown $owner:$group config.zip 2>&1";
+      $output = [];
+      $return_var = 0;
+      exec($command, $output, $return_var);
+	    $filen = DL3EL_BASE . "include/config.php";
+	    $file = file_get_contents($filen);
+echo "<br>Stat: $file [$filen]";
+	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log1.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr&zip=" . $file . "\"";
+	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+echo "<br>Stat: $cmd";
+	    exec($cmd);
+*/
     }  
 
     function delete_old_copies($globber,$max_kept,$cron_File,$test) {

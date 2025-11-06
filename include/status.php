@@ -263,7 +263,7 @@ if ($reflectorlogic2 != "") {
 //               echo "QRG:",exec($command, $output, $retval);
                exec($command, $output, $retval);
                if (substr($output[0],0,1) === "/") {
-                  echo "radio is gone";
+                  echo "Radio is gone";
                } else {
                   echo "QRG:$output[0]";
                }   
