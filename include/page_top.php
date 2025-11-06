@@ -57,7 +57,16 @@
 <span style = "font-size: 18px;letter-spacing:4px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:PaleBlue"><?php echo $fmnetwork; ?></span>
 <span style = "font-size: 12px;letter-spacing:2px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:PaleBlue"> 
     <a href="https://github.com/DL3EL/SVXLink-Dash-V2" target="github" style="color:#ffffff;">
-    <?php echo $dbversion; ?>
+    <?php echo $dbversion;
+        if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
+            $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-stat.pl\"";
+            if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+            exec($cmd);
+            $dbstatFile = DL3EL . "/dbwget.log";
+            $dbstat = file_get_contents($dbstatFile);
+            echo " (" . $dbstat . ")";
+        }
+     ?>
     </a>
 </span>
 
