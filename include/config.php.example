@@ -75,6 +75,9 @@ define("DL3EL_VERSION", "public");
 //define("DL3EL_VERSION", "develop");
 define("DL3EL_LIVEDB", "no");
 //define("DL3EL_LIVEDB", "yes");
+// good colours are green, silver and blue. There is no colour check :-)
+define("SVXMQTT_COLOR_active", "green");
+define("SVXMQTT_COLOR_passive", "blue");
 //define("DL3EL_DXCLUSTER", "yes");
 define("DL3EL_DXCLUSTER", "no");
 define("DL3EL_DXCLUSTER_CONT", "EU");
@@ -83,11 +86,13 @@ define("DL3EL_DXCLUSTER_CONT", "EU");
 define("DL3EL_SC_CHANGE", "no");
 // this string has to match the name of the card in the linux system
 define("DL3EL_SC_STRING", "Audio Device");
+// Time for cleanup cron job. Once a day (86400s) is sufficient
+define("DL3EL_CRON_TIMER", 86400);
 // allow update "git pull" via this dashboard (can be found in the power menu, if enabled
 // therefore for the command "git" had to be added in the file "www-data.sudoers", to activate this command, the script "upd_sudoer" has to be executed (as root)
 define("DL3EL_GIT_UPDATE", "yes");
 //
 define("DL3EL_APRS_MSG", "no");
 //
-include_once __DIR__."/config.inc.php"; 
+include_once DL3EL_BASE ."include/config.inc.php";
 ?>

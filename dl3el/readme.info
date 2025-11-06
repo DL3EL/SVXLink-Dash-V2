@@ -1,3 +1,8 @@
+Neues in der Version 4.88 (05.11.2025)
+- Servicerelease
+	wenn ein KEY in der config.php als Kommatar gekennzeichnet wurde, fehlte anschliessend das 
+	Systemmenu ganz unten. Jetzt nicht mehr.
+	
 Neues in der Version 4.87 (05.11.2025)
 - Servicerelease
 	verständlichere Meldungen beim Update (ist natürlich erst beim nächsten Update sichtbar :-)
