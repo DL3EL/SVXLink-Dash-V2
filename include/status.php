@@ -260,7 +260,13 @@ if ($reflectorlogic2 != "") {
             }
             if ($radioport !== "") {
                $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=" . $radioport;
-               echo "QRG:",exec($command, $output, $retval);
+//               echo "QRG:",exec($command, $output, $retval);
+               exec($command, $output, $retval);
+               if (substr($output[0],0,1) === "/") {
+                  echo "radio is gone";
+               } else {
+                  echo "QRG:$output[0]";
+               }   
             } else {
                echo " no Radio found";
             }   
