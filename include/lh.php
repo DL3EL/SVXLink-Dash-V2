@@ -51,7 +51,7 @@ include_once "tgdb.php";
         $target = filemtime($cron_File) + $timer;
         if ((defined ('DL3EL_SHOW_NEXT_RUN') && (DL3EL_SHOW_NEXT_RUN === "yes")) || (($target - time()) <600)) {
 	  date_default_timezone_set('Europe/Berlin');
-	  echo "Next Cron Run $updFile " . date ("F d Y H:i:s ", $target) . "<br>";;
+	  echo "Next Cron Run " . date ("F d Y H:i:s ", $target) . "<br>";;
 	}
 	$cron_File_size = filesize($cron_File);
 	if ($cron_File_size > 10000) {
