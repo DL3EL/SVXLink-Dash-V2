@@ -101,10 +101,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	    $net1= cidr_match($ip,"192.168.0.0/16");
 	    $net2= cidr_match($ip,"44.128.0.0/10");
 	    $net3= cidr_match($ip,"44.149.160.87/32");
+	    $net4= cidr_match($ip,"44.149.162.105/32");
 	    if ($net1 == TRUE || $net2 == TRUE) {
 		$show_auth = 1;
 	    } 
-	    if ($net3) {
+	    if (($net3) || ($net4)) {
 		    $_SESSION['auth'] = "AUTHORISED";
 		    $show_auth = 1;
 	    }
