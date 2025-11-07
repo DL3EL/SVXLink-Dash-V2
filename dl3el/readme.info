@@ -1,3 +1,25 @@
+Neues in der Version 4.90 (07.11.2025)
+- bessere Quelle für Namen von Talkgroups
+	die im Dashboard angezeigten Namen von TGs werden jetzt aus einer Datei geholt, die alle 24h vom 
+	FM-Funknetz Server aktualisiert wird
+
+Neues in der Version 4.89 (07.11.2025)
+- Timer sichtbar
+	das System für alle 24h wichtige Update und Aufräumarbeiten durch
+	- die Datei mit den TGs wird aktualisiert
+	- die Datei mit den Vornamen für die LH Liste wird aktualisiert
+	- ältere Sicherungskopien werden gelöscht
+	Diese Dinge dauern ein paar Sekunden udn vermitteln den EIndruck, ds System würde "hängen".
+	Um das etwas transparenter zu machen, wird jetzt in den letzen 10 Minuten vor einer der Aktionen eine
+	entsprechende Mail oberhalb der LH Liste im Main Dashboard angezeigt. Wenn man die Anzeipe permanent 
+	haben möchte, so muss in der config.php die Variable
+	define("DL3EL_SHOW_NEXT_RUN", "yes");
+	eingetragen werden.
+	Wenn das Dashboard eine Weile nicht benutzt wurde (und in der Zwischenzeit die 24h abgelaufen sind), 
+	kann es sein, dass direkt beim Aufruf, diese Aktionen durchgeführt werden. In diesem Fall kann es 
+	dazu kommen, dass die Meldungen nicht angezeigt werden sondern es einfach eine Weile dauert, bis 
+	das Dashboard verfügbar ist.
+	
 Neues in der Version 4.88 (05.11.2025)
 - Servicerelease
 	wenn ein KEY in der config.php als Kommatar gekennzeichnet wurde, fehlte anschliessend das 
@@ -91,7 +113,7 @@ Neues in der Version 4.76 (31.10.2025)
 	mehr notwendig.	Sofern das Dashboard läuft, wird die "Cleanup" Funktion wird automatisch alle 24 Stunden 
 	aufgerufen. Läuft das DB nicht, z.B. über Nacht, so wird die Funktion beim nächsten Aufruf gestartet 
 	(sofern 24h seit dem letzten Aufruf vergangen sind).
-	Aktuelle werden bis auf 10 Versionen alle Sicherungskopien der config.php, svxlink.conf, 
+	Aktuell werden bis auf 10 Versionen alle Sicherungskopien der config.php, svxlink.conf, 
 	ModuleMetarInfo.conf und ModuleEchoLink.conf gelöscht. 
 	Ausserdem werden aus dem Verzeichnis "backups" alle Datien entfernt, die älter als 7 Tage sind.
 
