@@ -1,7 +1,8 @@
 Neues in der Version 4.90 (07.11.2025)
 - bessere Quelle für Namen von Talkgroups
 	die im Dashboard angezeigten Namen von TGs werden jetzt aus einer Datei geholt, die alle 24h vom 
-	FM-Funknetz Server aktualisiert wird
+	FM-Funknetz Server aktualisiert wird. Die nächste Aktualisierung erfolgt mit dem LAuf des 
+	nächsten Cron-Jobs
 
 Neues in der Version 4.89 (07.11.2025)
 - Timer sichtbar
