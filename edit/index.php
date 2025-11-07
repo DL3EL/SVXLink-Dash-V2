@@ -107,18 +107,17 @@ if ($log) {
 } else {   
   $content = file_get_contents($file);
   if (str_contains($file,'include/config.php')) {
-    echo "repair $file";
     if (str_contains($content,'config.inc.php')) {
       echo "... file ok";  
     } else {
+      echo "repair $file";
+      $pos1 = stripos($content, '?>');
+      echo "Ende: " . $pos1;
 
-       $pos1 = stripos($content, '?>');
-       echo "Ende: " . $pos1;
-
-       $content = substr($content,0,$pos1);
-       $repair = 'include_once __DIR__."/config.inc.php"; ?>';
+      $content = substr($content,0,$pos1);
+      $repair = 'include_once __DIR__."/config.inc.php"; ?>';
 #       $repair = "\ngh";
-       $content = $content . $repair;
+      $content = $content . $repair;
     }  
   }
 }  

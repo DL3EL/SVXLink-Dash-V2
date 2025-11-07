@@ -31,6 +31,8 @@
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <?php
+// Farben:
+// https://www.w3schools.com/tags/ref_colornames.asp
 include_once  '../include/settings.php';
 
 if (defined ('SVXMQTT_COLOR_active')) {

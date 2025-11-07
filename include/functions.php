@@ -886,7 +886,8 @@ function display_config($config) {
         $delta = time() - filemtime($updFile);
         if ((defined ('debug')) && (debug > 5)) echo "$updFile was last modified: " . date ("F d Y H:i:s ", filemtime($updFile)) . "(Delta: $delta) <br>";
         $target = filemtime($updFile) + $timer;
-        if ((defined ('DL3EL_NEXT_RUN') && (DL3EL_NEXT_RUN === "yes")) || (($target - time()) <600)) {
+        if ((defined ('DL3EL_SHOW_NEXT_RUN') && (DL3EL_SHOW_NEXT_RUN === "yes")) || (($target - time()) <600)) {
+          date_default_timezone_set('Europe/Berlin');
           echo "Next Update $updFile @ " . date ("F d Y H:i:s ", $target) . "<br>";;
         }  
         if ($delta > $timer) {
@@ -908,6 +909,7 @@ function display_config($config) {
       }
 
     function start_cron($cron_File,$callsign,$fmnetwork) {
+      date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       if ((defined ('debug')) && (debug > 0)) echo "Start cron Job um $jetzt <br>";
 
@@ -941,7 +943,11 @@ function display_config($config) {
           rename($db_File, $db_File . ".bak");
           touch($db_File);
       }
-// 4. gather some statistics
+// 4. Update tgdb.php
+      $tgdb_File = DL3EL_BASE . "include/tgdb.php";
+      $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
+      file_put_contents($tgdb_File, $content);
+// 5. gather some statistics
 	    $dbversionFile = DL3EL . "/dbversion";
 	    $dbversion = file_get_contents($dbversionFile);
 	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
@@ -973,6 +979,7 @@ echo "<br>Stat: $cmd";
         if ((defined ('debug')) && (debug > 2)) echo "F:$filename<br>";
         ++$numberoffiles;
       }
+      date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       if ((defined ('debug')) && (debug > 0)) echo "Files found: $numberoffiles<br>";
       $max_kept = 10;
@@ -998,6 +1005,7 @@ echo "<br>Stat: $cmd";
       $expire = strtotime($max_days);
       $files = glob($globber . '/*');
 
+      date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       foreach ($files as $file) {
       // Skip anything that is not a file

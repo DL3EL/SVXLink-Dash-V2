@@ -15,16 +15,6 @@ include_once "tgdb.php";
       <th>Time (<?php echo date('T')?>)</th>
       <th width=100px>Callsign</th>
 <?php
-// prüfen ob tgdb.php aktualisiert werden muss
-      $tgdb_File = DL3EL_BASE . "include/tgdb.php";
-      if (file_exists($tgdb_File)) {
-	$tgdb_File_save = DL3EL_BASE . "include/tgdb.php.save";
-	$update_script = DL3EL_BASE . "include/tgdb_update.sh";
-	$logfile = DL3EL_BASE . "include/tgdb_update.log";
-	update_file($tgdb_File, $update_script, $logfile, 86400);
-      } else {
-	echo "TGDB: $tgdb_File does not exist<br>";
-      }
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
       if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
 	echo '<th>Name</th>';
@@ -59,7 +49,8 @@ include_once "tgdb.php";
 	}
 	$delta = time() - filemtime($cron_File);
         $target = filemtime($cron_File) + $timer;
-        if ((defined ('DL3EL_NEXT_RUN') && (DL3EL_NEXT_RUN === "yes")) || (($target - time()) <600)) {
+        if ((defined ('DL3EL_SHOW_NEXT_RUN') && (DL3EL_SHOW_NEXT_RUN === "yes")) || (($target - time()) <600)) {
+	  date_default_timezone_set('Europe/Berlin');
 	  echo "Next Cron Run $updFile " . date ("F d Y H:i:s ", $target) . "<br>";;
 	}
 	$cron_File_size = filesize($cron_File);
