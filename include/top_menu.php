@@ -73,7 +73,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <?php
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
-		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
+//		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #0000ff;">Wifi</a> | ';
 		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> | ';
 	}	

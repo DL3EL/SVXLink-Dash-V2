@@ -83,21 +83,6 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     }
 }
 include_once "include/page_top.php";
-/// neu audio
-
-if (file_exists('/etc/systemd/system/svxlink-node.service')) {
-    echo '<button class="button link" onclick="playAudioToggle(8001, this)">
-        <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
-    </button><br><br>';
-} 
-   
-///
-//<!-- PTT button -->
-//<?php 
-if (SHOWPTT=="TRUE") {
-// now including the volume buttons
-//    include_once "ptt.html";
-}
 
 if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
     $dmr_support = "1";

@@ -1,0 +1,105 @@
+Having installed the new dashboard and associated everything go to the terminal and open it.
+sudo nano /etc/svxlink/svxlink.conf
+
+If you are using [SimplexLogic] or [RepeaterLogic] the directions are identical.
+Where you have TX=Tx1 replace the Tx1 with MultiTx
+
+Scroll down to [MultiTx]
+
+make the content exactly like this
+
+[MultiTx]
+TYPE = Multi
+TRANSMITTERS = Tx1,TxStream
+
+now create a new sector just above [Tx1]
+and paste this
+[TxStream]
+TYPE = Local
+AUDIO_DEV = alsa:plughw:Loopback,0,0
+AUDIO_CHANNEL = 0
+PTT_TYPE = NONE
+TIMEOUT = 7200
+TX_DELAY = 0
+PREEMPHASIS = 0
+
+save the file.
+
+Now sudo nano /etc/asound.conf
+
+Whatever you have in here - remove it (ctrl-k on each line will do that)
+and paste the following.
+pcm.loophw {
+    type hw
+    card Loopback
+    device 0
+    subdevice 0
+}
+
+pcm.loopout {
+    type plug
+    slave.pcm "loophw"
+}
+and save the file.
+Finally in the command line type 
+sudo alsactl nrestore 
+ignore any errors, that's just a bug in alsa that had been around for years.
+ Now sudo systemctl restart svxlink svxlink-node - or reboot if you are really paranoid.
+ 
+ Now the RxMonitor button should work for you.
+ DL3EL:
+ upgrade_Sound.sh installiert node,js, npm usw
+ ==> muss noch auf die flexible DAteistruktur angepasst werden
+ sudo modprobe snd-aloop
+ muss bootfest eingebaut werden
+ 
+Im Abschnitt TxStream muss es statt
+ AUDIO_DEV = alsa:plughw:Loopback,0,0
+ AUDIO_DEV = alsa:plughw:CARD=Loopback,DEV=0
+heissen, dann wird die KArte auch gefunden.
+ Im Verzeichnis scripts/
+ müssen die beiden Datei pcm-player.min.js und server.js
+ vorhanden sein, kommen  über github
+ 
+ aktuelle Vorgehensweise:
+ - aktuelle index.php nach Github - ok
+ - neue Dateien im Verzeichnis Script nach Github - ok
+ - diese Datei (erstmal) nach Github laden ok
+ - upgrade_Sound.sh nach github ok
+ - /etc/asound.conf ins Verzeichnis dl3el bei github ok
+ - Änderungen bei svxlink.conf (s.o. beschreiben)
+    Datei zum ändern öffnen
+sudo nano /etc/svxlink/svxlink.conf
+    es ist egal ob [SimplexLogic] oder [RepeaterLogic] genutzt wird, die Vorgehensweise ist gleich.
+    Dort wo 
+    TX=Tx1
+    steht, muss das durch 
+    TX = MultiTx
+    ersetzt werden
+    Dann bitte zum Abschnitt [Tx1] vorblättern
+    und direk darüber die Abschnitte Multitx und TxStream einfügen:
+[MultiTx]
+TYPE = Multi
+TRANSMITTERS = Tx1,TxStream
+
+[TxStream]
+TYPE = Local
+AUDIO_DEV = alsa:plughw:CARD=Loopback,DEV=0
+AUDIO_CHANNEL = 0
+PTT_TYPE = NONE
+TIMEOUT = 7200
+TX_DELAY = 0
+PREEMPHASIS = 0
+    anschliessend die Datei bite speichern und schliessen.
+    Dann muss noch das Loopback Interface angelegt werden, dazu bitte 
+    cp [dir]/dl3el/asound.conf /etc/asound.conf
+    aurufen, wobei [dir] durch das aktuelle Verzeichnis der FM-Funknetz Dashboard Dateien zu ersetzten ist.
+    in der "crontab" muss auch noch ein Eintrag gemacht werden:
+    sudo crontab -e
+    @reboot sudo modprobe snd-aloop
+    dann speichern und beenden
+ - nach diesen Aktionenmuss noch die DAtei 
+    [dir]/upgrade_sound.sh ausgeführt werden
+    ([dir] wieder durch das aktuelle Verzeichnis der FM-Funknetz Dashboard Dateien ersetzten)
+ - anschliessend das System bitte neu starten
+ 
