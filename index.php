@@ -37,11 +37,6 @@ if ((!file_exists('include/buttons.php')) && (file_exists('include/buttons.php.e
 include_once "include/settings.php";
 include_once "include/functions.php";
 
-// gather some statistics
-//$cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "\"";
-//if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
-//exec($cmd);
-
 if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
 // always stay logged on
     $_SESSION['auth'] = "AUTHORISED";
@@ -88,6 +83,15 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
     }
 }
 include_once "include/page_top.php";
+/// neu audio
+
+if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+    echo '<button class="button link" onclick="playAudioToggle(8001, this)">
+        <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
+    </button><br><br>';
+} 
+   
+///
 //<!-- PTT button -->
 //<?php 
 if (SHOWPTT=="TRUE") {
