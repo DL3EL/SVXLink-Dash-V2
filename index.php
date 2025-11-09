@@ -89,13 +89,13 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
 }
 include_once "include/page_top.php";
 /// neu audio
+/*
 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
-    $dmrstatus = shell_exec('cat ' . '/etc/systemd/system/svxlink-node.service');
-//    echo "ST: $dmrstatus <br>";
     echo '<button class="button link" onclick="playAudioToggle(8001, this)">
         <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
     </button><br><br>';
-}    
+} 
+*/   
 ///
 //<!-- PTT button -->
 //<?php 
