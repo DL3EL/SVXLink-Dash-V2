@@ -1,17 +1,11 @@
 #!/bin/bash
-# This script is used to upgrade the system for the Permissions required for file handling.
-
 # Define the sudoers file, the source file, the script file, and the config file
 SUDOERS_FILE="/etc/sudoers.d/svxlink"
 SOURCE_FILE="www-data.sudoers"
-SCRIPT_FILE=$(basename "$0")
-CONFIG_FILE="include/config.inc.php"
 # Function to display an info message using whiptail
 show_info() {
   whiptail --title "Information" --msgbox "$1" 8 78
 }
-
-
 
 # Check if the source file exists
 if [ ! -f "$SOURCE_FILE" ]; then
@@ -46,12 +40,14 @@ else
 fi
 
 # Ensure webserver user (svxlink) can run npm-installed scripts if needed
-sudo chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/.npm*
-sudo chmod -R 755 /home/$CURRENT_USER/.npm-global
+#sudo chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/.npm*
+#sudo chmod -R 755 /home/$CURRENT_USER/.npm-global
+sudo chown -R svxlink:svxlink /home/svxlink/.npm*
+sudo chmod -R 755 /home/svxlink/.npm-global
 
 # Ensure ws module is installed for svxlink user in scripts folder
 # SCRIPT_DIR="/var/www/html/FM-Funknetz/scripts"
-SCRIPT_DIR=$(pwd)/scripts
+SCRIPT_DIR=$(pwd -P)/scripts
 if [ ! -d "$SCRIPT_DIR/node_modules/ws" ]; then
     show_info "Installing ws Node module for svxlink user..."
     sudo -u svxlink bash -c "cd $SCRIPT_DIR && npm install ws"
@@ -61,9 +57,9 @@ fi
 
 # Create the systemd service only if it doesn't exist
 SERVICE_FILE="/etc/systemd/system/svxlink-node.service"
+sudo rm "$SERVICE_FILE" > /dev/null 
 if [ ! -f "$SERVICE_FILE" ]; then
     show_info "Creating svxlink-node.service..."
-    sudo rm "$SERVICE_FILE" > /dev/null 
     sudo tee "$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
 Description=SVXLink Node.js Server
