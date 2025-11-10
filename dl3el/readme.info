@@ -1,3 +1,10 @@
+Neues in der Version 5.01 (10.11.2025)
+- Servicerelease
+	es ist aufgefallen, dass sich der Player beim beenden oder verlassen der WebSeite nicht komplett beendet. 
+	Das kann u.U. dazufühen, dass nach ein paar Stunden der Sound einfach nichtmehr funktioniert. Für diesen 
+	Fall gibt es jetzt ganz unten auf der Seite einen Button "Restart Player", der sollte das Probem beheben.
+	Wir arbeiten an einer automatischen Lösung.
+
 Neues in der Version 5.00 (10.11.2025)
 - komplexer Systemupdate für Fortgeschrittene
 	Dieser Update kann von jedem ausgeführt werden. Nur allein die von Github verteilten Dateien, bringen das System
