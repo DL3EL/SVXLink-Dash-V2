@@ -63,6 +63,7 @@ fi
 SERVICE_FILE="/etc/systemd/system/svxlink-node.service"
 if [ ! -f "$SERVICE_FILE" ]; then
     show_info "Creating svxlink-node.service..."
+    sudo rm "$SERVICE_FILE" > /dev/null 
     sudo tee "$SERVICE_FILE" > /dev/null <<EOL
 [Unit]
 Description=SVXLink Node.js Server
