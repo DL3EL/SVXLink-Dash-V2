@@ -888,7 +888,7 @@ function display_config($config) {
         $target = filemtime($updFile) + $timer;
         if ((defined ('DL3EL_SHOW_NEXT_RUN') && (DL3EL_SHOW_NEXT_RUN === "yes")) || (($target - time()) <600)) {
           date_default_timezone_set('Europe/Berlin');
-          echo "Next Update $updFile @ " . date ("F d Y H:i:s ", $target) . "<br>";;
+          echo "Next Update $updFile " . date ("F d Y H:i:s ", $target) . "<br>";;
         }  
         if ($delta > $timer) {
           // einmal am Tag wird die Datei neu geholt
@@ -950,6 +950,9 @@ function display_config($config) {
 // 5. gather some statistics
 	    $dbversionFile = DL3EL . "/dbversion";
 	    $dbversion = file_get_contents($dbversionFile);
+      if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+        $dbversion = $dbversion . "(s)";
+      }  
 	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
 	    exec($cmd);

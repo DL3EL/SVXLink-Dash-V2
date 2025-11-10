@@ -159,6 +159,9 @@ if (isset($_POST['btnDashUpdate']))
         } else {       
                 $dbversionFile = DL3EL . "/dbversion";
                 $dbversion = file_get_contents($dbversionFile);
+                if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+                  $dbversion = $dbversion . "(s)";
+                }  
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&upd\"";
                 if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
