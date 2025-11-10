@@ -22,19 +22,23 @@ fi
 # ==============================
 # Node.js, npm, and svxlink-node.service setup
 # ==============================
+CURRENT_USER=$(whoami)
+show_info "working as user $CURRENT_USER"
 
 # Check if Node.js is installed for the pi user
-if ! sudo -u pi command -v node >/dev/null 2>&1; then
-    show_info "Node.js not found. Installing Node.js and npm as pi..."
+# looks, that it doesn't work, skip the user, look for everyone
+# if ! sudo -u "$CURRENT_USER" command -v node >/dev/null 2>&1; then
+if ! command -v node >/dev/null 2>&1; then
+    show_info "Node.js not found. Installing Node.js and npm as $CURRENT_USER..."
     sudo apt update
     sudo apt install -y nodejs npm
 else
-    show_info "Node.js is already installed: $(sudo -u pi node -v)"
+    show_info "Node.js is already installed: $(node -v)"
 fi
 
 # Check if npm is installed for the pi user
 CURRENT_USER=$(whoami)
-if ! sudo -u $CURRENT_USER command -v npm >/dev/null 2>&1; then
+if ! command -v npm >/dev/null 2>&1; then
     show_info "npm not found. Installing npm as "
     sudo apt install -y npm
 else

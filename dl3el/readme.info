@@ -1,3 +1,57 @@
+Neues in der Version 5.00 (09.11.2025)
+- komplexer Systemupdate für Fortgeschrittene
+	Achtung: wer seit dem 9.11.2025 einen Update auf das Dashboard macht oder gemacht hat, bekommt diese Software 
+	verteilt. Ich habe die Versionsnummer noch nicht hochgesetzt (die letzte ist 4.90a), da die Tests noch nicht 
+	ganz abgeschlossen sind. Es kann funktionieren, muss aber nicht. Es gibt mindestens eine Installation, in der es 
+	noch nicht vernünftig geht, wir wissen noch nicht, warum. Aber: das einfache 'runterladen im Rahmen des 
+	GitHub Update schadet nicht. Wer trotzdem schon mal testen möchte, sollte mich nach Möglichkeit vorher 
+	ansprechen.
+	Dieser Update kann von jedem ausgeführt werden. Nur allein die von Github verteilten Dateien, bringen das System
+	auf den neuesten Stand, ermöglichen aber keine zusätzlichen Funktionen. 
+	Nur Nutzer, die ohne zusätzliche Erklärungen zum Folgenden wissen, was sie tun müssen und sich auf der 
+	Unix Shell wohlfühlen, sollten die nachstehendnen Aktionen umsetzen. 
+	Danach kann über das Dashboard (also im Browserfenster) der Ton des Hotspots (also die aktiven QSOs) 
+	abgehört werden. Chris, G4NAB/F5VMR hat gezeigt, wie das geht und ich habe das in mein Dashboard integriert. Wer 
+	unsicher ist, lässt das am besten. In einer der nächsten Versionen wird das 
+	zentraler Bestandteil vom DC9VQ Image sein.
+	Die versierten Unix-Nutzer arbeiten bitte nach dem erfolgreichen Github Update folgendes ab:
+	- Die Datei /etc/svxlink.conf zum ändern öffnen (z.B.: sudo nano /etc/svxlink/svxlink.conf)
+		es ist egal ob [SimplexLogic] oder [RepeaterLogic] genutzt wird, die Vorgehensweise ist gleich.
+		Dort wo 
+		TX=Tx1
+		steht, muss das durch 
+		TX = MultiTx
+		ersetzt werden
+		Dann bitte zum Abschnitt [Tx1] vorblättern
+		und direkt darüber die Abschnitte Multitx und TxStream einfügen:
+[MultiTx]
+TYPE = Multi
+TRANSMITTERS = Tx1,TxStream
+
+[TxStream]
+TYPE = Local
+AUDIO_DEV = alsa:plughw:CARD=Loopback,DEV=0
+AUDIO_CHANNEL = 0
+PTT_TYPE = NONE
+TIMEOUT = 7200
+TX_DELAY = 0
+PREEMPHASIS = 0
+		anschliessend die Datei bite speichern und schliessen.
+    
+    - Dann muss noch das Loopback Interface angelegt werden, dazu bitte 
+		cp [dir]/dl3el/asound.conf /etc/asound.conf
+		aurufen, wobei [dir] durch das aktuelle Verzeichnis der FM-Funknetz Dashboard Dateien zu ersetzten ist.
+	- In der "crontab" muss auch noch ein Eintrag gemacht werden (sudo crontab -e):
+		@reboot sudo modprobe snd-aloop
+		dann speichern und beenden
+	- nach diesen Aktionen muss noch die Datei upgrade_sound.sh
+		cd [dir]
+		./upgrade_sound.sh 
+		([dir] wieder durch das aktuelle Verzeichnis der FM-Funknetz Dashboard Dateien ersetzten)
+	- anschliessend das System bitte neu starten
+	- sollte der Button RX Monitor sichtbar sein, wenn aktiviert, wird der Sopund vom svxlink auf dem PC 
+		Lautsprecher ausgegeben
+
 Neues in der Version 4.90 (07.11.2025)
 - bessere Quelle für Namen von Talkgroups
 	die im Dashboard angezeigten Namen von TGs werden jetzt aus einer Datei geholt, die alle 24h vom 
