@@ -1,11 +1,5 @@
-Neues in der Version 5.00 (09.11.2025)
+Neues in der Version 5.00 (10.11.2025)
 - komplexer Systemupdate für Fortgeschrittene
-	Achtung: wer seit dem 9.11.2025 einen Update auf das Dashboard macht oder gemacht hat, bekommt diese Software 
-	verteilt. Ich habe die Versionsnummer noch nicht hochgesetzt (die letzte ist 4.90a), da die Tests noch nicht 
-	ganz abgeschlossen sind. Es kann funktionieren, muss aber nicht. Es gibt mindestens eine Installation, in der es 
-	noch nicht vernünftig geht, wir wissen noch nicht, warum. Aber: das einfache 'runterladen im Rahmen des 
-	GitHub Update schadet nicht. Wer trotzdem schon mal testen möchte, sollte mich nach Möglichkeit vorher 
-	ansprechen.
 	Dieser Update kann von jedem ausgeführt werden. Nur allein die von Github verteilten Dateien, bringen das System
 	auf den neuesten Stand, ermöglichen aber keine zusätzlichen Funktionen. 
 	Nur Nutzer, die ohne zusätzliche Erklärungen zum Folgenden wissen, was sie tun müssen und sich auf der 
