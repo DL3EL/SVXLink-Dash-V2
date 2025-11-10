@@ -39,7 +39,7 @@ fi
 # Check if npm is installed for the pi user
 CURRENT_USER=$(whoami)
 if ! command -v npm >/dev/null 2>&1; then
-    show_info "npm not found. Installing npm as "
+    show_info "npm not found. Installing npm "
     sudo apt install -y npm
 else
     show_info "npm is already installed: $(sudo -u $CURRENT_USER npm -v)"
@@ -49,9 +49,9 @@ fi
 sudo chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/.npm*
 sudo chmod -R 755 /home/$CURRENT_USER/.npm-global
 
-
 # Ensure ws module is installed for svxlink user in scripts folder
-SCRIPT_DIR="/var/www/html/FM-Funknetz/scripts"
+# SCRIPT_DIR="/var/www/html/FM-Funknetz/scripts"
+SCRIPT_DIR=$(pwd)/scripts
 if [ ! -d "$SCRIPT_DIR/node_modules/ws" ]; then
     show_info "Installing ws Node module for svxlink user..."
     sudo -u svxlink bash -c "cd $SCRIPT_DIR && npm install ws"
@@ -85,7 +85,7 @@ TimeoutStopSec=10
 Type=simple
 User=svxlink
 Group=svxlink
-ExecStart=/usr/bin/node /var/www/html/FM-Funknetz/scripts/server.js
+ExecStart=/usr/bin/node $SCRIPT_DIR/server.js
 Environment=NODE_ENV=production
 
 [Install]
