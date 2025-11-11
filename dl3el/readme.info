@@ -1,4 +1,32 @@
 Neues in der Version 5.01 (10.11.2025)
+- Unterstützung verschiedener Reflectorverbindungen 
+	Über Buttons ist es jetzt möglich, zwischen bis zu vier verschiednen Reflectorkonfigurationen zu wäheln
+	Das ist z.B. sinnvoll, wenn jemand mit mehreren Netzen arbeitet (FM-Funknetz, Lausitzlink, etc) oder 
+	wenn man für sein Netz verschieden MOnitorTGs hat, zwischen den schnell hin- und her geschaltet werden 
+	soll.
+	Auch für diese Funktion muss auf der Linu xShell des REchners etwas gemachtg werden, man sollte sich dass
+	also zutrauen.
+	Im Rahmen des Updates werden 4 DAteien im Verzeichnis dl3el neu ausgeliefert:
+	Reflector1.conf.example
+	Reflector2.conf.example
+	Reflector3.conf.example
+	Reflector4.conf.example
+	Aus diesen Dateien muss jeweils eine Datei Reflectorx.conf (also ohne .example) erstellt werden.
+	Das muss nicht für alle DAteien geschehen. Es funktionjiert auch nur mit 2 oder 3 Dateien.
+	Sobald die Datei dl3el/Reflector1.conf gefunden wird, werden die entsprechenden Buttons im Dashboard
+	angezeigt. Ändern lassen sich diese Datein, wie gewohnt über den Fullscreen Editor.
+	Am besten erzeugt man den Inhalt der Dateien in dem man die entsprechenden Einträge aus der 
+	/etc/svxlink/svxlink.conf mit den neuen passenden Werten dort einträgt
+	Es gibt folgendes zu beachten
+	- Im Moment kann nur eine [section] bearbeitet werden, diese muss zu Beginn der Reflectorx.conf eingetragen 
+		sein und exakt der gewünschten [section] aus der svxlink.conf entsprechen
+	- sollte man in der svxlink.conf innerhalb einer [section] den gleichen Eintrag mehrfach verwendet haben,
+		so gilt immer nur der letzte. Egal ob als Kommentar gekennzeichnet oder nicht. D.h. der aktive 
+		Eintrag *muss* immer der letze sein. Durch dieses Skript werden solche Mehrfacheinträeg jedoch 
+		gelöscht (bis auf den letzten, das ist leuder nicht zu vermeiden.
+	- nach dem Ende der Funktion wir die Reflektorverbindung neu gestartet
+
+Neues in der Version 5.01 (10.11.2025)
 - Servicerelease
 	es ist aufgefallen, dass sich der Player beim beenden oder verlassen der WebSeite nicht komplett beendet. 
 	Das kann u.U. dazufühen, dass nach ein paar Stunden der Sound einfach nichtmehr funktioniert. Für diesen 

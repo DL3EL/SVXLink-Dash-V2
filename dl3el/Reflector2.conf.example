@@ -1,0 +1,8 @@
+[ReflectorLogic]
+DNS_DOMAIN = hier gehört das Netz hin
+#HOSTS = IPp-Adresse
+CALLSIGN = das Call
+AUTH_KEY = "das PAsswort"
+DEFAULT_TG = DefTG
+MONITOR_TGS = MOnTGs
+

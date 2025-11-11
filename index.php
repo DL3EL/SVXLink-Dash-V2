@@ -94,6 +94,12 @@ if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
 // for debug, switch off dmr_support
 //    $dmr_support = "0";
 if ((defined ('debug')) && (debug > 0)) echo "DVS Support: $dmr_support";
+$refchg = DL3EL.'Reflector1.sh';
+if (file_exists(DL3EL.'/Reflector1.conf')) {
+    include_once "ref_change.php";
+} else {
+echo "[$refchg] not found <br>";
+}   
 
 ?>
 

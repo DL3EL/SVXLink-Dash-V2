@@ -129,10 +129,15 @@ if (!$log) {
   echo '<div style = "text-align:center">Make your changes here</div>';  
   if (substr($file, -3) !== "php") {
 // Save button
-    echo '<input type="submit" name="save" value="Save only">';  
-    echo '&nbsp;&nbsp;';
+    $fn_len = strlen($file);
+    if (substr($file,$fn_len-15,7) !== "Reflect") {
 // Save &reload button
-    echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
+      echo '<input type="submit" name="save" value="Save only">';  
+      echo '&nbsp;&nbsp;';
+      echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
+    } else { 
+      echo '<input type="submit" name="save" value="Save">';  
+    }
   } else {
     echo '<input type="submit" name="save" value="Save">';  
     echo '&nbsp;&nbsp;';
