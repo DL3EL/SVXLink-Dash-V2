@@ -1,3 +1,8 @@
+Neues in der Version 5.05 (12.11.2025)
+- Servicerelease
+	Beschreiung unten verbessert
+	fehlerhafter Menueintrg korrigiert
+
 Neues in der Version 5.04 (12.11.2025)
 - Reflectorverbindungen können jetzt individuell beschriftet werden
 	Über Variablen in der include/co0nfig.php können jetzt Texte für die Buttons zum Reflectorwechsel individuell 
@@ -13,15 +18,16 @@ Neues in der Version 5.03 (10.11.2025)
 	Das ist z.B. sinnvoll, wenn jemand mit mehreren Netzen arbeitet (FM-Funknetz, Lausitzlink, etc) oder 
 	wenn man für sein Netz verschieden MOnitorTGs hat, zwischen den schnell hin- und her geschaltet werden 
 	soll.
-	Auch für diese Funktion muss auf der Linu xShell des REchners etwas gemachtg werden, man sollte sich dass
-	also zutrauen.
-	Im Rahmen des Updates werden 4 DAteien im Verzeichnis dl3el neu ausgeliefert:
+	Auch für diese Funktion muss auf der Linux Shell des Rechners etwas gemachtg werden, man sollte sich dass
+	also zutrauen. Es ist aber alles nur dann n otwendig, wenn zwischen verschiedenen Reflektorverbindungen 
+	wechseln möchte.
+	Im Rahmen des Updates werden 4 Dateien im Verzeichnis dl3el neu ausgeliefert:
 	Reflector1.conf.example
 	Reflector2.conf.example
 	Reflector3.conf.example
 	Reflector4.conf.example
 	Aus diesen Dateien muss jeweils eine Datei Reflectorx.conf (also ohne .example) erstellt werden.
-	Das muss nicht für alle DAteien geschehen. Es funktionjiert auch nur mit 2 oder 3 Dateien.
+	Das muss nicht für alle Dateien geschehen. Es funktionjiert auch nur mit 2 oder 3 Dateien.
 	Sobald die Datei dl3el/Reflector1.conf gefunden wird, werden die entsprechenden Buttons im Dashboard
 	angezeigt. Ändern lassen sich diese Datein, wie gewohnt über den Fullscreen Editor.
 	Am besten erzeugt man den Inhalt der Dateien in dem man die entsprechenden Einträge aus der 

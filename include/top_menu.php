@@ -177,16 +177,16 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
-	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.sh</a> | ';
+	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a> | ';
 	}
 	if (file_exists(DL3EL.'/Reflector2.conf')) {
-	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.sh</a> | ';
+	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a> | ';
 	}
 	if (file_exists(DL3EL.'/Reflector3.conf')) {
-	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.sh</a> | ';
+	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a> | ';
 	}
 	if (file_exists(DL3EL.'/Reflector4.conf')) {
-	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.sh</a> | ';
+	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a> | ';
 	}
 	echo '</p>';
 }
