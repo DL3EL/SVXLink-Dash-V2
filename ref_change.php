@@ -16,7 +16,7 @@
             if (defined ('DL3EL_REF2_BUTTON') && (DL3EL_REF2_BUTTON !== ""))  {
                 $buttontext = DL3EL_REF2_BUTTON;
             } else {
-                $buttontext = "ref1";
+                $buttontext = "ref2";
             }    
             echo '<button name="btn_REF2" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
@@ -25,7 +25,7 @@
             if (defined ('DL3EL_REF3_BUTTON') && (DL3EL_REF3_BUTTON !== ""))  {
                 $buttontext = DL3EL_REF3_BUTTON;
             } else {
-                $buttontext = "ref1";
+                $buttontext = "ref3";
             }    
             echo '<button name="btn_REF3" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
@@ -34,7 +34,7 @@
             if (defined ('DL3EL_REF4_BUTTON') && (DL3EL_REF4_BUTTON !== ""))  {
                 $buttontext = DL3EL_REF4_BUTTON;
             } else {
-                $buttontext = "ref1";
+                $buttontext = "ref4";
             }    
             echo '<button name="btn_REF4" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
