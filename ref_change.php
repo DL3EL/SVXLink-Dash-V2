@@ -3,13 +3,16 @@
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
     <?php
         $file = SVXCONFPATH.SVXCONFIG;
+        $RefModeFile = DL3EL . "/ref_mode";
+        $refmode = file_get_contents($RefModeFile);
         if (file_exists(DL3EL.'/Reflector1.conf')) {
             if (defined ('DL3EL_REF1_BUTTON') && (DL3EL_REF1_BUTTON !== ""))  {
                 $buttontext = DL3EL_REF1_BUTTON;
             } else {
                 $buttontext = "ref1";
             }    
-            echo '<button name="btn_REF1" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
+            $color = ($refmode === DL3EL_REF1_BUTTON)? "green" : "blue";
+            echo '<button name="btn_REF1" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector2.conf')) {
@@ -18,7 +21,8 @@
             } else {
                 $buttontext = "ref2";
             }    
-            echo '<button name="btn_REF2" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
+            $color = ($refmode === DL3EL_REF2_BUTTON)? "green" : "blue";
+            echo '<button name="btn_REF2" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector3.conf')) {
@@ -27,7 +31,8 @@
             } else {
                 $buttontext = "ref3";
             }    
-            echo '<button name="btn_REF3" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
+            $color = ($refmode === DL3EL_REF3_BUTTON)? "green" : "blue";
+            echo '<button name="btn_REF3" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector4.conf')) {
@@ -36,7 +41,8 @@
             } else {
                 $buttontext = "ref4";
             }    
-            echo '<button name="btn_REF4" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
+            $color = ($refmode === DL3EL_REF4_BUTTON)? "green" : "blue";
+            echo '<button name="btn_REF4" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
     ?>
@@ -45,17 +51,22 @@
 
 <?php
 
+    $RefModeFile = DL3EL . "/ref_mode";
     if (isset($_POST['btn_REF1'])) {
         upd_svx_config($file,"dl3el/Reflector1.conf");
+        file_put_contents($RefModeFile, DL3EL_REF1_BUTTON);
     }
     if (isset($_POST['btn_REF2'])) {
         upd_svx_config($file,"dl3el/Reflector2.conf");
+        file_put_contents($RefModeFile, DL3EL_REF2_BUTTON);
     }
     if (isset($_POST['btn_REF3'])) {
         upd_svx_config($file,"dl3el/Reflector3.conf");
+        file_put_contents($RefModeFile, DL3EL_REF3_BUTTON);
     }
     if (isset($_POST['btn_REF4'])) {
         upd_svx_config($file,"dl3el/Reflector4.conf");
+        file_put_contents($RefModeFile, DL3EL_REF4_BUTTON);
     }
 
 function svx_restart() {

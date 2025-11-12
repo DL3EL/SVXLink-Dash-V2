@@ -1,3 +1,8 @@
+Neues in der Version 5.07 (12.11.2025)
+- ReflectorButton jetzt in Farbe
+	die aktuell ausgewählte Reflectorconfig wird jetzt mit grünem, der Rest mit blauem Hintergrund 
+	dargestellt.
+
 Neues in der Version 5.06 (12.11.2025)
 - Servicerelease
 	für die Umschaltmöglichkeiten für verschiedene Reflektoren ist jetzt eine Authorisierung notwendig
