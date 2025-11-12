@@ -4,19 +4,39 @@
     <?php
         $file = SVXCONFPATH.SVXCONFIG;
         if (file_exists(DL3EL.'/Reflector1.conf')) {
-            echo '<button name="btn_REF1" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>REF1</b></button>';
+            if (defined ('DL3EL_REF1_BUTTON') && (DL3EL_REF1_BUTTON !== ""))  {
+                $buttontext = DL3EL_REF1_BUTTON;
+            } else {
+                $buttontext = "ref1";
+            }    
+            echo '<button name="btn_REF1" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector2.conf')) {
-            echo '<button name="btn_REF2" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>REF2</b></button>';
+            if (defined ('DL3EL_REF2_BUTTON') && (DL3EL_REF2_BUTTON !== ""))  {
+                $buttontext = DL3EL_REF2_BUTTON;
+            } else {
+                $buttontext = "ref1";
+            }    
+            echo '<button name="btn_REF2" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector3.conf')) {
-            echo '<button name="btn_REF3" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>REF3</b></button>';
+            if (defined ('DL3EL_REF3_BUTTON') && (DL3EL_REF3_BUTTON !== ""))  {
+                $buttontext = DL3EL_REF3_BUTTON;
+            } else {
+                $buttontext = "ref1";
+            }    
+            echo '<button name="btn_REF3" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector4.conf')) {
-            echo '<button name="btn_REF4" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>REF4</b></button>';
+            if (defined ('DL3EL_REF4_BUTTON') && (DL3EL_REF4_BUTTON !== ""))  {
+                $buttontext = DL3EL_REF4_BUTTON;
+            } else {
+                $buttontext = "ref1";
+            }    
+            echo '<button name="btn_REF4" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
     ?>

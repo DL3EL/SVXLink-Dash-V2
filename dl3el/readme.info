@@ -1,4 +1,13 @@
-Neues in der Version 5.01 (10.11.2025)
+Neues in der Version 5.04 (12.11.2025)
+- Reflectorverbindungen können jetzt individuell beschriftet werden
+	Über Variablen in der include/co0nfig.php können jetzt Texte für die Buttons zum Reflectorwechsel individuell 
+	eingestellt werden, Beispiel:
+	define("DL3EL_REF1_BUTTON", "FMN");
+	define("DL3EL_REF2_BUTTON", "HAMNET");
+	define("DL3EL_REF3_BUTTON", "FMN 1TG");
+	define("DL3EL_REF4_BUTTON", "");
+	
+Neues in der Version 5.03 (10.11.2025)
 - Unterstützung verschiedener Reflectorverbindungen 
 	Über Buttons ist es jetzt möglich, zwischen bis zu vier verschiednen Reflectorkonfigurationen zu wäheln
 	Das ist z.B. sinnvoll, wenn jemand mit mehreren Netzen arbeitet (FM-Funknetz, Lausitzlink, etc) oder 

@@ -5,11 +5,12 @@ if (isset($_POST['btn_KILL_Player'])) {
     $command = "sudo killall -KILL node 2>&1";
     exec($command,$screen,$retval);
 }
-?>
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-<button name="btn_KILL_Player" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:red; height:30px; width:100px; font-size:12px;"><b>Restart Player (if necessary)</b></button>
-</form>
-<?php
+if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+    echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '">';
+    echo '<button name="btn_KILL_Player" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:red; height:30px; width:100px; font-size:12px;"><b>Restart Player (if necessary)</b></button>';
+    echo '</form>';
+} 
+
 
     echo '<div class="content2">'."\n";
     echo '<script type="text/javascript">'."\n";
