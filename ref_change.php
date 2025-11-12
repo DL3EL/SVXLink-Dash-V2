@@ -9,18 +9,17 @@
         if (file_exists(DL3EL.'/Reflector1.conf')) {
             if (defined ('DL3EL_REF1_BUTTON') && (DL3EL_REF1_BUTTON !== ""))  {
                 $buttontext = DL3EL_REF1_BUTTON;
-                $color = ($refmode === DL3EL_REF3_BUTTON)? "green" : "blue";
+                $color = ($refmode === DL3EL_REF1_BUTTON)? "green" : "blue";
             } else {
                 $buttontext = "ref1";
             }    
-            $color = ($refmode === DL3EL_REF1_BUTTON)? "green" : "blue";
             echo '<button name="btn_REF1" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
         if (file_exists(DL3EL.'/Reflector2.conf')) {
             if (defined ('DL3EL_REF2_BUTTON') && (DL3EL_REF2_BUTTON !== ""))  {
                 $buttontext = DL3EL_REF2_BUTTON;
-                $color = ($refmode === DL3EL_REF3_BUTTON)? "green" : "blue";
+                $color = ($refmode === DL3EL_REF2_BUTTON)? "green" : "blue";
             } else {
                 $buttontext = "ref2";
             }    
