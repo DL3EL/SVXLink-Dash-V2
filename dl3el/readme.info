@@ -1,3 +1,31 @@
+Neues in der Version 5.09 (13.11.2025)
+- diesmal gibt es nichts Neues, aber eine wichtige Info
+	Peter Fahlbusch, DG7AA, hat neue HAMNet Adressen bekommen. Alle Nutzer, die FM-Funknetz per HAMNet nutzen
+	muss ganz dringend, bis spätestens 16.11.2025 ihre svxlink.conf ändern. Mit diesem Dashboard geht das recht 
+	einfach über den Fullscreen Editor. 
+
+	HOSTS=1.fm-funknetz.hamnet.cloud,3.fm-funknetz.hamnet.cloud,2.fm-funknetz.hamnet.cloud
+	HOST_PORT=5308
+	HOST_PRIO=100
+	HOST_PRIO_INC=1
+	HOST_WEIGHT=10
+
+	Lt Peter muss die Reihenfolge genau so eingehalten werden.
+
+	Die Nutzer, die die Reflektorwechselfunktion nutzen, müssen das natürlich ggf. in den Dateien Reflectorx.conf
+	ebenfalls machen. Bitte daran denken, dass es in der Datei mit dem FM-Funknetzreflector dann entsprechened 
+	kommentierte Zeile, mit den Werten oben eingefügt werden.
+	
+	Da der Eintrag bei HOSTS jetzt etwas öänger geworden ist, sieht das auf dem DAshboard etwas blöd aus. 
+	Abhilfe schafft eine Anpassung der include/config.inc.php auf das, was in der Datei 
+	include/config.inc.php.example 	steht. 	Hier sind nur die Zeilen 71 -73 interessant, sie müssen so aussehen:
+    $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+	$fmnetwork_arry = explode(",", $fmnetwork_all);
+	$fmnetwork = $fmnetwork_arry[0];
+	
+	Es gibt für mich derzeit leider keine Möglichkeit, das im Rahmen eines Updates automatisch zu ändern
+	
+	
 Neues in der Version 5.07 (12.11.2025)
 - ReflectorButton jetzt in Farbe
 	die aktuell ausgewählte Reflectorconfig wird jetzt mit grünem, der Rest mit blauem Hintergrund 
@@ -47,7 +75,10 @@ Neues in der Version 5.03 (10.11.2025)
 	- sollte man in der svxlink.conf innerhalb einer [section] den gleichen Eintrag mehrfach verwendet haben,
 		so gilt immer nur der letzte. Egal ob als Kommentar gekennzeichnet oder nicht. D.h. der aktive 
 		Eintrag *muss* immer der letze sein. Durch dieses Skript werden solche Mehrfacheinträeg jedoch 
-		gelöscht (bis auf den letzten, das ist leuder nicht zu vermeiden.
+		gelöscht (bis auf den letzten, das ist leider nicht zu vermeiden.
+	- wenn man einen Wert in einer Konfig braucht (z.B. HOSTS) in anderen aber nicht, so muss der in denen,
+		wo er nicht benötigt wird, mit # versehen werden. Bevor man beginnt, muss der Eintrag entsprechend
+		auch in der svxlink.conf vorhanden sein.
 	- nach dem Ende der Funktion wir die Reflektorverbindung neu gestartet
 
 Neues in der Version 5.01 (10.11.2025)

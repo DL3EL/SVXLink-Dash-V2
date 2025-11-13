@@ -68,7 +68,9 @@ if (fopen($svxConfigFile,'r')) {
     if ($file === "dmr_only") {
         $fmnetwork = "Digital Modes only";
     } else {
-        $fmnetwork = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+	$fmnetwork_arry = explode(",", $fmnetwork_all);
+	$fmnetwork = $fmnetwork_arry[0];
     }
 } else { 
      $callsign="NOCALL";

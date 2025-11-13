@@ -75,7 +75,9 @@ if (isProcessRunning('svxlink')) {
    echo "</table>\n";
 //#### neu
 if ($reflectorlogic1 != "") {
-   $fmnetwork1 = isset($svxconfig[$reflectorlogic1]['HOSTS']) ? $svxconfig[$reflectorlogic1]['HOSTS'] : $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
+   $fmnetwork_all =    isset($svxconfig[$reflectorlogic1]['HOSTS']) ? $svxconfig[$reflectorlogic1]['HOSTS'] : $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
+	$fmnetwork_arry = explode(",", $fmnetwork_all);
+	$fmnetwork1 = $fmnetwork_arry[0];
    
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork1."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork1."</th></tr><tr>";
@@ -128,7 +130,9 @@ if ($reflectorlogic1 != "") {
 
 }
 if ($reflectorlogic2 != "") {
-   $fmnetwork2 = $svxconfig[$reflectorlogic2]['HOSTS'];     
+   $fmnetwork_all = isset($svxconfig[$reflectorlogic2]['HOSTS']) ? $svxconfig[$reflectorlogic1´2]['HOSTS'] : $svxconfig[$reflectorlogic2]['DNS_DOMAIN'];    
+	$fmnetwork_arry = explode(",", $fmnetwork_all);
+	$fmnetwork2 = $fmnetwork_arry[0];
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork2."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork2."</th></tr><tr>";
    $svxrstatus = getSVXRstatus($reflectorlogic2);
