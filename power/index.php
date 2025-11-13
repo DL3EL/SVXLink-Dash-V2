@@ -150,7 +150,12 @@ if (isset($_POST['btnDashUpdate']))
                     $content = $content . $mvfile;
                     $cmd = $file . " " . $file . ".bak\n";
                     $content = $content . "Datei wird umbenannt:\nrename " . $cmd;
-                    rename($file, $file. ".bak");
+                    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
+                       echo "no renaming, development\n";
+                       $content = $content .  "no renaming, development";
+                    } else {        
+                       rename($file, $file. ".bak");
+                    }    
                     $content = $content . "\n";
                     ++$nn;
                   }
@@ -162,8 +167,13 @@ if (isset($_POST['btnDashUpdate']))
                 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
                   $dbversion = $dbversion . "(s)";
                 }  
+                if (DL3EL_GIT_UPDATE === "nocheck") {
+                  $upd = "&upd=f";
+                } else {
+                  $upd = "&upd=n";
+                }        
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
-                $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&upd\"";
+                $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd ."\"";
                 if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
                 exec($cmd);
         }
@@ -227,13 +237,7 @@ if (isset($_POST['btnrstc710']))
             if (DL3EL_GIT_UPDATE === "nocheck") {
               echo "<br>Github Version:$gitversion installierte Version:$version,<br>Versionscheck abgeschaltet, Update ist möglich<br>";
               if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
-              echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
-                $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-stat.pl\"";
-                if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
-                exec($cmd);
-                $dbstatFile = DL3EL . "/dbwget.log";
-                $dbstat = file_get_contents($dbstatFile);
-                echo " (" . $dbstat . ")";
+                echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
               } else {
                   echo "ACHTUNG: nur für erfahrene Benutzer, es kann sein, dass noch nicht freigegebene Updates heruntergeladen werden, die das System beschädigen<br>";
                   echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
