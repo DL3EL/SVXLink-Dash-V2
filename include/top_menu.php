@@ -190,7 +190,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
         if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
             if (file_exists('./statistic.php')) {
-		echo '<a href="./statistic.php" style = "color: black;" id="log">Stat</a> | ';
+		echo '<a href="./statistic.php" style = "color: black;" id="log">Statistic</a> | ';
             }
         }
 	echo '</p>';
