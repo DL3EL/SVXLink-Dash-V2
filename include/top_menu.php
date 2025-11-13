@@ -188,6 +188,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	if (file_exists(DL3EL.'/Reflector4.conf')) {
 	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a> | ';
 	}
+        if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
+            if (file_exists('./statistic.php')) {
+		echo '<a href="./statistic.php" style = "color: black;" id="log">Stat</a> | ';
+            }
+        }
 	echo '</p>';
 }
 
