@@ -183,7 +183,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a>';
 	}
 	if (file_exists(DL3EL.'/Reflector3.conf')) {
-	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1"> | Reflector3.conf</a>';
+	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a>';
 	}
 	if (file_exists(DL3EL.'/Reflector4.conf')) {
 	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a>';
