@@ -388,7 +388,7 @@ Neues in der Version 4.62 (18.10.2025)
 	  
 Neues in der Version 4.60 (16.10.2025)
 - Die Dateien, die vom Github Update angefasst, dürfen auf keinen Fall lokal geändert werden. Wenn das trotzdem 
-	passiert, dann wird der Update abgrochen. Es ist jetzt ein kleiner Workaround eingebaut, der in genau 
+	passiert, dann wird der Update abgebrochen. Es ist jetzt ein kleiner Workaround eingebaut, der in genau 
 	diesem Fall, die betroffenen Daten in .bak umbebennt und dann darum bittet, den Update noch einmal 
 	auszuführen. In den meisten Fällen hilft das.
 
@@ -408,7 +408,7 @@ Neues in der Version 4.54 (14.10.2025)
 	PROXY_SERVER = 192.68.17.154 (Beispiel)
 	PROXY_PORT = 8100 (Pflicht)
 	PROXY_PASSWORD = PUBLIC (Pflicht)
-	dann wählt das Dashboard jetzt autoatisch einen freien Proxy aus
+	dann wählt das Dashboard jetzt automatisch einen freien Proxy aus
 	den Erfolg sieht man links unten im Statusfenster unter "Echolink Proxy"
 
 Neues in der Version 4.49 (12.10.2025)
