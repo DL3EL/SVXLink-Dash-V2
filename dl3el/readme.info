@@ -1,3 +1,15 @@
+Neues in der Version 5.10 (17.11.2025)
+- Servicerelease
+	wegen der Serveränderungen im FM-Funknetz, musste das Dashboard angepasst werden:
+	- die Namen der TGs in der Liveansicht sind wieder verfügbar
+	- wenn mehrere Hosts eingetrage sind, wird im obersten Seitenbanner immer nur der erste Eintrag angezeigt
+	  Werden trotzdem mehrere Namen angezeigt, bitte die config.inc.php an die Vorgaben der 
+	  config.inc.php.example anpassen. Ist das bisher noch nie passiert und setzt man kein aktueles Image von 
+	  DC9VQ ein, so empfiehlt sich das auch für die Datei config.php. Eine korrekte config erkennt man i.d.R. daran,
+	  das im obersten Seitenbanner der Server des aktuell ausgewählten Funknetzes angezeigt wird.
+	- wenn die Verbindung ins FM-Funknetz über HAMNet hergestellt wird, so wird links im Statusfenster nicht
+	  der Servername, sondern HAMNet angezeigt. Der aktuell gewählte DNS Name ist zu lang.
+
 Neues in der Version 5.09 (13.11.2025)
 - diesmal gibt es nichts Neues, aber eine wichtige Info
 	Peter Fahlbusch, DG7AA, hat neue HAMNet Adressen bekommen. Alle Nutzer, die FM-Funknetz per HAMNet nutzen

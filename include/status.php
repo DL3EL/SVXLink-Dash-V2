@@ -80,6 +80,10 @@ if ($reflectorlogic1 != "") {
    $fmnetwork_all =    isset($svxconfig[$reflectorlogic1]['HOSTS']) ? $svxconfig[$reflectorlogic1]['HOSTS'] : $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
 	$fmnetwork_arry = explode(",", $fmnetwork_all);
 	$fmnetwork1 = $fmnetwork_arry[0];
+   if (str_ends_with($fmnetwork1,"hamnet.cloud")) {
+	    $fmnetwork1 = "HAMNet."  . substr($fmnetwork1,0,1);
+	}    
+
    
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork1."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork1."</th></tr><tr>";
