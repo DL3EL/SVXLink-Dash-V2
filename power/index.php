@@ -172,11 +172,11 @@ if (isset($_POST['btnDashUpdate']))
                 if (DL3EL_GIT_UPDATE === "nocheck") {
                   $upd = "&upd=f";
                 } else {
-                  $upd = "&upd=n(" . $old_dbversion . ")";
+                  $upd = "&upd=u_" . $old_dbversion;
                 }        
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd ."\"";
-                if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
+                if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
         }
         // Display in textarea           
