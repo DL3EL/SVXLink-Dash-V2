@@ -11,7 +11,7 @@ include_once "functions.php";
   <form method="post">
   <table style = "margin-top:0px;">
     <tr height=25px>
-      <th>Time (<?php echo date('T')?>)</th>
+      <th>Zeit</th>
       <th width=100px>Callsign</th>
 <?php
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
