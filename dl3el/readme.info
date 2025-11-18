@@ -1,3 +1,7 @@
+Neues in der Version 5.11 (17.11.2025)
+- Servicerelease
+	- im Hauptdashboard stand noch "UTC" hinter der Zeit, obwohl es die Lokalzeit war. Jetzt nicht mehr.
+	
 Neues in der Version 5.10 (17.11.2025)
 - Servicerelease
 	wegen der Serveränderungen im FM-Funknetz, musste das Dashboard angepasst werden:
