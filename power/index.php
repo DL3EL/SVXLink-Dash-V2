@@ -116,6 +116,8 @@ if (isset($_POST['btnrstshari']))
 
 if (isset($_POST['btnDashUpdate']))
     {
+        $dbversionFile = DL3EL . "/dbversion";
+        $old_dbversion = file_get_contents($dbversionFile);
         $file = DL3EL_BASE .'git_pull.sh';
         $log = DL3EL_BASE .'git_pull.log';
         $gitdir = substr(DL3EL_BASE,0,strlen(DL3EL_BASE)-1);
@@ -170,7 +172,7 @@ if (isset($_POST['btnDashUpdate']))
                 if (DL3EL_GIT_UPDATE === "nocheck") {
                   $upd = "&upd=f";
                 } else {
-                  $upd = "&upd=n";
+                  $upd = "&upd=n(" . $old_dbversion . ")";
                 }        
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd ."\"";
