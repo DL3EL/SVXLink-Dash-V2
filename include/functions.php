@@ -947,6 +947,7 @@ function display_config($config) {
       $tgdb_File = DL3EL_BASE . "include/tgdb.php";
       $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
       file_put_contents($tgdb_File, $content);
+      include_once DL3EL_BASE . "include/tg_ext.php";
 // 5. gather some statistics
 	    $dbversionFile = DL3EL . "/dbversion";
 	    $dbversion = file_get_contents($dbversionFile);
