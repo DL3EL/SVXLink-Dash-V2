@@ -227,6 +227,7 @@ if (isset($_POST['btnrstc710']))
    }   
   if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
         $cmd = "wget -T 10  -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
+        $cmd = "wget -T 10  -O versioncheck http://192.68.17.16/FM-Relais/dbversion";
         echo "",exec($cmd, $output, $retval);
         $content = trim(shell_exec('cat versioncheck'));
         list($gitversion, $rest) = explode(" ", $content);
