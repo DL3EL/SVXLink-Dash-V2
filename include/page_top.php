@@ -62,7 +62,7 @@
 </span>
 
 </p></center>
-<div class="img" style = "padding-left:30px"><a href="https://wiki.fm-funknetz.de/" target="fm-funknetz"><img src="images/fmn-logo.png" /></a></div>
+<div class="img" style = "padding-right:30px"><a href="https://wiki.fm-funknetz.de/" target="fm-funknetz"><img src="images/fmn-logo.png" /></a></div>
 </div></div>
     <div class="text"style = "padding-right:230px">
 </div>
