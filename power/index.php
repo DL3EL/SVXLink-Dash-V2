@@ -231,6 +231,8 @@ if (isset($_POST['btnrstc710']))
         echo "",exec($cmd, $output, $retval);
         $content = trim(shell_exec('cat versioncheck'));
         list($gitversion, $rest) = explode(" ", $content);
+        $dbversionFile = DL3EL . "/dbversion";
+        $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
         echo '<br><br><br>';
         if ($gitversion !== $version) {
