@@ -62,6 +62,7 @@
 </span>
 
 </p></center>
+<div class="img" style = "padding-left:30px"><a href="https://wiki.fm-funknetz.de/" target="fm-funknetz"><img src="images/fmn-logo.png" /></a></div>
 </div></div>
     <div class="text"style = "padding-right:230px">
 </div>
@@ -87,7 +88,7 @@ if (SHOWPTT=="TRUE") {
 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
     echo '<button class="button link" onclick="playAudioToggle(8001, this)">
     <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
-    </button><br><br>';
+    </button>';
 }
    
 ///

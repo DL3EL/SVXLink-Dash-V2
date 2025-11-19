@@ -1,3 +1,8 @@
+Neues in der Version 5.12 (19.11.2025)
+- Servicerelease
+	- Es gibt ein ziemlich gutes Wiki zum FM-Funknetz. Das ist jetzt direkt über das FM-Funknetz Icon im
+	  obersten Banner verlinkt.
+	
 Neues in der Version 5.11 (17.11.2025)
 - Servicerelease
 	- im Hauptdashboard stand noch "UTC" hinter der Zeit, obwohl es die Lokalzeit war. Jetzt nicht mehr.
