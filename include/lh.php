@@ -110,7 +110,12 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 	if ($ssid){
 	  $call = substr($listElem[1],0,$ssid);
 	}
-	echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
+
+	if ((defined ('DL3EL_LH_DETAIL') && (DL3EL_LH_DETAIL === "FMN"))) {
+	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$listElem[1]."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
+	} else {
+	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
+	}
       }
 //////////////////// NEU //////////////Add Name ///////////////////////////////////////////////////////////////////////////////////////
       if ($use_names) {

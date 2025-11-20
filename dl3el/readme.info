@@ -1,3 +1,11 @@
+Neues in der Version 5.13 (19.11.2025)
+- Detailinfo vom FM-Funknetz jetzt wählbar
+	- In der Lastheard Liste (Haupt-Dashboard) ist bislang hinter dem Rufzeichen ein Link zum qrz.com Eintrag verlinkt. 
+	  Bei vielen Relais gibt es jedoch keinen Eintrag. Wenn die Systemvariabale
+	  define("DL3EL_LH_DETAIL", "FMN");
+	  gesetzt wird, so wird anstelle der qrz Seite, die Detailseite vom FM-Funknettz Dashboard für diese Station
+	  aufgerufen. Das gilt für alle Einträge in der Liste.
+	
 Neues in der Version 5.12 (19.11.2025)
 - Servicerelease
 	- Es gibt ein ziemlich gutes Wiki zum FM-Funknetz. Das ist jetzt direkt über das FM-Funknetz Icon im

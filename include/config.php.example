@@ -100,5 +100,7 @@ define("DL3EL_REF2_BUTTON", "Ref2");
 define("DL3EL_REF3_BUTTON", "Ref3");
 define("DL3EL_REF4_BUTTON", "Ref4");
 //
+define("DL3EL_LH_DETAIL", "FMN");
+//
 include_once DL3EL_BASE ."include/config.inc.php";
 ?>
