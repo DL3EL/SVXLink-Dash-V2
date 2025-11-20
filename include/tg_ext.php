@@ -4,6 +4,8 @@
 include_once DL3EL_BASE . "include/tgdb.php"; 
   if ((defined ('debug')) && (debug > 0)) echo "TG: " .$tgdb_array[262649] . "<br>";
   $tgdb_array[262649] = "OV Welle F49 Frankfurt-West";
+  $tgdb_array[60431] = "Frankfurt Stadt, DB0HTV";
+  $tgdb_array[63607] = "Wittgenborn, DB0CGW";
   if ((defined ('debug')) && (debug > 0)) echo "TG: ($tg)" .$tgdb_array[262649] . "<br>";
 
   $nn = 0;
