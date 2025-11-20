@@ -150,7 +150,7 @@ if (session_status() === PHP_SESSION_NONE) {
 		    echo '<a href="./ssh.php" style = "color: black;">SSH</a> | ';
 		}
 	    }	
-	    echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">Amixer</a> | ';
+//	    echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">Amixer</a> | ';
 	    if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
 		echo '<a href="./edit.php?file=TclVoiceMail.conf" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
 	    }
@@ -164,11 +164,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	    if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
 		echo '<a href="./editor.php?id=tclvoicemail" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
 	    }
-	    echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">Amixer</a> | ';
 	}	
 	if (defined('DL3EL_RADIO')) {
 	    $svxRadio = DL3EL_RADIO;
 	    if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+		echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">Amixer</a> | ';
 		echo '<a href="./rf.php" style = "color: black;" id="radio">Radio</a> | ';
 	    }
 	}
