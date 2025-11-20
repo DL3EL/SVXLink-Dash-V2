@@ -117,7 +117,8 @@ if (isset($_POST['btnrstshari']))
 if (isset($_POST['btnDashUpdate']))
     {
         $dbversionFile = DL3EL . "/dbversion";
-        $old_dbversion = file_get_contents($dbversionFile);
+        $dbversion = file_get_contents($dbversionFile);
+        list($old_dbversion, $rest) = explode(" ", $dbversion);
         $file = DL3EL_BASE .'git_pull.sh';
         $log = DL3EL_BASE .'git_pull.log';
         $gitdir = substr(DL3EL_BASE,0,strlen(DL3EL_BASE)-1);
@@ -165,7 +166,8 @@ if (isset($_POST['btnDashUpdate']))
                 $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
         } else {       
                 $dbversionFile = DL3EL . "/dbversion";
-                $dbversion = file_get_contents($dbversionFile);
+                $new_dbversion = file_get_contents($dbversionFile);
+                list($dbversion, $rest) = explode(" ", $new_dbversion);
                 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
                   $dbversion = $dbversion . "(s)";
                 }  
