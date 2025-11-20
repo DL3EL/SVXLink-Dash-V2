@@ -1,3 +1,8 @@
+Neues in der Version 5.13c (20.11.2025)
+- Servicerelease
+	- In der Übersicht der aktuellen TGs (MonitorCalls) fehlte der TG Name der aktuellen TG, sofern 
+	  diese nicht in der Mnitorliste war
+
 Neues in der Version 5.13 (19.11.2025)
 - Detailinfo vom FM-Funknetz jetzt wählbar
 	- In der Lastheard Liste (Haupt-Dashboard) ist bislang hinter dem Rufzeichen ein Link zum qrz.com 
