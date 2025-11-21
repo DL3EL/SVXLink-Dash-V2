@@ -172,7 +172,7 @@ if (isset($_POST['btnDashUpdate']))
                   $dbversion = $dbversion . "(s)";
                 }  
                 if (DL3EL_GIT_UPDATE === "nocheck") {
-                  $upd = "&upd=f";
+                  $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
                 } else {
                   $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
                 }        
