@@ -171,6 +171,7 @@ if (isset($_POST['btnDashUpdate']))
                 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
                   $dbversion = $dbversion . "(s)";
                 }  
+                $gitversion = file_get_contents("gitversion");
                 if (DL3EL_GIT_UPDATE === "nocheck") {
                   $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
                 } else {
@@ -239,6 +240,7 @@ if (isset($_POST['btnrstc710']))
             $content = trim(shell_exec('cat versioncheck'));
         }        
         list($gitversion, $rest) = explode(" ", $content);
+        file_put_contents("gitversion",$gitversion);
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);

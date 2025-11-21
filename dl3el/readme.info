@@ -1,3 +1,8 @@
+Neues in der Version 5.13d (21.11.2025)
+- Servicerelease
+	- In seltenen Fällen klappt die Erkennung einer neuen Verion bei github nicht. Ich habe jetzt 
+	  einen Backup Server eingebaut
+
 Neues in der Version 5.13c (20.11.2025)
 - Servicerelease
 	- In der Übersicht der aktuellen TGs (MonitorCalls) fehlte der TG Name der aktuellen TG, sofern 
