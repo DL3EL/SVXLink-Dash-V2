@@ -52,9 +52,16 @@
     <div class="text"style = "padding-right:230px">
 --->    
 <?php 
-    $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
-	$fmnetwork_arry = explode(",", $fmnetwork_all);
-	$fmnetwork = $fmnetwork_arry[0];
+    if ($fmnetwork === "") {
+        if (fopen($svxConfigFile,'r')) { 
+          $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+          $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+          $fmnetwork_arry = explode(",", $fmnetwork_all);
+          $fmnetwork = $fmnetwork_arry[0];
+        } else {
+          $fmnetwork = "confErr";
+        }
+    }    
 ?>
 <center><p style = "margin-top:5px;margin-bottom:0px;">
 <span style = "font-size: 32px;letter-spacing:4px;font-family: &quot;sans-serif&quot;, sans-serif;font-weight:500;color:PaleBlue"><?php echo $callsign;?></span>

@@ -1,3 +1,8 @@
+Neues in der Version 5.13f (22.11.2025)
+- Servicerelease
+	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .exampe Dateien 
+	  entsprechen, wird das aktuelle Funknetz nicht angezeigt. Das soll behoben werden.
+
 Neues in der Version 5.13d (21.11.2025)
 - Servicerelease
 	- In seltenen Fällen klappt die Erkennung einer neuen Verion bei github nicht. Ich habe jetzt 
