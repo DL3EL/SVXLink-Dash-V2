@@ -250,7 +250,7 @@ if (isset($_POST['btnrstc710']))
             $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
         }        
         list($gitversion, $rest) = explode(" ", $content);
-        file_put_contents("gitversion",$gitversion);
+        file_put_contents("gitversion",$content);
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
