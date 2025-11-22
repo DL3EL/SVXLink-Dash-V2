@@ -1,6 +1,6 @@
 Neues in der Version 5.13f (22.11.2025)
 - Servicerelease
-	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .exampe Dateien 
+	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .example Dateien 
 	  entsprechen, wird das aktuelle Funknetz nicht angezeigt. Das soll behoben werden.
 
 Neues in der Version 5.13d (21.11.2025)
