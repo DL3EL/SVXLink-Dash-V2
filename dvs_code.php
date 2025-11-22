@@ -20,7 +20,7 @@ $dvsmode = OFF | DMR | YSF | DSTAR
     if (fopen($svxConfigFile,'r')) {
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
 //      print_r($svxconfig);  
-        $file = isset($svxconfig['File_Description']['FILE']) ? $svxconfig['File_Description']['FILE'] : 'no';     
+        $file = isset($svxconfig['File_Description']['FUNCTION']) ? $svxconfig['File_Description']['FUNCTION'] : 'no';     
         $radio = isset($svxconfig['File_Description']['RADIO']) ? $svxconfig['File_Description']['RADIO'] : 'no';     
     }
 
