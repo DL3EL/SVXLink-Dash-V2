@@ -178,9 +178,16 @@ if (isset($_POST['btnDashUpdate']))
                   $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
                 }        
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
-                $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
-                $fmnetwork_arry = explode(",", $fmnetwork_all);
-                $fmnetwork = $fmnetwork_arry[0];
+                if ($fmnetwork === "") {
+                    if (fopen($svxConfigFile,'r')) { 
+                        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+                        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+                        $fmnetwork_arry = explode(",", $fmnetwork_all);
+                        $fmnetwork = $fmnetwork_arry[0];
+                    } else {
+                        $fmnetwork = "confErr";
+                    }
+                }    
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd ."\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
@@ -232,12 +239,15 @@ if (isset($_POST['btnrstc710']))
       }    
    }   
   if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
-        $cmd = "wget -T 10  -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
-        echo "",exec($cmd, $output, $retval);
-        $content = trim(shell_exec('cat versioncheck'));
-        if (!filesize('versioncheck')) {
-            $cmd = "wget -T 10  -O versioncheck http://192.68.17.16/FM-Relais/dbversion";
-            $content = trim(shell_exec('cat versioncheck'));
+        //$cmd = "wget -T 10  -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
+        //echo "",exec($cmd, $output, $retval);
+        //$content = trim(shell_exec('cat versioncheck'));
+        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion');
+//        if (!filesize('versioncheck')) {
+        if ($content === "")  {
+//            $cmd = "wget -T 10  -O versioncheck http://192.68.17.16/FM-Relais/dbversion";
+//            $content = trim(shell_exec('cat versioncheck'));
+            $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
         }        
         list($gitversion, $rest) = explode(" ", $content);
         file_put_contents("gitversion",$gitversion);

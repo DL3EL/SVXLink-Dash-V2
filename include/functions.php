@@ -954,9 +954,16 @@ function display_config($config) {
       if (file_exists('/etc/systemd/system/svxlink-node.service')) {
         $dbversion = $dbversion . "(s)";
       }  
-      $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
-      $fmnetwork_arry = explode(",", $fmnetwork_all);
-      $fmnetwork = $fmnetwork_arry[0];
+      if ($fmnetwork === "") {
+        if (fopen($svxConfigFile,'r')) { 
+          $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+          $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+          $fmnetwork_arry = explode(",", $fmnetwork_all);
+          $fmnetwork = $fmnetwork_arry[0];
+        } else {
+          $fmnetwork = "confErr";
+        }
+      }    
 	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
 	    exec($cmd);
