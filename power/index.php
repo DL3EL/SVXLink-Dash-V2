@@ -238,19 +238,23 @@ if (isset($_POST['btnrstc710']))
         echo '<button name="btnrstc710" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Reset Sound C710</button>';
       }    
    }   
+
   if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
         //$cmd = "wget -T 10  -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
         //echo "",exec($cmd, $output, $retval);
         //$content = trim(shell_exec('cat versioncheck'));
         $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . "g";
+        $github = "g";
 //        if (!filesize('versioncheck')) {
-        if ($content === "g")  {
+        if ($content === ".g")  {
 //            $cmd = "wget -T 10  -O versioncheck http://192.68.17.16/FM-Relais/dbversion";
 //            $content = trim(shell_exec('cat versioncheck'));
             $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion') . "g";
+        $github = ".r";
         }        
         list($gitversion, $rest) = explode(" ", $content);
-        file_put_contents("gitversion",$content);
+        $gitversion = $gitversion . $github;
+        file_put_contents("gitversion",$gitversion);
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
