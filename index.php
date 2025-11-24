@@ -28,32 +28,33 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-	include_once "include/browserdetect.php";
-//	$mobile = 1;
+	$mobile = 1;
+  if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
+    include_once "include/browserdetect.php";
+//	$mobile = 1 = mobile;
+  }
+  if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile<br>";
+  if (!$mobile) {
+    echo '<body>';
+    echo '<div class="container">';
+
+    echo '<div class="left-half">';
+    echo '<object style="outline:none; height:1200px; width:950px;" data=index1.php></object>';
+    echo '</div>';
+
+    echo '<div class="right-half">';
+    echo '<object style="outline:none; height:1200px; width:700px" data=svx2mqtt/index_duo.php></object>';
+    echo '</div>';
+
+    echo '</div>';
+
+    echo '</body>';
+
+  } else {
     if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile<br>";
-if (!$mobile) {
-    if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile<br>";
-
-echo '<body>';
-echo '<div class="container">';
-
-echo '<div class="left-half">';
-echo '<object style="outline:none; height:1200px; width:950px" data=index1.php></object>';
-echo '</div>';
-
-echo '<div class="right-half">';
-echo '<object style="outline:none; height:1200px; width:700px" data=svx2mqtt/index_duo.php></object>';
-echo '</div>';
-
-echo '</div>';
-
-echo '</body>';
-
-} else {
-    if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile<br>";
-        header("Location: http:index1.php");
-        exit;
-}
+    header("Location: http:index1.php");
+    exit;
+  }
 
 ?>
 </html>
