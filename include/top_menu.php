@@ -39,7 +39,7 @@ if (session_status() === PHP_SESSION_NONE) {
    <div id="display-links" align=right>
 	<p style = "padding-right: 5px; text-align: right; color: #000000;">
 	<a style = "color: black;">Display</a> |
-	<a href="./index.php" style = "color: #000000;">Dashboard</a> | 
+	<a href="./index1.php" style = "color: #000000;">Dashboard</a> | 
 <?php
 	if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
 	    include_once "include/browserdetect.php";
