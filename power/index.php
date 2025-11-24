@@ -253,8 +253,8 @@ if (isset($_POST['btnrstc710']))
         $github = ".r";
         }        
         list($gitversion, $rest) = explode(" ", $content);
-        $gitversion = $gitversion . $github;
-        file_put_contents("gitversion",$gitversion);
+        $gitversionf = $gitversion . $github;
+        file_put_contents("gitversion",$gitversionf);
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
