@@ -118,8 +118,8 @@ if (session_status() === PHP_SESSION_NONE) {
 		}    
 	    }
 	    if (($net3) || ($net4)) {
-		$_SESSION['auth'] = "AUTHORISED";
-		$show_auth = 1;
+//		$_SESSION['auth'] = "AUTHORISED";
+//		$show_auth = 1;
 	    }
 	}
 	if ($show_auth) {
