@@ -105,9 +105,21 @@ if (session_status() === PHP_SESSION_NONE) {
 	    if ($net1 == TRUE || $net2 == TRUE) {
 		$show_auth = 1;
 	    } 
+	    if (defined ('DL3EL_MASTER_IP')) {
+		$master_ip_array = explode(",", DL3EL_MASTER_IP);
+		$nn = 0;
+		foreach ($master_ip_array as $master_ip) {
+		    if ((defined ('debug')) && (debug > 0)) echo "<br>IP($nn):$master_ip ($ip)";
+		    if (cidr_match($ip,$master_ip)) {
+			$_SESSION['auth'] = "AUTHORISED";
+			$show_auth = 1;
+		    }
+		    ++$nn;
+		}    
+	    }
 	    if (($net3) || ($net4)) {
-		    $_SESSION['auth'] = "AUTHORISED";
-		    $show_auth = 1;
+		$_SESSION['auth'] = "AUTHORISED";
+		$show_auth = 1;
 	    }
 	}
 	if ($show_auth) {
