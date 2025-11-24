@@ -18,6 +18,7 @@
 <?php echo ("<title>" . $callsign . " Dashboard " . $dbversion . "</title>" ); ?>
 
 <?php include_once "include/browserdetect.php"; ?>
+
     <script type="text/javascript" src="scripts/jquery.min.js"></script>
     <script type="text/javascript" src="scripts/functions.js"></script>
     <script type="text/javascript" src="scripts/pcm-player.min.js"></script>
