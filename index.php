@@ -33,7 +33,8 @@ if (session_status() === PHP_SESSION_NONE) {
     include_once "include/browserdetect.php";
 //	$mobile = 1 = mobile;
   }
-  if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile<br>";
+	$mobile = 0;
+  if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile (0=Desktop, 1=MOBIL)<br>";
   if (!$mobile) {
     echo '<body>';
     echo '<div class="container">';
