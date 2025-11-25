@@ -188,7 +188,9 @@ if (isset($_POST['btnDashUpdate']))
                         $fmnetwork = "confErr";
                     }
                 }    
-                $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']) . "x";
+                $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
+                $useragent = str_replace(";"," ",$useragent); 
+
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
