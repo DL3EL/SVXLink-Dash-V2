@@ -189,7 +189,7 @@ if (isset($_POST['btnDashUpdate']))
                     }
                 }    
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
-                $useragent = str_replace(";"," ",$useragent); 
+                $useragent = str_replace(";",",",$useragent); 
 
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
