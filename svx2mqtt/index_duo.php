@@ -26,7 +26,7 @@
         th {
             text-align: left;
             //font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             color: white;
             background-color: #0000FF;
         }
@@ -34,7 +34,7 @@
         td {
             text-align: middle;
             //font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             color: black;
         }
 
@@ -146,7 +146,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                             <table id="activeTable">
                                 <thead>
                                     <tr style="height:24px;">
-                                        <th style="width:20%">&nbsp;&nbsp;Call</th>
+                                        <th style="width:22%;">&nbsp;&nbsp;Call</th>
                                         <th style="width:12%">TG</th>
                                         <th style="width:40%">TG Name</th>
                                         <th style="width:12%">Zeit</th>
@@ -169,7 +169,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                             <table id="lhTable">
                                 <thead>
                                     <tr style="height:24px;">
-                                        <th style="width:20%">&nbsp;&nbsp;Call</th>
+                                        <th style="width:22%">&nbsp;&nbsp;Call</th>
                                         <th style="width:12%">TG</th>
                                         <th style="width:40%">TG Name</th>
                                         <th style="width:12%">Zeit</th>
@@ -371,7 +371,9 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                             const group = tgName(a.tg);
                             const tr = document.createElement("tr");
                             tr.innerHTML = `
-<td >&nbsp;${escapeHtml(a.call)}</td>
+
+<td style="color:#0065ff;font-weight:bold;">&nbsp;${escapeHtml(a.call)}</td>
+<!--<td align=\"left\"><a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$escapeHtml(a.call)}."\" target=\"_blank\" class=\"qrz_link\">${escapeHtml(a.call)}</a></td>" -->
 
 <?php $tg_a = '${escapeHtml(a.tg || "—")}' ?>
 <td><button
@@ -398,7 +400,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                         const tr = document.createElement("tr");
                         tgConn.textContent = h.tg;
                         tr.innerHTML = `
-<td>&nbsp;${escapeHtml(h.call)}</td>
+<td style="color:#0065ff;font-weight:bold;">&nbsp;${escapeHtml(h.call)}</td>
 
 <?php $tg_h = '${escapeHtml(h.tg || "—")}' ?>
 <td><button
