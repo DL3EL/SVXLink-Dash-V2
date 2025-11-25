@@ -246,13 +246,13 @@ if (isset($_POST['btnrstc710']))
         //$cmd = "wget -T 10  -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
         //echo "",exec($cmd, $output, $retval);
         //$content = trim(shell_exec('cat versioncheck'));
-        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . "g";
-        $github = "g";
+        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
+        $github = ".g";
 //        if (!filesize('versioncheck')) {
         if ($content === ".g")  {
 //            $cmd = "wget -T 10  -O versioncheck http://192.68.17.16/FM-Relais/dbversion";
 //            $content = trim(shell_exec('cat versioncheck'));
-            $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion') . "g";
+            $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
         $github = ".r";
         }        
         list($gitversion, $rest) = explode(" ", $content);
