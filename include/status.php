@@ -84,7 +84,7 @@ if ($reflectorlogic1 != "") {
 	    $fmnetwork1 = "HAMNet."  . substr($fmnetwork1,0,1);
 	}    
    if (str_ends_with($fmnetwork1,"fm-funknetz.de:5308")) {
-	    $fmnetwork1 = substr($fmnetwork1,1,6);
+	    $fmnetwork1 = substr($fmnetwork1,0,6);
 	}    
 
    
