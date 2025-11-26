@@ -26,7 +26,7 @@
         th {
             text-align: left;
             //font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             color: white;
             background-color: #0000FF;
         }
@@ -34,7 +34,7 @@
         td {
             text-align: middle;
             //font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             color: black;
         }
 
@@ -55,7 +55,7 @@
 }
 
 #lhTable {
-        tr:nth-child(n+35) {
+        tr:nth-child(n+45) {
             display:none;
         }
 }
@@ -71,10 +71,10 @@
             font-size: 18px;
             margin-top: 8px;
         }
-.small { font-size:13px; color:black; }
+.small { font-size:14px; color:black; }
 
     .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .pill { padding:4px 10px; border-radius:999px; background:#ffffff; font-size:13px; border:1px solid #374151; }
+    .pill { padding:4px 10px; border-radius:999px; background:#ffffff; font-size:12px; border:1px solid #374151; }
     .ok { color:#10b981; }
     .warn { color:#f59e0b; }
     .bad { color:#ef4444; }
@@ -82,13 +82,13 @@
     .grid { display:grid; gap:12px; grid-template-columns: 1fr 1fr; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     .card { background:#edf0f5; border:1px solid #0f1011; border-radius:12px; overflow:hidden; }
-    .card h2 { margin:0; font-size:13px; padding:10px 12px; border-bottom:1px solid #0f1011; }
+    .card h2 { margin:0; font-size:15px; padding:10px 12px; border-bottom:1px solid #0f1011; }
     .card .body { padding:12px; }
-    .tag { font-size:13px; background:blue; border:1px solid #374151; color:#ffffff; padding:2px 6px; border-radius:999px; }
-//    .call { color:#0065ff;font-weight:bold; }
+    .tag { font-size:14px; background:blue; border:1px solid #374151; color:#ffffff; padding:2px 6px; border-radius:999px; }
+//    .call { font-weight:bold; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
     button:disabled { opacity:.6; cursor:not-allowed; }
-    #error { white-space:pre-wrap; color:#ef4444; font-size:13px; margin-top:8px; }
+    #error { white-space:pre-wrap; color:#ef4444; font-size:12px; margin-top:8px; }
 
 
 
@@ -102,28 +102,28 @@
 include_once  '../include/settings.php';
 
 if (defined ('SVXMQTT_COLOR_active')) {
-  $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:13px;";
+  $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";
 } else {
-  $SVXMQTT_COLOR1_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:13px;";
-  $SVXMQTT_COLOR2_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:13px;";
-  $SVXMQTT_COLOR3_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:13px;";
+  $SVXMQTT_COLOR1_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR2_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR3_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
   $svxmqtt_color_active = $SVXMQTT_COLOR2_active;
 }
 
 if (defined ('SVXMQTT_COLOR_passive')) {
-  $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:13px;";
+  $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;";
 } else {
-  $SVXMQTT_COLOR1_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:13px;";
-  $SVXMQTT_COLOR2_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:13px;";
-  $SVXMQTT_COLOR3_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:13px;";
+  $SVXMQTT_COLOR1_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR2_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR3_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
   $svxmqtt_color_passive = $SVXMQTT_COLOR3_passive;
 }
 ?>
 
 <body style="background:#e1e1e1;">
 <form method="post">
-<fieldset style = "box-shadow:5px 5px 20px #999; background-color:#f1f1f1; height:1200px; margin-top:15px; font-size:13px; border-radius: 10px;">
-     <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:13px; border:none; border-radius:10px;">
+<fieldset style = "box-shadow:5px 5px 20px #999; background-color:#f1f1f1; height:1380px; margin-top:15px; font-size:13px; border-radius: 10px;">
+     <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border-radius:10px;">
         <header>
             <center>
                 <h1 style="background-color:#fififi; color:#0000ff; font:18pt arial, sans-serif;font-weight:bold;">Live Dashboard</h1>
@@ -135,11 +135,9 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                     <section>
                         <h3 style="color:#000000">Live</h3>
                         <div>
-                            <button id="clients" style="margin-right:30px;margin-bottom:10px;color:black; font-size:13px;border-radius:10px;background-color:transparent;">Verbundene Clients: —</button>
-                            <span id="conn" style="color:green; font-size:13px; font-weight:bold;">Getrennt</span>
-                            <center>
-                            <div style="color:#909090;font-size:30px, font-weight:bold;" id="activeEmpty">Funkstille .... Niemand spricht... aber wirklich niemand.</div>
-                            </center>
+                            <button id="clients" style="margin-right:30px;margin-bottom:10px;color:black; font-size:14px;border-radius:10px;background-color:transparent;">Verbundene Clients: —</button>
+                            <span id="conn" style="color:green; font-size:14px; font-weight:bold;">Getrennt</span>
+                            <div style="color:#909090;font-size:20px, font-weight:bold;" id="activeEmpty">Funkstille .... Niemand spricht... aber wirklich niemand.</div>
                             <button hidden id="btnConnect">Verbinden</button>
                             <button hidden id="btnDisconnect" disabled>Trennen</button>
                             <button hidden id="btnTGConn" enabled>TGConn</button>
@@ -148,7 +146,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                             <table id="activeTable">
                                 <thead>
                                     <tr style="height:24px;">
-                                        <th style="width:20%">&nbsp;&nbsp;Call</th>
+                                        <th style="width:22%;">&nbsp;&nbsp;Call</th>
                                         <th style="width:12%">TG</th>
                                         <th style="width:40%">TG Name</th>
                                         <th style="width:12%">Zeit</th>
@@ -162,16 +160,16 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                         </div>
                     </section>
     </fieldset>
-    <fieldset style="color:white; background-color:#f1f1f1; height:100; font-size:13px; border:none; border-radius:10px;">
+    <fieldset style="color:white; background-color:#f1f1f1; height:1500; font-size:14px; border:none; border-radius:10px;">
         <form method="post">
                     <section>
                         <h3 style="color:#000000;">Zuletzt Aktiv</h3>
                         <div style="max-height:70vh; overflow:auto;">
-                            <fieldset style = "height:800px;box-shadow:2px 2px 10px #999;background-color:#e8e8e8;font-size:13px;border-radius: 10px;">
+                            <fieldset style = "height:1010px;box-shadow:2px 2px 10px #999;background-color:#e8e8e8;font-size:12px;border-radius: 10px;">
                             <table id="lhTable">
                                 <thead>
                                     <tr style="height:24px;">
-                                        <th style="width:20%">&nbsp;&nbsp;Call</th>
+                                        <th style="width:22%">&nbsp;&nbsp;Call</th>
                                         <th style="width:12%">TG</th>
                                         <th style="width:40%">TG Name</th>
                                         <th style="width:12%">Zeit</th>
@@ -373,11 +371,13 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                             const group = tgName(a.tg);
                             const tr = document.createElement("tr");
                             tr.innerHTML = `
+
 <td style="color:#0065ff;font-weight:bold;">&nbsp;${escapeHtml(a.call)}</td>
+<!--<td align=\"left\"><a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$escapeHtml(a.call)}."\" target=\"_blank\" class=\"qrz_link\">${escapeHtml(a.call)}</a></td>" -->
 
 <?php $tg_a = '${escapeHtml(a.tg || "—")}' ?>
 <td><button
- style=cursor:pointer;border-radius:8px;width:85px;<?php echo $svxmqtt_color_active; ?>;font-weight:bold;font-size:13px;
+ style=cursor:pointer;border-radius:8px;width:85px;<?php echo $svxmqtt_color_active; ?>;font-weight:bold;font-size:14px;
  type=submit
  id=dtmfsvx
  name=dtmfsvx
@@ -387,7 +387,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
 
 <td>&nbsp;${escapeHtml(group || "—")}</td>
 <td>${new Date(a.startMs).toLocaleTimeString()}</td>
-<td align=center>${durSec}s</td>
+<td>${durSec}s</td>
 `;
                             elActiveBody.appendChild(tr);
                         }
@@ -400,13 +400,11 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                         const tr = document.createElement("tr");
                         tgConn.textContent = h.tg;
                         tr.innerHTML = `
-
-
 <td style="color:#0065ff;font-weight:bold;">&nbsp;${escapeHtml(h.call)}</td>
 
 <?php $tg_h = '${escapeHtml(h.tg || "—")}' ?>
 <td><button
- style=cursor:pointer;border-radius:8px;width:85px;<?php echo $svxmqtt_color_passive; ?>;font-weight:bold;font-size:13px;
+ style=cursor:pointer;border-radius:8px;width:85px;<?php echo $svxmqtt_color_passive; ?>;font-weight:bold;font-size:14px;
  type=submit
  id=dtmfsvx
  name=dtmfsvx
@@ -416,7 +414,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
 
 <td>&nbsp;${escapeHtml(group || "—")}</td>
 <td>${new Date(h.endMs).toLocaleTimeString()}</td>
-<td align=center>${h.durationSec}s</td>
+<td>${h.durationSec}s</td>
 `;
                         elLHBody.appendChild(tr);
                     }
@@ -450,7 +448,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
         }
         ?>
 
-<center><small><br><br>FM-Funknetz.de - basierend auf dem MQTT Livedashboard von DJ1JAY (integriert von Frank, DL4EM)</small></center>
+<center><small><br>FM-Funknetz.de - basierend auf dem MQTT Livedashboard von DJ1JAY (integriert von Frank, DL4EM)</small></center>
 
 </fieldset>
     <!-- SIMPLE Button 
