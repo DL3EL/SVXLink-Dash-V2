@@ -61,7 +61,7 @@ echo '</body>';
 
   } else {
     if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile<br>";
-    header("Location: http:index1.php");
+    header("Location:http:index1.php");
     exit;
   }
 
