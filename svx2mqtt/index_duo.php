@@ -55,7 +55,7 @@
 }
 
 #lhTable {
-        tr:nth-child(n+100) {
+        tr:nth-child(n+70) {
             display:none;
         }
 }
