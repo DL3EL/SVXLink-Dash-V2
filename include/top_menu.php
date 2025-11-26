@@ -39,7 +39,6 @@ if (session_status() === PHP_SESSION_NONE) {
    <div id="display-links" align=right>
 	<p style = "padding-right: 5px; text-align: right; color: #000000;">
 	<a style = "color: black;">Display</a> |
-	<a href="./index1.php" style = "color: #000000;">Dashboard</a> | 
 <?php
 	if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
 	    include_once "include/browserdetect.php";
@@ -49,8 +48,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	    $show_livedb = 1;
 	}    
 	if ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "yes") && ($show_livedb)) {
+	    echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
 	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
-	}    
+	} else {
+	    echo '<a href="./index1.php" style = "color: #000000;">Dashboard</a> | ';
+	}   
 ?>
 	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
 	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls | </a> 
