@@ -1,3 +1,17 @@
+Neues in der Version 5.14 (26.11.2025)
+- Live Dashboard jetzt auf Wunsch auch dauerhaft anzeigbar
+	- Frank, DL4EM, hat mal wieder gezaubert. Auf Wunsch kann das Live Dashboard jetzt permanent rechts neben
+	  dem Hauptdashboard des eigenen Hotspots angezeigt werden. Dazu muss in der config.php folgender Eintrag
+	  gemacht werden:
+	  define("DL3EL_LIVEDB_AUTO", "yes");
+	  Fehlt dieser Eintrag, bleibt alles wie bisher. Da diese neue Möglichkeit viel Platz auf dem Bildschirm
+	  benötigt, wird das LiveDB nicht angezeigt, wenn als Browser ein Handy erkannt wird.
+	  Wird das LiveDB parallel angezeigt, entfällt der Menuepunkt LiveDB. Sollte die Handyerkennung nicht 
+	  funktionieren, so bitte ich um Info per Telegram oder Mail.
+	- eine Info für die Sysops von Relais mit öffentlich erreichbaren Dahboards. Wenn es die Infrastruktur erlaubt, 
+	  dass die Nutzer eindeutig an der IP Adresse zu erkennen sind, gibt es eine Möglichkeit zur vereinfachten 
+	  Authorisierung. Wer Interesse hat, bitte melden.
+
 Neues in der Version 5.13f (22.11.2025)
 - Servicerelease
 	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .example Dateien 
