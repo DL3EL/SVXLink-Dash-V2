@@ -192,6 +192,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> | ';
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
+    echo '<p><a href="./edit.php?file=info" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
 	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a>';
 	}
@@ -212,10 +213,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '</p>';
 }
 
+
     echo '</div>';
     echo '<div id="display-links" align=center>';
-    echo '<a href="./edit.php?file=info" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
+//    echo '<a href="./edit.php?file=info" style = "border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in der Version ' . $dbversion . '&nbsp;&nbsp;</a>';
     echo '</div>';
+
     echo '</form>';
 
 //include_once('parse_svxconf.php');
