@@ -1,3 +1,12 @@
+Neues in der Version 5.14d (26.11.2025)
+- Servicerelease
+	- Es gibt weiterhin noch Probleme mit der Weiterleitung. Für die meisten Situation sollte das mit dieser 
+	  Version funktionieren .. more to come ..
+
+Neues in der Version 5.14c (26.11.2025)
+- Servicerelease
+	- In seltenen Fällen hat die Weiterleitung der URL nicht funktioniert, das sollte jetzt behoben sein
+
 Neues in der Version 5.14c (26.11.2025)
 - Servicerelease
 	- In seltenen Fällen hat die Weiterleitung der URL nicht funktioniert, das sollte jetzt behoben sein
