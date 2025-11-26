@@ -1,3 +1,7 @@
+Neues in der Version 5.14c (26.11.2025)
+- Servicerelease
+	- In seltenen Fällen hat die Weiterleitung der URL nicht funktioniert, das sollte jetzt behoben sein
+
 Neues in der Version 5.14a (26.11.2025)
 - Servicerelease
 	- Das Größenverhältnis des LiveDB hat nicht ganz gepasst.
