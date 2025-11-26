@@ -65,8 +65,17 @@ if (session_status() === PHP_SESSION_NONE) {
     echo '</body>';
 
   } else {
+    $uri=$_SERVER['REQUEST_URI'];
     $StringExplo=explode("/",$_SERVER['REQUEST_URI']);
     $HeadTo=$StringExplo[0]."/index1.php";
+    if (($StringExplo[1] === "index.php") || ($uri === "/")) {
+      $HeadTo = "/index1.php";
+    } else {
+      $HeadTo = "/" . $StringExplo[1] . "/index1.php";
+    }  
+//echo "URI: " . $_SERVER['REQUEST_URI'] . "<br>";
+//echo "String: 1:$StringExplo[0] 2:$StringExplo[1] 3:$StringExplo[2]<br>";
+//echo "new Header: $HeadTo<br>";
     Header("Location: ".$HeadTo);
     exit;
   }
