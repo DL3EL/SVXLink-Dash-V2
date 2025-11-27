@@ -1,4 +1,13 @@
-Neues in der Version 5.14d (26.11.2025)
+Neues in der Version 5.14f (27.11.2025)
+- neue DNS Namen bei FM-Funknetz
+	- spätestens zum 01.01.2026 müssen die neuen DNS Namen vom FM-Funknetz benutzt werden. Diese müssen bis
+	  dahin in die svxlink.conf, bzw. in die reflectorx.conf eingetragen sein.
+	  Details dazu gibt es dort: https://wiki.fm-funknetz.de/doku.php?id=reflectorlogic_setup
+	- Da die Namen (1.reflector-network.eu bzw. 2.reflector-network.eu)	recht lang für die Statusleiste
+	  sind, werden sie mit dieser Version dort verkürzt dargestellt. Im oberen Banner werden sie 
+	  vollqualifiziert, so wie in der svxlink.conf eingetragen, dargestellt.
+
+Neues in der Version 5.14e (26.11.2025)
 - Servicerelease
 	- Es gibt weiterhin noch Probleme mit der Weiterleitung. Für die meisten Situation sollte das mit dieser 
 	  Version funktionieren .. more to come ..
