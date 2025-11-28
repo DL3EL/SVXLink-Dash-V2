@@ -1,3 +1,14 @@
+Neues in der Version 5.14g (28.11.2025)
+- Servicerelease
+	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .example Dateien 
+	  entsprechen, wird das aktuelle Funknetz nicht angezeigt. Die Änderung in V5.13f haben nicht alle Fälle 
+	  behoben, nächster Versuch.
+	- Die Weiterleitung bei der Auswahl des parallel angezeigten LiveDasboards scheint stabil zu funktionieren.
+	  Es gibt lediglich Probleme auf IPADs, mit der Browserkennung:
+	  Macintosh, Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15 
+	  Ddg/26.1'
+	  da funktioniert es einfach nicht, der Bildschirm bleibt weiß.
+
 Neues in der Version 5.14f (27.11.2025)
 - neue DNS Namen bei FM-Funknetz
 	- spätestens zum 01.01.2026 müssen die neuen DNS Namen vom FM-Funknetz benutzt werden. Diese müssen bis
