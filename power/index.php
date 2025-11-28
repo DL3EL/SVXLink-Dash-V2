@@ -187,6 +187,9 @@ if (isset($_POST['btnDashUpdate']))
                     } else {
                         $fmnetwork = "confErr";
                     }
+                    if ($fmnetwork === "") {
+                        $fmnetwork = "parseErr";
+                    }  
                 }    
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
                 $useragent = str_replace(";",",",$useragent); 

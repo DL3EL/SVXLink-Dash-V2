@@ -963,6 +963,9 @@ function display_config($config) {
         } else {
           $fmnetwork = "confErr";
         }
+        if ($fmnetwork === "") {
+          $fmnetwork = "parseErr";
+        }  
       }    
 	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
