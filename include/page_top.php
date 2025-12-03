@@ -59,7 +59,6 @@
           $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
           $fmnetwork_arry = explode(",", $fmnetwork_all);
           $fmnetwork = $fmnetwork_arry[0];
-        $fmnetwork = "(" . $fmnetwork_arry[0] . ")";
         } else {
           $fmnetwork = "confErr";
         }
