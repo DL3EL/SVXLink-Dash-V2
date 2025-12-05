@@ -1064,7 +1064,7 @@ echo "<br>Stat: $cmd";
       } else {
           $fmnetwork = "confErr";
       }
-      if ($fmnetwork === "") {
+      if (!strlen($fmnetwork)) {
         $fmnetwork = "'parseErr:" . $fmnetwork_all . "'";
       }  
       return $fmnetwork;
