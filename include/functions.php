@@ -954,21 +954,9 @@ function display_config($config) {
       if (file_exists('/etc/systemd/system/svxlink-node.service')) {
         $dbversion = $dbversion . "(s)";
       }  
-//      if ($fmnetwork === "") {
-        if (fopen($svxConfigFile,'r')) { 
-          $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
-          $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
-          $fmnetwork_arry = explode(",", $fmnetwork_all);
-          $fmnetwork = $fmnetwork_arry[0];
-        } else {
-          $fmnetwork = "confErr";
-        }
-        if ($fmnetwork === "") {
-          $fmnetwork = "'parseErr:" . $fmnetwork_all . "'";
-        }  
-//      } else {
-//          $fmnetwork = $fmnetwork . "_ok";
-//      }     
+      if (!strlen($fmnetwork)) {
+        $fmnetwork = getfmnetwork();
+      }     
 	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
 	    exec($cmd);
@@ -1063,6 +1051,22 @@ echo "<br>Stat: $cmd";
       $jetzt = date("Y-m-d H:i:s");
       $add2log = "$jetzt: " . $logtext;
 			file_put_contents($db_File, $add2log,FILE_APPEND);
+    }
+
+    function getfmnetwork () {
+      $svxConfigFile = SVXCONFPATH . SVXCONFIG;
+      if (fopen($svxConfigFile,'r')) { 
+        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+        $fmnetwork_arry = explode(",", $fmnetwork_all);
+        $fmnetwork = $fmnetwork_arry[0];
+      } else {
+          $fmnetwork = "confErr";
+      }
+      if ($fmnetwork === "") {
+        $fmnetwork = "'parseErr:" . $fmnetwork_all . "'";
+      }  
+      return $fmnetwork;
     }
 ?>
     

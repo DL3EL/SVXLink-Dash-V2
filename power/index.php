@@ -178,19 +178,9 @@ if (isset($_POST['btnDashUpdate']))
                   $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
                 }        
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
-                if ($fmnetwork === "") {
-                    if (fopen($svxConfigFile,'r')) { 
-                        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
-                        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
-                        $fmnetwork_arry = explode(",", $fmnetwork_all);
-                        $fmnetwork = $fmnetwork_arry[0];
-                    } else {
-                        $fmnetwork = "confErr";
-                    }
-                    if ($fmnetwork === "") {
-                        $fmnetwork = "parseErr";
-                    }  
-                }    
+                if (!strlen($fmnetwork)) {
+                    $fmnetwork = getfmnetwork();
+                }     
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
                 $useragent = str_replace(";",",",$useragent); 
 
