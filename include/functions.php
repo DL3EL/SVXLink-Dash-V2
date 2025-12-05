@@ -1058,15 +1058,26 @@ echo "<br>Stat: $cmd";
       $section = "ReflectorLogic";
       if (fopen($svxConfigFile,'r')) { 
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
-        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $svxconfig[$section]['DNS_DOMAIN'];
-        $fmnetwork_arry = explode(",", $fmnetwork_all);
-        $fmnetwork = $fmnetwork_arry[0];
+//        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $svxconfig[$section]['DNS_DOMAIN'];
+//        $svxconfig = custom_parse_ini_file($svxConfigFile);
+//        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS']['value'] : $svxconfig[$section]['DNS_DOMAIN']['value'];
+        if (isset($svxconfig[$section]['HOSTS'])) {
+          $fmnetwork_all = $svxconfig[$section]['HOSTS'];
+          $fmnetwork_arry = explode(",", $fmnetwork_all);
+          $fmnetwork = $fmnetwork_arry[0];
+        } else {
+          $fmnetwork = "";
+        }    
+        if (!strlen($fmnetwork)) {
+          if (isset($svxconfig[$section]['DNS_DOMAIN'])) {
+            $fmnetwork = $svxconfig[$section]['DNS_DOMAIN'];
+          } else {
+            $fmnetwork = "parseErr";
+          } 
+        }
       } else {
           $fmnetwork = "confErr";
       }
-      if (!strlen($fmnetwork)) {
-        $fmnetwork = "'parseErr:" . $fmnetwork_all . "'";
-      }  
       return $fmnetwork;
     }
 ?>
