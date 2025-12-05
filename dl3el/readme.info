@@ -1,8 +1,8 @@
-Neues in der Version 5.14i (04.12.2025)
+Neues in der Version 5.14k (05.12.2025)
 - Servicerelease
 	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .example Dateien 
-	  entsprechen, wird das aktuelle Funknetz nicht angezeigt. Die Änderung in V5.14g haben nicht alle Fälle 
-	  behoben, nächster Versuch.
+	  entsprechen, wird das aktuelle Funknetz nicht angezeigt. Die Änderung in V5.14i haben nicht alle Fälle 
+	  behoben, nächster Versuch. Komplett neuer Ansatz.
 
 Neues in der Version 5.14g (28.11.2025)
 - Servicerelease
