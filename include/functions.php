@@ -1055,6 +1055,7 @@ echo "<br>Stat: $cmd";
 
     function getfmnetwork () {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
+      $section = "ReflectorLogic";
       if (fopen($svxConfigFile,'r')) { 
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
         $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
