@@ -1,3 +1,7 @@
+Neues in der Version 5.15 (06.12.2025)
+- Nikolausrelease
+	- Wenn man zu lange (>23 Zeichen) DNS oder Hostnamen verwendet, werden diese jetzt gekürzt
+	
 Neues in der Version 5.14o (05.12.2025)
 - Servicerelease
 	- Wenn die config.php und die config.inc.php nicht dem aktuellen Stand der jeweiligen .example Dateien 

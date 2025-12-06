@@ -77,20 +77,29 @@ if (isProcessRunning('svxlink')) {
 //#### neu
 if ((defined ('debug')) && (debug > 0)) echo "R1:$reflectorlogic1 R2:$reflectorlogic2<br>";
 if ($reflectorlogic1 != "") {
-   $fmnetwork_all =    isset($svxconfig[$reflectorlogic1]['HOSTS']) ? $svxconfig[$reflectorlogic1]['HOSTS'] : $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
-	$fmnetwork_arry = explode(",", $fmnetwork_all);
-	$fmnetwork1 = $fmnetwork_arry[0];
-   if (str_ends_with($fmnetwork1,"hamnet.cloud")) {
-	    $fmnetwork1 = "HAMNet."  . substr($fmnetwork1,0,1);
-	}    
-   if (str_ends_with($fmnetwork1,"fm-funknetz.de:5308")) {
-	    $fmnetwork1 = substr($fmnetwork1,0,7);
-	}    
-   if (str_ends_with($fmnetwork1,"reflector-network.eu:5308")) {
-	    $fmnetwork1 = substr($fmnetwork1,0,11);
-	}    
-
-   
+// Achtung: wenn jemand in der svxlink.con nur HOSTS = schreibt, funktioniert das nicht.
+   $fmnetwork_all = isset($svxconfig[$reflectorlogic1]['HOSTS']) ? $svxconfig[$reflectorlogic1]['HOSTS'] : $svxconfig[$reflectorlogic1]['DNS_DOMAIN'];    
+   if (strlen($fmnetwork_all) > 23) {
+      $fmnetwork_arry = explode(",", $fmnetwork_all);
+      $fmnetwork1 = $fmnetwork_arry[0];
+      if (str_ends_with($fmnetwork1,"hamnet.cloud")) {
+         $fmnetwork1 = "HAMNet."  . substr($fmnetwork1,0,1);
+      }    
+      if (str_ends_with($fmnetwork1,"fm-funknetz.de:5308")) {
+         $fmnetwork1 = substr($fmnetwork1,0,7);
+      }    
+      if (str_ends_with($fmnetwork1,"reflector-network.eu:5308")) {
+         $fmnetwork1 = substr($fmnetwork1,0,11);
+      }    
+// shorter name
+      if (strlen($fmnetwork1) > 23) {
+         $fmnetwork_arry = explode(".", $fmnetwork1);
+         $fmnetwork1 = $fmnetwork_arry[0];
+      }
+   } else {
+      $fmnetwork1 = $fmnetwork_all;
+   }   
+//   
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork1."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork1."</th></tr><tr>";
    $svxrstatus = getSVXRstatus($reflectorlogic1);
@@ -143,7 +152,20 @@ if ($reflectorlogic1 != "") {
 }
 if ((defined ('debug')) && (debug > 0)) echo "R1:$reflectorlogic1 R2:$reflectorlogic2<br>";
 if ($reflectorlogic2 != "") {
-   $fmnetwork2 = $svxconfig[$reflectorlogic2]['HOSTS'];     
+//   $fmnetwork2 = $svxconfig[$reflectorlogic2]['HOSTS'];     
+   $fmnetwork_all = isset($svxconfig[$reflectorlogic2]['HOSTS']) ? $svxconfig[$reflectorlogic2]['HOSTS'] : $svxconfig[$reflectorlogic2]['DNS_DOMAIN'];    
+   if (strlen($fmnetwork_all) > 23) {
+      $fmnetwork_arry = explode(",", $fmnetwork_all);
+      $fmnetwork2 = $fmnetwork_arry[0];
+// shorter name
+      if (strlen($fmnetwork2) > 23) {
+         $fmnetwork2_arry = explode(".", $fmnetwork2);
+         $fmnetwork2 = $fmnetwork2_arry[0];
+      }
+   } else {
+      $fmnetwork2 = $fmnetwork_all;
+   }   
+
 //   echo "<table  style=\"margin-bottom:13px;\"><tr><th>".$fmnetwork2."</th></tr><tr>";
    echo "<table><tr><th>".$fmnetwork2."</th></tr><tr>";
    $svxrstatus = getSVXRstatus($reflectorlogic2);
