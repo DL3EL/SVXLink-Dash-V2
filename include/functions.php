@@ -890,22 +890,30 @@ function display_config($config) {
           date_default_timezone_set('Europe/Berlin');
           echo "Next Update $updFile " . date ("F d Y H:i:s ", $target) . "<br>";;
         }  
-        if ($delta > $timer) {
+        $checkFile = $updFile . "1";
+        if (file_exists($checkFile)) {
+          if ((defined ('debug')) && (debug > 0)) echo "update is running ($checkFile exists)<br>";
+          return (0);
+        } else {
+          if ((defined ('debug')) && (debug > 0)) echo "update is not running ($checkFile does not exist).. checking timer ,<br>target:$target, delta:$delta<br>";
+          if ($delta > $timer) {
           // einmal am Tag wird die Datei neu geholt
           // mal prüfen, ob es Überhohlvorgänge gibt ....
-           echo "$updFile too old: " . filemtime($updFile) . " / " . time()- filemtime($updFile) . "<br>"; 
+            echo "$updFile too old: " . filemtime($updFile) . " / " . time()- filemtime($updFile) . "<br>"; 
 //          $file = DL3EL .'/DMRID_update.sh';
 //          $log = DL3EL .'/DMRID_update.log';
-          $owner = 'svxlink';
-          $group = 'svxlink';
-          $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " 2>&1";
-//          echo "cmd: $command";
-          exec($command, $output, $return_var);
-          return (1);
-        } else {
-          if ((defined ('debug')) && (debug > 5)) echo "$updFile ok: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
-          return (0);
-        }  
+            $owner = 'svxlink';
+            $group = 'svxlink';
+//          $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " 2>&1";
+            $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " &";
+            if ((defined ('debug')) && (debug > 0)) echo " starting: $cmd<br>"; 
+            exec($command, $output, $return_var);
+            return (1);
+          } else {
+            if ((defined ('debug')) && (debug > 0)) echo "$updFile ok, no update: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
+            return (0);
+          }  
+        } 
       }
 
     function start_cron($cron_File,$callsign,$fmnetwork) {

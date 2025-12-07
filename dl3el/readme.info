@@ -1,6 +1,15 @@
+Neues in der Version 5.16 (07.12.2025)
+- internes Cleanup optimiert
+	mit der Version 4.76 vom 31.10.2025 wurde das interne Cleanup als Alternative zum crontab-job eingeführt.
+	Bei dieser Funktion wird u.a. eine reht große Datei aktualisert, die für die Anzeige der Vornamen benötigt 
+	wird. 	Bisher war das Dashboard während des Downloads nicht nutzbar und "hat gehangen". 
+	Ich habe das jetzt parallelisiert 	und das Dashboard sollte in der Zeit des Downloads ohne 
+	Einschränkungen weiterlaufen
+
 Neues in der Version 5.15 (06.12.2025)
 - Nikolausrelease
-	- Wenn man zu lange (>23 Zeichen) DNS oder Hostnamen verwendet, werden diese jetzt gekürzt
+	- Wenn man zu lange (>23 Zeichen) DNS oder Hostnamen verwendet, werden diese jetzt für die Anzeige 
+	  im Statusfenster  gekürzt. Es wird nur Teil bis zum ersten "." angezeigt.
 	
 Neues in der Version 5.14o (05.12.2025)
 - Servicerelease
@@ -126,10 +135,10 @@ Neues in der Version 5.09 (13.11.2025)
 	ebenfalls machen. Bitte daran denken, dass es in der Datei mit dem FM-Funknetzreflector dann entsprechened 
 	kommentierte Zeile, mit den Werten oben eingefügt werden.
 	
-	Da der Eintrag bei HOSTS jetzt etwas öänger geworden ist, sieht das auf dem DAshboard etwas blöd aus. 
+	Da der Eintrag bei HOSTS jetzt etwas länger geworden ist, sieht das auf dem DAshboard etwas blöd aus. 
 	Abhilfe schafft eine Anpassung der include/config.inc.php auf das, was in der Datei 
 	include/config.inc.php.example 	steht. 	Hier sind nur die Zeilen 71 -73 interessant, sie müssen so aussehen:
-    $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $fmnetwork =$svxconfig[$section]['DNS_DOMAIN'];
+    $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $svxconfig[$section]['DNS_DOMAIN'];
 	$fmnetwork_arry = explode(",", $fmnetwork_all);
 	$fmnetwork = $fmnetwork_arry[0];
 	

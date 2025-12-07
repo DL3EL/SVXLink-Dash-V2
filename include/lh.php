@@ -26,6 +26,8 @@ include_once "functions.php";
 	$update_script = DL3EL .'/DMRID_update.sh ';
 	$update_script = DL3EL . "/DMRID_update.sh";
 	$logfile =  DL3EL .'/DMRID_update.log';
+	// für Tests
+	// touch -m -t 202508101421 DMRIds.dat
 	$upd = update_file($DMRIDFile, $update_script, $logfile, 86400);
 	$dmrIDline = file_get_contents($DMRIDFile);
 	if (strlen($dmrIDline) > 1000000) {
