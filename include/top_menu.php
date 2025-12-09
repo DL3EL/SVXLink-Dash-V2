@@ -43,11 +43,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
 	    include_once "include/browserdetect.php";
 	    //$mobile = 1;
-	    $show_livedb = $mobile;
+	    $show_livedb_inDB = $mobile;
 	} else {
-	    $show_livedb = 1;
+	    $show_livedb_inDB = 1;
 	}    
-	if ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "yes") && ($show_livedb)) {
+// Hinweis zu nodes gestrichen noch ergänzen
+	if ($show_livedb_inDB) {
 	    echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
 	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
 	} else {
@@ -191,7 +192,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> | ';
+	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS</a> | ';
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 	if (file_exists(DL3EL.'/Reflector1.conf')) {

@@ -5,6 +5,7 @@ use utf8;
 use Time::Piece;
 use File::stat;
 use IO::Socket::INET;
+use Net::MQTT::Simple;
 
 my $entry;
 my @array;
@@ -30,8 +31,11 @@ my $conf = "";
 my $aprs_login  = "";
 my $aprs_passwd = "";
 my $aprs_msg_call = "";
-
+my $mqtt_broker = "";
 my $hispaddr = "";
+
+my $nn = 0;
+my $message_old = "";
 
 # flush after every write
 $| = 1;
@@ -74,11 +78,20 @@ my ($socket,$client_socket);
 	STDOUT->autoflush(1);
 #    open(LOG, ">/home/svxlink/dl3el/get-monitor.log") or die "Fehler bei Logdatei: $tgdatei\n";
 	open(LOG, ">$logdatei") or die "Fehler bei Logdatei: $logdatei\n";
-	open(MSG, ">>$msgdatei") or die "Fehler bei LOGGINGdatei: $msgdatei\n";
+	open(MSG, ">$msgdatei") or die "Fehler bei LOGGINGdatei: $msgdatei\n";
     printf LOG "LOG: %s LOGGINGdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
     printf LOG "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
 	printf LOG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
 	printf MSG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
+	if ($mqtt_broker) {
+		my $mqtt = Net::MQTT::Simple->new($mqtt_broker);
+		$mqtt->subscribe("openwebrx/APRS/#", \&received);
+		print "subscribed\n"; 
+		# This call blocks, and runs the callback, when a message arrives
+		$mqtt->run();
+ 
+		$mqtt->disconnect();
+	}	
     close MSG;
     close LOG;
 
@@ -243,8 +256,55 @@ sub read_config {
 			$aprs_login = $par if ($1 eq "aprs_login");
 			$aprs_passwd = $par if ($1 eq "aprs_passwd");
 			$aprs_msg_call = $par if ($1 eq "aprs_msg_call");
+			$mqtt_broker = $par if ($1 eq "mqtt_broker");
 		}
 	}
 	print "config received:\n" if ($verbose >= 1);
 	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+}
+
+# This is the callback function, when a message arrives for the subscribed topic
+sub received 
+{
+my $key = "";
+my $path = "";
+my $source = "";
+my $value = "";
+my $comment = "";
+
+    my ($topic, $message) = @_;
+    my $json_string = $message;
+    return if ($message eq $message_old);
+    print STDERR "Incoming message on topic $topic is: $message\n" if $verbose;
+
+# Ein Hash, um die extrahierten Daten zu speichern
+my %data = ();
+# Das Regex sucht nach:
+# 1. Einem Anführungszeichen (")
+# 2. Dem Schlüsselnamen (z.B. source, destination)
+# 3. Einem Doppelpunkt gefolgt von einem Leerzeichen (: ")
+# 4. Dem Wert (alles bis zum nächsten unescaped Anführungszeichen)
+# WICHTIG: Das 'raw'-Feld ist hier schwer zu matchen, da es selbst Anführungszeichen enthält, 
+# aber in Ihrem Beispiel sind die inneren Zeichen hexadezimal, was das Problem löst.
+
+# Dieses Muster extrahiert einfache Schlüssel-Wert-Paare:
+    while ($json_string =~ /"([^"]+)":\s*\[?"([^"]+)"/g) {
+        my ($key, $value) = ($1, $2);
+        if ($key eq "path") {
+            $path = $json_string;
+            $path = ($path =~ /.*path\": \[([^\]]+)/g)? $1 : "undef";
+            print "Path: $path\n" if $verbose;
+        } else {        
+            $data{$key} = $value;
+            $source = $value if ($key eq "source");
+            $comment = $value if ($key eq "comment");
+        }    
+        print "Key: $key, Value: $data{$key}\n" if $verbose;
+    }
+	$message_time = act_time();
+	$write2file = sprintf "[$message_time] OWRX: %s %s [%s]\n",$source,$path, $comment;
+	print_file($msgdatei,$write2file);
+    ++$nn;
+    $message_old = $message;
+  
 }
