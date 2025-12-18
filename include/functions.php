@@ -888,17 +888,23 @@ function display_config($config) {
         $target = filemtime($updFile) + $timer;
         if ((defined ('DL3EL_SHOW_NEXT_RUN') && (DL3EL_SHOW_NEXT_RUN === "yes")) || (($target - time()) <600)) {
           date_default_timezone_set('Europe/Berlin');
-          echo "Next Update $updFile " . date ("F d Y H:i:s ", $target) . "<br>";;
+          echo "Next Update $updFile " . date ("F d Y H:i:s ", $target) . "<br>";
         }  
         $checkFile = $updFile . "1";
         if (file_exists($checkFile)) {
           if ((defined ('debug')) && (debug > 0)) echo "update is running ($checkFile exists)<br>";
+          $jetzt = date("Y-m-d H:i:s");
+          $logtext = "$jetzt Update is running ($checkFile exists)\n";
+          addlog ("L",$logtext);
           return (0);
         } else {
           if ((defined ('debug')) && (debug > 0)) echo "update is not running ($checkFile does not exist).. checking timer ,<br>target:$target, delta:$delta<br>";
           if ($delta > $timer) {
           // einmal am Tag wird die Datei neu geholt
           // mal prüfen, ob es Überhohlvorgänge gibt ....
+            $jetzt = date("Y-m-d H:i:s");
+            $logtext = "$jetzt Downloading new $updFile (D:$delta, T:$timer)\n";
+            addlog ("L",$logtext);
             echo "$updFile too old: " . filemtime($updFile) . " / " . time()- filemtime($updFile) . "<br>"; 
 //          $file = DL3EL .'/DMRID_update.sh';
 //          $log = DL3EL .'/DMRID_update.log';
@@ -908,9 +914,15 @@ function display_config($config) {
             $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " &";
             if ((defined ('debug')) && (debug > 0)) echo " starting: $cmd<br>"; 
             exec($command, $output, $return_var);
+            $jetzt = date("Y-m-d H:i:s");
+            $logtext = "$jetzt Downloaded new $updFile (D:$delta, T:$timer)\n";
+            addlog ("L",$logtext);
             return (1);
           } else {
             if ((defined ('debug')) && (debug > 0)) echo "$updFile ok, no update: " . filemtime($updFile) . " / " . time() - filemtime($updFile) . "<br>"; 
+            $jetzt = date("Y-m-d H:i:s");
+            $logtext = "$jetzt File still ok $updFile (D:$delta, T:$timer)\n";
+            addlog ("L",$logtext);
             return (0);
           }  
         } 
@@ -919,6 +931,8 @@ function display_config($config) {
     function start_cron($cron_File,$callsign,$fmnetwork) {
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
+      $logtext = "$jetzt starting cron ($cron_File $callsign $fmnetwork)\n";
+      addlog ("L",$logtext);
       if ((defined ('debug')) && (debug > 0)) echo "Start cron Job um $jetzt <br>";
 
       $max_kept = 10;
@@ -996,6 +1010,7 @@ echo "<br>Stat: $cmd";
       }
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
+      $logtext = "$jetzt deleting files\n";
       if ((defined ('debug')) && (debug > 0)) echo "Files found: $numberoffiles<br>";
       $max_kept = 10;
       $files2delete = $numberoffiles - $max_kept;
