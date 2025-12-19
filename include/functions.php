@@ -1062,18 +1062,20 @@ echo "<br>Stat: $cmd";
     }
 
     function addlog ($logfile,$logtext) {
-      if ($logfile === "L") {
-        $db_File = DL3EL . "/db.log";
-      } else {
-        $db_File = $logfile;
+      if ((defined ('debug')) && (debug > 1)) {
+        if ($logfile === "L") {
+          $db_File = DL3EL . "/db.log";
+        } else {
+          $db_File = $logfile;
+        }  
+        if (!file_exists($db_File)) {
+          touch($db_File);
+        }
+        date_default_timezone_set('Europe/Berlin');
+        $jetzt = date("Y-m-d H:i:s");
+        $add2log = "$jetzt: " . $logtext;
+        file_put_contents($db_File, $add2log,FILE_APPEND);
       }  
-      if (!file_exists($db_File)) {
-        touch($db_File);
-      }
-      date_default_timezone_set('Europe/Berlin');
-      $jetzt = date("Y-m-d H:i:s");
-      $add2log = "$jetzt: " . $logtext;
-			file_put_contents($db_File, $add2log,FILE_APPEND);
     }
 
     function getfmnetwork () {
