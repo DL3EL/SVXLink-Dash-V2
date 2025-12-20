@@ -27,8 +27,6 @@ include_once "functions.php";
 	$update_script = DL3EL . "/DMRID_update.sh";
 	$logfile =  DL3EL .'/DMRID_update.log';
 	$jetzt = date("Y-m-d H:i:s");
-	$logtext = "$jetzt starting updating ($DMRIDFile)\n";
-	addlog ("L",$logtext);
 	// für Tests
 	// touch -m -t 202508101421 DMRIds.dat
 //	$upd = update_file($DMRIDFile, $update_script, $logfile, 30);

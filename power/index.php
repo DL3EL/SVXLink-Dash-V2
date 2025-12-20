@@ -28,8 +28,6 @@ include_once  '../include/functions.php';
 // load the connlist
 $retval = null;
 $conns = null;
-// find the gateway
-
 
 if (isset($_POST['btnPower']))
     {
@@ -116,6 +114,9 @@ if (isset($_POST['btnrstshari']))
 
 if (isset($_POST['btnDashUpdate']))
     {
+        $logtext =  "Update started..\n";
+        addsvxlog($logtext);
+
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($old_dbversion, $rest) = explode(" ", $dbversion);
@@ -164,6 +165,7 @@ if (isset($_POST['btnDashUpdate']))
                   }
                 }        
                 $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
+                $logtext =  "Update not successful\n";
         } else {       
                 $dbversionFile = DL3EL . "/dbversion";
                 $new_dbversion = file_get_contents($dbversionFile);
@@ -187,8 +189,10 @@ if (isset($_POST['btnDashUpdate']))
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
+                $logtext =  "Update successful\n";
         }
         // Display in textarea           
+        addsvxlog($logtext);
         echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($content) . '</textarea><br>';
 
 }
@@ -234,8 +238,10 @@ if (isset($_POST['btnrstc710']))
         echo '<button name="btnrstc710" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Reset Sound C710</button>';
       }    
    }   
+    $logtext="Power menu started\n";
+    addsvxlog($logtext);
 
-  if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
+    if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
         //$cmd = "wget -T 10  -O versioncheck https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
         //echo "",exec($cmd, $output, $retval);
         //$content = trim(shell_exec('cat versioncheck'));

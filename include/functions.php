@@ -1062,8 +1062,8 @@ echo "<br>Stat: $cmd";
     }
 
     function addlog ($logfile,$logtext) {
-      if ((defined ('debug')) && (debug > 1)) {
-        if ($logfile === "L") {
+      if (((defined ('debug')) && (debug > 0)) || ($logfile === "F")) {
+        if (($logfile === "L") || ($logfile === "F")) {
           $db_File = DL3EL . "/db.log";
         } else {
           $db_File = $logfile;
@@ -1076,6 +1076,15 @@ echo "<br>Stat: $cmd";
         $add2log = "$jetzt: " . $logtext;
         file_put_contents($db_File, $add2log,FILE_APPEND);
       }  
+    }
+
+    function addsvxlog ($logtext) {
+      $db_File = SVXLOGPATH.SVXLOGPREFIX;
+      date_default_timezone_set('Europe/Berlin');
+      $jetzt = date("Y-m-d H:i:s");
+      $jetzt = date("d.m.Y H:i:s");
+      $add2log = "$jetzt: " . $logtext;
+      file_put_contents($db_File, $add2log,FILE_APPEND);
     }
 
     function getfmnetwork () {
