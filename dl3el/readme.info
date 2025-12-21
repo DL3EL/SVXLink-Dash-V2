@@ -1,10 +1,18 @@
+Neues in der Version 5.17 (20.12.2025)
+- Servicerelease
+	Manchmal ist es auch für das Dashboard sinnvoll, LogInfos zu haben. Im ersten Schritt sind jetzt 
+	zwei Möglichkeiten eingebaut.
+	a) wird die config Variable "debug" auf 1 gesetzt, werden ein paar Sachen in die DAtei dl3el/db.log geloggt
+	b) wenn das Dashboard gestartet oder das Powermenu aufgerufen wird, so werden diese Events immer im SVXLink 
+	   Log geloggt.
+
 Neues in der Version 5.16 (07.12.2025)
 - internes Cleanup optimiert
-	mit der Version 4.76 vom 31.10.2025 wurde das interne Cleanup als Alternative zum crontab-job eingeführt.
-	Bei dieser Funktion wird u.a. eine reht große Datei aktualisert, die für die Anzeige der Vornamen benötigt 
-	wird. 	Bisher war das Dashboard während des Downloads nicht nutzbar und "hat gehangen". 
-	Ich habe das jetzt parallelisiert 	und das Dashboard sollte in der Zeit des Downloads ohne 
-	Einschränkungen weiterlaufen
+	mit der Version 4.76 vom 31.10.2025 wurde das interne Cleanup als Alternative zum crontab-job 
+	eingeführt. Bei dieser Funktion wird u.a. eine reht große Datei aktualisert, die für die Anzeige 
+	der Vornamen benötigt wird. Bisher war das Dashboard während des Downloads nicht nutzbar und 
+	"hat gehangen". Ich habe das jetzt parallelisiert und das Dashboard sollte in der Zeit des 
+	Downloads ohne Einschränkungen weiterlaufen
 
 Neues in der Version 5.15 (06.12.2025)
 - Nikolausrelease
