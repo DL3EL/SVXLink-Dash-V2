@@ -982,6 +982,20 @@ function display_config($config) {
 	    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . "&cr\"";
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
 	    exec($cmd);
+// 6. check for Updates
+        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
+//        $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
+        list($gitversion, $rest) = explode(" ", $content);
+        $dbversionFile = DL3EL . "/dbversion";
+        $dbversion = file_get_contents($dbversionFile);
+        list($version, $rest) = explode(" ", $dbversion);
+        if ($gitversion !== $version) {
+            $dbversionFile = DL3EL . "/dbversion.upd";
+            $content = "update";
+            file_put_contents($dbversionFile, $content);
+            $logtext =  "Update to version $gitversion possible\n";
+            addsvxlog($logtext);
+        }
 /*
 	    exec("sudo zip config.zip config.php > /dev/null");
       $owner = 'svxlink';

@@ -190,6 +190,10 @@ if (isset($_POST['btnDashUpdate']))
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
                 $logtext =  "Update successful\n";
+                $dbversionFile = DL3EL . "/dbversion.upd";
+                $content = "up2date";
+                file_put_contents($dbversionFile, $content);
+                addsvxlog($logtext);
         }
         // Display in textarea           
         addsvxlog($logtext);
