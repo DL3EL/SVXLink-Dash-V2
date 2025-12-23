@@ -165,6 +165,7 @@ if (isset($_POST['btnDashUpdate']))
                   }
                 }        
                 $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
+                addsvxlog($content);
                 $logtext =  "Update not successful\n";
         } else {       
                 $dbversionFile = DL3EL . "/dbversion";
@@ -189,11 +190,10 @@ if (isset($_POST['btnDashUpdate']))
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
-                $logtext =  "Update successful\n";
                 $dbversionFile = DL3EL . "/dbversion.upd";
                 $content = "up2date";
                 file_put_contents($dbversionFile, $content);
-                addsvxlog($logtext);
+                $logtext =  "$old_dbversion Update to version $gitversion successful\n";
         }
         // Display in textarea           
         addsvxlog($logtext);
