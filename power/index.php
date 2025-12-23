@@ -191,8 +191,8 @@ if (isset($_POST['btnDashUpdate']))
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
                 $dbversionFile = DL3EL . "/dbversion.upd";
-                $content = "up2date";
-                file_put_contents($dbversionFile, $content);
+                $dbversionFilecontent = "up2date";
+                file_put_contents($dbversionFile, $dbversionFilecontent);
                 $logtext =  "$old_dbversion Update to version $gitversion successful\n";
         }
         // Display in textarea           
