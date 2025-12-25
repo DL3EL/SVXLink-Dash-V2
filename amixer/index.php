@@ -185,7 +185,7 @@ $max_values = [
                         <br>
                         <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Capture - RX Levels</h3>
                         <label for="capture">(0-100) Set for 25:</label>
-                        <input type="number" id="capture" name="capture" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); ?>" required>
+                        <input type="number" id="capture" name="capture" min="0" max="200" value="<?php echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); ?>" required>
                         <br>
                         <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>
                         <label for="autogain">Set to OFF for optimum control</label>
