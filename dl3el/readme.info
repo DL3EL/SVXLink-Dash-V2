@@ -1,3 +1,9 @@
+Neues in der Version 5.19 (25.12.2025)
+- Erweiterung des Loggings
+	Dieser Update ist eher für Relaisbetreiber interessant, die ein öffentliches Dashboard für ihr Relais anbieten.
+	Jetzt werden in die svxlink.log die DTMF Kommandos geloggt, so dass man erkennen kann, ob die über das Dashboard 
+	oder über Funk kamen.
+
 Neues in der Version 5.18 (23.12.2025)
 - Weihnachtsrelease
 	Nach dem Update auf diese Verison, wird zukünftig ein möglicher Update direkt auf der Startseite angezeigt.

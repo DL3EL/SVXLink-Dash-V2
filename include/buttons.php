@@ -108,6 +108,12 @@ if(array_key_exists('button11', $_POST)) {
             exec($exec,$output);
             echo "<meta http-equiv='refresh' content='0'>";
         }
+    if (strlen($exec)) {
+        $logtext = "DTMF via Button: "  . $exec;
+    } else {
+        $logtext = "";
+    }    
+
 /*
 // if(array_key_exists('button8', $_POST)) {
 //        $exec="".KEY8[1]."";
@@ -203,26 +209,33 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
         echo '</form>';
     }    
   if (isset($_POST["dtmfsvx"])){
-   $exec= "echo '" . $_POST['dtmfsvx'] . "' > /tmp/dtmf_svx";
-   exec($exec,$output);
-   echo "<meta http-equiv='refresh' content='0'>";
+    $exec= "echo '" . $_POST['dtmfsvx'] . "' > /tmp/dtmf_svx";
+    exec($exec,$output);
+    echo "<meta http-equiv='refresh' content='0'>";
+    $logtext = "DTMF via Dashboard: "  . $_POST['dtmfsvx'];
     }
   if (isset($_POST["jmpto"])) {
-   $exec= "echo '91" . $_POST['jmpto'] . "#' > /tmp/dtmf_svx";
-   exec($exec,$output);
-   echo "<meta http-equiv='refresh' content='0'>";
+    $exec= "echo '91" . $_POST['jmpto'] . "#' > /tmp/dtmf_svx";
+    exec($exec,$output);
+    echo "<meta http-equiv='refresh' content='0'>";
+    $logtext = "DTMF via Dashboard: "  . $_POST['jmpto'];
     }
  if (isset($_POST["jmptoA"])) {
-   $exec= "echo '*91" . $_POST['jmptoA'] . "#' > /tmp/dtmf_svx";
-   exec($exec,$output);
-   echo "<meta http-equiv='refresh' content='0'>";
+    $exec= "echo '*91" . $_POST['jmptoA'] . "#' > /tmp/dtmf_svx";
+    exec($exec,$output);
+    echo "<meta http-equiv='refresh' content='0'>";
+    $logtext = "DTMF via Dashboard: "  . $_POST['jmptoA'];
     }
 if (isset($_POST["jmptoM"])) {
-   $exec= "echo '94" . $_POST['jmptoM'] . "#' > /tmp/dtmf_svx";
-   exec($exec,$output);
-   echo "<meta http-equiv='refresh' content='0'>";
+    $exec= "echo '94" . $_POST['jmptoM'] . "#' > /tmp/dtmf_svx";
+    exec($exec,$output);
+    echo "<meta http-equiv='refresh' content='0'>";
+    $logtext =  "DTMF via Dashboard: "  . $_POST['jmptoM'];
     }
-
+$logtext = "[" . $logtext . "]\n";
+if ($logtext !== "[]\n") {
+    addsvxlog($logtext);
+}    
 
 ?>
 <p style = "margin-bottom:-2px;"></p>
