@@ -1,3 +1,35 @@
+Neues in der Version 5.20 (28.12.2025)
+- Empfang von APRS Nachrichten
+	In der V1.40 von QSOLink hat Frederic die Möglichkeit eingebaut, APRS Nachrichten zu versenden. Mein Dashboard 
+	kann diese Nachrichten jetzt empfangen und darstellen. Damit das funktioniert, sind ein paar kleine zusätzliche
+	Befehle notwendig.
+	1) das mitgelieferte Programm aprs-is-msg.pl muss laufen. Es lauscht auf dem APRS Backbone und filtert die 
+	eigenen Nachrichten heraus. Am besten es wird in die "Crontab" eingetragen, dann wird das Skriopt bei jedem 
+	Systemboot automatisch gestartet.
+	Dazu muss mit "crontab -e" die Crontab geöffnet werden, es reicht die "pi" Crontab, Root ist nicht notwendig.
+	An das Dateiende muss der Befehl:
+	@reboot /var/www/html/dl3el/aprs-is-msg.pl &
+	ergänzt werden.
+	Wenn das Dashboard nicht in /var/www/html installiert ist, so muss der richtige Pfad zum Verzeichnis der 
+	Installation angegeben werden, also z.B.: @reboot /var/www/html/FM-Funknetz/dl3el/aprs-is-msg.pl &
+	Zusätzlich müssen in der config.php noch zwei Variablen gesetzt werden:
+	define("DL3EL_APRS_MSG", "yes");
+	define("DL3EL_APRS_MSG_TIMER", 120);
+	Die erste schaltet diese Funktion ein, die zweite legt fest, wie lange nach Erhalt der Nachricht ein Hinweis im
+	Statusfenster links eingeblendet wird. In diesem Beispiel 120s.
+	Solange der Hinweis "Neue APRS Nachricht" eingeblendet wird, kommt man direkt durch einen Klick darauf zum 
+	APRS Fenster. Ansonsten kann dies jederzeit über den Link in der zweiten Menuzeile oben erreicht werden.
+	Es gibt nach dem Update im Verzeichnis dl3el eine neue config Datei: aprs-is-msg.conf.example
+	Diese Datei darf nicht verändert und muss in eine Datei aprs-is-msg.conf kopiert werden. Dort müssen die 
+	für den Nachrichtenempfang notwendigen Daten eingetragen werden. Also das LoginCall beim APRS-IS 
+	(z.B: wie bei APRSDROID ohne SSID) und das entsprechende Passwort. Wer das nicht weiß kann es sich dort
+	https://www.darc.de/der-club/distrikte/o/ortsverbaende/aprspasscode/
+	ausrechnen lassen. Ausserdem muss das Call eingetragen werden, auf das für die Nachrichten gefiltert werden 
+	soll. Also z.B. DB0AI* für alles an DB0AI oder DB0AI-1 nur für Nachrichten an DB0AI-1. 
+	Datei abspeichern bitte nicht vergessen.
+	
+	Danach sollte das System gebootet werden, damit das Skript gestartet wird.
+
 Neues in der Version 5.19 (25.12.2025)
 - Erweiterung des Loggings
 	Dieser Update ist eher für Relaisbetreiber interessant, die ein öffentliches Dashboard für ihr Relais anbieten.
