@@ -63,8 +63,8 @@ my ($socket,$client_socket);
 # "/var/www/html" should be replaced with the running directroy of the svxlink dasboard
 # all necessary definitgion have to made in the file /var/www/html/dl3el/aprs-is.conf
 
-	$dir = ($0 =~ /(.*)aprs-is.pl/i)? $1 : "undef";
-	$conf = $dir . "aprs-is.conf";
+	$dir = ($0 =~ /(.*)aprs-is-msg.pl/i)? $1 : "undef";
+	$conf = $dir . "aprs-is-msg.conf";
 	printf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV $dir $conf\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year if ($verbose >= 1);
 	read_config($conf);
  	my $logdatei = $dir  . "/aprs-is.log";
