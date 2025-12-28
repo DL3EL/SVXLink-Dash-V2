@@ -7,6 +7,21 @@ include_once "tools.php";
 include_once "functions.php";
 
 ?>
+<?php
+	$aprsmsg = DL3EL . "/aprs-is.msg";
+   if (file_exists($aprsmsg)) {
+      if ((defined ('DL3EL_APRS_MSG_TIMER')) && (DL3EL_APRS_MSG_TIMER > 0)) {
+         $timer = DL3EL_APRS_MSG_TIMER;
+      } else {
+         $timer = 60;
+      }
+      $delta = time() - filemtime($aprsmsg);
+      if ($delta < $timer) {
+         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
+      }
+	} 
+?>
+
 <div style = "width:180px;"><span style = "font-weight: bold;font-size:14px;">SVXLink Info</span></div>
 <fieldset style = "width:175px;background-color:#e8e8e8e8;margin-top:6px;;margin-bottom:0px;margin-left:0px;margin-right:3px;font-size:12px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
 <?php
