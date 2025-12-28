@@ -1,6 +1,6 @@
 Neues in der Version 5.20 (28.12.2025)
 - Empfang von APRS Nachrichten
-	In der V1.40 von QSOLink hat Frederic die Möglichkeit eingebaut, APRS Nachrichten zu versenden. Mein Dashboard 
+	In der V1.40 von QSOLink hat Cedric die Möglichkeit eingebaut, APRS Nachrichten zu versenden. Mein Dashboard 
 	kann diese Nachrichten jetzt empfangen und darstellen. Damit das funktioniert, sind ein paar kleine zusätzliche
 	Befehle notwendig.
 	1) das mitgelieferte Programm aprs-is-msg.pl muss laufen. Es lauscht auf dem APRS Backbone und filtert die 
