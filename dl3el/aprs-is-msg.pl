@@ -20,8 +20,6 @@ my $rr = 0;
 my $message_time = "";
 my $log_time = "";
 my $write2file = "";
-# prüfen ob Heimnetz erreichbar ist, keine Aktion, falls aktiv
-# 10.3.0.1 ist das ggü liegende tun interface
 my $tm = localtime(time);
 my $version = "1.20";
 my $dir = "";
