@@ -23,7 +23,7 @@ my $write2file = "";
 # prüfen ob Heimnetz erreichbar ist, keine Aktion, falls aktiv
 # 10.3.0.1 ist das ggü liegende tun interface
 my $tm = localtime(time);
-my $version = "1.10";
+my $version = "1.20";
 my $dir = "";
 my $conf = "";
 
@@ -59,16 +59,16 @@ my ($socket,$client_socket);
         }
 	}
 # best to create a crontab entry for the receiver to start at system boot
-# @reboot /var/www/html/dl3el/aprs-is.pl
+# @reboot /var/www/html/dl3el/aprs-is-msg.pl
 # "/var/www/html" should be replaced with the running directroy of the svxlink dasboard
-# all necessary definitgion have to made in the file /var/www/html/dl3el/aprs-is.conf
+# all necessary definitgion have to made in the file /var/www/html/dl3el/aprs-is-msg.conf
 
 	$dir = ($0 =~ /(.*)aprs-is-msg.pl/i)? $1 : "undef";
 	$conf = $dir . "aprs-is-msg.conf";
 	printf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV $dir $conf\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year if ($verbose >= 1);
 	read_config($conf);
- 	my $logdatei = $dir  . "aprs-is.log";
- 	my $msgdatei = $dir  . "aprs-is.msg";
+ 	my $logdatei = $dir  . "aprs-is-msg.log";
+ 	my $msgdatei = $dir  . "aprs-is-msg.msg";
     printf "LOG: %s Logdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
     printf "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
 	STDOUT->autoflush(1);
