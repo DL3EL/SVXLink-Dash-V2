@@ -958,8 +958,15 @@ function display_config($config) {
       $globber = DL3EL_BASE . "backups";
       $max_days = '-7 DAYS';
       delete_old_files($globber,$max_days,$cron_File,$test);
-// 3. Clear LogFile
+// 3a. Clear LogFile
       $db_File = DL3EL . "/db.log";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
+// 3b. Clear APRSFiles
+      $db_File = DL3EL . "/aprs-is.msg";
       $db_File_size = filesize($db_File);
       if ($db_File_size > 100000) {
           rename($db_File, $db_File . ".bak");
@@ -989,6 +996,8 @@ function display_config($config) {
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
+        $logtext =  "Update $gitversion to version $version possible\n";
+        addsvxlog($logtext);
         if ($gitversion !== $version) {
             $dbversionFile = DL3EL . "/dbversion.upd";
             $content = "update";

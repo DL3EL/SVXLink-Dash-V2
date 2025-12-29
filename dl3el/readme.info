@@ -1,3 +1,9 @@
+Neues in der Version 5.20a (29.12.2025)
+- Servicerelease
+	Weitere Tests haben gezeigt, dass der Empfang der APRS Nachrichten nur stabil funktioniert, wenn das 
+	dafür notwendige Perlskript unter dem Nutzer svxlink läuft. Ich habe die Beschreibung der V5.20 
+	entsprechend angepasst.
+	
 Neues in der Version 5.20 (28.12.2025)
 - Empfang von APRS Nachrichten
 	In der V1.40 von QSOLink hat Cedric die Möglichkeit eingebaut, APRS Nachrichten zu versenden. Mein Dashboard 
@@ -7,11 +13,12 @@ Neues in der Version 5.20 (28.12.2025)
 	eigenen Nachrichten heraus. Am besten es wird in die "Crontab" eingetragen, dann wird das Skriopt bei jedem 
 	Systemboot automatisch gestartet.
 	Dazu muss mit "crontab -e" die Crontab geöffnet werden, es reicht die "pi" Crontab, Root ist nicht notwendig.
-	An das Dateiende muss der Befehl:
-	@reboot /var/www/html/dl3el/aprs-is-msg.pl &
+	Das Skript selbst muss unter dem Nutzer "svxlink" laufen.
+	An das Dateiende muss daher der Befehl:
+	@reboot -u svxlink /var/www/html/dl3el/aprs-is-msg.pl &
 	ergänzt werden.
 	Wenn das Dashboard nicht in /var/www/html installiert ist, so muss der richtige Pfad zum Verzeichnis der 
-	Installation angegeben werden, also z.B.: @reboot /var/www/html/FM-Funknetz/dl3el/aprs-is-msg.pl &
+	Installation angegeben werden, also z.B.: @reboot -u svxlink /var/www/html/FM-Funknetz/dl3el/aprs-is-msg.pl &
 	Zusätzlich müssen in der config.php noch zwei Variablen gesetzt werden:
 	define("DL3EL_APRS_MSG", "yes");
 	define("DL3EL_APRS_MSG_TIMER", 120);
