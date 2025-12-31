@@ -71,6 +71,8 @@ if (($file == "log") || ($file == "ref") || ($file == "msg") || ($file == "info"
       $file = DL3EL . "/aprs-is.msg";
       $log = 1;
       echo ">Message Display: " . $file . " (reverse order)</h1>";
+      unlink($file . ".neu");
+
     } else {  
       $file = DL3EL . "/readme.info";
       $log = 2;
@@ -125,19 +127,25 @@ if ($log) {
 echo '<form method="post">';
 echo '<textarea name="content" rows="35" cols="120">' . htmlspecialchars($content) . '</textarea><br>';
 
+$aprs_conf = 0;
 if (!$log) {
   echo '<div style = "text-align:center">Make your changes here</div>';  
   if (substr($file, -3) !== "php") {
 // Save button
     $fn_len = strlen($file);
-    if (substr($file,$fn_len-15,7) !== "Reflect") {
-// Save &reload button
+    if (substr($file,$fn_len-16,16) === "aprs-is-msg.conf") {
       echo '<input type="submit" name="save" value="Save only">';  
       echo '&nbsp;&nbsp;';
-      echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
-    } else { 
-      echo '<input type="submit" name="save" value="Save">';  
-    }
+      echo '<input type="submit" name="save_restart" value="Save & RestartAPRS">';  
+      $aprs_conf = 1;
+    } elseif (substr($file,$fn_len-15,7) !== "Reflect") {
+// Save &reload button
+        echo '<input type="submit" name="save" value="Save only">';  
+        echo '&nbsp;&nbsp;';
+        echo '<input type="submit" name="save_reload" value="Save & ReLoad">';  
+      } else { 
+          echo '<input type="submit" name="save" value="Save">';  
+      }
   } else {
     echo '<input type="submit" name="save" value="Save">';  
     echo '&nbsp;&nbsp;';
@@ -149,7 +157,7 @@ if (!$log) {
   echo '</form>';
 
   // Save / Reload on submit//
-  if ((isset($_POST['save'])) || (isset($_POST['save_reload']))) {
+  if ((isset($_POST['save'])) || (isset($_POST['save_reload'])) || (isset($_POST['save_restart']))) {
 
     // Backup file
     $backup_filename = $file . "." . date("YmdHis");
@@ -176,8 +184,36 @@ if (!$log) {
       } else {
         echo "$prog restart failure, check log";
       }
-    }   
+    }
+    if (isset($_POST['save_restart'])) {
+      $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
+      exec($cmd, $output, $retval);
+      $cmd = "sudo -u svxlink " . DL3EL . "/aprs-is-msg.pl >/dev/null &";
+      echo "Starting APRS";
+      exec($cmd, $output, $retval);
+    }  
   }
+} else {
+  if ($log ===1) {
+      echo '<input type="text" id="aprs" name="aprs_call" value="Call" required>';
+      echo '&nbsp;&nbsp;';
+      echo '<input type="text" style = "width:300px" id="aprs" name="aprs_msg" value="Text" required>';
+      echo '&nbsp;&nbsp;';
+      echo '<input type="submit" name="senden" value="senden">';  
+      echo '</form>';
+      // Save / Reload on submit//
+      if ((isset($_POST['senden'])) || (isset($_POST['cancel']))) {
+        $aprs_call = $_POST['aprs_call'];
+        if ($aprs_call !== "Call") {
+          $aprs_msg = $_POST['aprs_msg'];
+          $aprs_tx = $aprs_call . "^" .  $aprs_msg;
+          $file = DL3EL . "/aprs-tx.msg";
+          file_put_contents($file, $aprs_tx);
+          $logtext =  "APRS Nachricht \"" . $aprs_msg . "\" an " . $aprs_call . " gesendet\n";
+          addsvxlog($logtext);
+        }  
+      }
+    }  
 }
 ?>
 </body>

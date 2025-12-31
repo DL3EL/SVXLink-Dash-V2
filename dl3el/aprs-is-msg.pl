@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use utf8;
 use Time::Piece;
-use File::stat;
+#use File::stat;
 use IO::Socket::INET;
 
 my $entry;
@@ -30,6 +30,12 @@ my $aprs_passwd = "";
 my $aprs_msg_call = "";
 
 my $hispaddr = "";
+
+my $send_trigger = 0;
+my $pckt_nr = 0;
+my $s_srccall = "";
+my $s_srcdest = "";
+my $s_destcall = "";
 
 # flush after every write
 $| = 1;
@@ -67,6 +73,7 @@ my ($socket,$client_socket);
 	read_config($conf);
  	my $logdatei = $dir  . "aprs-is.log";
  	my $msgdatei = $dir  . "aprs-is.msg";
+ 	my $aprs_txdatei = $dir  . "aprs-tx.msg";
     printf "LOG: %s Logdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
     printf "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
 	STDOUT->autoflush(1);
@@ -85,10 +92,11 @@ Start:
 # creating object interface of IO::Socket::INET modules which internally creates
 # socket, binds and connects to the TCP server running on the specific port.
 	$socket = new IO::Socket::INET (
-	PeerHost => 'euro.aprs2.net',
+	PeerHost => 'rotate.aprs2.net',
 	PeerPort => '14580',
 	Proto => 'tcp',
-	) or do {
+	Blocking => 1
+ 	) or do {
 		$write2file = sprintf "[$log_time] ERROR in Socket Creation : $!\n";
 		print_file($logdatei,$write2file);
 		die "ERROR in Socket Creation : $!\n";
@@ -98,7 +106,7 @@ Start:
 	$log_time = act_time();
 #	print LOG "[$log_time] TCP Connection Success.\n";
     $write2file = sprintf "[$log_time] TCP Connection Success.\n";
-    print_file($logdatei,$write2file) if ($verbose >= 0);
+    print_file($logdatei,$write2file) if ($verbose >= 1);
 
 # read the socket data sent by server.
 	$data = <$socket>;
@@ -118,7 +126,7 @@ Start:
 	$log_time = act_time();
 #	print LOG "[$log_time] $data\n";
     $write2file = sprintf "[$log_time] $data\n";
-    print_file($logdatei,$write2file) if ($verbose >= 0);
+    print_file($logdatei,$write2file) if ($verbose >= 1);
 	print $socket "$data\n";
 # we can also send the data through IO::Socket::INET module,
 # $socket->send($data);
@@ -132,40 +140,55 @@ Start:
 			$write2file = sprintf "[$log_time] recv failed: $!\n";
 			print_file($logdatei,$write2file) if ($verbose >= 1);
 	    } else {
-			++$rr;
-			$log_time = act_time();
 #			print LOG ("[$log_time] recv successful ($datastring), $rr\n");
-			print("recv successful ($datastring), $rr\n") if ($verbose >= 1);
-			$write2file = sprintf "[$log_time] recv successful ($datastring), $rr\n";
+			if (length($datastring)) {
+				$log_time = act_time();
+				++$rr;
+				print("recv successful ($datastring), $rr\n") if ($verbose >= 1);
+				$write2file = sprintf "[$log_time] recv successful ($datastring), $rr\n";
+				print_file($logdatei,$write2file) if ($verbose >= 0);
 # recv successful (# logresp DL3EL-AI verified, server T2PRT
-			my $payload = ($datastring =~ /(\# logresp)/i)? $1 : "undef";
-			if ($payload ne "undef") {
-				print_file($logdatei,$datastring);
-			} else {	
-				print_file($logdatei,$write2file) if ($verbose >= 1);
-				parse_aprs($datastring);
+				my $payload = ($datastring =~ /(\# logresp)/i)? $1 : "undef";
+				if ($payload ne "undef") {
+					print_file($logdatei,$datastring);
+				} else {	
+					print_file($logdatei,$write2file) if ($verbose >= 2);
+					parse_aprs($datastring);
+				}	
 			}	
 	    }
+#	    if ($send_trigger == 2) {
+#			send_msg($s_srccall,$s_srcdest,$s_destcall,$pckt_nr,"msg recvd");
+#		}	
+		aprs_tx($aprs_txdatei); 
+	    print "." if ($verbose >= 2);
+		sleep 5 if ($verbose >= 2);
 	}	
 	$socket->close();
 
 sub parse_aprs {
 	my $raw_data = trim_cr($_[0]);
-#	print LOG "working on: [$raw_data]\n" if ($verbose >= 1);
-	$write2file = sprintf "working on: [$raw_data]\n" if ($verbose >= 1);
-	print_file($logdatei,$write2file) if ($verbose >= 1);
+#	print LOG "working on: [$raw_data]\n" if ($verbose >= 2);
+	$write2file = sprintf "working on: [$raw_data]\n" if ($verbose >= 2);
+	print_file($logdatei,$write2file) if ($verbose >= 2);
 	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{([\d]+)/i)? $4 : "undef";
 	if ($payload ne "undef") {
 # ack first
+		$pckt_nr = $5;
+		$s_srccall = $1;
+		$s_srcdest = $2;
+		$s_destcall = $3;
+		$message_time = act_time();
+		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
 		send_ack($1,$2,$3);
 # then process		
-		$message_time = act_time();
 #		printf LOG "[$message_time] Call: %s from %s, Message: %s, Number: %d\n",$1,$payload,$3;
 		$write2file = sprintf "[$message_time] Call: %s from: %s, Message: %s, Number: %d\n",$3,$1,$payload,$5;
-		print_file($logdatei,$write2file) if ($verbose >= 1);
+		print_file($logdatei,$write2file) if ($verbose >= 2);
 #		printf MSG "[$message_time] Call: %s, Message: %s\n",$1,$payload;
 		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$3,$1,$payload,$5;
 		print_file($msgdatei,$write2file);
+		system('touch', $msgdatei . ".neu");
 	}
 }
 
@@ -184,7 +207,30 @@ sub send_ack {
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
 		$write2file = sprintf "[$log_time] $data";
-		print_file($logdatei,$write2file) if ($verbose >= 1);
+		print_file($logdatei,$write2file) if ($verbose >= 2);
+		$send_trigger = 2;
+}
+
+sub send_msg {
+	my $srccall = $_[0];
+	my $srcdest = $_[1];
+	my $destcall = $_[2];
+	my $pckt_nmbr = $_[3];
+	my $data = $_[4];
+		while (length($srccall) < 9) {
+			$srccall = $srccall . " ";
+		}	
+# DL9SAU: answer_message = Tcall + ">" + MY_APRS_DEST_IDENTIFYER + "::" + String(msg_from) + ":ack" + String(q+1);
+		++$pckt_nr;
+		$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$destcall,$srcdest,$srccall,$data,$pckt_nr);
+#		print $socket "$data\n";
+# we can also send the data through IO::Socket::INET module,
+		$socket->send($data);
+		$log_time = act_time();
+#		print LOG "[$log_time] $data";
+		$write2file = sprintf "[$log_time] $data";
+		print_file($logdatei,$write2file) if ($verbose >= 0);
+		$send_trigger = 0;
 }
 
 sub print_file {
@@ -193,7 +239,7 @@ sub print_file {
 	
 	open(FILE, ">>$file") or die "Fehler bei Logdatei: $file\n";
 	print FILE $data;
-	print $data if ($verbose >= 1);
+	print "[PF] $data" if ($verbose >= 1);
     close FILE;
 }
 
@@ -219,7 +265,7 @@ sub act_time {
 }
 sub read_config {
 	$log_time = act_time();
-	print "[$log_time] reading config...\n" if ($verbose >= 1);
+	print "[$log_time] reading config...\n" if ($verbose >= 2);
 	my $confdatei = $_[0];
 	my $par;
 	open(INPUT, $confdatei) or die "Fehler bei Eingabedatei: $confdatei\n";
@@ -228,7 +274,7 @@ sub read_config {
 	    $data = <INPUT>;
 	    }    
 	close INPUT;
-	print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 1);
+	print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
 	@array = split (/\n/, $data);
 	$aprs_login  = "NOCALL-AI";
 	$aprs_passwd = "-1";
@@ -236,13 +282,48 @@ sub read_config {
 	
 	foreach $entry (@array) {
 		if ((substr($entry,0,1) ne "#") && (substr($entry,0,1) ne "")) {
-			printf "[%s] \n",$entry if ($verbose >= 1);
+			printf "[%s] \n",$entry if ($verbose >= 2);
 			$par = ($entry =~ /([\w]+).*\=.*\"(.*)\"/s)? $2 : "undef";
 			$aprs_login = $par if ($1 eq "aprs_login");
 			$aprs_passwd = $par if ($1 eq "aprs_passwd");
 			$aprs_msg_call = $par if ($1 eq "aprs_msg_call");
 		}
 	}
-	print "config received:\n" if ($verbose >= 1);
-	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+	print "config received:\n" if ($verbose >= 2);
+	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 2);
+}
+
+sub aprs_tx {
+	$log_time = act_time();
+	print "[$log_time] reading aprs tx data...\n" if ($verbose >= 2);
+	my $aprsdatei = $_[0];
+	my $data = "";
+	my $data_len = 0;
+	my $aprs_msg = "";
+
+# Überprüfen, ob die Datei existiert
+	if (-e $aprsdatei) {
+		# stat gibt eine Liste zurück. Das 8. Element (Index 7) ist die Größe.
+		my @file_info = stat($aprsdatei);
+		my $data_len = $file_info[7]; # Größe in Bytes
+		if ($data_len) {
+			open(INPUT, $aprsdatei) or die "Fehler bei Eingabedatei: $aprsdatei\n";
+			{
+			local $/;#	
+			$data = <INPUT>;
+			}    
+			close INPUT;
+			print "Datei $aprsdatei erfolgreich geoeffnet, Laenge $data_len ($data)\n" if ($verbose >= 2);
+			$send_trigger = 1;
+			($s_destcall,$aprs_msg) = split(/\^/, $data);
+			$s_destcall = uc $s_destcall;
+			print "Dest $s_destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
+			$s_srcdest = "APNFMN";
+			send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
+			unlink $aprsdatei;
+		}	
+	} else {
+		print "Datei '$aprsdatei' nicht gefunden.\n" if ($verbose >= 2);
+		$send_trigger = 0;
+	}
 }

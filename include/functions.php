@@ -983,6 +983,9 @@ function display_config($config) {
       if (file_exists('/etc/systemd/system/svxlink-node.service')) {
         $dbversion = $dbversion . "(s)";
       }  
+	    if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+        $dbversion = $dbversion . "(a)";
+      }  
       if (!strlen($fmnetwork)) {
         $fmnetwork = getfmnetwork();
       }     

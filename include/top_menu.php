@@ -201,6 +201,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS</a> | ';
+	    echo '<a href="./edit.php?file=' . DL3EL . '/aprs-is-msg.conf" style = "color: black;" id="aprs">aprs.conf</a> | ';
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 	if (file_exists(DL3EL.'/Reflector1.conf')) {

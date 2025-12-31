@@ -8,18 +8,21 @@ include_once "functions.php";
 
 ?>
 <?php
-	$aprsmsg = DL3EL . "/aprs-is.msg";
-   if (file_exists($aprsmsg)) {
-      if ((defined ('DL3EL_APRS_MSG_TIMER')) && (DL3EL_APRS_MSG_TIMER > 0)) {
-         $timer = DL3EL_APRS_MSG_TIMER;
+   if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+      $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
+      if (!strlen($aprs_script)) {
+         $cmd = "sudo -u svxlink " . DL3EL . "/aprs-is-msg.pl >/dev/null &";
+         echo "Starting APRS";
+         exec($cmd, $output, $retval);
       } else {
-         $timer = 60;
-      }
-      $delta = time() - filemtime($aprsmsg);
-      if ($delta < $timer) {
+         if ((defined ('debug')) && (debug > 0)) echo "APRS: [" . $aprs_script . "]<br>";
+      }   
+      $aprsmsg = DL3EL . "/aprs-is.msg.neu";
+      if (file_exists($aprsmsg)) {
          echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
-      }
+      }   
 	} 
+// sudo killall aprs-is-msg.pl
 ?>
 
 <div style = "width:180px;"><span style = "font-weight: bold;font-size:14px;">SVXLink Info</span></div>
@@ -84,7 +87,13 @@ if (isProcessRunning('svxlink')) {
             $modecho ="True";
          }
       }
-
+      if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+         $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
+         if (strlen($aprs_script)) {
+            $activemod="<td style=\"background:MediumSeaGreen;color:#464646;font-weight: bold;\">";
+            echo "<tr>".$activemod."APRS</td></tr>";
+         }
+      }
    } else {
       echo "<tr><td style=\"background: #ffffed;\" ><span style=\"color:#b0b0b0;\"><b>No Modules</b></span></td></tr>";
    }
