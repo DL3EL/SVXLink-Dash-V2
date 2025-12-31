@@ -11,7 +11,8 @@ include_once "functions.php";
    if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
       $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
       if (!strlen($aprs_script)) {
-         $cmd = "sudo -u svxlink " . DL3EL . "/aprs-is-msg.pl >/dev/null &";
+//         $cmd = "sudo -u svxlink " . DL3EL . "/aprs-is-msg.pl >/dev/null &";
+         $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
          echo "Starting APRS";
          exec($cmd, $output, $retval);
          $logtext = "APRS: $cmd // $output // $retval\n";
