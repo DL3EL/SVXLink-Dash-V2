@@ -20,6 +20,13 @@ include_once "../include/config.php";
 // Get filename from query parameter
 $file = $_GET['file']; 
 $log = 0;
+$file_ex = $file .'.example';
+echo "Datei $file $file_ex";
+if ((!file_exists($file)) && (file_exists($file_ex))) {
+    copy($file_ex,$file);
+    sleep(3); 
+}
+echo "Datei $file";
 
 if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'] === 'AUTHORISED')) {
   // ok, go ahead, set to authorized :-)
@@ -188,9 +195,11 @@ if (!$log) {
     if (isset($_POST['save_restart'])) {
       $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
       exec($cmd, $output, $retval);
-      $cmd = "sudo -u svxlink " . DL3EL . "/aprs-is-msg.pl >/dev/null &";
+      $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
       echo "Starting APRS";
       exec($cmd, $output, $retval);
+      $logtext =  "APRS Dienst neu gestartet\n";
+      addsvxlog($logtext);
     }  
   }
 } else {
