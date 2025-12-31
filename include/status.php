@@ -14,6 +14,8 @@ include_once "functions.php";
          $cmd = "sudo -u svxlink " . DL3EL . "/aprs-is-msg.pl >/dev/null &";
          echo "Starting APRS";
          exec($cmd, $output, $retval);
+         $logtext = "APRS: $cmd // $output // $retval\n";
+         addlog ("L",$logtext);
       } else {
          if ((defined ('debug')) && (debug > 0)) echo "APRS: [" . $aprs_script . "]<br>";
       }   
