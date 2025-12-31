@@ -164,6 +164,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./edit.php?file=' . MODULEPATH . ECHOLINKCONFIG . '" style = "color: black;" id="echolink">EchoLink</a> | ';
 	    echo '<a href="./edit.php?file=' . MODULEPATH . METARINFO . '" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
 	    echo '<a href="./edit.php?file=' . SVXCONFPATH . 'node_info.json" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
+	    if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+		echo '<a href="./edit.php?file=' . DL3EL . '/aprs-is-msg.conf" style = "color: black;" id="aprs">aprs.conf</a> | ';
+	    }
+	    echo '<a href="./edit.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
 	    if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 		echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
 		echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> | ';
@@ -181,7 +185,6 @@ if (session_status() === PHP_SESSION_NONE) {
 	    if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
 		echo '<a href="./edit.php?file=TclVoiceMail.conf" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
 	    }
-	    echo '<a href="./edit.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
 	} else {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Edit</a> | ';
 	    echo '<a href="./editor.php?id=svxlink" style = "color: black;" id="svxlink">SVXLink</a> | ';
@@ -201,7 +204,6 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS</a> | ';
-	    echo '<a href="./edit.php?file=' . DL3EL . '/aprs-is-msg.conf" style = "color: black;" id="aprs">aprs.conf</a> | ';
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
