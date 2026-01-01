@@ -69,6 +69,7 @@ define("DL3EL_SPEC_TG", 99);
 define("DL3EL_RADIO", "Shari");
 //define("DL3EL_RADIO", "RFGuru");
 //define("DL3EL_RADIO", "no Radio");
+//define("DL3EL_RADIO", "SC (no Radio)");
 //define("DL3EL_RADIO", "VX7");
 define("DL3EL_DMRTG", "26269");
 define("DL3EL_VERSION", "public");

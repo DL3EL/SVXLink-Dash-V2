@@ -213,6 +213,21 @@ $max_values = [
                         ?>
                         <br>
                         <button type="submit">Apply Settings</button>
+                         <?php 
+   if (defined('DL3EL_RADIO') ) {
+      $svxRadio = DL3EL_RADIO;
+      if ($svxRadio == "SC (no Radio)") {
+        echo '<br>';
+        echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save SoundCard Settings</button>';
+        echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore SoundCard Settings</button>';
+      }    
+      if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+        echo '<br>';
+        echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save $svxRadio Sound Settings</button>';
+        echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore $svxRadio Sound Settings</button>';
+      }    
+   }   
+                        ?>
                         <input type="hidden" name="form_submitted" value="1">
                     </form>
                 </center>
@@ -246,6 +261,24 @@ $max_values = [
             $autogain = $_POST['autogain'] === '1' ? '1' : '0';
             if ((defined ('debug')) && (debug > 0)) echo "Ende autogain values: $autogain<br>";
             exec("sudo amixer -c" . $sc . " cset numid=9 " . escapeshellarg($autogain));
+        }
+        if (isset($_POST['btnsavshari']))
+            {
+// wichttig: damit das funktioniert, muss mit visudo folgendes eingetragen werden
+// svxlink        ALL=(ALL) NOPASSWD: /usr/sbin/alsactl
+            $retval = null;
+            $screen = null;
+            $command = DL3EL . "/astore.sh  2>&1";
+            exec($command,$screen,$retval);
+        }
+        if (isset($_POST['btnrstshari']))
+            {
+// wichttig: damit das funktioniert, muss mit visudo folgendes eingetragen werden
+// svxlink        ALL=(ALL) NOPASSWD: /usr/sbin/alsactl
+            $retval = null;
+            $screen = null;
+            $command = DL3EL . "/arestore.sh  2>&1";
+            exec($command,$screen,$retval);
         }
         // Refresh the page to show updated values
         echo "<script type='text/javascript'>

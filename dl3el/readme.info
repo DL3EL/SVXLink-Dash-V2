@@ -1,3 +1,21 @@
+Neues in der Version 5.22 (01.01.2026)
+- AMixer überarbeitet
+	Manchmal verändert der alsamixer ohne Eingriff die Einstellungen der Soundkarte des Shari. Es gibt jetzt unter 
+	dem Menupunkt "AMixer" zwei weitere Buttons. 
+	"Save ..." sichert die aktuellen Einstellungen
+	"Restore ..." stellt die gesicherten Einstellungen wieder her.
+	Wenn man seinen Sound (Lautstärke) ändern möchte, geht das über die Felder im Oben Teil der Maske. Mit Apply
+	werden die Einstellungen aktiviert (aber nicht gesichert). Wenn man eine gute Einstellung gefunden hat, so 
+	sollte man die mit "Save.." sichern, dann kann man später wieder darauf zurückgreifen.
+	
+	Damit der Menupunkt AMixer angezeigt wird, muss zwingend ein Radio oder eine Soundkarte in der config.php 
+	eingestellt werden. Dafür sind folgende KOnstanten wichtig:
+	
+	define("DL3EL_RADIO", "SC (no Radio)"); // kein Radio angeschlossen, aber eine Soundkarte, die benutzt wird
+	define("DL3EL_RADIO", "no Radio");      // kein Radio, keine Sound angeschlossen 
+	define("DL3EL_RADIO", "Shari");			// Shari angeschlossen
+	define("DL3EL_RADIO", "RFGuru");		// RFGuru
+
 Neues in der Version 5.21 (31.12.2025)
 - Silvesterrelease
 	Empfangene APRS Nachrichten können jetzt auch direkt aus dem Dashboard beantwortet werden :-)

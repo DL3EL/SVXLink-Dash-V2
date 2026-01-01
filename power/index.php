@@ -231,6 +231,7 @@ if (isset($_POST['btnrstc710']))
         echo '<button name="btnSvxRef" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart SVXReflector Service</button>';
         echo '<br>';
    }
+/*
    if (defined('DL3EL_RADIO') && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
       $svxRadio = DL3EL_RADIO;
       if ($svxRadio == "Shari") {
@@ -242,6 +243,7 @@ if (isset($_POST['btnrstc710']))
         echo '<button name="btnrstc710" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Reset Sound C710</button>';
       }    
    }   
+*/ 
     $logtext="Power menu started\n";
     addsvxlog($logtext);
 
