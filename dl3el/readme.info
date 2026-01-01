@@ -13,8 +13,8 @@ Neues in der Version 5.22 (01.01.2026)
 	
 	define("DL3EL_RADIO", "SC (no Radio)"); // kein Radio angeschlossen, aber eine Soundkarte, die benutzt wird
 	define("DL3EL_RADIO", "no Radio");      // kein Radio, keine Sound angeschlossen 
-	define("DL3EL_RADIO", "Shari");			// Shari angeschlossen
-	define("DL3EL_RADIO", "RFGuru");		// RFGuru
+	define("DL3EL_RADIO", "Shari");	        // Shari angeschlossen
+	define("DL3EL_RADIO", "RFGuru");        // RFGuru
 
 Neues in der Version 5.21 (31.12.2025)
 - Silvesterrelease
