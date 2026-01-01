@@ -174,6 +174,9 @@ if (isset($_POST['btnDashUpdate']))
                 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
                   $dbversion = $dbversion . "(s)";
                 }  
+                if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+                    $dbversion = $dbversion . "(a)";
+                }  
                 $gitversion = file_get_contents("gitversion");
                 if (DL3EL_GIT_UPDATE === "nocheck") {
                   $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
