@@ -214,19 +214,19 @@ $max_values = [
                         <br>
                         <button type="submit">Apply Settings</button>
                          <?php 
-   if (defined('DL3EL_RADIO') ) {
-      $svxRadio = DL3EL_RADIO;
-      if ($svxRadio == "SC (no Radio)") {
-        echo '<br>';
-        echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save SoundCard Settings</button>';
-        echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore SoundCard Settings</button>';
-      }    
-      if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
-        echo '<br>';
-        echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save $svxRadio Sound Settings</button>';
-        echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore $svxRadio Sound Settings</button>';
-      }    
-   }   
+                            if (defined('DL3EL_RADIO') ) {
+                                $svxRadio = DL3EL_RADIO;
+                                if ($svxRadio == "SC (no Radio)") {
+                                    echo '<br>';
+                                    echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save SoundCard Settings</button>';
+                                    echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore SoundCard Settings</button>';
+                                }    
+                                if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+                                    echo '<br>';
+                                    echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save ' . $svxRadio . ' Sound Settings</button>';
+                                    echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore ' . $svxRadio . ' Sound Settings</button>';
+                                }    
+                            }   
                         ?>
                         <input type="hidden" name="form_submitted" value="1">
                     </form>
