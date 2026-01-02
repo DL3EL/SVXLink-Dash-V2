@@ -381,31 +381,37 @@ sub read_config {
 	my $confdatei = $_[0];
 	my $par;
 	open(INPUT, $confdatei) or die "Fehler bei Eingabedatei: $confdatei\n";
-	    {
+		) or do {
+			$write2file = sprintf "[$log_time] $confdatei kann nicht geöffnet werden: $!\n";
+			print_file($logdatei,$write2file);
+			$data = "";
+		};
+	{
 	    local $/;#	
 	    $data = <INPUT>;
-	    }    
+    }    
 	close INPUT;
-	print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
-	@array = split (/\n/, $data);
-	$aprs_login  = "N0CALL-M";
-	$aprs_passwd = "-1";
-	$aprs_msg_call = "N0CALL";
+	if ($data) {
+		print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
+		@array = split (/\n/, $data);
+		$aprs_login  = "N0CALL-M";
+		$aprs_passwd = "-1";
+		$aprs_msg_call = "N0CALL";
 	
-	foreach $entry (@array) {
-		if ((substr($entry,0,1) ne "#") && (substr($entry,0,1) ne "")) {
-			printf "[%s] \n",$entry if ($verbose >= 2);
-			$par = ($entry =~ /([\w]+).*\=.*\"(.*)\"/s)? $2 : "undef";
-			$aprs_login = $par if ($1 eq "aprs_login");
-			$aprs_passwd = $par if ($1 eq "aprs_passwd");
-			$aprs_msg_call = $par if ($1 eq "aprs_msg_call");
+		foreach $entry (@array) {
+			if ((substr($entry,0,1) ne "#") && (substr($entry,0,1) ne "")) {
+				printf "[%s] \n",$entry if ($verbose >= 2);
+				$par = ($entry =~ /([\w]+).*\=.*\"(.*)\"/s)? $2 : "undef";
+				$aprs_login = $par if ($1 eq "aprs_login");
+				$aprs_passwd = $par if ($1 eq "aprs_passwd");
+				$aprs_msg_call = $par if ($1 eq "aprs_msg_call");
+			}
 		}
+		print "config received:\n" if ($verbose >= 2);
+		printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 2);
+		$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
+		print_file($logdatei,$write2file) if ($verbose >= 0);
 	}
-	print "config received:\n" if ($verbose >= 2);
-	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 2);
-	$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
-	print_file($logdatei,$write2file) if ($verbose >= 0);
-
 	if (($aprs_login eq "N0CALL-M") ||  ($aprs_login eq "")) {
 		if ($fmn_call) {
 			$aprs_login = ($fmn_call =~ /([\w]+)[-\w]*/s)? $1 : "undef";
