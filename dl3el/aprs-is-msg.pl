@@ -389,11 +389,12 @@ sub read_config {
 		}    
 		close INPUT;
 	} else {
-		$write2file = sprintf "[$log_time] $confdatei kann nicht geöffnet werden: $!\n";
+		$write2file = sprintf "[$log_time] $confdatei kann nicht geoeffnet werden: $!\n";
 		print_file($logdatei,$write2file);
 		$data = "";
 	}
 
+		printf "config received:[%s]\n",$data if ($verbose >= 2);
 	if ($data) {
 		print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
 		@array = split (/\n/, $data);
