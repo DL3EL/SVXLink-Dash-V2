@@ -245,6 +245,7 @@ sub parse_aprs {
 				$write2file = sprintf "[$message_time] no ack to be send\n";
 			} else {
 				 $write2file = sprintf "[$message_time] new condition: %s\n",$ack;
+				 $ack = "";
 			}
 		} else {	
 			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
@@ -344,8 +345,8 @@ sub send_msg {
 			++$pckt_nr;
 			$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$destcall,$srcdest,$srccall,$data,$pckt_nr);
 		}	
-#		print $socket "$data\n";
-# we can also send the data through IO::Socket::INET module,
+		$write2file = sprintf "[$log_time] TX: %s", $data;
+		print_file($logdatei,$write2file) if ($verbose >= 0);
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
@@ -476,7 +477,7 @@ sub aprs_tx {
 			$s_destcall = uc $s_destcall;
 			print "Dest $s_destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$s_srcdest = "APNFMN";
-			if ($s_destcall eq "FMNUPD") {
+			if ($s_destcall eq "xFMNUPDx") {
 				send_msg($s_destcall,$s_srcdest,$aprs_login,"no-ack",$aprs_msg);
 			} else {	
 				send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
