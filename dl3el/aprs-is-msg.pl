@@ -21,7 +21,7 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.30";
+my $version = "1.40";
 my $dir = "";
 my $conf = "";
 
@@ -201,7 +201,8 @@ my $blocking = 0;
 # received keepalive
 #DeinCall>APRS,TCPIP*:					
 					++$keepalive;
-					if ($keepalive > 90) {
+# send one back every hour
+					if ($keepalive > 180) {
 						print_file($logdatei,$write2file) if ($verbose >= 2);
 						send_keepalive($aprs_login);
 						$keepalive = 0;
