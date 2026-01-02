@@ -394,8 +394,8 @@ sub read_config {
 		$data = "";
 	}
 
-		printf "config received:[%s]\n",$data if ($verbose >= 2);
-	if ($data) {
+	printf "1 config received:[%s]\n",$data if ($verbose >= 2);
+	if ($data ne "") {
 		print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
 		@array = split (/\n/, $data);
 		$aprs_login  = "N0CALL-M";
@@ -423,6 +423,7 @@ sub read_config {
 			print_file($logdatei,$write2file) if ($verbose >= 0);
 		}
 	}
+	printf "2 config received:[%s]\n",$aprs_login if ($verbose >= 2);
 	if (($aprs_login eq "undef") ||  ($aprs_login eq "")) {
 		return(0);
 	}	
