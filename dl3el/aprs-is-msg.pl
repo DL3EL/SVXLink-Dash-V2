@@ -86,6 +86,7 @@ my ($socket,$client_socket);
  	my $msgdatei = $dir  . "aprs-is.msg";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
 	my $aprs_ok_datei = $dir  . "aprs-login.ok";
+	my $dbversionFile = $dir  . "dbversion.upd";
 	unlink $aprs_ok_datei;
 
     printf "LOG: %s Logdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
@@ -272,8 +273,18 @@ sub parse_aprs {
 		print_file($logdatei,$write2file);
 		print_file($msgdatei,$write2file);
 		system('touch', $msgdatei . ".neu");
-		$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload;
-		print_file($msgdatei,$write2file);
+		if ($s_destcall eq "FMNUPD") {
+			$write2file = sprintf "[$message_time] neues Update!\n",$payload;
+			print_file($msgdatei,$write2file);
+            $payload = "update";
+			open(ANSWER, ">$dbversionFile") or do {
+						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
+						print_file($logdatei,$write2file);
+						die "ERROR in Filehandling: $!\n"; };
+						# die "Fehler bei Datei: $aprs_txdatei\n";
+			printf ANSWER $payload;
+			close ANSWER;
+		}	
 		if ($payload eq "?aprs?") {
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload;
 			print_file($msgdatei,$write2file);
