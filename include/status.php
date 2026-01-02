@@ -11,17 +11,28 @@ include_once "functions.php";
    if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
       $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
       if (!strlen($aprs_script)) {
-         $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
-         echo "Starting APRS";
+         $debug = "";
+         if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
+         $dbversionFile = DL3EL . "/dbversion";
+         $dbversion = file_get_contents($dbversionFile);
+         if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+            $dbversion = $dbversion . "(s)";
+         }  
+         if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+            $dbversion = $dbversion . "(a)";
+         }  
+         $dbversion = " db=\"" . $dbversion . "\"";
+         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . " >/dev/null &";
+         echo "Starting APRS " . $debug;
          exec($cmd, $output, $retval);
-         $logtext =  "APRS Dienst gestartet\n";
+         $logtext =  "APRS Dienst gestartet " . $cmd . " / " . $debug . "\n";
          addsvxlog($logtext);
       } else {
          if ((defined ('debug')) && (debug > 0)) echo "APRS: [" . $aprs_script . "]<br>";
       }   
       $aprsmsg = DL3EL . "/aprs-is.msg.neu";
       if (file_exists($aprsmsg)) {
-         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
+         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht' . $dbversion , 't<br>';
       }   
 	} 
 // sudo killall aprs-is-msg.pl
@@ -91,8 +102,15 @@ if (isProcessRunning('svxlink')) {
       }
       if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
          $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
+         $aprs_login_ok =  DL3EL . "/aprs-login.ok";
          if (strlen($aprs_script)) {
-            $activemod="<td style=\"background:MediumSeaGreen;color:#464646;font-weight: bold;\">";
+// process is running
+            if (file_exists($aprs_login_ok)) {
+               $activemod="<td style=\"background:MediumSeaGreen;color:#464646;font-weight: bold;\">";
+            } else {
+// login was not successful
+               $activemod="<td style=\"background:#ffffed;;color:#b5651d;font-weight: bold;\">";
+            }
             echo "<tr>".$activemod."APRS</td></tr>";
          }
       }

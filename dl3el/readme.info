@@ -1,3 +1,12 @@
+Neues in der Version 5.23 (02.01.2026)
+- Optimierung im APRS Interface
+	Der APRS Prozess wurde überarbeitet und optimiert. Die wesentliche Änderung ist, das jetzt
+	die Konfigdatei nicht mehr ausgefüllt werden muss. Wenn ohne eine angepasste Konfig Datei 
+	gearbeitet wird, wird als APRS Login Rufzeichen, das Call des Dashboards ohne Suffix 
+	verwendet. Dieses Call wird auch zum Filtern der Nachrichten verwendet. 
+	Das Passwort wird jetzt automatisch berechnet. Wenn gewünscht, kann die 
+	Konfigurationsdatei, wie beim Release 5.20 beschrieben, geändert werden.
+
 Neues in der Version 5.22 (01.01.2026)
 - AMixer überarbeitet
 	Manchmal verändert der alsamixer ohne Eingriff die Einstellungen der Soundkarte des Shari. Es gibt jetzt unter 
