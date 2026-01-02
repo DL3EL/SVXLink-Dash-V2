@@ -32,7 +32,7 @@ include_once "functions.php";
       }   
       $aprsmsg = DL3EL . "/aprs-is.msg.neu";
       if (file_exists($aprsmsg)) {
-         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht' . $dbversion , 't<br>';
+         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachrichtt<br>';
       }   
 	} 
 // sudo killall aprs-is-msg.pl

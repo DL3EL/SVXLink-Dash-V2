@@ -196,16 +196,17 @@ my $blocking = 0;
 				$log_time = act_time();
 				++$rr;
 				$write2file = sprintf "[$log_time] recv successful ($datastring) Laenge:%s, $rr\n",length($datastring);
-				print_file($logdatei,$write2file) if ($verbose >= 2);
 				if (substr($datastring,0,7) eq "# aprsc") {
 # received keepalive
 #DeinCall>APRS,TCPIP*:					
 					++$keepalive;
 					if ($keepalive > 90) {
+						print_file($logdatei,$write2file) if ($verbose >= 2);
 						send_keepalive($aprs_login);
 						$keepalive = 0;
 					} 
 				} else {	
+					print_file($logdatei,$write2file) if ($verbose >= 2);
 					parse_aprs($datastring);
 				}	
 			}	
@@ -263,20 +264,24 @@ sub parse_aprs {
 		$s_srccall = $1;
 		$s_srcdest = $2;
 		$s_destcall = $3;
+# delete ack from payload
+		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{/i)? $4 : "undef";
 
 		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$3,$1,$payload,$ack;
 		print_file($logdatei,$write2file);
 		print_file($msgdatei,$write2file);
 		system('touch', $msgdatei . ".neu");
+		$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload;
+		print_file($msgdatei,$write2file);
 		if ($payload eq "?aprs?") {
-			$write2file = sprintf "[$message_time] Antwort für Payload %s vorbereiten\n",$payload;
+			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload;
 			print_file($msgdatei,$write2file);
 			open(ANSWER, ">$aprs_txdatei") or do {
 						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
 						print_file($logdatei,$write2file);
 						die "ERROR in Filehandling: $!\n"; };
 						# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$s_destcall,$dbv;
+			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$s_srccall,$dbv;
 			close ANSWER;
 			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$s_srccall;
 			print_file($msgdatei,$write2file);
