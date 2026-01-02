@@ -993,14 +993,14 @@ function display_config($config) {
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
 	    exec($cmd);
 // 6. check for Updates
-        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
+        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion');
 //        $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
         list($gitversion, $rest) = explode(" ", $content);
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
-        $logtext =  "Update $gitversion to version $version possible\n";
-        addsvxlog($logtext);
+//        $logtext =  "Update $gitversion to version $version possible\n";
+//        addsvxlog($logtext);
         if ($gitversion !== $version) {
             $dbversionFile = DL3EL . "/dbversion.upd";
             $content = "update";

@@ -151,12 +151,12 @@ my $blocking = 0;
 			if (substr($data,0,6) eq "# aprs") {
 # we can override the config with par login
 				if ($login eq "") {
-					$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s",$aprs_login,$aprs_passwd,$aprs_msg_call);
+					$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s g/FMNUPD/APNFMN",$aprs_login,$aprs_passwd,$aprs_msg_call);
 				}	
 				$data = $login;
 				$log_time = act_time();
 				$write2file = sprintf "[$log_time] send2server (login): $data\n";
-				print_file($logdatei,$write2file) if ($verbose >= 1);
+				print_file($logdatei,$write2file);
 # write on the socket to server.
 				print $socket "$data\n";
 			}	
@@ -332,14 +332,18 @@ sub send_msg {
 	my $srccall = $_[0];
 	my $srcdest = $_[1];
 	my $destcall = $_[2];
-	my $pckt_nmbr = $_[3];
+	my $arq = $_[3];
 	my $data = $_[4];
 		while (length($srccall) < 9) {
 			$srccall = $srccall . " ";
 		}	
 # DL9SAU: answer_message = Tcall + ">" + MY_APRS_DEST_IDENTIFYER + "::" + String(msg_from) + ":ack" + String(q+1);
-		++$pckt_nr;
-		$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$destcall,$srcdest,$srccall,$data,$pckt_nr);
+		if ($arq eq "no-ack") {
+			$data = sprintf ("%s>%s,WIDE1-1::%s:%s\n",$destcall,$srcdest,$srccall,$data);
+		} else {	
+			++$pckt_nr;
+			$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$destcall,$srcdest,$srccall,$data,$pckt_nr);
+		}	
 #		print $socket "$data\n";
 # we can also send the data through IO::Socket::INET module,
 		$socket->send($data);
@@ -472,7 +476,11 @@ sub aprs_tx {
 			$s_destcall = uc $s_destcall;
 			print "Dest $s_destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$s_srcdest = "APNFMN";
-			send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
+			if ($s_destcall eq "FMNUPD") {
+				send_msg($s_destcall,$s_srcdest,$aprs_login,"no-ack",$aprs_msg);
+			} else {	
+				send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
+			}	
 			unlink $aprsdatei;
 		}	
 	} else {
