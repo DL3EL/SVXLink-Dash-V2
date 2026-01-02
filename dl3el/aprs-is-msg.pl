@@ -380,17 +380,20 @@ sub read_config {
 	print "[$log_time] reading config...\n" if ($verbose >= 2);
 	my $confdatei = $_[0];
 	my $par;
-	open(INPUT, $confdatei) or die "Fehler bei Eingabedatei: $confdatei\n";
-		) or do {
-			$write2file = sprintf "[$log_time] $confdatei kann nicht geöffnet werden: $!\n";
-			print_file($logdatei,$write2file);
-			$data = "";
-		};
-	{
-	    local $/;#	
-	    $data = <INPUT>;
-    }    
-	close INPUT;
+
+	if (-e $confdatei) {
+		open(INPUT, $confdatei) or die "Fehler bei Eingabedatei: $confdatei\n";
+		{
+			local $/;#	
+			$data = <INPUT>;
+		}    
+		close INPUT;
+	} else {
+		$write2file = sprintf "[$log_time] $confdatei kann nicht geöffnet werden: $!\n";
+		print_file($logdatei,$write2file);
+		$data = "";
+	}
+
 	if ($data) {
 		print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
 		@array = split (/\n/, $data);
