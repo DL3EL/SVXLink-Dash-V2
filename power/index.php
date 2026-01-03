@@ -226,6 +226,15 @@ if (isset($_POST['btnrstc710']))
   echo '<h1 id="power" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">You are not authorised to make changes here.</h1>';
  
 }
+    $dbversionFile = DL3EL . "/dbversion.upd";
+    $update_available = 0;
+    if (file_exists($dbversionFile)) {
+        $content = file_get_contents($dbversionFile);
+        if ($content === "update") {
+            $update_available = 1;
+        }
+    }
+
 ?>
 
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
@@ -295,7 +304,11 @@ if (isset($_POST['btnrstc710']))
                   echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
               }        
             } else{
-              echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+                if ($update_available) {
+                    echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+                } else{
+                    echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+                }    
             }  
         }
   }

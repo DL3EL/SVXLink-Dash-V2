@@ -250,11 +250,12 @@ sub parse_aprs {
 		$s_srcdest = $2;
 		$s_destcall = $3;
 	} else {
-		$write2file = sprintf "[$message_time] invalid Message %s\n",$raw_data;
+		$write2file = sprintf "[$message_time] invalid Message %s\n",$raw_data if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		return 0;
 	}	
 	if ($5 ne "") {
+# prüfen, ob wir das überhaupt noch brauchen
 		$d5 = $5;
 		$write2file = sprintf "[$message_time] RX 1:%s 2:%s 3:%s 4:%s 5:%s\n",$s_srccall,$s_srcdest,$s_destcall,$payload,$d5;
 		print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -271,21 +272,21 @@ sub parse_aprs {
 			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
 		}	
 	} else {
-		$write2file = sprintf "[$message_time] check for ack R[%s], P[%s]\n",$raw_data,$payload;
+		$write2file = sprintf "[$message_time] check for ack R[%s], P[%s]\n",$raw_data,$payload if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
 		if ($ack eq "undef") {
-			$write2file = sprintf "[$message_time] no ack to be send [$ack][$payload]\n";
+			$write2file = sprintf "[$message_time] no ack to be send [$ack][$payload]\n" if ($verbose >= 2);
 			if (substr($payload,0,3) ne "ack") {
 				$ack = "msg";
 			} else { 
 				$ack = ":ack";
 			}	
 		} else {
-			$write2file = sprintf "[$message_time] ack to be send [$ack] P[$payload]\n";
+			$write2file = sprintf "[$message_time] ack to be send [$ack] P[$payload]\n" if ($verbose >= 2);
 			print_file($logdatei,$write2file) if ($verbose >= 2);
 			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
-			$write2file = sprintf "[$message_time] ack to be send P[$payload]\n";
+			$write2file = sprintf "[$message_time] ack to be send P[$payload]\n" if ($verbose >= 2);
 		}
 	}	
 	print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -307,12 +308,17 @@ sub parse_aprs {
 # delete ack from payload
 #		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{/i)? $4 : "undef";
 
-		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$s_destcall,$s_srccall,$payload,$ack;
+		$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$s_destcall,$s_srccall,$payload,$ack,$s_srcdest;
 		print_file($logdatei,$write2file);
+		$write2file = sprintf "[$message_time] Message to %s from %s: [%s]\n",$s_destcall,$s_srccall,$payload;
 		print_file($msgdatei,$write2file);
 		system('touch', $msgdatei . ".neu");
+		if ((substr($s_srccall,0,5) eq "DL3EL") && ($s_srcdest eq "APNFMN") && ($payload eq "?update?")) {
+			$s_destcall = "FMNUPD";
+		} 
+			
 		if ($s_destcall eq "FMNUPD") {
-			$write2file = sprintf "[$message_time] neues Update!\n",$payload;
+			$write2file = sprintf "[$message_time] neues Update steht bereit!\n",$payload;
 			print_file($msgdatei,$write2file);
             $payload = "update";
 			open(ANSWER, ">$dbversionFile") or do {
