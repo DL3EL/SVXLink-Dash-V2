@@ -32,7 +32,24 @@ include_once "functions.php";
       }   
       $aprsmsg = DL3EL . "/aprs-is.msg.neu";
       if (file_exists($aprsmsg)) {
-         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
+         // Erweitertes CSS f r maximale Aufmerksamkeit
+         echo '<style>
+            .blink-msg {
+                color: blue;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 2px 5px;
+                border-radius: 3px;
+                animation: attention 0.8s linear infinite;
+            }
+            @keyframes attention {
+                0% { color: blue; background-color: transparent; }
+                50% { color: white; background-color: red; }
+                100% { color: blue; background-color: transparent; }
+            }
+         </style>';
+//         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
+         echo '<a href="./edit.php?file=msg" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
       }   
 	} 
 // sudo killall aprs-is-msg.pl
