@@ -226,6 +226,7 @@ sub parse_aprs {
 	my $raw_data = trim_cr($_[0]);
 	my $ack  = "";
 	my $nn = 0;
+	my $d5 = $5;
 	$message_time = act_time();
 	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 2);
 	print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -254,7 +255,7 @@ sub parse_aprs {
 		return 0;
 	}	
 	if ($5 ne "") {
-		my $d5 = $5;
+		$d5 = $5;
 		$write2file = sprintf "[$message_time] RX 1:%s 2:%s 3:%s 4:%s 5:%s\n",$s_srccall,$s_srcdest,$s_destcall,$payload,$d5;
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
@@ -270,7 +271,12 @@ sub parse_aprs {
 			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
 		}	
 	} else {
-		$write2file = sprintf "[$message_time] no ack necessary\n";
+		$write2file = sprintf "[$message_time] no ack necessary [%s]\n",$raw_data;
+		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
+		if ($ack eq "undef") {
+			$write2file = sprintf "[$message_time] 2. no ack to be send [$ack]\n";
+			 $ack = ":ack";
+		}	
 	}	
 	print_file($logdatei,$write2file) if ($verbose >= 2);
 #	if ((defined $1) && (defined $2) && (defined $3) && ($ack ne "") && ($ack ne ":ack")) {
@@ -278,7 +284,7 @@ sub parse_aprs {
 # ack first
 		$pckt_nr = $ack;
 #		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
-		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$s_destcall,$s_srccall,$payload,$ack if ($verbose >= 2);
+		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$s_destcall,$s_srccall,$payload,$ack if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		send_ack($s_srccall,$s_srcdest,$s_destcall,$ack);
 	}

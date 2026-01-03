@@ -204,7 +204,7 @@ if (!$log) {
   }
 } else {
   if ($log ===1) {
-      echo '<input type="text" id="aprs" name="aprs_call" value="Call" required>';
+      echo ' Nachricht an <input type="text" id="aprs" name="aprs_call" value="DL3EL" required>';
       echo '&nbsp;&nbsp;';
       echo '<input type="text" style = "width:300px" id="aprs" name="aprs_msg" value="Text" required>';
       echo '&nbsp;&nbsp;';
