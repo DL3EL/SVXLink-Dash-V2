@@ -203,9 +203,12 @@ if (isset($_POST['btnDashUpdate']))
                 $dbversionFile = DL3EL . "/dbversion.upd";
                 $dbversionFilecontent = "up2date";
                 file_put_contents($dbversionFile, $dbversionFilecontent);
-                $logtext =  "$old_dbversion Update to version $gitversion successful\nAPRS Task neu gestartet";
+                $logtext =  "$old_dbversion Update to version $gitversion successful\nAPRS Task neu gestartet\n";
                 $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
                 exec($cmd, $output, $retval);
+// if this file exists, aprs task will terminate, status.php will start it again
+                $aprs_exit = DL3EL . "/aprs.exit";
+                touch($aprs_exit);
         }
         // Display in textarea           
         addsvxlog($logtext);

@@ -18,7 +18,7 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.41";
+my $version = "1.45";
 my $dir = "";
 my $conf = "";
 
@@ -82,6 +82,7 @@ my ($socket,$client_socket);
  	my $msgdatei = $dir  . "aprs-is.msg";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
 	my $aprs_ok_datei = $dir  . "aprs-login.ok";
+	my $aprs_exit_datei = $dir  . "aprs.exit";
 	my $dbversionFile = $dir  . "dbversion.upd";
 	unlink $aprs_ok_datei;
 
@@ -220,8 +221,15 @@ my $blocking = 0;
 	    }
 # check if something to send
 		aprs_tx($aprs_txdatei); 
+		if (-e $aprs_exit_datei) {
+			unlink $aprs_exit_datei;
+			last;
+		}	
 	}	
 	$socket->close();
+	unlink $aprs_ok_datei;
+	exit 0;
+
 
 sub parse_aprs {
 	my $raw_data = trim_cr($_[0]);

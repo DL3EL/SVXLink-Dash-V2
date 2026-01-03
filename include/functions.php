@@ -931,7 +931,7 @@ function display_config($config) {
     function start_cron($cron_File,$callsign,$fmnetwork) {
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
-      $logtext = "$jetzt starting cron ($cron_File $callsign $fmnetwork)\n";
+      $logtext = $jetzt . " starting cron ($cron_File $callsign $fmnetwork)\n";
       addlog ("L",$logtext);
       if ((defined ('debug')) && (debug > 0)) echo "Start cron Job um $jetzt <br>";
 
@@ -958,6 +958,18 @@ function display_config($config) {
       $globber = DL3EL_BASE . "backups";
       $max_days = '-7 DAYS';
       delete_old_files($globber,$max_days,$cron_File,$test);
+// 3. delete copies of full screen editor in DL3EL
+      $test = 0;
+      $globber = DL3EL . "/aprs-is-msg.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector1.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector2.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector3.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector4.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
 // 3a. Clear LogFile
       $db_File = DL3EL . "/db.log";
       $db_File_size = filesize($db_File);
@@ -965,8 +977,15 @@ function display_config($config) {
           rename($db_File, $db_File . ".bak");
           touch($db_File);
       }
-// 3b. Clear APRSFiles
+// 3b. Clear APRSFiles msg
       $db_File = DL3EL . "/aprs-is.msg";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
+// 3c. Clear APRSFiles log
+      $db_File = DL3EL . "/aprs-is.log";
       $db_File_size = filesize($db_File);
       if ($db_File_size > 100000) {
           rename($db_File, $db_File . ".bak");
@@ -1033,12 +1052,16 @@ echo "<br>Stat: $cmd";
       foreach ($file_array as $filename) {
         if ((defined ('debug')) && (debug > 2)) echo "F:$filename<br>";
         ++$numberoffiles;
+        $logtext = $jetzt . " " . $filename . " found\n";
+        addlog ($cron_File,$logtext);
       }
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       $logtext = "$jetzt deleting files\n";
+      addlog ($cron_File,$logtext);
       if ((defined ('debug')) && (debug > 0)) echo "Files found: $numberoffiles<br>";
-      $max_kept = 10;
+      $logtext = $jetzt . " Files found: " . $numberoffiles . "\n";
+      addlog ($cron_File,$logtext);
       $files2delete = $numberoffiles - $max_kept;
       $nn = 0;
       $jetzt = date("Y-m-d H:i:s");
@@ -1053,6 +1076,9 @@ echo "<br>Stat: $cmd";
           }  
         } else {  
             if ((defined ('debug')) && (debug > 0)) echo $file_array[$nn] . " would be deleted ($nn)<BR>";
+            $cron_log = "'$jetzt: " . $file . " would be deleted'";
+            $logtext = $jetzt . " " . $file_array[$nn] . " would be deleted\n";
+            addlog ($cron_File,$logtext);
         }
       }   
     }  
