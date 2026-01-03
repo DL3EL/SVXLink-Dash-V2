@@ -228,8 +228,8 @@ sub parse_aprs {
 	my $nn = 0;
 	my $d5 = $5;
 	$message_time = act_time();
-	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 2);
-	print_file($logdatei,$write2file) if ($verbose >= 2);
+	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 0);
 #	@array = split (/\n/, $raw_data);
 #	foreach $entry (@array) {
 #		printf "Data $nn: %s\n",$entry;
@@ -295,7 +295,7 @@ sub parse_aprs {
 # ack first
 		$pckt_nr = $ack;
 #		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
-		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$s_destcall,$s_srccall,$payload,$ack;
+		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$s_destcall,$s_srccall,$payload,$ack if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		send_ack($s_srccall,$s_srcdest,$s_destcall,$ack);
 	}
