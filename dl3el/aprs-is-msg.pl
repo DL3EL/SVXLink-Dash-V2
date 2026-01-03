@@ -90,7 +90,7 @@ my ($socket,$client_socket);
     printf "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
 	STDOUT->autoflush(1);
 #    open(LOG, ">/home/svxlink/dl3el/get-monitor.log") or die "Fehler bei Logdatei: $tgdatei\n";
-	open(LOG, ">$logdatei") or die "Fehler bei Logdatei: $logdatei\n";
+	open(LOG, ">>$logdatei") or die "Fehler bei Logdatei: $logdatei\n";
 	open(MSG, ">>$msgdatei") or die "Fehler bei LOGGINGdatei: $msgdatei\n";
     printf LOG "LOG: %s LOGGINGdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
     printf LOG "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
@@ -223,6 +223,8 @@ my $blocking = 0;
 		aprs_tx($aprs_txdatei); 
 		if (-e $aprs_exit_datei) {
 			unlink $aprs_exit_datei;
+			$write2file = sprintf "[$log_time] APRS shutdown (aprs.exit)\n";
+			print_file($logdatei,$write2file);
 			last;
 		}	
 	}	
