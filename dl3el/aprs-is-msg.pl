@@ -39,7 +39,7 @@ my $pckt_nr = 0;
 my $s_srccall = "";
 my $s_srcdest = "";
 my $s_destcall = "";
-
+my $aprsgroups = "";
 # flush after every write
 $| = 1;
 
@@ -152,7 +152,12 @@ my $blocking = 0;
 			if (substr($data,0,6) eq "# aprs") {
 # we can override the config with par login
 				if ($login eq "") {
-					$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s g/FMNUPD/APNFMN",$aprs_login,$aprs_passwd,$aprs_msg_call);
+					if  ($verbose >= 2) {
+						$aprsgroups = "g/FMNUPD/APNFMN/FMNTUPD";
+					} else {
+						$aprsgroups = "g/FMNUPD/APNFMN";
+					}	
+					$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
 				}	
 				$data = $login;
 				$log_time = act_time();
@@ -243,8 +248,8 @@ sub parse_aprs {
 		$s_srcdest = $2;
 		$s_destcall = $3;
 	} else {
-		$write2file = sprintf "[$message_time] invalid Message %s\n",$$raw_data;
-		print_file($logdatei,$write2file);
+		$write2file = sprintf "[$message_time] invalid Message %s\n",$raw_data;
+		print_file($logdatei,$write2file) if ($verbose >= 2);
 		return 0;
 	}	
 	if (defined $5) {
@@ -254,7 +259,7 @@ sub parse_aprs {
 			if ($ack eq ":ack") {
 				$write2file = sprintf "[$message_time] no ack to be send\n";
 			} else {
-				 $write2file = sprintf "[$message_time] new condition: %s\n",$ack;
+				 $write2file = sprintf "[$message_time] new condition: %s (raw: %s)\n",$ack,$raw_data;
 				 $ack = ":ack";
 			}
 		} else {	
@@ -263,7 +268,7 @@ sub parse_aprs {
 	} else {
 		$write2file = sprintf "[$message_time] no ack necessary\n";
 	}	
-	print_file($logdatei,$write2file);
+	print_file($logdatei,$write2file) if ($verbose >= 2);
 #	if ((defined $1) && (defined $2) && (defined $3) && ($ack ne "") && ($ack ne ":ack")) {
 	if (($ack ne "") && ($ack ne ":ack")) {
 # ack first
@@ -499,7 +504,7 @@ sub aprs_tx {
 			$s_destcall = uc $s_destcall;
 			print "Dest $s_destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$s_srcdest = "APNFMN";
-			if ($s_destcall eq "FMNUPD") {
+			if (($s_destcall eq "FMNUPD") || ($s_destcall eq "FMNTUPD")) {
 				send_msg($s_destcall,$s_srcdest,$aprs_login,"no-ack",$aprs_msg);
 			} else {	
 				send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
