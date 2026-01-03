@@ -207,7 +207,7 @@ my $blocking = 0;
 				print_file($logdatei,$write2file) if ($verbose >= 2);
 				if (substr($datastring,0,7) eq "# aprsc") {
 # received keepalive
-#DeinCall>APRS,TCPIP*:					
+# Format: DeinCall>APRS,TCPIP*:					
 					++$keepalive;
 # send one back every hour
 					if ($keepalive > 180) {
