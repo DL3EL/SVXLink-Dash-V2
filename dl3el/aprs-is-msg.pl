@@ -295,7 +295,7 @@ sub parse_aprs {
 # ack first
 		$pckt_nr = $ack;
 #		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
-		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$s_destcall,$s_srccall,$payload,$ack if ($verbose >= 2);
+		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$s_destcall,$s_srccall,$payload,$ack;
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		send_ack($s_srccall,$s_srcdest,$s_destcall,$ack);
 	}
