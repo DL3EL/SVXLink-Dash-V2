@@ -173,7 +173,7 @@ my $blocking = 0;
 		exit -1;
 	} else {
 		system('touch', $aprs_ok_datei);
-		$write2file = sprintf "[$log_time] Login successfull $data ($rr)";
+		$write2file = sprintf "[$log_time] Login successfull $data";
 		print_file($logdatei,$write2file);
 		print_file($msgdatei,$write2file);
 	}
