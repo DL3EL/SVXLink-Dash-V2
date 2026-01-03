@@ -203,7 +203,9 @@ if (isset($_POST['btnDashUpdate']))
                 $dbversionFile = DL3EL . "/dbversion.upd";
                 $dbversionFilecontent = "up2date";
                 file_put_contents($dbversionFile, $dbversionFilecontent);
-                $logtext =  "$old_dbversion Update to version $gitversion successful\n";
+                $logtext =  "$old_dbversion Update to version $gitversion successful\nAPRS Task neu gestartet";
+                $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
+                exec($cmd, $output, $retval);
         }
         // Display in textarea           
         addsvxlog($logtext);
