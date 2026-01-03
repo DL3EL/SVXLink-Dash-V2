@@ -271,12 +271,22 @@ sub parse_aprs {
 			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
 		}	
 	} else {
-		$write2file = sprintf "[$message_time] no ack necessary [%s]\n",$raw_data;
+		$write2file = sprintf "[$message_time] check for ack R[%s], P[%s]\n",$raw_data,$payload;
+		print_file($logdatei,$write2file) if ($verbose >= 2);
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
 		if ($ack eq "undef") {
-			$write2file = sprintf "[$message_time] 2. no ack to be send [$ack]\n";
-			 $ack = ":ack";
-		}	
+			$write2file = sprintf "[$message_time] no ack to be send [$ack][$payload]\n";
+			if (substr($payload,0,3) ne "ack") {
+				$ack = "msg";
+			} else { 
+				$ack = ":ack";
+			}	
+		} else {
+			$write2file = sprintf "[$message_time] ack to be send [$ack] P[$payload]\n";
+			print_file($logdatei,$write2file) if ($verbose >= 2);
+			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
+			$write2file = sprintf "[$message_time] ack to be send P[$payload]\n";
+		}
 	}	
 	print_file($logdatei,$write2file) if ($verbose >= 2);
 #	if ((defined $1) && (defined $2) && (defined $3) && ($ack ne "") && ($ack ne ":ack")) {
