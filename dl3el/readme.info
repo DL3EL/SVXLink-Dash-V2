@@ -1,3 +1,29 @@
+Neues in der Version 5.24 (04.01.2026)
+- Optimierung im APRS Interface
+	Der APRS Prozess wurde überarbeitet und empfängt jetzt Gruppennachrichten. Damit ist es möglich, dass 
+	Dashboard Installationen über APRS informiert werden, dass es einen neuen Update gibt.
+	Ich werde jetzt immer, wenn ich einen Update bereitstelle, zusätzlich eine Nachtricht wie z.B:
+	DL3EL>APNFMN,TCPIP*,qAC,T2PERTH::FMNUPD   :v5.24
+	verschicken. Das Dashboard reagiert und blendet einen entsprechenden Hinweis ein.
+	Der Hinweis wird gelöscht, sobald der Update durchgeführt wurde. Der Update muss weiterhin manuell 
+	gestartet werden. Sollte das jemand misbrauchen, kann nicht viel passieren, da beim Update Prozess 
+	zuerst geprüft wird, ob eine aktuellere SW als die instalierte vorhanden ist. Nur wenn das so ist, 
+	wird etwas aktualisiert.
+	Alfred, DL3MX, hat mir die Änderung zukommen lassen, dass die APRS Info rot blinkt, danke dafür.
+	
+	Ich finde die Art des Informationsaustausches sehr interessant, da sie das jeweilige System nicht 
+	sehr belastet und schnell ist. Dafür muss aber der APRS Prozess gestartet werden, d.h. der Eintrag
+	define("DL3EL_APRS_MSG", "yes");
+	muss so in der config.php sein. Ich habe jetzt den APRS Prozess so erweitert, dass das APRS Password
+	nicht mehr angegeben werden muss, der Prozess berechnet es selbstständig. Deshalb könnte ich die 
+	Funktion auch ohne Nutzereingriff aktivieren. Dazu hätte ich gerne mal Eure Meinung:
+	"Ist es ok, wenn das FM Funknetz Dashboard sich autmatisch bei APRS anmeldet und Nachrichten empangen kann,
+	auch wenn der Nutzer das nicht explizit eingeschaltet hat?".
+	Ein Opt-Out wäre dann immer mit 
+	define("DL3EL_APRS_MSG", "no");
+	möglich.
+	Antworten bitte an dl3el@darc.de oder per Telegram.
+
 Neues in der Version 5.23 (02.01.2026)
 - Optimierung im APRS Interface
 	Der APRS Prozess wurde überarbeitet und optimiert. Die wesentliche Änderung ist, das jetzt
