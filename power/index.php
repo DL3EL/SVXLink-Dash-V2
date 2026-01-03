@@ -93,7 +93,7 @@ if (isset($_POST['btnRestartAPRS'])) {
 // if this file exists, aprs task will terminate, status.php will start it again
         $aprs_exit = DL3EL . "/aprs.exit";
         touch($aprs_exit);
-        $logtext =  "APRS Dienst gestoppt\n";
+        $logtext =  "APRS Dienst gestoppt, Restart automatisch durch Dashboard\n";
         addsvxlog($logtext);
     }  
 
@@ -191,7 +191,7 @@ if (isset($_POST['btnDashUpdate']))
                 } else {
                   $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
                 }        
-                $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.";
+                $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
                 if (!strlen($fmnetwork)) {
                     $fmnetwork = getfmnetwork();
                 }     
@@ -204,9 +204,7 @@ if (isset($_POST['btnDashUpdate']))
                 $dbversionFile = DL3EL . "/dbversion.upd";
                 $dbversionFilecontent = "up2date";
                 file_put_contents($dbversionFile, $dbversionFilecontent);
-                $logtext =  "$old_dbversion Update to version $gitversion successful\nAPRS Task neu gestartet\n";
-                $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
-                exec($cmd, $output, $retval);
+                $logtext =  "$old_dbversion Update to version $gitversion successful\n";
 // if this file exists, aprs task will terminate, status.php will start it again
                 $aprs_exit = DL3EL . "/aprs.exit";
                 touch($aprs_exit);
