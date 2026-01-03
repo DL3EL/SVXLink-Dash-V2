@@ -90,10 +90,11 @@ if (isset($_POST['btnSvxlinkoff']))
 }
 
 if (isset($_POST['btnRestartAPRS'])) {
-      $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
-      exec($cmd, $output, $retval);
-      $logtext =  "APRS Dienst gestoppt\n";
-      addsvxlog($logtext);
+// if this file exists, aprs task will terminate, status.php will start it again
+        $aprs_exit = DL3EL . "/aprs.exit";
+        touch($aprs_exit);
+        $logtext =  "APRS Dienst gestoppt\n";
+        addsvxlog($logtext);
     }  
 
 if (isset($_POST['btnRestart']))
