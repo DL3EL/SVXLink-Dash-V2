@@ -238,6 +238,15 @@ sub parse_aprs {
 #	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{([\d]+)/i)? $4 : "undef";
 	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
 	$ack = "";
+	if (($payload ne "undef") && ($ack ne ":ack")){
+		$s_srccall = $1;
+		$s_srcdest = $2;
+		$s_destcall = $3;
+	} else {
+		$write2file = sprintf "[$message_time] invalid Message %s\n",$$raw_data;
+		print_file($logdatei,$write2file);
+		return 0;
+	}	
 	if (defined $5) {
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
 		if ($ack eq "undef") {
@@ -255,21 +264,25 @@ sub parse_aprs {
 		$write2file = sprintf "[$message_time] no ack necessary\n";
 	}	
 	print_file($logdatei,$write2file);
-	if ((defined $1) && (defined $2) && (defined $3) && ($ack ne "") && ($ack ne ":ack")) {
+#	if ((defined $1) && (defined $2) && (defined $3) && ($ack ne "") && ($ack ne ":ack")) {
+	if (($ack ne "") && ($ack ne ":ack")) {
 # ack first
 		$pckt_nr = $ack;
-		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
-		send_ack($1,$2,$3,$ack);
+#		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
+		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$s_destcall,$s_srccall,$payload,$ack if ($verbose >= 2);
+		print_file($logdatei,$write2file) if ($verbose >= 2);
+		send_ack($s_srccall,$s_srcdest,$s_destcall,$ack);
 	}
-	if (($payload ne "undef") && ($ack ne ":ack")){
+#	if (($payload ne "undef") && ($ack ne ":ack")){
+	if ($ack ne ":ack") {
 		$pckt_nr = $ack;
-		$s_srccall = $1;
-		$s_srcdest = $2;
-		$s_destcall = $3;
+#		$s_srccall = $1;
+#		$s_srcdest = $2;
+#		$s_destcall = $3;
 # delete ack from payload
-		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{/i)? $4 : "undef";
+#		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{/i)? $4 : "undef";
 
-		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$3,$1,$payload,$ack;
+		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s)\n",$s_destcall,$s_srccall,$payload,$ack;
 		print_file($logdatei,$write2file);
 		print_file($msgdatei,$write2file);
 		system('touch', $msgdatei . ".neu");
@@ -357,15 +370,11 @@ sub send_msg {
 			++$pckt_nr;
 			$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$destcall,$srcdest,$srccall,$data,$pckt_nr);
 		}	
-		$write2file = sprintf "[$log_time] TX: %s", $data;
-		print_file($logdatei,$write2file) if ($verbose >= 0);
 		$socket->send($data);
 		$log_time = act_time();
-#		print LOG "[$log_time] $data";
-		$write2file = sprintf "[$log_time] $data";
-		print_file($logdatei,$write2file) if ($verbose >= 0);
+		$write2file = sprintf "[$log_time] TX: %s", $data;
+		print_file($logdatei,$write2file) if ($verbose >= 1);
 		print_file($msgdatei,$write2file);
-		$send_trigger = 0;
 }
 
 sub print_file {
@@ -490,7 +499,7 @@ sub aprs_tx {
 			$s_destcall = uc $s_destcall;
 			print "Dest $s_destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$s_srcdest = "APNFMN";
-			if ($s_destcall eq "xFMNUPDx") {
+			if ($s_destcall eq "FMNUPD") {
 				send_msg($s_destcall,$s_srcdest,$aprs_login,"no-ack",$aprs_msg);
 			} else {	
 				send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
