@@ -353,12 +353,14 @@ sub send_ack {
 	my $a_srcdest = $_[1];
 	my $a_destcall = $_[2];
 	my $tx_ack = (defined $_[3])? ":ack" . $_[3] : "";
+# alt: WIDE1-1
+	my $path = "TCPIP*";
 
 		while (length($a_srccall) < 9) {
 			$a_srccall = $a_srccall . " ";
 		}	
 # DL9SAU: answer_message = Tcall + ">" + MY_APRS_DEST_IDENTIFYER + "::" + String(msg_from) + ":ack" + String(q+1);
-		$data = sprintf ("%s>%s,WIDE1-1::%s%s\n",$a_destcall,$a_srcdest,$a_srccall,$tx_ack);
+		$data = sprintf ("%s>%s,%s::%s%s\n",$a_destcall,$a_srcdest,$path,$a_srccall,$tx_ack);
 #		print $socket "$data\n";
 # we can also send the data through IO::Socket::INET module,
 		$socket->send($data);
@@ -387,16 +389,19 @@ sub send_msg {
 	my $m_srcdest = $_[1];
 	my $m_destcall = $_[2];
 	my $arq = $_[3];
+# alt: WIDE1-1
+	my $path = "TCPIP*";
 	my $data = $_[4];
 		while (length($m_srccall) < 9) {
 			$m_srccall = $m_srccall . " ";
-		}	
+		}
+			
 # DL9SAU: answer_message = Tcall + ">" + MY_APRS_DEST_IDENTIFYER + "::" + String(msg_from) + ":ack" + String(q+1);
 		if ($arq eq "no-ack") {
-			$data = sprintf ("%s>%s,WIDE1-1::%s:%s\n",$m_destcall,$m_srcdest,$m_srccall,$data);
+			$data = sprintf ("%s>%s,%s::%s:%s\n",$m_destcall,$m_srcdest,$path,$m_srccall,$data);
 		} else {	
 			++$pckt_nr;
-			$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$m_destcall,$m_srcdest,$m_srccall,$data,$pckt_nr);
+			$data = sprintf ("%s>%s,%s::%s:%s{%s\n",$m_destcall,$m_srcdest,$path,$m_srccall,$data,$pckt_nr);
 		}	
 		$socket->send($data);
 		$log_time = act_time();
