@@ -197,18 +197,17 @@ my $blocking = 0;
 				$log_time = act_time();
 				++$rr;
 				$write2file = sprintf "[$log_time] recv successful ($datastring) Laenge:%s, $rr\n",length($datastring);
+				print_file($logdatei,$write2file) if ($verbose >= 2);
 				if (substr($datastring,0,7) eq "# aprsc") {
 # received keepalive
 #DeinCall>APRS,TCPIP*:					
 					++$keepalive;
 # send one back every hour
 					if ($keepalive > 180) {
-						print_file($logdatei,$write2file) if ($verbose >= 2);
 						send_keepalive($aprs_login);
 						$keepalive = 0;
 					} 
 				} else {	
-					print_file($logdatei,$write2file) if ($verbose >= 2);
 					parse_aprs($datastring);
 				}	
 			}	
@@ -247,7 +246,7 @@ sub parse_aprs {
 				$write2file = sprintf "[$message_time] no ack to be send\n";
 			} else {
 				 $write2file = sprintf "[$message_time] new condition: %s\n",$ack;
-				 $ack = "";
+				 $ack = ":ack";
 			}
 		} else {	
 			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
@@ -302,6 +301,7 @@ sub parse_aprs {
 	} else {
 		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
+		print_file($msgdatei,$write2file);
 	}
 }
 
@@ -364,6 +364,7 @@ sub send_msg {
 #		print LOG "[$log_time] $data";
 		$write2file = sprintf "[$log_time] $data";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
+		print_file($msgdatei,$write2file);
 		$send_trigger = 0;
 }
 
