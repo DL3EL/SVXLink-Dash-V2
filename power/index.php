@@ -92,10 +92,7 @@ if (isset($_POST['btnSvxlinkoff']))
 if (isset($_POST['btnRestartAPRS'])) {
       $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
       exec($cmd, $output, $retval);
-      $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
-      echo "Starting APRS";
-      exec($cmd, $output, $retval);
-      $logtext =  "APRS Dienst neu gestartet\n";
+      $logtext =  "APRS Dienst gestoppt\n";
       addsvxlog($logtext);
     }  
 
