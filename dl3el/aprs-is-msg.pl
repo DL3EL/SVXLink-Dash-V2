@@ -506,12 +506,13 @@ sub aprs_tx {
 			$s_srcdest = "APNFMN";
 			if (($s_destcall eq "FMNUPD") || ($s_destcall eq "FMNTUPD")) {
 				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $s_destcall if ($verbose >= 2);
+				print_file($logdatei,$write2file) if ($verbose >= 2);
 				send_msg($s_destcall,$s_srcdest,$aprs_login,"no-ack",$aprs_msg);
 			} else {	
 				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (ack)\n", $s_destcall if ($verbose >= 2);
+				print_file($logdatei,$write2file) if ($verbose >= 2);
 				send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
 			}	
-			print_file($logdatei,$write2file) if ($verbose >= 0);
 			unlink $aprsdatei;
 		}	
 	} else {
