@@ -307,7 +307,7 @@ sub parse_aprs {
 #		$srcdest = $2;
 #		$destcall = $3;
 
-		if (((substr($srccall,0,5) eq "DL3EL") && ($srcdest eq "APNFMN") && ($payload eq "?update?")) || ($destcall eq "FMNUPD")) {
+		if (((substr($srccall,0,5) eq "DL3EL") && ($payload eq "?update?")) || ($destcall eq "FMNUPD")) {
 #			$destcall = "FMNUPD";
 #		} 
 #		if ($destcall eq "FMNUPD") {
