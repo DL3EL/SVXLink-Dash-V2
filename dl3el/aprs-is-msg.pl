@@ -240,6 +240,7 @@ sub parse_aprs {
 # DL3EL-8>APDR16,TCPIP*,qAC,T2ERFURT::DL3EL    :google.com{36
 # other
 # WA1GOV-10>APX219,TCPIP*,qAC,T2PERTH::DL3EL    :ISS over JO40HD AOS 02Jan26 21:28 UTC AZ 199 MaxEL/AZ 15/139
+#     1       2                          3         4 
 #	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{([\d]+)/i)? $4 : "undef";
 	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
 	$ack = "";
@@ -252,8 +253,10 @@ sub parse_aprs {
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		return 0;
 	}	
-	if (defined $5) {
+	if ($5 ne "") {
 		my $d5 = $5;
+		$write2file = sprintf "[$message_time] RX 1:%s 2:%s 3:%s 4:%s 5:%s\n",$s_srccall,$s_srcdest,$s_destcall,$payload,$d5;
+		print_file($logdatei,$write2file) if ($verbose >= 2);
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
 		if ($ack eq "undef") {
 			$ack = ($raw_data =~ /.*(\:ack)([\d]+)/i)? $1 : "undef";

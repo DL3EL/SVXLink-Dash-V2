@@ -89,6 +89,16 @@ if (isset($_POST['btnSvxlinkoff']))
         exec($command,$screen,$retval);
 }
 
+if (isset($_POST['btnRestartAPRS'])) {
+      $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
+      exec($cmd, $output, $retval);
+      $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
+      echo "Starting APRS";
+      exec($cmd, $output, $retval);
+      $logtext =  "APRS Dienst neu gestartet\n";
+      addsvxlog($logtext);
+    }  
+
 if (isset($_POST['btnRestart']))
     {
 
@@ -226,6 +236,8 @@ if (isset($_POST['btnrstc710']))
 	<br>
 	<!--button name="btnLcd" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart Lcd Service</button>
 	<BR-->
+	<button name="btnRestartAPRS" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart APRS Task</button>
+        <br>
 	<button name="btnRestart" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart Device</button>
         <br>
 	<button name="btnPower" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Power OFF</button>
