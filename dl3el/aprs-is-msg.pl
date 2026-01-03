@@ -12,16 +12,13 @@ my $login = "";
 my $verbose = 0;
 my $aprs = "";
 my $call = "";
-my $srccall = "";
-my $srcdest = "";
-my $destcall = "";
 my $data = "";
 my $rr = 0;
 my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.40";
+my $version = "1.41";
 my $dir = "";
 my $conf = "";
 
@@ -34,11 +31,10 @@ my $hispaddr = "";
 my $dbv = "";
 my $keepalive = 0;
 
-my $send_trigger = 0;
 my $pckt_nr = 0;
-my $s_srccall = "";
-my $s_srcdest = "";
-my $s_destcall = "";
+my $srccall = "";
+my $srcdest = "";
+my $destcall = "";
 my $aprsgroups = "";
 # flush after every write
 $| = 1;
@@ -203,6 +199,9 @@ my $blocking = 0;
 			if (length($datastring)) {
 				$log_time = act_time();
 				++$rr;
+				$srccall = "";
+				$srcdest = "";
+				$destcall = "";
 				$write2file = sprintf "[$log_time] recv successful ($datastring) Laenge:%s, $rr\n",length($datastring);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
 				if (substr($datastring,0,7) eq "# aprsc") {
@@ -246,11 +245,10 @@ sub parse_aprs {
 #     1       2                          3         4 
 #	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{([\d]+)/i)? $4 : "undef";
 	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
-	$ack = "";
-	if (($payload ne "undef") && ($ack ne ":ack")){
-		$s_srccall = $1;
-		$s_srcdest = $2;
-		$s_destcall = $3;
+	if ($payload ne "undef") {
+		$srccall = $1;
+		$srcdest = $2;
+		$destcall = $3;
 	} else {
 		$write2file = sprintf "[$message_time] invalid Message %s\n",$raw_data if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -259,7 +257,7 @@ sub parse_aprs {
 	if ($5 ne "") {
 # prüfen, ob wir das überhaupt noch brauchen
 		$d5 = $5;
-		$write2file = sprintf "[$message_time] RX 1:%s 2:%s 3:%s 4:%s 5:%s\n",$s_srccall,$s_srcdest,$s_destcall,$payload,$d5;
+		$write2file = sprintf "[$message_time] RX 1:%s 2:%s 3:%s 4:%s 5:%s\n",$srccall,$srcdest,$destcall,$payload,$d5;
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
 		if ($ack eq "undef") {
@@ -273,6 +271,7 @@ sub parse_aprs {
 		} else {	
 			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
 		}	
+# bis hier prüfen, ob wir das überhaupt noch brauchen
 	} else {
 		$write2file = sprintf "[$message_time] check for ack R[%s], P[%s]\n",$raw_data,$payload if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -287,6 +286,7 @@ sub parse_aprs {
 		} else {
 			$write2file = sprintf "[$message_time] ack to be send [$ack] P[$payload]\n" if ($verbose >= 2);
 			print_file($logdatei,$write2file) if ($verbose >= 2);
+# delete ack from payload
 			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
 			$write2file = sprintf "[$message_time] ack to be send P[$payload]\n" if ($verbose >= 2);
 		}
@@ -296,30 +296,21 @@ sub parse_aprs {
 	if (($ack ne "") && ($ack ne ":ack")) {
 # ack first
 		$pckt_nr = $ack;
-#		printf "PA: [$message_time] Call: %s from %s, Message: %s, Number: %d [%s]\n",$s_destcall,$s_srccall,$payload,$pckt_nr,$2 if ($verbose >= 2);
-		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$s_destcall,$s_srccall,$payload,$ack if ($verbose >= 2);
+		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$destcall,$srccall,$payload,$ack if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
-		send_ack($s_srccall,$s_srcdest,$s_destcall,$ack);
+		send_ack($srccall,$srcdest,$destcall,$ack);
 	}
 #	if (($payload ne "undef") && ($ack ne ":ack")){
 	if ($ack ne ":ack") {
 		$pckt_nr = $ack;
-#		$s_srccall = $1;
-#		$s_srcdest = $2;
-#		$s_destcall = $3;
-# delete ack from payload
-#		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{/i)? $4 : "undef";
+#		$srccall = $1;
+#		$srcdest = $2;
+#		$destcall = $3;
 
-		$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$s_destcall,$s_srccall,$payload,$ack,$s_srcdest;
-		print_file($logdatei,$write2file);
-		$write2file = sprintf "[$message_time] Message to %s from %s: [%s]\n",$s_destcall,$s_srccall,$payload;
-		print_file($msgdatei,$write2file);
-		system('touch', $msgdatei . ".neu");
-		if ((substr($s_srccall,0,5) eq "DL3EL") && ($s_srcdest eq "APNFMN") && ($payload eq "?update?")) {
-			$s_destcall = "FMNUPD";
-		} 
-			
-		if ($s_destcall eq "FMNUPD") {
+		if (((substr($srccall,0,5) eq "DL3EL") && ($srcdest eq "APNFMN") && ($payload eq "?update?")) || ($destcall eq "FMNUPD")) {
+#			$destcall = "FMNUPD";
+#		} 
+#		if ($destcall eq "FMNUPD") {
 			$write2file = sprintf "[$message_time] neues Update steht bereit!\n",$payload;
 			print_file($msgdatei,$write2file);
             $payload = "update";
@@ -332,17 +323,23 @@ sub parse_aprs {
 			close ANSWER;
 		}	
 		if ($payload eq "?aprs?") {
-			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload;
-			print_file($msgdatei,$write2file);
+			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 2);
+			print_file($msgdatei,$write2file) if ($verbose >= 2);
 			open(ANSWER, ">$aprs_txdatei") or do {
 						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
 						print_file($logdatei,$write2file);
 						die "ERROR in Filehandling: $!\n"; };
 						# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$s_srccall,$dbv;
+			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
 			close ANSWER;
-			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$s_srccall;
+			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$srccall if ($verbose >= 2);
+			print_file($msgdatei,$write2file) if ($verbose >= 2);
+		} else {
+			$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$destcall,$srccall,$payload,$ack,$srcdest;
+			print_file($logdatei,$write2file);
+			$write2file = sprintf "[$message_time] Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
 			print_file($msgdatei,$write2file);
+			system('touch', $msgdatei . ".neu");
 		}
 	} else {
 		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 2);
@@ -352,16 +349,16 @@ sub parse_aprs {
 }
 
 sub send_ack {
-	my $srccall = $_[0];
-	my $srcdest = $_[1];
-	my $destcall = $_[2];
+	my $a_srccall = $_[0];
+	my $a_srcdest = $_[1];
+	my $a_destcall = $_[2];
 	my $tx_ack = (defined $_[3])? ":ack" . $_[3] : "";
 
-		while (length($srccall) < 9) {
-			$srccall = $srccall . " ";
+		while (length($a_srccall) < 9) {
+			$a_srccall = $a_srccall . " ";
 		}	
 # DL9SAU: answer_message = Tcall + ">" + MY_APRS_DEST_IDENTIFYER + "::" + String(msg_from) + ":ack" + String(q+1);
-		$data = sprintf ("%s>%s,WIDE1-1::%s%s\n",$destcall,$srcdest,$srccall,$tx_ack);
+		$data = sprintf ("%s>%s,WIDE1-1::%s%s\n",$a_destcall,$a_srcdest,$a_srccall,$tx_ack);
 #		print $socket "$data\n";
 # we can also send the data through IO::Socket::INET module,
 		$socket->send($data);
@@ -369,39 +366,37 @@ sub send_ack {
 #		print LOG "[$log_time] $data";
 		$write2file = sprintf "[$log_time] $data";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
-		$send_trigger = 2;
 }
 
 sub send_keepalive {
-	my $srccall = $_[0];
-	my $srcdest = "TCPIP*";
-	my $destcall = "APRS";
+	my $k_srccall = $_[0];
+	my $k_srcdest = "TCPIP*";
+	my $k_destcall = "APRS";
 
 # DeinCall>APRS,TCPIP*:
-		$data = sprintf ("%s>%s,%s:\n",$srccall,$destcall,$srcdest);
+		$data = sprintf ("%s>%s,%s:\n",$k_srccall,$k_destcall,$k_srcdest);
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
 		$write2file = sprintf "[$log_time] keepalive $data";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
-		$send_trigger = 2;
 }
 
 sub send_msg {
-	my $srccall = $_[0];
-	my $srcdest = $_[1];
-	my $destcall = $_[2];
+	my $m_srccall = $_[0];
+	my $m_srcdest = $_[1];
+	my $m_destcall = $_[2];
 	my $arq = $_[3];
 	my $data = $_[4];
-		while (length($srccall) < 9) {
-			$srccall = $srccall . " ";
+		while (length($m_srccall) < 9) {
+			$m_srccall = $m_srccall . " ";
 		}	
 # DL9SAU: answer_message = Tcall + ">" + MY_APRS_DEST_IDENTIFYER + "::" + String(msg_from) + ":ack" + String(q+1);
 		if ($arq eq "no-ack") {
-			$data = sprintf ("%s>%s,WIDE1-1::%s:%s\n",$destcall,$srcdest,$srccall,$data);
+			$data = sprintf ("%s>%s,WIDE1-1::%s:%s\n",$m_destcall,$m_srcdest,$m_srccall,$data);
 		} else {	
 			++$pckt_nr;
-			$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$destcall,$srcdest,$srccall,$data,$pckt_nr);
+			$data = sprintf ("%s>%s,WIDE1-1::%s:%s{%s\n",$m_destcall,$m_srcdest,$m_srccall,$data,$pckt_nr);
 		}	
 		$socket->send($data);
 		$log_time = act_time();
@@ -527,25 +522,23 @@ sub aprs_tx {
 			}    
 			close INPUT;
 			print "Datei $aprsdatei erfolgreich geoeffnet, Laenge $data_len ($data)\n" if ($verbose >= 2);
-			$send_trigger = 1;
-			($s_destcall,$aprs_msg) = split(/\^/, $data);
-			$s_destcall = uc $s_destcall;
-			print "Dest $s_destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
-			$s_srcdest = "APNFMN";
-			if (($s_destcall eq "FMNUPD") || ($s_destcall eq "FMNTUPD")) {
-				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $s_destcall if ($verbose >= 2);
+			($destcall,$aprs_msg) = split(/\^/, $data);
+			$destcall = uc $destcall;
+			print "Dest $destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
+			$srcdest = "APNFMN";
+			if (($destcall eq "FMNUPD") || ($destcall eq "FMNTUPD")) {
+				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $destcall if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
-				send_msg($s_destcall,$s_srcdest,$aprs_login,"no-ack",$aprs_msg);
+				send_msg($destcall,$srcdest,$aprs_login,"no-ack",$aprs_msg);
 			} else {	
-				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (ack)\n", $s_destcall if ($verbose >= 2);
+				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (ack)\n", $destcall if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
-				send_msg($s_destcall,$s_srcdest,$aprs_login,$pckt_nr,$aprs_msg);
+				send_msg($destcall,$srcdest,$aprs_login,$pckt_nr,$aprs_msg);
 			}	
 			unlink $aprsdatei;
 		}	
 	} else {
 		print "Datei '$aprsdatei' nicht gefunden.\n" if ($verbose >= 3);
-		$send_trigger = 0;
 	}
 }
 
