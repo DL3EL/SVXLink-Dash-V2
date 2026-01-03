@@ -253,13 +253,14 @@ sub parse_aprs {
 		return 0;
 	}	
 	if (defined $5) {
+		my $d5 = $5;
 		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
 		if ($ack eq "undef") {
 			$ack = ($raw_data =~ /.*(\:ack)([\d]+)/i)? $1 : "undef";
 			if ($ack eq ":ack") {
 				$write2file = sprintf "[$message_time] no ack to be send\n";
 			} else {
-				 $write2file = sprintf "[$message_time] new condition: %s (raw: %s)\n",$ack,$raw_data;
+				 $write2file = sprintf "[$message_time] new condition: %s (raw: %s [$d5])\n",$ack,$raw_data;
 				 $ack = ":ack";
 			}
 		} else {	
