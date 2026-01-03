@@ -170,14 +170,15 @@ my $blocking = 0;
 		sleep 2;
 	}	
 	if ($rr == 6) {
-		$write2file = sprintf "[$log_time] Login unsuccessfull $data ($rr)\n";
+		$write2file = sprintf "[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data";
 		print_file($logdatei,$write2file);
+		print_file($msgdatei,$write2file);
 		unlink $aprs_ok_datei;
 		exit -1;
 	} else {
 		system('touch', $aprs_ok_datei);
-		$write2file = sprintf "[$log_time] Login successfull $data ($rr)\n";
-		print_file($logdatei,$write2file);
+		$write2file = sprintf "[$log_time] Login successfull $data ($rr)";
+		print_file($msgdatei,$write2file);
 	}
 	$rr = 0;
 # we can also send the data through IO::Socket::INET module,
