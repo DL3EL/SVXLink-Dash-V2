@@ -33,7 +33,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
   $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
-  $logtext = "Dasboard started from $ip ";
+  $logtext = "Dashboard started from $ip ";
 
   if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
     $useragent=$_SERVER['HTTP_USER_AGENT'];
