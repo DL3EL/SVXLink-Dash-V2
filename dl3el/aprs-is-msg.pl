@@ -5,6 +5,7 @@ use utf8;
 use Time::Piece;
 #use File::stat;
 use IO::Socket::INET;
+use IO::Select;
 
 my $entry;
 my @array;
@@ -18,9 +19,15 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.45";
+my $version = "1.50";
 my $dir = "";
 my $conf = "";
+
+# --- Konfiguration ---
+my $call_with_ssid = "DL3EL-6";
+my $server         = 'euro.aprs2.net';
+my $port           = 14580;
+my $app_name       = "DL3EL APRS Client " . $version;
 
 my $aprs_login  = "";
 my $fmn_call  = "";
@@ -36,11 +43,22 @@ my $srccall = "";
 my $srcdest = "";
 my $destcall = "";
 my $aprsgroups = "";
+
 # flush after every write
 $| = 1;
 
-my ($socket,$client_socket);
+my $blocking = 0;
+#my ($socket,$client_socket);
+my $socket;
+my $selector    = IO::Select->new(\*STDIN);
+# Koordinaten & Intervall
+my $lat      = "5009.20N"; 
+my $lon      = "00839.42E";
+my $sym      = "-";
+my $interval = 1800;
+my $last_beacon = 0;
 
+my $exit_script = 0;
 
 	my $total = $#ARGV + 1;
 	my $counter = 1;
@@ -89,99 +107,34 @@ my ($socket,$client_socket);
     printf "LOG: %s Logdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
     printf "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
 	STDOUT->autoflush(1);
-#    open(LOG, ">/home/svxlink/dl3el/get-monitor.log") or die "Fehler bei Logdatei: $tgdatei\n";
 	open(LOG, ">>$logdatei") or die "Fehler bei Logdatei: $logdatei\n";
 	open(MSG, ">>$msgdatei") or die "Fehler bei LOGGINGdatei: $msgdatei\n";
     printf LOG "LOG: %s LOGGINGdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
-    printf LOG "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
-	if ((!read_config($conf)) && ($login eq "")) {
-		print LOG "DL3EL APRS-IS Message Receiver [v$version]: no valid config found, terminating\n";
-		print MSG "DL3EL APRS-IS Message Receiver [v$version]: no valid config found, terminating\n";
-		exit 0;
-	}
-	printf LOG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n$0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
-	printf MSG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
+    printf MSG "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
     close MSG;
     close LOG;
-
-Start:
-my $blocking = 0;
-	$log_time = act_time();
-	$write2file = sprintf "[$log_time] Blocking Mode: (%s)\n",$blocking;
-	print_file($logdatei,$write2file);
-# creating object interface of IO::Socket::INET modules which internally creates
-# socket, binds and connects to the TCP server running on the specific port.
-	$socket = new IO::Socket::INET (
-	PeerHost => 'rotate.aprs2.net',
-	PeerPort => '14580',
-	Blocking => $blocking,
-	Proto => 'tcp',
- 	) or do {
-		$write2file = sprintf "[$log_time] ERROR in Socket Creation : $!\n";
-		print_file($logdatei,$write2file);
-		die "ERROR in Socket Creation : $!\n";
-	};
-
-    $write2file = sprintf "[$log_time] TCP Connection Success.\n";
-    print_file($logdatei,$write2file) if ($verbose >= 1);
-
-# read the socket data sent by server.
-# waiting for: # logresp DL3EL verified 
-	$rr = 0;
-	while ($rr < 6) {
-		$write2file = sprintf "[$log_time] starting login loop ($rr)\n";
-		print_file($logdatei,$write2file) if ($verbose >= 1);
-		$data = <$socket>;
-# we can also read from socket through recv()  in IO::Socket::INET
-# $socket->recv($data,1024);
-		++$rr;
-		$log_time = act_time();
-		if (defined $data) {
-			$write2file = sprintf "[$log_time] Received from Server ($rr): $data\n";
-			print_file($logdatei,$write2file);
-# waiting for: # logresp DL3EL verified 
-			my $login_success = "# logresp " . $aprs_login . " verified";
-			$write2file = sprintf "[$log_time] Waiting for: $login_success\n";
-			print_file($logdatei,$write2file);
-			if (substr($data,0,length($login_success)) eq $login_success) {
-				last;
-			}	
-			if (substr($data,0,6) eq "# aprs") {
-# we can override the config with par login
-				if ($login eq "") {
-					if  ($verbose >= 2) {
-						$aprsgroups = "g/FMNUPD/APNFMN/FMNTUPD";
-					} else {
-						$aprsgroups = "g/FMNUPD/APNFMN";
-					}	
-					$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
-				}	
-				$data = $login;
-				$log_time = act_time();
-				$write2file = sprintf "[$log_time] send2server (login): $data\n";
-				print_file($logdatei,$write2file);
-# write on the socket to server.
-				print $socket "$data\n";
-			}	
-		}	
-		sleep 2;
-	}	
-	if ($rr == 6) {
-		$write2file = sprintf "[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data";
-		print_file($logdatei,$write2file);
-		print_file($msgdatei,$write2file);
-		unlink $aprs_ok_datei;
-		exit -1;
-	} else {
-		system('touch', $aprs_ok_datei);
-		$write2file = sprintf "[$log_time] Login successfull $data";
-		print_file($logdatei,$write2file);
-		print_file($msgdatei,$write2file);
+#	printf LOG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n$0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
+#	printf MSG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
+	$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\nCalled via: $0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
+	print_file($logdatei,$write2file) if ($verbose >= 0);
+	$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
+	print_file($msgdatei,$write2file) if ($verbose >= 0);
+	if ((!read_config($conf)) && ($login eq "")) {
+		$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version]: no valid config found, terminating\n";
+		print_file($logdatei,$write2file) if ($verbose >= 0);
+		print_file($msgdatei,$write2file) if ($verbose >= 0);
+		exit 0;
 	}
+
+eval {
+MainLoop:
 	$rr = 0;
-# we can also send the data through IO::Socket::INET module,
-# $socket->send($data);
 	while (1) {
+		if (!$socket || !$socket->connected) {
+				$write2file = sprintf "[$log_time] new connect necessary\n";
+				print_file($logdatei,$write2file) if ($verbose >= 0);
+			if (!connect_aprs()) { sleep 10; next; }
+		}
 	    my $datastring = '';
 	    $hispaddr = recv($socket, $datastring, 512, 0); # blocking recv
 	    if (!defined($hispaddr)) {
@@ -225,13 +178,19 @@ my $blocking = 0;
 			unlink $aprs_exit_datei;
 			$write2file = sprintf "[$log_time] APRS shutdown (aprs.exit)\n";
 			print_file($logdatei,$write2file);
+			$exit_script = 1;
 			last;
 		}	
 	}	
 	$socket->close();
 	unlink $aprs_ok_datei;
-	exit 0;
-
+};	
+	if ($exit_script) {
+		exit 0;
+	} else {
+		print "Folgender Fehler ist aufgetreten: $@\n" if($@);
+		goto MainLoop;
+	}
 
 sub parse_aprs {
 	my $raw_data = trim_cr($_[0]);
@@ -331,6 +290,19 @@ sub parse_aprs {
 						# die "Fehler bei Datei: $aprs_txdatei\n";
 			printf ANSWER $payload;
 			close ANSWER;
+		}	
+		if ($payload eq "?wx?") {
+			my $metar = "curl -s \"http://relais.dl3el.de/cgi-bin/adds.pl?ctrcall=$srccall\" 2>&1";
+			$write2file = sprintf "[$message_time] Metar: %s\n",$metar;
+			print_file($logdatei,$write2file) if ($verbose >= 2);
+			$metar = `$metar`;
+			if ($metar eq "") {
+				$metar = "kein Flughafen im Umkreis von 50km";
+			}	
+			$write2file = sprintf "[$message_time] Metar: [%s]\n",$metar;
+			print_file($logdatei,$write2file);
+			prepare_answer_buffer($srccall,$metar);
+
 		}	
 		if ($payload eq "?aprs?") {
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 2);
@@ -452,7 +424,6 @@ sub act_time {
 }
 sub read_config {
 	$log_time = act_time();
-	print "[$log_time] reading config...\n" if ($verbose >= 2);
 	my $confdatei = $_[0];
 	my $par;
 
@@ -464,14 +435,12 @@ sub read_config {
 		}    
 		close INPUT;
 	} else {
-		$write2file = sprintf "[$log_time] $confdatei kann nicht geoeffnet werden: $!\n";
-		print_file($logdatei,$write2file);
+		$write2file = sprintf "[$log_time] $confdatei kann nicht geoeffnet werden: $! ($verbose)\n";
+		print_file($logdatei,$write2file) if ($verbose >= 1);
 		$data = "";
 	}
 
-	printf "1 config received:[%s]\n",$data if ($verbose >= 2);
 	if ($data ne "") {
-		print "Datei $confdatei erfolgreich geöffnet\n" if ($verbose >= 2);
 		@array = split (/\n/, $data);
 		$aprs_login  = "N0CALL-M";
 		$aprs_passwd = "-1";
@@ -486,16 +455,14 @@ sub read_config {
 				$aprs_msg_call = $par if ($1 eq "aprs_msg_call");
 			}
 		}
-		print "config received:\n" if ($verbose >= 2);
-		printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 2);
-		$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
-		print_file($logdatei,$write2file) if ($verbose >= 0);
+		$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
 	}
 	if (($aprs_login eq "N0CALL-M") ||  ($aprs_login eq "")) {
 		if ($fmn_call) {
 			$aprs_login = ($fmn_call =~ /([\w]+)[-\w]*/s)? $1 : "undef";
-			$write2file = sprintf "[$log_time] take aprs login from dashboard. aprs_login:%s\n", $aprs_login if ($verbose >= 0);
-			print_file($logdatei,$write2file) if ($verbose >= 0);
+			$write2file = sprintf "[$log_time] take aprs login from dashboard. aprs_login:%s\n", $aprs_login if ($verbose >= 1);
+			print_file($logdatei,$write2file) if ($verbose >= 1);
 		}
 	}
 	printf "2 config received:[%s]\n",$aprs_login if ($verbose >= 2);
@@ -510,9 +477,9 @@ sub read_config {
 	if (($aprs_passwd eq "-1") || ($aprs_passwd eq "")) {
 		$aprs_passwd = aprs_passcode($aprs_login);
 	}	
-	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 2);
-	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
-	print_file($logdatei,$write2file) if ($verbose >= 0);
+	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
 	return(1);
 }
 
@@ -590,4 +557,95 @@ printf("\nThe passcode for %s is %d\n", $callsign, $passcode) if ($verbose >= 2)
 $write2file = sprintf "[$log_time] The passcode for %s is %d\n", $callsign, $passcode if ($verbose >= 2);
 print_file($logdatei,$write2file) if ($verbose >= 2);
 return ($passcode);
+}
+
+sub prepare_answer_buffer {
+	my $srccall = $_[0];
+	my $text2send = $_[1];
+
+			open(ANSWER, ">$aprs_txdatei") or do {
+						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
+						print_file($logdatei,$write2file);
+						die "ERROR in Filehandling: $!\n"; };
+						# die "Fehler bei Datei: $aprs_txdatei\n";
+			printf ANSWER "%s\^%s",$srccall,$text2send;
+			close ANSWER;
+
+}
+
+sub connect_aprs {
+	my $rr;
+	$log_time = act_time();
+# creating object interface of IO::Socket::INET modules which internally creates
+# socket, binds and connects to the TCP server running on the specific port.
+	$socket = new IO::Socket::INET (
+	PeerHost => 'euro.aprs2.net',
+	PeerPort => '14580',
+	Blocking => $blocking,
+	Proto => 'tcp',
+ 	) or do {
+		$write2file = sprintf "[$log_time] ERROR in Socket Creation : $!\n";
+		print_file($logdatei,$write2file);
+		die "ERROR in Socket Creation : $!\n";
+	};
+
+    $write2file = sprintf "[$log_time] TCP Connection Success.(%s)\n",$blocking;
+    print_file($logdatei,$write2file) if ($verbose >= 1);
+
+# read the socket data sent by server.
+# waiting for: # logresp DL3EL verified 
+	$rr = 0;
+# we can override the config with par login
+	if ($login eq "") {
+		if  ($verbose >= 2) {
+			$aprsgroups = "g/FMNUPD/APNFMN/FMNTUPD";
+		} else {
+			$aprsgroups = "g/FMNUPD/APNFMN";
+		}	
+		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
+	}	
+	my $login_success = "# logresp " . $aprs_login . " verified";
+# Login Loop
+	while ($rr < 6) {
+		$write2file = sprintf "[$log_time] starting login loop ($rr)\n";
+		print_file($logdatei,$write2file) if ($verbose >= 1);
+		$data = <$socket>;
+		++$rr;
+		$log_time = act_time();
+		if (defined $data) {
+			$data =~ s/\r?\n$//;
+			$write2file = sprintf "[$log_time] Received from Server ($rr): $data\n";
+			print_file($logdatei,$write2file);
+			if (substr($data,0,9) eq "# logresp") {
+# waiting for: # logresp DL3EL verified 
+				if (substr($data,0,length($login_success)) eq $login_success) {
+					last;
+				}
+			}	
+			$log_time = act_time();
+			$write2file = sprintf "[$log_time] Login with: $login\n";
+			print_file($logdatei,$write2file);
+# write on the socket to server.
+			print $socket "$login\n";
+			if (substr($data,0,6) eq "# aprs") {
+				$write2file = sprintf "[$log_time] Waiting for: $login_success\n" if ($verbose >= 0);
+				print_file($logdatei,$write2file);
+			}	
+		}	
+		sleep 2;
+	}	
+	if ($rr == 6) {
+		$write2file = sprintf "[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data\n";
+		print_file($logdatei,$write2file);
+		print_file($msgdatei,$write2file);
+		unlink $aprs_ok_datei;
+#		exit -1;
+		return 0;
+	} else {
+		system('touch', $aprs_ok_datei);
+		$write2file = sprintf "[$log_time] Login successfull $data\n";
+		print_file($logdatei,$write2file);
+		print_file($msgdatei,$write2file);
+		return 1;
+	}
 }

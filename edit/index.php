@@ -193,14 +193,17 @@ if (!$log) {
       }
     }
     if (isset($_POST['save_restart'])) {
-      $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
-      exec($cmd, $output, $retval);
-      $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
-      echo "Starting APRS";
-      exec($cmd, $output, $retval);
-      $logtext =  "APRS Dienst neu gestartet\n";
+#      $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
+#      exec($cmd, $output, $retval);
+#      $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
+#      echo "Starting APRS";
+#      exec($cmd, $output, $retval);
+#      $logtext =  "APRS Dienst neu gestartet\n";
+      $aprs_exit = DL3EL . "/aprs.exit";
+      touch($aprs_exit);
+      $logtext =  "APRS Dienst gestoppt, Restart automatisch durch Dashboard\n";
       addsvxlog($logtext);
-    }  
+     }  
   }
 } else {
   if ($log ===1) {

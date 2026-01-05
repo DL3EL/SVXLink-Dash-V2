@@ -1,3 +1,11 @@
+Neues in der Version 5.25 (05.01.2026)
+- Wetterinfos über APRS abrufbar
+	Der APRS Prozess kennt jetzt den Befehl ?wx?. Wann jemand per APRS an seine eigene Station 
+	per mobilen APRS Gerät den Befehl ?wx? schickt, dann wird der Wetterbereicht des 
+	nächstgelegenen Flughafens im Metar Format an das APRS Gerät geschickt. Es werden Flughäfen 
+	im Umkreis von 50km um das anfragende Gerät berücksichtigt.
+	Eine Erklärung zum Metar Format gibt es hier: https://de.wikipedia.org/wiki/METAR
+
 Neues in der Version 5.24 (04.01.2026)
 - Optimierung im APRS Interface
 	Der APRS Prozess wurde überarbeitet und empfängt jetzt Gruppennachrichten. Damit ist es möglich, dass 
