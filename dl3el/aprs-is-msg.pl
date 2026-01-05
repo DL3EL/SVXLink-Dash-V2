@@ -155,7 +155,10 @@ MainLoop:
 				$destcall = "";
 				$write2file = sprintf "[$log_time] recv successful ($datastring) Laenge:%s, $rr\n",length($datastring);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
-				parse_aprs($datastring);
+# do not parse server msg
+				if (substr($datastring,0,7) ne "# aprsc") {
+					parse_aprs($datastring);
+				}	
 			}	
 	    }
 # check if something to send
@@ -190,14 +193,7 @@ sub parse_aprs {
 	my $d5 = $5;
 	$message_time = act_time();
 	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 0);
-	print_file($logdatei,$write2file) if ($verbose >= 0);
-#	@array = split (/\n/, $raw_data);
-#	foreach $entry (@array) {
-#		printf "Data $nn: %s\n",$entry;
-#		$write2file = sprintf "[$message_time] Data $nn: %s\n",$entry if ($verbose >= 2);
-#		print_file($logdatei,$write2file) if ($verbose >= 2);
-#		++$nn;
-#	}	
+	print_file($logdatei,$write2file) if ($verbose >= 1);
 # msg
 # DL3EL-8>APDR16,TCPIP*,qAC,T2ERFURT::DL3EL    :google.com{36
 # other
@@ -349,7 +345,7 @@ sub send_keepalive {
 	my $k_destcall = "APRS";
 
 # DeinCall>APRS,TCPIP*:
-		$data = sprintf ("%s>%s,%s:\n",$k_srccall,$k_destcall,$k_srcdest);
+		$data = sprintf ("%s>%s,%s::# DL3EL keepalive\n",$k_srccall,$k_destcall,$k_srcdest);
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
