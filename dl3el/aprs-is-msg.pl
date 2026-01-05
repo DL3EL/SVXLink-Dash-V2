@@ -52,9 +52,6 @@ my $blocking = 0;
 my $socket;
 my $selector    = IO::Select->new(\*STDIN);
 # Koordinaten & Intervall
-my $lat      = "5009.20N"; 
-my $lon      = "00839.42E";
-my $sym      = "-";
 my $interval = 1800;
 my $last_beacon = 0;
 
@@ -158,22 +155,15 @@ MainLoop:
 				$destcall = "";
 				$write2file = sprintf "[$log_time] recv successful ($datastring) Laenge:%s, $rr\n",length($datastring);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
-				if (substr($datastring,0,7) eq "# aprsc") {
-# received keepalive
-# Format: DeinCall>APRS,TCPIP*:					
-					++$keepalive;
-# send one back every hour
-					if ($keepalive > 180) {
-						send_keepalive($aprs_login);
-						$keepalive = 0;
-					} 
-				} else {	
-					parse_aprs($datastring);
-				}	
 			}	
 	    }
 # check if something to send
 		aprs_tx($aprs_txdatei); 
+		if (time() - $last_beacon >= $interval) {
+			send_keepalive($aprs_login);
+			$last_beacon = time();
+		}
+
 		if (-e $aprs_exit_datei) {
 			unlink $aprs_exit_datei;
 			$write2file = sprintf "[$log_time] APRS shutdown (aprs.exit)\n";
@@ -364,6 +354,20 @@ sub send_keepalive {
 #		print LOG "[$log_time] $data";
 		$write2file = sprintf "[$log_time] keepalive $data";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
+#### alt
+#				if (substr($datastring,0,7) eq "# aprsc") {
+# received keepalive
+# Format: DeinCall>APRS,TCPIP*:					
+#					++$keepalive;
+# send one back every hour
+#					if ($keepalive > 180) {
+#						send_keepalive($aprs_login);
+#						$keepalive = 0;
+#					} 
+#				} else {	
+#					parse_aprs($datastring);
+#				}	
+###
 }
 
 sub send_msg {
