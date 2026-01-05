@@ -19,7 +19,7 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.50";
+my $version = "1.60";
 my $dir = "";
 my $conf = "";
 
@@ -192,7 +192,7 @@ sub parse_aprs {
 	my $nn = 0;
 	my $d5 = $5;
 	$message_time = act_time();
-	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 0);
+	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 1);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 # msg
 # DL3EL-8>APDR16,TCPIP*,qAC,T2ERFURT::DL3EL    :google.com{36
@@ -278,7 +278,7 @@ sub parse_aprs {
 			printf ANSWER $payload;
 			close ANSWER;
 		}	
-		if ($payload eq "?wx?") {
+		if (($payload eq "?wx?") || (substr($payload,0,2) eq "?w")) {
 			my $metar = "curl -s \"http://relais.dl3el.de/cgi-bin/adds.pl?ctrcall=$srccall\" 2>&1";
 			$write2file = sprintf "[$message_time] Metar: %s\n",$metar;
 			print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -290,6 +290,33 @@ sub parse_aprs {
 			print_file($logdatei,$write2file);
 			prepare_answer_buffer($srccall,$metar);
 
+		}	
+		if (($payload eq "?rp?") || (substr($payload,0,2) eq "?r")) {
+			my $position = 0;
+			my $old_position = 0;
+			my $relais = "curl -s \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=$srccall&maxgateways=5&printas=csv&type_el=1&type_fr=1&kmmls=km&aprs_pr=y\" 2>&1";
+			$write2file = sprintf "[$message_time] Repeater: %s\n",$relais;
+			print_file($logdatei,$write2file) if ($verbose >= 2);
+			$relais = `$relais`;
+			my $relais_org = $relais;
+			my $relais_1 = "";
+			my $relais_2 = "";
+			$write2file = sprintf "[$message_time] Relais ORG: [%s] $old_position, $position\n",$relais_org;
+			print_file($logdatei,$write2file);
+			if ($relais eq "") {
+				$relais = "keine Relais mit Echolink oder FM-Funknetz erreichbar";
+			} else {
+# max. 67 Byte Payload
+				$relais_1 = extract_relais($relais);
+				$relais = substr($relais_org,length($relais_1),length($relais_org));
+				$relais_2 = extract_relais($relais);
+
+				$relais_1 =~ s/\^/ /g;
+				prepare_answer_buffer($srccall,$relais_1);
+				aprs_tx($aprs_txdatei); 
+				$relais_2 =~ s/\^/ /g;
+				prepare_answer_buffer($srccall,$relais_2);
+			}
 		}	
 		if ($payload eq "?aprs?") {
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 2);
@@ -315,6 +342,19 @@ sub parse_aprs {
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		print_file($msgdatei,$write2file);
 	}
+}
+
+sub extract_relais {
+	my $relais = $_[0];
+	my $position = 0;
+	my $old_position = 0;
+
+	while ($position < 67) {
+		$old_position = $position;
+		$position = index($relais, "^", $position+1);
+		last if ($position eq "-1");
+	}
+	return substr($relais,0,$old_position);
 }
 
 sub send_ack {
@@ -343,9 +383,10 @@ sub send_keepalive {
 	my $k_srccall = $_[0];
 	my $k_srcdest = "TCPIP*";
 	my $k_destcall = "APRS";
-
+# mal beobachten ob das bei HTV oder FT gegen einen Verbindungsabbruch hilft
 # DeinCall>APRS,TCPIP*:
-		$data = sprintf ("%s>%s,%s::# DL3EL keepalive\n",$k_srccall,$k_destcall,$k_srcdest);
+#		$data = sprintf ("%s>%s,%s:# DL3EL keepalive\n",$k_srccall,$k_destcall,$k_srcdest);
+		$data = sprintf ("%s>%s:# DL3EL keepalive\n",$k_srccall,$k_destcall);
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
