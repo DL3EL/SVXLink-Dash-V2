@@ -308,7 +308,7 @@ sub parse_aprs {
 			} else {
 # max. 67 Byte Payload
 				$relais_1 = extract_relais($relais);
-				$relais = substr($relais_org,length($relais_1),length($relais_org));
+				$relais = substr($relais_org,length($relais_1)+1,length($relais_org));
 				$relais_2 = extract_relais($relais);
 
 				$relais_1 =~ s/\^/ /g;
