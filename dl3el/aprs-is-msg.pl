@@ -188,7 +188,7 @@ sub parse_aprs {
 	my $nn = 0;
 	my $d5 = $5;
 	$message_time = act_time();
-	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 0);
+	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 1);
 	print_file($logdatei,$write2file) if ($verbose >= 0);
 #	@array = split (/\n/, $raw_data);
 #	foreach $entry (@array) {
