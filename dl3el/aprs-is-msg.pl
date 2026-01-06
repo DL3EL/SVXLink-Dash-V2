@@ -52,6 +52,10 @@ my $blocking = 0;
 my $socket;
 my $selector    = IO::Select->new(\*STDIN);
 # Koordinaten & Intervall
+# Koordinaten & Intervall
+my $aprs_lat      = "5009.20N"; 
+my $aprs_lon      = "00839.42E";
+my $aprs_sym      = "-";
 my $interval = 1800;
 my $last_beacon = 0;
 
@@ -131,6 +135,7 @@ MainLoop:
 				$write2file = sprintf "[$log_time] new connect necessary\n";
 				print_file($logdatei,$write2file) if ($verbose >= 0);
 			if (!connect_aprs()) { sleep 10; next; }
+			my $last_beacon = 0;
 		}
 	    my $datastring = '';
 	    $hispaddr = recv($socket, $datastring, 512, 0); # blocking recv
@@ -383,11 +388,20 @@ sub send_keepalive {
 	my $k_srccall = $_[0];
 	my $k_srcdest = "TCPIP*";
 	my $k_destcall = "APRS";
+	my $aprs_init = "";
+
 # mal beobachten ob das bei HTV oder FT gegen einen Verbindungsabbruch hilft
 # DeinCall>APRS,TCPIP*:
-		$data = sprintf ("%s>%s,%s:\n",$k_srccall,$k_destcall,$k_srcdest);
+#		$data = sprintf ("%s>%s,%s:\n",$k_srccall,$k_destcall,$k_srcdest);
 #		$data = sprintf ("%s>%s,%s:# DL3EL keepalive\n",$k_srccall,$k_destcall,$k_srcdest);
 #		$data = sprintf ("%s>%s:# DL3EL keepalive\n",$k_srccall,$k_destcall);
+		if (!$last_beacon) {
+			$aprs_init = "Online";
+		} else {
+			$aprs_init = "";
+		}	
+			
+        $data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz APRS-Client (by DL3EL) %s\n",$k_srccall,$k_destcall,$aprs_init);
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
@@ -469,7 +483,7 @@ sub read_config {
 	$log_time = act_time();
 	my $confdatei = $_[0];
 	my $par;
-
+	my $aprs_ssid;
 	if (-e $confdatei) {
 		open(INPUT, $confdatei) or die "Fehler bei Eingabedatei: $confdatei\n";
 		{
@@ -496,19 +510,23 @@ sub read_config {
 				$aprs_login = $par if ($1 eq "aprs_login");
 				$aprs_passwd = $par if ($1 eq "aprs_passwd");
 				$aprs_msg_call = $par if ($1 eq "aprs_msg_call");
+				$aprs_lat = $par if ($1 eq "aprs_lat");
+				$aprs_lon = $par if ($1 eq "aprs_lon");
+				$aprs_sym = $par if ($1 eq "aprs_sym");
 			}
 		}
 		$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
 	}
-	if (($aprs_login eq "N0CALL-M") ||  ($aprs_login eq "")) {
+	if ((substr($aprs_login,0,6) eq "N0CALL") ||  ($aprs_login eq "")) {
 		if ($fmn_call) {
 			$aprs_login = ($fmn_call =~ /([\w]+)[-\w]*/s)? $1 : "undef";
 			$write2file = sprintf "[$log_time] take aprs login from dashboard. aprs_login:%s\n", $aprs_login if ($verbose >= 1);
 			print_file($logdatei,$write2file) if ($verbose >= 1);
 		}
 	}
-	printf "2 config received:[%s]\n",$aprs_login if ($verbose >= 2);
+	$write2file = sprintf "[$log_time] Config received  CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
 	if (($aprs_login eq "undef") ||  ($aprs_login eq "")) {
 		return(0);
 	}	
@@ -516,12 +534,32 @@ sub read_config {
 	if (($aprs_msg_call eq "N0CALL") ||  ($aprs_msg_call eq "")) {
 		$aprs_msg_call = $aprs_login;
 	}
+	$write2file = sprintf "[$log_time] Begin1 CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
+	$aprs_login = ($aprs_login =~ /([\w]+)([-]*)([-\w]*)/s)? $1 : "undef";
+	if ($2 eq "-") {
+		$aprs_ssid = $3;
+
+		if ($aprs_ssid =~ /^-?\d+(\.\d+)?$/) {
+			if ($aprs_ssid > 15) {
+				$aprs_login = $aprs_login . "-14";
+			} else {
+				if ($aprs_ssid != 0) {
+					$aprs_login = $aprs_login . "-" . $aprs_ssid;
+				}	
+			}	
+		} else {
+			$aprs_login = $aprs_login . "-15";
+		}	
+
+	$write2file = sprintf "[$log_time] Begin2 CallCheck: aprs_login:%s aprs_ssid:%s\n", $aprs_login,$aprs_ssid if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
+	}		
 	
 	if (($aprs_passwd eq "-1") || ($aprs_passwd eq "")) {
 		$aprs_passwd = aprs_passcode($aprs_login);
 	}	
-	printf "aprs_login:%s\naprs_passwd:%s\naprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
-	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	return(1);
 }
