@@ -385,8 +385,9 @@ sub send_keepalive {
 	my $k_destcall = "APRS";
 # mal beobachten ob das bei HTV oder FT gegen einen Verbindungsabbruch hilft
 # DeinCall>APRS,TCPIP*:
+		$data = sprintf ("%s>%s,%s:\n",$k_srccall,$k_destcall,$k_srcdest);
 #		$data = sprintf ("%s>%s,%s:# DL3EL keepalive\n",$k_srccall,$k_destcall,$k_srcdest);
-		$data = sprintf ("%s>%s:# DL3EL keepalive\n",$k_srccall,$k_destcall);
+#		$data = sprintf ("%s>%s:# DL3EL keepalive\n",$k_srccall,$k_destcall);
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
