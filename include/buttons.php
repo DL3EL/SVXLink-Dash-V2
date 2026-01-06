@@ -234,6 +234,8 @@ if (isset($_POST["jmptoM"])) {
     }
 $logtext = "[" . $logtext . "]\n";
 if ($logtext !== "[]\n") {
+    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+    $logtext = $ip . ": " . $logtext;
     addsvxlog($logtext);
 }    
 
