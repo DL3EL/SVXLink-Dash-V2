@@ -269,7 +269,8 @@ if (isset($_POST['btnrstc710']))
       }    
    }   
 */ 
-    $logtext="Power menu started\n";
+    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+    $logtext="Power menu started from $ip\n";
     addsvxlog($logtext);
 
     if (((defined('DL3EL_BASE')) && (file_exists(DL3EL_BASE.'git_pull.sh'))) && ((defined('DL3EL_GIT_UPDATE')) && ((DL3EL_GIT_UPDATE === "yes") || (DL3EL_GIT_UPDATE === "nocheck")))) {
