@@ -1,5 +1,14 @@
+Neues in der Version 5.26 (06.01.2026)
+- Relaisinformationen über APRS abrufbar
+	Der APRS Prozess kennt jetzt den Befehl ?rp?. Wann jemand per APRS an seine eigene Station 
+	per mobilen APRS Gerät den Befehl ?rp? schickt, dann werden die nächstgelegenen Relais mit 
+	Echolink oder FM-Funknetzanbindung an das APRS Gerät geschickt. Da die meisten Geräte 
+	nur 67 Bytes Nutzlast empfangen können und das i.d.R. nur zwei Relais sind, werden
+	zwei Pakete mit jeweils zwei Relaisinformationen verschickt.
+	Pakete mit mehr als 67 Byte Nutzlast, werden von den Geräten meist ignoriert.
+
 Neues in der Version 5.25 (05.01.2026)
-- Wetterinfos über APRS abrufbar
+- Wetterinformationen über APRS abrufbar
 	Der APRS Prozess kennt jetzt den Befehl ?wx?. Wann jemand per APRS an seine eigene Station 
 	per mobilen APRS Gerät den Befehl ?wx? schickt, dann wird der Wetterbereicht des 
 	nächstgelegenen Flughafens im Metar Format an das APRS Gerät geschickt. Es werden Flughäfen 
