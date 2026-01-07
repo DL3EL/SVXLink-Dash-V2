@@ -8,11 +8,11 @@ use IO::Socket::INET;
 use IO::Select;
 ######
 # Todo
-# Filter prüfen, ob pos PAckete empfangen werden können
+# Filter prüfen, ob pos Packete empfangen werden können
 # falls, ja "moving Client einbauen", d.h. Koordinaten hier folgen einem Call
 # ausserdem flexible Filter einbauen und die entsprechenden Pakete parsen
 # Aufwand der MQTT Integration (OpenWebRX) prüfen 
-# Beacon mit aktueller TG senden
+# Beacon mit aktueller TG senden ok, 07.01.2026
 ######
 my $entry;
 my @array;
@@ -178,7 +178,7 @@ MainLoop:
 	    }
 # check if something to send
 		aprs_tx($aprs_txdatei); 
-		beacon_tx($aprs_bcdatei);
+		beacon_tx($aprs_bcdatei) if (($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E"));
 		if (time() - $last_beacon >= $interval) {
 			send_keepalive($aprs_login);
 			$last_beacon = time();
@@ -651,6 +651,9 @@ sub aprs_tx {
 }
 
 sub beacon_tx {
+#####
+# $verbose = 2;
+#####
 	$log_time = act_time();
 	print "[$log_time] reading beacon tx data...\n" if ($verbose >= 3);
 	my $aprsdatei = $_[0];

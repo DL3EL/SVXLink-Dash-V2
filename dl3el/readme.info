@@ -1,3 +1,52 @@
+Neues in der Version 5.26a (06.01.2026)
+- Servicerelease
+	Da die beiden Funktionen ?wx? und ?rp? vor allem von portablen oder mobilen APRS Geräten 
+	genutzt werden, ist es wichtig, ein Call zu nutzen, welches per Funk erreicht werden kann. 
+	In der APRS Spezifikation ist beschrieben, dass SSIDs nur im Bereich von -1 bis -15 
+	gültig sind. Daher habe ich jetzt folgende Vorgehensweise eingebaut.
+	Zuerst wird geprüft, ob in der aprs.conf ein etwas ungleich "N0CALL" eingetragen ist. Falls 
+	nicht, wird das in der svxlink.conf für FM-Funknetz eingetragene Call genutzt.
+	Danach wird geprüft, ob die SSID im Bereich von -1 bis -15 ist.
+	Ist sie nicht numerisch, wird als SSID -15 genutzt, ist sie größer als -15 wird
+	-14 verwendet. 
+	Wenn in der aprs.conf ein Standort eingetragen ist:
+	aprs_lat = "500.00N"; 
+	aprs_lon = "00800.00E";
+	so wird dieser mit der Bake beim APRS Start und beim keepalive ausgesendet. Ansonsten nicht.
+	Die Koordinaten bitte anpassen.
+	
+	Da ich ein FT2D für portablen APRS Betrieb habe, kann ich spezielle Funkgeräteanpassungen
+	am einfachsten an diesem Gerätetyp machen. Der Empfänger kann APRS Nachrichten mit einer
+	maximalen Länge von 67 Zeichen darstellen. Verteit auf 3 Zeilen a 20 Byte und eine mit dem Rest.
+	Die zuletzt empfangene Nachricht ist immer die oberste. Daher gibt es jetzt eine spezielle 
+	Ausgabe für das FT2D (und vergleichbare Geräte) wenn man den Befehl "?rp?" auf "?r" verkürzt.
+	Die Ausgabe sieht dann etwa so aus, genereller Aufbau:
+	(Call);Frequenz,CTCSS,Entfernung,System
+	Die Frequenz ist auf 2 Nachkommastellen begrenzt
+	Die Entfernung gilt ab dem Standort, von dem die Anfrage kam
+	Das System "E" ist Echolink und "F" ist FM-Funknetz
+	
+	Erste Gruppe (zweiter empfangener Frame, oberster in der Anzeige)
+	DB0HTV:145.75;; 2;F	Da die Daten ohne Call weniger als 14 Byte sind, wird das Call ergänzt
+	145.75;67,0Hz; 2;E
+	DB0HTV:145.75;; 2;F Da die Daten ohne Call weniger als 14 Byte sind, wird das Call ergänzt
+	Zweite Gruppe (erster empfangener Frame, zweiter in der Anzeige)
+	DK1ML:145.34;; 6;E  Da die Daten ohne Call weniger als 14 Byte sind, wird das Call ergänzt
+	DB0PX:439.38;; 7;E  Da die Daten ohne Call weniger als 14 Byte sind, wird das Call ergänzt
+	IW0RQJ:144.00;; 9;E Da die Daten ohne Call weniger als 14 Byte sind, wird das Call ergänzt
+	
+	Anpassung bei ?wx?
+	Bei den heutigen Wetterverhältnissen waren die MEtar Infos vom Frankfurter Flughafen sehr
+	lang. Es können jetzt max. 134 Zeichen verteilt auf zwei Datenpakete empfangen werden. Die
+	Aussendung erfolgt in der Reihenfolge des Textes. Bei Geräten wie dem FT2D muss die zweite 
+	empfangene Nachricht zuerst gelesen werden.
+	
+	Wenn mir jemand Detailinfos zu seinem Gerät schickt, versuche ich das entsprechend zu 
+	berücksichtigen.
+	
+	Änderungen der aktiven TG werden jetzt als Bake per APRS verschickt, sofern die Koordinaten
+	eingegeben sind.
+
 Neues in der Version 5.26 (06.01.2026)
 - Relaisinformationen über APRS abrufbar
 	Der APRS Prozess kennt jetzt den Befehl ?rp?. Wann jemand per APRS an seine eigene Station 
@@ -6,6 +55,20 @@ Neues in der Version 5.26 (06.01.2026)
 	nur 67 Bytes Nutzlast empfangen können und das i.d.R. nur zwei Relais sind, werden
 	zwei Pakete mit jeweils zwei Relaisinformationen verschickt.
 	Pakete mit mehr als 67 Byte Nutzlast, werden von den Geräten meist ignoriert.
+	Die Ausgabe sieht dann etwa so aus, genereller Aufbau:
+	Call;Frequenz,CTCSS,Entfernung,System
+	Die Frequenz ist auf 3 Nachkommastellen begrenzt
+	Die Entfernung gilt ab dem Standort, von dem die Anfrage kam
+	Das System "E" ist Echolink und "FR" ist FM-Funknetz
+
+	erster Antwortframe
+	DB0HTV;145,750;;2.02km;FR
+	DB0HTV-R;145,750;67,0Hz;2.06km;E
+
+	zweiter Antwortframe
+	DB0HTV-XLX;145,750;;2.30km;FR
+	DK1ML-L;145,337;;6.32km;E
+
 
 Neues in der Version 5.25 (05.01.2026)
 - Wetterinformationen über APRS abrufbar

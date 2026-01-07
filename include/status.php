@@ -197,13 +197,19 @@ if ($reflectorlogic1 != "") {
    $tgselect = trim(getSVXTGSelect($reflectorlogic1));
    if ( $tgselect=="0") {
       $tgselect="";
+      $svxTGact = DL3EL . "/tg_act";
+      if (file_exists($svxTGact)) {
+         $svxStatusFile = DL3EL . "/tg_status";
+         file_put_contents($svxStatusFile, $tgdefault);
+         unlink($svxTGact);
+      }   
    } else {
       if (defined('DL3EL')) {
          $svxStatusFile = DL3EL . "/tg_status";
-         if ($tgselect != $tgselect_a){
-            $acttg= $tgselect . " >" . $svxStatusFile;
-            shell_exec("echo $acttg");
-            $tgselect_a = $tgselect;
+        $svxTGact = DL3EL . "/tg_act";
+         if (!file_exists($svxTGact)) {
+            file_put_contents($svxStatusFile, $tgselect);
+            touch($svxTGact);
          }
       }      
    }
