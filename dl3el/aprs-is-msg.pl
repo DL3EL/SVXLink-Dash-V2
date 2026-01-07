@@ -6,7 +6,14 @@ use Time::Piece;
 #use File::stat;
 use IO::Socket::INET;
 use IO::Select;
-
+######
+# Todo
+# Filter prüfen, ob pos PAckete empfangen werden können
+# falls, ja "moving Client einbauen", d.h. Koordinaten hier folgen einem Call
+# ausserdem flexible Filter einbauen und die entsprechenden Pakete parsen
+# Aufwand der MQTT Integration (OpenWebRX) prüfen 
+# Beacon mit aktueller TG senden
+######
 my $entry;
 my @array;
 my $login = "";
@@ -19,7 +26,7 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.60";
+my $version = "1.65";
 my $dir = "";
 my $conf = "";
 
@@ -53,11 +60,13 @@ my $socket;
 my $selector    = IO::Select->new(\*STDIN);
 # Koordinaten & Intervall
 # Koordinaten & Intervall
-my $aprs_lat      = "5009.20N"; 
-my $aprs_lon      = "00839.42E";
+my $aprs_lat      = "5001.00N"; 
+my $aprs_lon      = "00800.00E";
 my $aprs_sym      = "-";
 my $interval = 1800;
 my $last_beacon = 0;
+my $tg_status = "";
+my $old_tgstatus = "";
 
 my $exit_script = 0;
 
@@ -100,6 +109,7 @@ my $exit_script = 0;
  	my $logdatei = $dir  . "aprs-is.log";
  	my $msgdatei = $dir  . "aprs-is.msg";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
+ 	my $aprs_bcdatei = $dir  . "tg_status";
 	my $aprs_ok_datei = $dir  . "aprs-login.ok";
 	my $aprs_exit_datei = $dir  . "aprs.exit";
 	my $dbversionFile = $dir  . "dbversion.upd";
@@ -168,6 +178,7 @@ MainLoop:
 	    }
 # check if something to send
 		aprs_tx($aprs_txdatei); 
+		beacon_tx($aprs_bcdatei);
 		if (time() - $last_beacon >= $interval) {
 			send_keepalive($aprs_login);
 			$last_beacon = time();
@@ -192,6 +203,9 @@ MainLoop:
 	}
 
 sub parse_aprs {
+#####
+# $verbose = 1;
+#####
 	my $raw_data = trim_cr($_[0]);
 	my $ack  = "";
 	my $nn = 0;
@@ -291,6 +305,15 @@ sub parse_aprs {
 			if ($metar eq "") {
 				$metar = "kein Flughafen im Umkreis von 50km";
 			}	
+			if (length($metar) > 67) {
+				my $metar1 = substr($metar,0,67);
+				my $metar2 = substr($metar,67,67);
+				$write2file = sprintf "[$message_time] Metar: [%s]\n",$metar1;
+				print_file($logdatei,$write2file);
+				prepare_answer_buffer($srccall,$metar1);
+				aprs_tx($aprs_txdatei); 
+				$metar = $metar2;
+			} 
 			$write2file = sprintf "[$message_time] Metar: [%s]\n",$metar;
 			print_file($logdatei,$write2file);
 			prepare_answer_buffer($srccall,$metar);
@@ -299,33 +322,52 @@ sub parse_aprs {
 		if (($payload eq "?rp?") || (substr($payload,0,2) eq "?r")) {
 			my $position = 0;
 			my $old_position = 0;
-			my $relais = "curl -s \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=$srccall&maxgateways=5&printas=csv&type_el=1&type_fr=1&kmmls=km&aprs_pr=y\" 2>&1";
+			my $aprs_pr = ($payload eq "?rp?")? "y" : "s";
+			my $relais = "curl -s \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=$srccall&maxgateways=7&printas=csv&type_el=1&type_fr=1&kmmls=km&aprs_pr=$aprs_pr\" 2>&1";
 			$write2file = sprintf "[$message_time] Repeater: %s\n",$relais;
-			print_file($logdatei,$write2file) if ($verbose >= 2);
+			print_file($logdatei,$write2file) if ($verbose >= 1);
 			$relais = `$relais`;
 			my $relais_org = $relais;
 			my $relais_1 = "";
 			my $relais_2 = "";
-			$write2file = sprintf "[$message_time] Relais ORG: [%s] $old_position, $position\n",$relais_org;
-			print_file($logdatei,$write2file);
-			if ($relais eq "") {
-				$relais = "keine Relais mit Echolink oder FM-Funknetz erreichbar";
-			} else {
+			if ($aprs_pr eq "y") {
+				$write2file = sprintf "[$message_time] Relais ORG: [%s] $old_position, $position\n",$relais_org;
+				print_file($logdatei,$write2file) if ($verbose >= 2);
+				if ($relais eq "") {
+					$relais = "keine Relais mit Echolink oder FM-Funknetz erreichbar";
+				} else {
 # max. 67 Byte Payload
-				$relais_1 = extract_relais($relais);
-				$relais = substr($relais_org,length($relais_1)+1,length($relais_org));
-				$relais_2 = extract_relais($relais);
-
-				$relais_1 =~ s/\^/ /g;
-				prepare_answer_buffer($srccall,$relais_1);
-				aprs_tx($aprs_txdatei); 
-				$relais_2 =~ s/\^/ /g;
-				prepare_answer_buffer($srccall,$relais_2);
-			}
+					$relais_1 = extract_relais($relais);
+					$relais = substr($relais_org,length($relais_1)+1,length($relais_org));
+					$relais_2 = extract_relais($relais);
+					$relais_1 =~ s/\^/ /g;
+					prepare_answer_buffer($srccall,$relais_1);
+					aprs_tx($aprs_txdatei); 
+					$relais_2 =~ s/\^/ /g;
+					prepare_answer_buffer($srccall,$relais_2);
+				}
+			} else {
+				@array = split (/\^/, $relais);
+				my $rr = 0;
+				foreach $entry (@array) {
+					if ($rr < 3) {
+						$relais_1 = $relais_1 . sprintf("%-20s", $entry);
+					} else {
+						$relais_2 = $relais_2 . sprintf("%-20s", $entry);
+					}
+					++$rr;
+					last if ($rr == 6);
+				}	
+			prepare_answer_buffer($srccall,$relais_2);
+			aprs_tx($aprs_txdatei); 
+			$write2file = sprintf "[$message_time] Relais1 ORG: [%s] [$relais_2]\n",$relais_1;
+			print_file($logdatei,$write2file) if ($verbose >= 1);
+			prepare_answer_buffer($srccall,$relais_1);
+			}	
 		}	
 		if ($payload eq "?aprs?") {
-			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 2);
-			print_file($msgdatei,$write2file) if ($verbose >= 2);
+			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 1);
+			print_file($msgdatei,$write2file) if ($verbose >= 1);
 			open(ANSWER, ">$aprs_txdatei") or do {
 						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
 						print_file($logdatei,$write2file);
@@ -333,8 +375,8 @@ sub parse_aprs {
 						# die "Fehler bei Datei: $aprs_txdatei\n";
 			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
 			close ANSWER;
-			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$srccall if ($verbose >= 2);
-			print_file($msgdatei,$write2file) if ($verbose >= 2);
+			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$srccall if ($verbose >= 1);
+			print_file($msgdatei,$write2file) if ($verbose >= 1);
 		} else {
 			$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$destcall,$srccall,$payload,$ack,$srcdest;
 			print_file($logdatei,$write2file);
@@ -343,8 +385,8 @@ sub parse_aprs {
 			system('touch', $msgdatei . ".neu");
 		}
 	} else {
-		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 2);
-		print_file($logdatei,$write2file) if ($verbose >= 2);
+		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 1);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
 		print_file($msgdatei,$write2file);
 	}
 }
@@ -400,8 +442,11 @@ sub send_keepalive {
 		} else {
 			$aprs_init = "";
 		}	
-			
-        $data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz APRS-Client (by DL3EL) %s\n",$k_srccall,$k_destcall,$aprs_init);
+		if (($aprs_lat eq "5001.00N") &&	($aprs_lon eq "00800.00E")) {
+			$data = sprintf ("%s>%s,TCPIP*:\n",$k_srccall,$k_destcall);
+		} else {
+			$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz APRS-Client (by DL3EL) %s\n",$k_srccall,$k_destcall,$aprs_init);
+		}	
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
@@ -525,7 +570,7 @@ sub read_config {
 			print_file($logdatei,$write2file) if ($verbose >= 1);
 		}
 	}
-	$write2file = sprintf "[$log_time] Config received  CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 0);
+	$write2file = sprintf "[$log_time] Config received  CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 1);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	if (($aprs_login eq "undef") ||  ($aprs_login eq "")) {
 		return(0);
@@ -599,6 +644,50 @@ sub aprs_tx {
 				send_msg($destcall,$srcdest,$aprs_login,$pckt_nr,$aprs_msg);
 			}	
 			unlink $aprsdatei;
+		}	
+	} else {
+		print "Datei '$aprsdatei' nicht gefunden.\n" if ($verbose >= 3);
+	}
+}
+
+sub beacon_tx {
+	$log_time = act_time();
+	print "[$log_time] reading beacon tx data...\n" if ($verbose >= 3);
+	my $aprsdatei = $_[0];
+	my $data = "";
+	my $data_len = 0;
+	my $aprs_msg = "";
+# my $tg_status = "";
+# my $old_tgstatus = "";
+
+	$log_time = act_time();
+# Überprüfen, ob die Datei existiert
+	if (-e $aprsdatei) {
+		# stat gibt eine Liste zurück. Das 8. Element (Index 7) ist die Größe.
+		my @file_info = stat($aprsdatei);
+		my $data_len = $file_info[7]; # Größe in Bytes
+		my $data_mod = time() - $file_info[9]; # Größe in Bytes
+		$write2file = sprintf "[$log_time] Datei:%s Laege:%s Zeit:%s\n",$aprsdatei,$data_len,$data_mod;
+		print_file($logdatei,$write2file) if ($verbose >= 2);
+		if (($data_len) && ($data_mod < 5)) {
+			open(INPUT, $aprsdatei) or die "Fehler bei Eingabedatei: $aprsdatei\n";
+			{
+			local $/;#	
+			$tg_status = <INPUT>;
+			}    
+			close INPUT;
+			if ($tg_status ne $old_tgstatus) {
+				$srcdest = "APNFMN";
+				$srcdest = "APRS";
+				$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz %s:TG%s\n",$aprs_login,$srcdest,$fmn_call,$tg_status);
+				$socket->send($data);
+				$write2file = sprintf "[$log_time] beacon $data";
+				print_file($logdatei,$write2file) if ($verbose >= 0);
+			} else {
+				$write2file = sprintf "[$log_time] no change, no beacon $data";
+				print_file($logdatei,$write2file) if ($verbose >= 2);
+			}
+			$old_tgstatus = $tg_status
 		}	
 	} else {
 		print "Datei '$aprsdatei' nicht gefunden.\n" if ($verbose >= 3);
@@ -684,6 +773,7 @@ sub connect_aprs {
 			$aprsgroups = "g/FMNUPD/APNFMN";
 		}	
 		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
+#		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter m/50 %s",$aprs_login,$aprs_passwd,$aprsgroups);
 	}	
 	my $login_success = "# logresp " . $aprs_login . " verified";
 # Login Loop
