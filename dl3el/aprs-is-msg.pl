@@ -339,8 +339,8 @@ sub parse_aprs {
 # Process data
 	if ($ack ne ":ack") {
 		$pckt_nr = $ack;
-
-		if (((substr($srccall,0,5) eq "DL3EL") && ($payload eq "?update?")) || ($destcall eq "FMNUPD")) {
+# Payload could end with {ack#, there a substring should done
+		if (((substr($srccall,0,5) eq "DL3EL") && (substr($payload,0,8) eq "?update?")) || ($destcall eq "FMNUPD")) {
 # process ?update?
 			process_update($payload);
 		}	
@@ -352,7 +352,7 @@ sub parse_aprs {
 # process ?rp?
 			process_rp($payload,$srccall);
 		}	
-		if ($payload eq "?aprs?") {
+		if (substr($payload,0,3) eq "?ap") { 
 # process ?aprs?
 			process_aprs($payload,$srccall);
 		} else {
@@ -889,20 +889,9 @@ sub read_config {
 	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
 	$write2file .= sprintf "aprs_filter:%s aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_filter,$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 0);
-#	if (($qrg ne "") || ($rxctcss ne "" )) {
-#		$radioinfo = "(";
-#		if ($qrg ne "") {
-#			$radioinfo .= $qrg . "MHz ";
-#		}	
-#		if ($rxctcss ne "") {
-#			$radioinfo .= $rxctcss . "Hz";
-#		}	
-#		$radioinfo .= ")";
-#	} else {
-#		$radioinfo = "(no Radio)";
-#	}
 	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
+	$write2file = "";
 	return(1);
 }
 
