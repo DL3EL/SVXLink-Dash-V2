@@ -40,15 +40,17 @@ if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'
     }  
 }  
 
-if (($file == "log") || ($file == "ref") || ($file == "msg") || ($file == "info")) {
-  if (($file == "log")  || ($file == "ref")) {
+if (($file == "log") || ($file == "loga") || ($file == "ref") || ($file == "msg") || ($file == "info")) {
+  if (($file == "log")  || ($file == "loga")  || ($file == "ref")) {
     if ($file == "log") {
       $file = SVXLOGPATH . SVXLOGPREFIX;
-    } else {  
-      $file = SVXLOGPATH . "svxreflector";
-	    if (!file_exists($file)) {
-        $file = SVXLOGPATH . "svxreflector.log";
-      }
+    } elseif ($file == "loga") {  
+        $file = DL3EL . "/aprs-is.log";
+      } else { 
+        $file = SVXLOGPATH . "svxreflector";
+        if (!file_exists($file)) {
+          $file = SVXLOGPATH . "svxreflector.log";
+        }
     }
     $zipfile = $file . ".1.gz";
     $log = 1;

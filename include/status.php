@@ -22,7 +22,23 @@ include_once "functions.php";
             $dbversion = $dbversion . "(a)";
          }  
          $dbversion = " db=\"" . $dbversion . "\"";
-         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . " >/dev/null &";
+         /* Radio */
+         $radioqrg = "";
+         $radioctcss = "";
+         if (defined('DL3EL_RADIO')) {
+            $svxRadio = DL3EL_RADIO;
+            if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+               $RfConfFile = DL3EL . '/sa818/sa818.json';
+               if (fopen($RfConfFile,'r')) {
+                  $filedata = file_get_contents($RfConfFile);
+                  $RfData = json_decode($filedata,true);
+                  $radioqrg = " qrg=" . $RfData['rxfreq'] . "\"";
+                  $radioctcss = " rct=" . $RfData['rxctcss'] . "\"";
+               } 
+            }
+         }
+         
+         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioqrg . $radioctcss . " >/dev/null &";
          echo "Starting APRS " . $debug;
          exec($cmd, $output, $retval);
          $logtext =  "APRS Dienst gestartet " . $cmd . " / " . $debug . "\n";
@@ -406,6 +422,17 @@ if ($reflectorlogic2 != "") {
    } else {   
       echo '<span title="[' . $ip .']"> from<br>IPV6</span>';
    }   
+   if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+      $aprspos = DL3EL . "/aprs-follow.pos";
+      if (file_exists($aprspos)) {
+         $delta = time() - filemtime($aprspos);
+         if ($delta > 60) {
+            $filepos = file_get_contents($aprspos);
+            $position = explode("^",$filepos);
+            echo "<br>QTH: " . $position[0] . " " . $position[1];
+         }   
+      }
+   }      
    echo "</div></td></tr>";
    echo "</table>\n";
 } else {

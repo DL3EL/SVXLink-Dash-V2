@@ -43,12 +43,16 @@ my $aprs_msg_call = "";
 
 my $hispaddr = "";
 my $dbv = "";
+my $qrg = "";
+my $rxctcss = "";
+my $radioinfo = "";
+
 my $keepalive = 0;
 
 my $pckt_nr = 0;
-my $srccall = "";
-my $srcdest = "";
-my $destcall = "";
+#my $srccall = "";
+#my $srcdest = "";
+#my $destcall = "";
 my $aprsgroups = "";
 
 # flush after every write
@@ -63,10 +67,14 @@ my $selector    = IO::Select->new(\*STDIN);
 my $aprs_lat      = "5001.00N"; 
 my $aprs_lon      = "00800.00E";
 my $aprs_sym      = "-";
+my $aprs_filter   = "";
+my $aprs_follow   = "";
 my $interval = 1800;
 my $last_beacon = 0;
 my $tg_status = "";
 my $old_tgstatus = "";
+my $old_aprs_lat      = "5001.00N"; 
+my $old_aprs_lon      = "00800.00E";
 
 my $exit_script = 0;
 
@@ -93,9 +101,17 @@ my $exit_script = 0;
 		    print "dir: $dir\n" if $verbose;
         }
 		if (substr($a,0,3) eq "db=") {
-		    $dbv = substr($a,3,length($a-3));
-		    $dbv = substr($a,3,length($a));
+		    $dbv = substr($a,3,length($a)-3);
+#		    $dbv = substr($a,3,length($a));
 		    print "DB-Verison: $dbv\n" if $verbose;
+        }
+		if (substr($a,0,4) eq "qrg=") {
+		    $qrg = substr($a,3,length($a)-3);
+		    print "QRG: $qrg\n" if $verbose;
+        }
+		if (substr($a,0,4) eq "rct=") {
+		    $rxctcss = substr($a,3,length($a)-3);
+		    print "RXCTCSS: $rxctcss\n" if $verbose;
         }
 	}
 # best to create a crontab entry for the receiver to start at system boot
@@ -112,6 +128,7 @@ my $exit_script = 0;
  	my $aprs_bcdatei = $dir  . "tg_status";
 	my $aprs_ok_datei = $dir  . "aprs-login.ok";
 	my $aprs_exit_datei = $dir  . "aprs.exit";
+	my $aprs_follow_pos = $dir  . "aprs-follow.pos";
 	my $dbversionFile = $dir  . "dbversion.upd";
 	unlink $aprs_ok_datei;
 
@@ -145,10 +162,10 @@ MainLoop:
 				$write2file = sprintf "[$log_time] new connect necessary\n";
 				print_file($logdatei,$write2file) if ($verbose >= 0);
 			if (!connect_aprs()) { sleep 10; next; }
-			my $last_beacon = 0;
+		    $last_beacon = 0;
 		}
 	    my $datastring = '';
-	    $hispaddr = recv($socket, $datastring, 512, 0); # blocking recv
+	    $hispaddr = recv($socket, $datastring, 1024, 0); # blocking recv
 	    if (!defined($hispaddr)) {
 			if ($blocking) {
 				$log_time = act_time();
@@ -162,23 +179,55 @@ MainLoop:
 				sleep 1; 
 			}	
 	    } else {
+# remove CR obsolete
+#            $datastring =~ s/\r?\n$//;
+# it could be, that there are more frames in one datastring, separated bei 0x0A (\r), so we have to deal with it
 			if (length($datastring)) {
 				$log_time = act_time();
 				++$rr;
-				$srccall = "";
-				$srcdest = "";
-				$destcall = "";
-				$write2file = sprintf "[$log_time] recv successful ($datastring) Laenge:%s, $rr\n",length($datastring);
+				my $ll = length($datastring);
+				$write2file = sprintf("[$log_time]recv successful ($datastring) [$ll] $rr\n") if ($verbose >= 0);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
+				my @matches = $datastring =~ m/\r/g; # Findet alle Vorkommen von \r
+				my $count = scalar @matches;    # Zählt die Anzahl der gefundenen Elemente
+				$count = 0;
+				while ($datastring =~ /(.*)\r/g) {
+					$count++; # Inkrementiert Zähler für jedes gefundene \r
+# for debugging this, we have to start the script via cli 
+					print "(0x0a) gefunden, $count Teil: $1\n" if ($verbose >= 3);
+					if (substr($1,0,7) ne "# aprsc") {
 # do not parse server msg
-				if (substr($datastring,0,7) ne "# aprsc") {
-					parse_aprs($datastring);
-				}	
+						parse_aprs($1);
+						$ll = length($1);
+						$write2file = sprintf("[$log_time]2 ($count) parsed ($1) [$ll] $rr\n") if ($verbose >= 0);
+						print_file($logdatei,$write2file) if ($verbose >= 3);
+					} 
+				}
+# do not parse server msg
+#				if (substr($datastring,0,7) ne "# aprsc") {
+#					print_file($logdatei,$write2file) if ($verbose >= 0);
+#					parse_aprs($datastring);
+#				} else {
+#					print_file($logdatei,$write2file) if ($verbose >= 2);
+#				}		
 			}	
 	    }
 # check if something to send
 		aprs_tx($aprs_txdatei); 
-		beacon_tx($aprs_bcdatei) if (($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E"));
+		if (($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E")) {
+#	if coordinates are given, send a beacon, when TG has changed
+# resets keepalive timer, if beacon was sent
+			beacon_tx($aprs_bcdatei);
+		}
+
+
+		if (($old_aprs_lat ne $aprs_lat) || ($old_aprs_lon ne $aprs_lon)) {
+			send_keepalive($aprs_login);
+			$last_beacon = time();
+			$old_aprs_lat = $aprs_lat; 
+			$old_aprs_lon = $aprs_lon; 
+		}
+
 		if (time() - $last_beacon >= $interval) {
 			send_keepalive($aprs_login);
 			$last_beacon = time();
@@ -209,7 +258,13 @@ sub parse_aprs {
 	my $raw_data = trim_cr($_[0]);
 	my $ack  = "";
 	my $nn = 0;
-	my $d5 = $5;
+	my $datatype = "undef";
+	my $position = "";
+	my $srccall = "undef";
+	my $srcdest = "undef";
+	my $destcall = "undef";
+	my $payload = "";
+
 	$message_time = act_time();
 	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 1);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
@@ -217,75 +272,138 @@ sub parse_aprs {
 # DL3EL-8>APDR16,TCPIP*,qAC,T2ERFURT::DL3EL    :google.com{36
 # other
 # WA1GOV-10>APX219,TCPIP*,qAC,T2PERTH::DL3EL    :ISS over JO40HD AOS 02Jan26 21:28 UTC AZ 199 MaxEL/AZ 15/139
-#     1       2                          3         4 
-#	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)\{([\d]+)/i)? $4 : "undef";
-	my $payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
-	if ($payload ne "undef") {
+# DJ6RG-2>T9UPV0,qAS,DB0ND-10:`~)VpHov/`"5B}439.300MHz Wolfram on Tour_1 (something invalid) -> compressed position
+# DH4FE>APDR16,TCPIP*,qAC,T2SWEDEN:=5012.46N/00842.25E>438.875MHz/A=000596      F-51          438. (something invalid)
+# DL3EL-8>APDR16,TCPIP*,qAC,T2POLNW::DL3EL    :?wx?{135
+#
+# Code Alternative.
+# offener Punkt: ? kann nicht ausgewertet werden. Entgegen aller Beschreibeungen klappt die Regex damit nicht.
+	if ($raw_data =~ /([\w-]+)>([\w-]+),.*:([:;!\/=@#$%*<>T])/i) {
 		$srccall = $1;
 		$srcdest = $2;
-		$destcall = $3;
-	} else {
-		$write2file = sprintf "[$message_time] invalid Message %s\n",$raw_data if ($verbose >= 2);
-		print_file($logdatei,$write2file) if ($verbose >= 2);
+		$datatype = $3;
+	}	
+
+	if ($datatype eq "undef") {
+# Todo: compressed beacon		
+		$write2file = sprintf "[$message_time] unknown data [%s]\n",$raw_data if ($verbose >= 0);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
 		return 0;
 	}	
-	if ($5 ne "") {
-# prüfen, ob wir das überhaupt noch brauchen
-		$d5 = $5;
-		$write2file = sprintf "[$message_time] RX 1:%s 2:%s 3:%s 4:%s 5:%s\n",$srccall,$srcdest,$destcall,$payload,$d5;
-		print_file($logdatei,$write2file) if ($verbose >= 2);
-		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
-		if ($ack eq "undef") {
-			$ack = ($raw_data =~ /.*(\:ack)([\d]+)/i)? $1 : "undef";
-			if ($ack eq ":ack") {
-				$write2file = sprintf "[$message_time] no ack to be send\n";
+	if ($datatype eq ":") {
+# datatype is message
+		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)/i)? $4 : "undef";
+
+		if ($payload ne "undef") {
+			$srccall = $1;
+			$srcdest = $2;
+			$destcall = $3;
+# Type Message found			
+#			$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
+			$destcall = $3;
+			if ($destcall eq $aprs_msg_call) {
+				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$payload if ($verbose >= 1);
+				print_file($logdatei,$write2file) if ($verbose >= 1);
 			} else {
-				 $write2file = sprintf "[$message_time] new condition: %s (raw: %s [$d5])\n",$ack,$raw_data;
-				 $ack = ":ack";
-			}
-		} else {	
-			$write2file = sprintf "[$message_time] Payload need ack: %s\n",$ack;
-		}	
-# bis hier prüfen, ob wir das überhaupt noch brauchen
-	} else {
-		$write2file = sprintf "[$message_time] check for ack R[%s], P[%s]\n",$raw_data,$payload if ($verbose >= 2);
-		print_file($logdatei,$write2file) if ($verbose >= 2);
-		$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
-		if ($ack eq "undef") {
-			$write2file = sprintf "[$message_time] no ack to be send [$ack][$payload]\n" if ($verbose >= 2);
-			if (substr($payload,0,3) ne "ack") {
-				$ack = "msg";
-			} else { 
-				$ack = ":ack";
-			}	
+				$write2file = sprintf "[$message_time] other message [%s]\n",$raw_data if ($verbose >= 1);
+				print_file($logdatei,$write2file) if ($verbose >= 1);
+				return 0;
+			}		
 		} else {
-			$write2file = sprintf "[$message_time] ack to be send [$ack] P[$payload]\n" if ($verbose >= 2);
-			print_file($logdatei,$write2file) if ($verbose >= 2);
-# delete ack from payload
-			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
-			$write2file = sprintf "[$message_time] ack to be send P[$payload]\n" if ($verbose >= 2);
-		}
+			$write2file = sprintf "[$message_time] wrong payload for datatype [%s] [%s]\n",$datatype,$raw_data if ($verbose >= 1);
+			print_file($logdatei,$write2file) if ($verbose >= 1);
+			return 0;
+		}	
+	} else {
+		$write2file = sprintf "[$message_time] Datatyp is [%s] [%s]\n",$datatype,$raw_data if ($verbose >= 1);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
+		if (($srcdest ne "APNFMN") && ($destcall ne $aprs_msg_call)) {
+		# not for us, but put into Log		
+			process_other($raw_data,$srccall);
+		} else {
+			$write2file = sprintf "[$message_time] Data ignored [%s]\n",$raw_data if ($verbose >= 0);
+			print_file($logdatei,$write2file) if ($verbose >= 0);
+		}	
+		return 0;
 	}	
+# check and process ack if necessary
+	$write2file = sprintf "[$message_time] calling check for ack R[%s], P[%s]\n",$raw_data,$payload if ($verbose >= 2);
 	print_file($logdatei,$write2file) if ($verbose >= 2);
-#	if ((defined $1) && (defined $2) && (defined $3) && ($ack ne "") && ($ack ne ":ack")) {
+	$ack = process_ack($raw_data,$payload,$srccall,$srcdest,$destcall);
+
+# Process data
+	if ($ack ne ":ack") {
+		$pckt_nr = $ack;
+
+		if (((substr($srccall,0,5) eq "DL3EL") && ($payload eq "?update?")) || ($destcall eq "FMNUPD")) {
+# process ?update?
+			process_update($payload);
+		}	
+		if (($payload eq "?wx?") || (substr($payload,0,2) eq "?w")) {
+# process ?wx?
+			process_wx($srccall);
+		}	
+		if (($payload eq "?rp?") || (substr($payload,0,2) eq "?r")) {
+# process ?rp?
+			process_rp($payload,$srccall);
+		}	
+		if ($payload eq "?aprs?") {
+# process ?aprs?
+			process_aprs($payload,$srccall);
+		} else {
+			$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$destcall,$srccall,$payload,$ack,$srcdest;
+			print_file($logdatei,$write2file);
+			$write2file = sprintf "[$message_time] FM-Funknetz: Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
+			print_file($msgdatei,$write2file);
+			system('touch', $msgdatei . ".neu");
+		}
+	} else {
+		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 1);
+		print_file($logdatei,$write2file);
+		print_file($msgdatei,$write2file) if ($verbose >= 1);
+	}
+}
+
+sub process_ack {
+	my $raw_data = $_[0];
+	my $payload = $_[1];
+	my $srccall = $_[2];
+	my $srcdest = $_[3];
+	my $destcall = $_[4];
+	
+	my $ack = "";
+	$write2file = sprintf "[$message_time] check for ack R[%s], P[%s]\n",$raw_data,$payload if ($verbose >= 2);
+	print_file($logdatei,$write2file) if ($verbose >= 2);
+	$ack = ($raw_data =~ /.*\{([\d]+)/i)? $1 : "undef";
+	if ($ack eq "undef") {
+		$write2file = sprintf "[$message_time] no ack to be send [$payload]\n" if ($verbose >= 2);
+		if (substr($payload,0,3) ne "ack") {
+			$ack = "msg";
+		} else { 
+			$ack = ":ack";
+		}	
+	} else {
+		$write2file = sprintf "[$message_time] ack to be send [$ack] P[$payload]\n" if ($verbose >= 2);
+		print_file($logdatei,$write2file) if ($verbose >= 2);
+# delete ack from payload
+		$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
+		$write2file = sprintf "[$message_time] ack to be send P[$payload]\n" if ($verbose >= 2);
+	}
+
+	print_file($logdatei,$write2file) if ($verbose >= 2);
 	if (($ack ne "") && ($ack ne ":ack")) {
 # ack first
-		$pckt_nr = $ack;
 		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$destcall,$srccall,$payload,$ack if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
 		send_ack($srccall,$srcdest,$destcall,$ack);
+		if ($ack =~ /^-?\d+(\.\d+)?$/) {
+			$pckt_nr = $ack;
+		}
 	}
-#	if (($payload ne "undef") && ($ack ne ":ack")){
-	if ($ack ne ":ack") {
-		$pckt_nr = $ack;
-#		$srccall = $1;
-#		$srcdest = $2;
-#		$destcall = $3;
-
-		if (((substr($srccall,0,5) eq "DL3EL") && ($payload eq "?update?")) || ($destcall eq "FMNUPD")) {
-#			$destcall = "FMNUPD";
-#		} 
-#		if ($destcall eq "FMNUPD") {
+	return $ack;
+}	
+sub process_update {
+	my $payload = $_[0];
 			$write2file = sprintf "[$message_time] neues Update steht bereit!\n",$payload;
 			print_file($msgdatei,$write2file);
             $payload = "update";
@@ -296,8 +414,9 @@ sub parse_aprs {
 						# die "Fehler bei Datei: $aprs_txdatei\n";
 			printf ANSWER $payload;
 			close ANSWER;
-		}	
-		if (($payload eq "?wx?") || (substr($payload,0,2) eq "?w")) {
+}
+sub process_wx {
+	my $srccall = $_[0];
 			my $metar = "curl -s \"http://relais.dl3el.de/cgi-bin/adds.pl?ctrcall=$srccall\" 2>&1";
 			$write2file = sprintf "[$message_time] Metar: %s\n",$metar;
 			print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -317,9 +436,12 @@ sub parse_aprs {
 			$write2file = sprintf "[$message_time] Metar: [%s]\n",$metar;
 			print_file($logdatei,$write2file);
 			prepare_answer_buffer($srccall,$metar);
+}
 
-		}	
-		if (($payload eq "?rp?") || (substr($payload,0,2) eq "?r")) {
+sub process_rp {
+	my $payload = $_[0];
+	my $srccall = $_[1];
+
 			my $position = 0;
 			my $old_position = 0;
 			my $aprs_pr = ($payload eq "?rp?")? "y" : "s";
@@ -365,7 +487,11 @@ sub parse_aprs {
 			prepare_answer_buffer($srccall,$relais_1);
 			}	
 		}	
-		if ($payload eq "?aprs?") {
+
+sub process_aprs {
+	my $payload = $_[0];
+	my $srccall = $_[1];
+
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 1);
 			print_file($msgdatei,$write2file) if ($verbose >= 1);
 			open(ANSWER, ">$aprs_txdatei") or do {
@@ -377,19 +503,7 @@ sub parse_aprs {
 			close ANSWER;
 			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$srccall if ($verbose >= 1);
 			print_file($msgdatei,$write2file) if ($verbose >= 1);
-		} else {
-			$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$destcall,$srccall,$payload,$ack,$srcdest;
-			print_file($logdatei,$write2file);
-			$write2file = sprintf "[$message_time] Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
-			print_file($msgdatei,$write2file);
-			system('touch', $msgdatei . ".neu");
-		}
-	} else {
-		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 1);
-		print_file($logdatei,$write2file) if ($verbose >= 1);
-		print_file($msgdatei,$write2file);
-	}
-}
+}	
 
 sub extract_relais {
 	my $relais = $_[0];
@@ -422,8 +536,138 @@ sub send_ack {
 		$socket->send($data);
 		$log_time = act_time();
 #		print LOG "[$log_time] $data";
-		$write2file = sprintf "[$log_time] $data";
+		$write2file = sprintf "[$log_time]ack: $data";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
+}
+
+sub process_other {
+	my $raw_data = $_[0];
+	my $srccall = $_[1];
+	my $datatype = "";
+	my $position = "";
+
+# danach noch manuell filtern
+# APRS Data Type Identifiers
+# ! Position without timestamp
+# / Position with timestamp
+# = Position without timestamp (with APRS messaging)
+# @ Position with timestamp (with APRS messaging)
+# ? Query
+# # Peet Bros U-II Weather Station
+# $ Raw GPS data or Ultimeter 2000
+# % Agrelo DFJr / MicroFinder
+# * Peet Bros U-II Weather Station
+# < Station Capabilities
+# > Status
+# T Telemetry data
+# 
+# : Message
+# Symbol Table Identifier Selected Table or Overlay Symbol 
+#/ Primary Symbol Table (mostly stations) 
+#\ Alternate Symbol Table (mostly Objects) 
+#0-9 Numeric overlay. Symbol from Alternate Symbol Table (uncompressed lat/long data format) 
+#a-j Numeric overlay. Symbol from Alternate Symbol Table (compressed lat/long data format only). i.e. a-j maps to 0-9 
+#A-Z Alpha overlay. Symbol from Alternate Symbol Table
+
+# 2026-01-07 15:32:17 CET: DL3EL-5>APDR16,TCPIP*,qAC,T2TURKIYE:=5009.20N/00839.39E$/A=000735 https://aprsdroid.org/
+# [08.01.2026 12:19:31] DF1VA-12>APRSMC,TCPIP*,qAR,DG3FAW-12:!5011.27N/00838.10E#Gateway JO40HE/B=061/A=000420
+# DN9EER-10>APDW17,TCPIP*,qAC,T2LAUSITZ:!4951.90NR00819.02E&PHG0500OpenWebRX APRS gateway
+# DN9EER-10>APDW17,TCPIP*,qAC,T2LAUSITZ:!4951.90NR00819.02E&PHG0500OpenWebRX APRS gateway
+# DH1FAN-9>APDR10,DB0VA*,WIDE2-1,qAR,DB0EJ:!5002.80N/00811.63E(173/000/A=000465Maddin - TG262
+# DH1FAN-9>APDR10,DB0VA*,WIDE2-1,qAR,DB0EJ:!5002.80N/00811.63E(173/000/A=000465Maddin - TG262
+# DH4FE>APDR16,TCPIP*,qAC,T2SWEDEN:=5012.46N/00842.25E>438.875MHz/A=000624      F-51          438.DL8HW-12>APRSGW,TCPIP*,qAR,DL8HW-12:!5016.61N/00847.06E-Wetterau#Hans/B=005/A=000476
+# DH4FE>APDR16,TCPIP*,qAC,T2SWEDEN:=5012.46N/00842.25E>438.875MHz/A=000624      F-51          438.DL8HW-12>APRSGW,TCPIP*,qAR,DL8HW-12:!5016.61N/00847.06E-Wetterau#Hans/B=005/A=000476
+# DB0VA>APNU19,WIDE1-1,WIDE2-2,qAO,DF6PA-2:)DB0VA FM1!5006.57N/00808.00Er439.325MHz -760 z54.vfdb.org  Wiesbaden (compressed pos?)
+# DB0FDA>APRS,WIDE3-3,qAR,DB0EJ:!4952.05N/00838.28E#Relais Hochschule Darmstadt 438.587 MHz DOK F42
+# DB0FDA>APRS,WIDE3-3,qAR,DB0EJ:!4952.05N/00838.28E#Relais Hochschule Darmstadt 438.587 MHz DOK F42
+# DG3FBL-13>APRSGW,TCPIP*,qAR,DG3FBL-13:!4958.13N/00834.21E#MeshCom mobil#Jochen on Tour/B=098/A=000259
+# DG3FBL-13>APRSGW,TCPIP*,qAR,DG3FBL-13:!4958.13N/00834.21E#MeshCom mobil#Jochen on Tour/B=098/A=000259
+#		$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([\!\/\=\@]+)([\d\d\d\d\.\d\d[N|S][\/|\\|0-9|a-j|A-Z]\d\d\d\d\d\.\d\d[W|E])/i)? $4 : "undef";
+#		$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([!|=]+)([\d\d\d\d\.\d\d[N|S][\/|\\|0-9|a-j|A-Z]\d\d\d\d\d\.\d\d[W|E])/i)? $4 : "undef";
+#		$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:!([\d*\.\d*[N|S]\/\d*\.\d*[W|E])/i)? $3 : "undef";
+#		$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:!([\d*\.\d*][N|S]\/\d*\.\d*[W|E])/i)? $3 : "undef";
+#		$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([!|=]+)([\d\d\d\d\.\d\d]+)/i)? $4 : "undef";
+# ok		$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([!|=]+)([\d*.\d*]+[N|S]+[\/|\\|0-9|a-j|A-Z]{1}[\d*.\d*]+)/i)? $4 : "undef";
+	$position = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([!\/=@]+)([\d*.\d*]+[N|S]+)[\/|\\|0-9|a-j|A-Z]{1}([\d*.\d*]+[E|W]+).(.*)/i)? $4 : "undef";
+
+	if ($position eq "undef") {
+# other than pos reports
+		$write2file = sprintf "[$message_time]. %s\n",$raw_data if ($verbose >= 1);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
+	} else {
+		if ($srccall eq $aprs_follow) {
+			$aprs_lat = $4;
+			$aprs_lon = $5;
+			$write2file = sprintf "[$message_time] Position of station to follow %s found: %s %s\n",$srccall,$aprs_lat,$aprs_lon if ($verbose >= 0);
+# Position of DL3EL-15 found: 5009.20N/00839.42
+# aprs_lat = "5009.20N"; 
+# aprs_lon = "00839.42E";
+			my $lat_dec = aprs_to_decimal($aprs_lat);
+			my $lon_dec = aprs_to_decimal($aprs_lon);			
+			my $locator = convert2loc($lat_dec,$lon_dec);
+			$position = $aprs_lat . "^" . $aprs_lon . "^" . $locator;
+
+			open(DBPOS, ">$aprs_follow_pos") or do {
+					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
+					print_file($logdatei,$write2file);
+					die "ERROR in Filehandling: $!\n"; };
+					# die "Fehler bei Datei: $aprs_txdatei\n";
+			printf DBPOS $position;
+			close DBPOS;
+		} else {
+			my $lat_dec = aprs_to_decimal($4);
+			my $lon_dec = aprs_to_decimal($5);			
+			my $locator = convert2loc($lat_dec,$lon_dec);
+			$write2file = sprintf "[$message_time]%s (%s): %s\n",$1,$locator,$6 if ($verbose >= 0);
+		}
+		print_file($logdatei,$write2file) if ($verbose >= 0);
+	}	
+}
+
+sub aprs_to_decimal {
+    my ($coord, $type) = @_;
+
+    # Extraktion der Werte mit Regex
+    # Latitude: DDMM.mm (2 Stellen Grad)
+    # Longitude: DDDMM.mm (3 Stellen Grad)
+    if ($coord =~ /^(\d{2,3})(\d{2}\.\d+)([NSEW])$/) {
+        my ($degrees, $minutes, $direction) = ($1, $2, $3);
+
+        # Berechnung: Dezimalgrad = Grad + (Minuten / 60)
+        my $decimal = $degrees + ($minutes / 60);
+
+        # Südliche Breite und westliche Länge sind negativ
+        if ($direction eq 'S' || $direction eq 'W') {
+            $decimal *= -1;
+        }
+
+        return sprintf("%.6f", $decimal);
+    }
+    return undef;
+}
+
+sub convert2loc {
+my $latcalc;
+my $loncalc;
+my @loc;
+
+	$latcalc = (defined $_[0])? $_[0] : 0;
+	$loncalc = (defined $_[1])? $_[1] : 0;
+
+	$loncalc += 180;
+	$loncalc /= 2;
+
+	$loc[0] = int($loncalc/10) + 65;
+	$loc[2] = int($loncalc%10) + 65 - 17;
+	$loc[4] = int(24*($loncalc-int($loncalc))) + 65;
+
+	$latcalc += 90;
+
+	$loc[1] = int($latcalc/10) + 65;
+	$loc[3] = int($latcalc%10) + 65 - 17;
+	$loc[5] = int(24*(abs($latcalc-int($latcalc)))) + 65;
+
+	return(sprintf "%s%s%s%s%s%s",chr($loc[0]),chr($loc[1]),chr($loc[2]),chr($loc[3]),chr($loc[4]),chr($loc[5]));
 }
 
 sub send_keepalive {
@@ -558,9 +802,12 @@ sub read_config {
 				$aprs_lat = $par if ($1 eq "aprs_lat");
 				$aprs_lon = $par if ($1 eq "aprs_lon");
 				$aprs_sym = $par if ($1 eq "aprs_sym");
+				$aprs_filter = $par if ($1 eq "aprs_filter");
+				$aprs_follow = $par if ($1 eq "aprs_follow");
 			}
 		}
-		$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 1);
+		$write2file = sprintf "[$log_time] current aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s \n aprs_filter:%s ", $aprs_login,$aprs_passwd,$aprs_msg_call,$aprs_filter;
+		$write2file .= sprintf "aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 1);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
 	}
 	if ((substr($aprs_login,0,6) eq "N0CALL") ||  ($aprs_login eq "")) {
@@ -585,6 +832,7 @@ sub read_config {
 	if ($2 eq "-") {
 		$aprs_ssid = $3;
 
+# Test if numeric
 		if ($aprs_ssid =~ /^-?\d+(\.\d+)?$/) {
 			if ($aprs_ssid > 15) {
 				$aprs_login = $aprs_login . "-14";
@@ -604,8 +852,38 @@ sub read_config {
 	if (($aprs_passwd eq "-1") || ($aprs_passwd eq "")) {
 		$aprs_passwd = aprs_passcode($aprs_login);
 	}	
+## check if station to follow and if pos avail	
+	if ($aprs_follow ne "") {
+		if (-e $aprs_follow_pos) {
+			open(INPUT, $aprs_follow_pos) or die "Fehler bei Eingabedatei: $aprs_follow_pos\n";
+			{
+				local $/;#	
+				$data = <INPUT>;
+			}    
+			close INPUT;
+			($aprs_lat,$aprs_lon) = split(/\^/, $data);
+			$write2file = sprintf "[$log_time] Follower %s found with position %s %s [$data]\n", $aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+			print_file($logdatei,$write2file) if ($verbose >= 0);
+			$aprs_filter .= " b/" . $aprs_follow;
+		}	
+	} else {
+		if ((($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E")) || (($aprs_lat ne "") && ($aprs_lon ne ""))) {
+			my $position = $aprs_lat . "^" . $aprs_lon;
+			open(DBPOS, ">$aprs_follow_pos") or do {
+					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
+					print_file($logdatei,$write2file);
+					die "ERROR in Filehandling: $!\n"; };
+					# die "Fehler bei Datei: $aprs_txdatei\n";
+			printf DBPOS $position;
+			close DBPOS;
+		}	
+	}
+	$old_aprs_lat = $aprs_lat; 
+	$old_aprs_lon = $aprs_lon; 
+
 	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
-	print_file($logdatei,$write2file) if ($verbose >= 1);
+	$write2file .= sprintf "aprs_filter:%s aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_filter,$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 0);
 	return(1);
 }
 
@@ -616,6 +894,8 @@ sub aprs_tx {
 	my $data = "";
 	my $data_len = 0;
 	my $aprs_msg = "";
+	my $destcall = "";
+	my $srcdest = "";
 
 # Überprüfen, ob die Datei existiert
 	if (-e $aprsdatei) {
@@ -660,6 +940,8 @@ sub beacon_tx {
 	my $data = "";
 	my $data_len = 0;
 	my $aprs_msg = "";
+#	$srcdest = "APNFMN";
+	my $srcdest = "APRS";
 # my $tg_status = "";
 # my $old_tgstatus = "";
 
@@ -671,7 +953,7 @@ sub beacon_tx {
 		my $data_len = $file_info[7]; # Größe in Bytes
 		my $data_mod = time() - $file_info[9]; # Größe in Bytes
 		$write2file = sprintf "[$log_time] Datei:%s Laege:%s Zeit:%s\n",$aprsdatei,$data_len,$data_mod;
-		print_file($logdatei,$write2file) if ($verbose >= 2);
+		print_file($logdatei,$write2file) if ($verbose >= 3);
 		if (($data_len) && ($data_mod < 5)) {
 			open(INPUT, $aprsdatei) or die "Fehler bei Eingabedatei: $aprsdatei\n";
 			{
@@ -680,15 +962,25 @@ sub beacon_tx {
 			}    
 			close INPUT;
 			if ($tg_status ne $old_tgstatus) {
-				$srcdest = "APNFMN";
-				$srcdest = "APRS";
-				$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz %s:TG%s\n",$aprs_login,$srcdest,$fmn_call,$tg_status);
+				if (($qrg ne "") || ($rxctcss ne "" )) {
+					$radioinfo = "(";
+					if ($qrg ne "") {
+						$radioinfo .= $qrg . " ";
+					}	
+					if ($rxctcss ne "") {
+						$radioinfo .= $rxctcss;
+					}	
+					$radioinfo = ")";
+				}		
+				$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz %s:TG%s %s\n",$aprs_login,$srcdest,$fmn_call,$tg_status,$radioinfo);
 				$socket->send($data);
+# reset keepalive timer
+				$last_beacon = time();
 				$write2file = sprintf "[$log_time] beacon $data";
 				print_file($logdatei,$write2file) if ($verbose >= 0);
 			} else {
 				$write2file = sprintf "[$log_time] no change, no beacon $data";
-				print_file($logdatei,$write2file) if ($verbose >= 2);
+				print_file($logdatei,$write2file) if ($verbose >= 3);
 			}
 			$old_tgstatus = $tg_status
 		}	
@@ -775,8 +1067,15 @@ sub connect_aprs {
 		} else {
 			$aprsgroups = "g/FMNUPD/APNFMN";
 		}	
-		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
-#		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter m/50 %s",$aprs_login,$aprs_passwd,$aprsgroups);
+#		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
+		if ($aprs_filter eq "") {
+			$aprs_filter = sprintf ("m/50 b/%s",$aprs_msg_call);
+			$aprs_filter = sprintf ("b/%s",$aprs_msg_call);
+			if ($aprs_follow ne "") {
+				$aprs_filter .= sprintf ("/%s",$aprs_follow);
+			}	
+		}	
+		$login = sprintf ("user %s pass %s vers %s filter %s %s",$aprs_login,$aprs_passwd,$app_name,$aprs_filter,$aprsgroups);
 	}	
 	my $login_success = "# logresp " . $aprs_login . " verified";
 # Login Loop
