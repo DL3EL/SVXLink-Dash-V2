@@ -35,7 +35,7 @@ include_once "functions.php";
                   $RfData = json_decode($filedata,true);
 //                  $radioqrg = " qrg=\"" . $RfData['rxfreq'] . "\"";
 //                  $radioctcss = " rct=\"" . $RfData['rxctcss'] . "\"";
-                  $radioinfo = "ri=\"(" . $RfData['rxfreq'] . "MHz, T" . $RfData['rxctcss'] . ")\"";
+                  $radioinfo = " ri=\"(" . $RfData['rxfreq'] . "MHz, T" . $RfData['rxctcss'] . ")\"";
                } 
             } else {
                $radioinfo = " ri=\"(" . $svxRadio . ")\"";
