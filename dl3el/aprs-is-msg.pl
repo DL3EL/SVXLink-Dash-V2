@@ -187,7 +187,7 @@ MainLoop:
 				$log_time = act_time();
 				++$rr;
 				my $ll = length($datastring);
-				$write2file = sprintf("[$log_time]recv successful ($datastring) [$ll] $rr\n") if ($verbose >= 0);
+				$write2file = sprintf("[$log_time]recv successful ($datastring) [$ll] $rr\n") if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
 				my @matches = $datastring =~ m/\r/g; # Findet alle Vorkommen von \r
 				my $count = scalar @matches;    # Zählt die Anzahl der gefundenen Elemente
@@ -200,7 +200,7 @@ MainLoop:
 # do not parse server msg
 						parse_aprs($1);
 						$ll = length($1);
-						$write2file = sprintf("[$log_time]2 ($count) parsed ($1) [$ll] $rr\n") if ($verbose >= 0);
+						$write2file = sprintf("[$log_time]2 ($count) parsed ($1) [$ll] $rr\n") if ($verbose >= 3);
 						print_file($logdatei,$write2file) if ($verbose >= 3);
 					} 
 				}
@@ -898,7 +898,7 @@ sub read_config {
 		$radioinfo = "(no Radio)";
 	}
 	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
-	print_file($logdatei,$write2file) if ($verbose >= 1);
+	print_file($logdatei,$write2file) if ($verbose >= 0);
 	return(1);
 }
 
