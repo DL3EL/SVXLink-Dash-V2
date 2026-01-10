@@ -118,6 +118,10 @@ my $exit_script = 0;
 		    $rxctcss = substr($a,4,length($a)-4);
 		    print "RXCTCSS: $rxctcss\n" if $verbose;
         }
+		if (substr($a,0,3) eq "ri=") {
+		    $radioinfo = substr($a,3,length($a)-3);
+		    print "Radioinfo: $radioinfo\n" if $verbose;
+        }
 	}
 # best to create a crontab entry for the receiver to start at system boot
 # @reboot /var/www/html/dl3el/aprs-is-msg.pl
@@ -885,18 +889,18 @@ sub read_config {
 	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
 	$write2file .= sprintf "aprs_filter:%s aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_filter,$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 0);
-	if (($qrg ne "") || ($rxctcss ne "" )) {
-		$radioinfo = "(";
-		if ($qrg ne "") {
-			$radioinfo .= $qrg . "MHz ";
-		}	
-		if ($rxctcss ne "") {
-			$radioinfo .= $rxctcss . "Hz";
-		}	
-		$radioinfo .= ")";
-	} else {
-		$radioinfo = "(no Radio)";
-	}
+#	if (($qrg ne "") || ($rxctcss ne "" )) {
+#		$radioinfo = "(";
+#		if ($qrg ne "") {
+#			$radioinfo .= $qrg . "MHz ";
+#		}	
+#		if ($rxctcss ne "") {
+#			$radioinfo .= $rxctcss . "Hz";
+#		}	
+#		$radioinfo .= ")";
+#	} else {
+#		$radioinfo = "(no Radio)";
+#	}
 	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	return(1);

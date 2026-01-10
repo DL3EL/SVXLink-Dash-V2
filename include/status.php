@@ -23,6 +23,7 @@ include_once "functions.php";
          }  
          $dbversion = " db=\"" . $dbversion . "\"";
          /* Radio */
+         $radioinfo = "";
          $radioqrg = "";
          $radioctcss = "";
          if (defined('DL3EL_RADIO')) {
@@ -34,11 +35,14 @@ include_once "functions.php";
                   $RfData = json_decode($filedata,true);
                   $radioqrg = " qrg=\"" . $RfData['rxfreq'] . "\"";
                   $radioctcss = " rct=\"" . $RfData['rxctcss'] . "\"";
+                  $radioinfo = "ri=\"(" . $RfData['rxfreq'] . "MHz, " . $RfData['rxctcss'] . "Hz)\"";
                } 
-            }
+            } else {
+               $radioinfo = " ri=\"(" . $svxRadio . ")\"";
+            }   
          }
-         
-         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioqrg . $radioctcss . " >/dev/null &";
+#         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioqrg . $radioctcss . " >/dev/null &";
+         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioinfo . " >/dev/null &";
          echo "Starting APRS " . $debug;
          exec($cmd, $output, $retval);
          $logtext =  "APRS Dienst gestartet " . $cmd . " / " . $debug . "\n";
