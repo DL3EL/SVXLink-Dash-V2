@@ -898,7 +898,7 @@ sub read_config {
 		$radioinfo = "(no Radio)";
 	}
 	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
-	print_file($logdatei,$write2file) if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
 	return(1);
 }
 
