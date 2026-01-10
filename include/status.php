@@ -32,8 +32,8 @@ include_once "functions.php";
                if (fopen($RfConfFile,'r')) {
                   $filedata = file_get_contents($RfConfFile);
                   $RfData = json_decode($filedata,true);
-                  $radioqrg = " qrg=" . $RfData['rxfreq'] . "\"";
-                  $radioctcss = " rct=" . $RfData['rxctcss'] . "\"";
+                  $radioqrg = " qrg=\"" . $RfData['rxfreq'] . "\"";
+                  $radioctcss = " rct=\"" . $RfData['rxctcss'] . "\"";
                } 
             }
          }

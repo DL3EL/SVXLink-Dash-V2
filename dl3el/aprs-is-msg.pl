@@ -78,6 +78,11 @@ my $old_aprs_lon      = "00800.00E";
 
 my $exit_script = 0;
 
+	$dir = ($0 =~ /(.*)aprs-is-msg.pl/i)? $1 : "undef";
+	$conf = $dir . "aprs-is-msg.conf";
+	printf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV $dir $conf\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year if ($verbose >= 1);
+ 	my $logdatei = $dir  . "aprs-is.log";
+
 	my $total = $#ARGV + 1;
 	my $counter = 1;
 	foreach my $a(@ARGV) {
@@ -103,14 +108,14 @@ my $exit_script = 0;
 		if (substr($a,0,3) eq "db=") {
 		    $dbv = substr($a,3,length($a)-3);
 #		    $dbv = substr($a,3,length($a));
-		    print "DB-Verison: $dbv\n" if $verbose;
+		    print "DB-Version: $dbv\n" if $verbose;
         }
 		if (substr($a,0,4) eq "qrg=") {
-		    $qrg = substr($a,3,length($a)-3);
+		    $qrg = substr($a,4,length($a)-4);
 		    print "QRG: $qrg\n" if $verbose;
         }
 		if (substr($a,0,4) eq "rct=") {
-		    $rxctcss = substr($a,3,length($a)-3);
+		    $rxctcss = substr($a,4,length($a)-4);
 		    print "RXCTCSS: $rxctcss\n" if $verbose;
         }
 	}
@@ -119,10 +124,6 @@ my $exit_script = 0;
 # "/var/www/html" should be replaced with the running directroy of the svxlink dasboard
 # all necessary definitgion have to made in the file /var/www/html/dl3el/aprs-is-msg.conf
 
-	$dir = ($0 =~ /(.*)aprs-is-msg.pl/i)? $1 : "undef";
-	$conf = $dir . "aprs-is-msg.conf";
-	printf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV $dir $conf\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year if ($verbose >= 1);
- 	my $logdatei = $dir  . "aprs-is.log";
  	my $msgdatei = $dir  . "aprs-is.msg";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
  	my $aprs_bcdatei = $dir  . "tg_status";
@@ -884,6 +885,20 @@ sub read_config {
 	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
 	$write2file .= sprintf "aprs_filter:%s aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_filter,$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 0);
+	if (($qrg ne "") || ($rxctcss ne "" )) {
+		$radioinfo = "(";
+		if ($qrg ne "") {
+			$radioinfo .= $qrg . "MHz ";
+		}	
+		if ($rxctcss ne "") {
+			$radioinfo .= $rxctcss . "Hz";
+		}	
+		$radioinfo .= ")";
+	} else {
+		$radioinfo = "(no Radio)";
+	}
+	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
 	return(1);
 }
 
@@ -962,16 +977,6 @@ sub beacon_tx {
 			}    
 			close INPUT;
 			if ($tg_status ne $old_tgstatus) {
-				if (($qrg ne "") || ($rxctcss ne "" )) {
-					$radioinfo = "(";
-					if ($qrg ne "") {
-						$radioinfo .= $qrg . " ";
-					}	
-					if ($rxctcss ne "") {
-						$radioinfo .= $rxctcss;
-					}	
-					$radioinfo = ")";
-				}		
 				$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz %s:TG%s %s\n",$aprs_login,$srcdest,$fmn_call,$tg_status,$radioinfo);
 				$socket->send($data);
 # reset keepalive timer
