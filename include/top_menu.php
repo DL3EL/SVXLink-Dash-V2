@@ -205,10 +205,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
 	    echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> | ';
 	} else {
-	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">Log</a> | ';
+	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a> | ';
 	}
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS</a> ';
+	    echo '<a href="./edit.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
+	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> || <b>Full</b> Edit</a> | ';
