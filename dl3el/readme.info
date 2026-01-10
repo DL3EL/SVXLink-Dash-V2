@@ -1,19 +1,37 @@
+Neues in der Version 5.27 (10.01.2026)
+- Dashboard jetzt mit aktuellen Koordinaten möglich
+	Die APRS Erweiterung bringt einiges an zusätzlichen Möglchkeiten. Man das das Dashboard 
+	jetzt so konfigurieren, dass es seine eigenen Koordinaten kennt. Für die hier beschriebenen
+	Funktionen muss in der config.php die Konstante:
+	define("DL3EL_APRS_MSG", "yes");
+	gesetzt sein. Wer das jetzt neu macht, der sollte sich auch die Releasenotes zu den 
+	vorangegangen Updates durclesen.
+	Die einfachste und statische Möglichkeit ist, wenn in der aprs-is-msg.conf die Koordinaten 
+	eingetragen werden:
+	aprs_lat = "5009.25N"; 
+	aprs_lon = "00839.46E";
+	aprs_sym = "-";
+	Ist das geschehen so wird beim Login, alle 30 Minuten und immer dann, wenn sich die
+	TG ändert eine APRS Bake mit dem Standort ausgesendet (ähnlich wie bei QSO Link).
+	Im Statusfenster unten links werden die aktuellen Koordinaten im APRS Format angezeigt.
+
 Neues in der Version 5.26a (06.01.2026)
 - Servicerelease
 	Da die beiden Funktionen ?wx? und ?rp? vor allem von portablen oder mobilen APRS Geräten 
 	genutzt werden, ist es wichtig, ein Call zu nutzen, welches per Funk erreicht werden kann. 
 	In der APRS Spezifikation ist beschrieben, dass SSIDs nur im Bereich von -1 bis -15 
 	gültig sind. Daher habe ich jetzt folgende Vorgehensweise eingebaut.
-	Zuerst wird geprüft, ob in der aprs.conf ein etwas ungleich "N0CALL" eingetragen ist. Falls 
-	nicht, wird das in der svxlink.conf für FM-Funknetz eingetragene Call genutzt.
+	Zuerst wird geprüft, ob in der aprs-is-msg.conf ein etwas ungleich "N0CALL" eingetragen ist. 
+	Falls nicht, wird das in der svxlink.conf für FM-Funknetz eingetragene Call genutzt.
 	Danach wird geprüft, ob die SSID im Bereich von -1 bis -15 ist.
 	Ist sie nicht numerisch, wird als SSID -15 genutzt, ist sie größer als -15 wird
 	-14 verwendet. 
-	Wenn in der aprs.conf ein Standort eingetragen ist:
-	aprs_lat = "500.00N"; 
+	Wenn in der aprs-is-msg.conf ein Standort eingetragen ist:
+	aprs_lat = "5000.00N"; 
 	aprs_lon = "00800.00E";
 	so wird dieser mit der Bake beim APRS Start und beim keepalive ausgesendet. Ansonsten nicht.
-	Die Koordinaten bitte anpassen.
+	Die Koordinaten bitte anpassen. Sollte der Defaultwert aus der aprs-is-msg.conf.example
+	nicht geändert werden, wird auch keine Bake verschickt.
 	
 	Da ich ein FT2D für portablen APRS Betrieb habe, kann ich spezielle Funkgeräteanpassungen
 	am einfachsten an diesem Gerätetyp machen. Der Empfänger kann APRS Nachrichten mit einer
@@ -383,10 +401,10 @@ Neues in der Version 5.03 (10.11.2025)
 	Es gibt folgendes zu beachten
 	- Im Moment kann nur eine [section] bearbeitet werden, diese muss zu Beginn der Reflectorx.conf eingetragen 
 		sein und exakt der gewünschten [section] aus der svxlink.conf entsprechen
-	- sollte man in der svxlink.conf innerhalb einer [section] den gleichen Eintrag mehrfach verwendet haben,
-		so gilt immer nur der letzte. Egal ob als Kommentar gekennzeichnet oder nicht. D.h. der aktive 
-		Eintrag *muss* immer der letze sein. Durch dieses Skript werden solche Mehrfacheinträeg jedoch 
-		gelöscht (bis auf den letzten, das ist leider nicht zu vermeiden.
+	- sollte man in der svxlink.conf innerhalb einer [section] den gleichen Eintrag mehrfach verwendet haben, 
+		so gilt immer der letzte. Egal ob als Kommentar gekennzeichnet oder nicht. Durch dieses Skript werden 
+		solche Mehrfacheinträge gelöscht (bis auf den letzten egal ob auskommentiert oder nicht), 
+		das ist leider nicht zu vermeiden.
 	- wenn man einen Wert in einer Konfig braucht (z.B. HOSTS) in anderen aber nicht, so muss der in denen,
 		wo er nicht benötigt wird, mit # versehen werden. Bevor man beginnt, muss der Eintrag entsprechend
 		auch in der svxlink.conf vorhanden sein.
