@@ -8,9 +8,6 @@ include_once "settings.php";
     $aprs_datei = DL3EL . "/aprs-is.txt";
     $msg_datei = DL3EL . "/aprs-is.msg";
 
-    $result  = file($aprs_datei);
-    $aprs_data = array_reverse($result);
-    sort($aprs_data);
     if (file_exists($msg_datei)) {
 	$result  = file($msg_datei);
 	$aprs_msg = array_reverse($result);
@@ -80,10 +77,18 @@ include_once "settings.php";
     $parsedData = parseLinesToUniqueArray($line_neu);
 */
 $file = $aprs_datei;
+    if (file_exists($aprs_datei)) {
+//	$result  = file($aprs_datei);
+//	$aprs_data = array_reverse($result);
+//	sort($aprs_data);
+	$uniqueData = readLast100Unique($file);
+    } else {
+	return;
+    }
+
 
 // 1. Daten holen (Eindeutigkeit basierend auf dem ersten Feld, z.B. DL1FX)
 $uniqueData = readLast100Unique($file);
-
 // 2. Daten ausgeben
     $aprs_data = printLogData($uniqueData);
     $nn = 0;
