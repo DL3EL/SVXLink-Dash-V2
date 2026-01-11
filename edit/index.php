@@ -40,12 +40,14 @@ if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'
     }  
 }  
 
-if (($file == "log") || ($file == "loga") || ($file == "ref") || ($file == "msg") || ($file == "info")) {
-  if (($file == "log")  || ($file == "loga")  || ($file == "ref")) {
+if (($file == "log") || ($file == "loga") || ($file == "logb") || ($file == "ref") || ($file == "msg") || ($file == "info")) {
+  if (($file == "log")  || ($file == "loga")  || ($file == "logb") || ($file == "ref")) {
     if ($file == "log") {
       $file = SVXLOGPATH . SVXLOGPREFIX;
     } elseif ($file == "loga") {  
         $file = DL3EL . "/aprs-is.log";
+    } elseif ($file == "logb") {  
+        $file = DL3EL . "/aprs-is-mqtt.msg";
       } else { 
         $file = SVXLOGPATH . "svxreflector";
         if (!file_exists($file)) {

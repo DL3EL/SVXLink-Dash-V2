@@ -69,7 +69,8 @@ include_once "functions.php";
             }
          </style>';
 //         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
-         echo '<a href="./edit.php?file=msg" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
+//         echo '<a href="./edit.php?file=msg" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
+         echo '<a href="./aprs.php" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
       }   
 	} 
 // sudo killall aprs-is-msg.pl

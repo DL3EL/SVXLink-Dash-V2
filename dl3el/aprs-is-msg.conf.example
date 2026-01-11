@@ -1,6 +1,6 @@
-aprs_login  = "N0CALL-M"
+aprs_login  = "N0CALL"
 aprs_passwd = "-1"
-aprs_msg_call = "N0CALL*"
+aprs_msg_call = "N0CALL"
 aprs_lat = "5001.00N"
 aprs_lon = "00800.00E"
 aprs_sym = "-"

@@ -14,17 +14,30 @@ include_once "include/page_top.php";
     echo '</div>'."\n";
     echo '</td>'."\n";
 
-   if (defined('DL3EL')) {
-      $ELQueryFile = DL3EL . "/el_query";
-      $elquery = shell_exec('cat ' . $ELQueryFile);
-      $RelaisFile = DL3EL . "/relais.csv";
-      $FMQueryFile = DL3EL . "/fm_query";
-      $fmquery = shell_exec('cat ' . $FMQueryFile);
-      $FMLQueryFile = DL3EL . "/fml_query";
-      $fmlquery = shell_exec('cat ' . $FMLQueryFile);
-   } else {
-      $RelaisFile = "relais.csv";
-   }
+    if (defined('DL3EL')) {
+        $ELQueryFile = DL3EL . "/el_query";
+        $elquery = shell_exec('cat ' . $ELQueryFile);
+        $RelaisFile = DL3EL . "/relais.csv";
+        $FMQueryFile = DL3EL . "/fm_query";
+        $fmquery = shell_exec('cat ' . $FMQueryFile);
+        $FMLQueryFile = DL3EL . "/fml_query";
+        $fmlquery = shell_exec('cat ' . $FMLQueryFile);
+    } else {
+        $RelaisFile = "relais.csv";
+    }
+    if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+        $aprspos = DL3EL . "/aprs-follow.pos";
+        if (file_exists($aprspos)) {
+            $filepos = file_get_contents($aprspos);
+            $position = explode("^",$filepos);
+            if ((defined ('debug')) && (debug > 0)) echo "<br>" . $position[0] . " " . $position[1] . ":" .  $position[2];
+            $fmquery = "";
+            $fmlquery = $position[2];
+            $update_list = 1;
+        }
+    } else {
+        $update_list = 0;
+    }     
 ?>
    <p style = "padding-left: 5px; text-align: left;"> &nbsp;
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
@@ -38,9 +51,14 @@ include_once "include/page_top.php";
         <button type="submit">Query</button>
         <input type="hidden" name="form_submitted" value="1">
     </form>
+
+
    </p> 
     <?php
-//wget -O relais.csv -q "http://relais.dl3el.de/cgi-bin/relais.pl?ctrcall=dl3el-14&sel=ctrcall&type_fr=1&printas=csv&maxgateways=20&nohtml=yes"
+    if ($update_list === 1) {
+        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $fmlquery . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+        echo "",exec($cmd, $output, $retval);
+    }    
     $loc = "";
     $loc_found = 0;
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
@@ -60,7 +78,9 @@ include_once "include/page_top.php";
         $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?" . $query_loc . $query_el . $query_fr . $query_fhs . "&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
 //        $cmd = "wget -O " . $RelaisFile . " -q \"https://relais.dl3el.de/FM-Relais/DM7DS/relaisgeo_fmn_el.php\"";
 //        echo "<br>Aufruf: " . $cmd . "<br>";
+        if ((defined ('debug')) && (debug > 0)) echo "Call: $cmd<br>";
         echo "",exec($cmd, $output, $retval);
+        $update_list = 1;
         if (defined('DL3EL')) {
             $fmquery = $_POST['prefix'] . " >" . $FMQueryFile;
             shell_exec("echo $fmquery");
@@ -68,6 +88,7 @@ include_once "include/page_top.php";
             shell_exec("echo $fmlquery");
         }    
     }
+
     if (($handle = fopen($RelaisFile, "r")) !== FALSE) {
         echo '<form method="post">';
         while (($data = fgetcsv($handle, 1000, ";", "\"", "\\")) !== FALSE) {
@@ -98,8 +119,10 @@ include_once "include/page_top.php";
             }
         }
         fclose($handle);
-        $cmd = "wget -O- -q \"http://relais.dl3el.de/cgi-bin/metar.pl?sel=gridsq&gs=" . $loc . "\"";
-//        echo "",exec($cmd, $output, $retval);
+        if ($update_list === 1) {
+            $cmd = "wget -O- -q \"http://relais.dl3el.de/cgi-bin/metar.pl?sel=gridsq&gs=" . $loc . "\"";
+            echo "",exec($cmd, $output, $retval);
+        }    
         echo '</form>';
     } else {
       echo "wrong file: " . $RelaisFile ."<br>";  

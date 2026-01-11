@@ -69,6 +69,8 @@ my $aprs_lon      = "00800.00E";
 my $aprs_sym      = "-";
 my $aprs_filter   = "";
 my $aprs_follow   = "";
+my $aprs_lat_dec  = ""; 
+my $aprs_lon_dec  = "";
 my $interval = 1800;
 my $last_beacon = 0;
 my $tg_status = "";
@@ -129,6 +131,7 @@ my $exit_script = 0;
 # all necessary definitgion have to made in the file /var/www/html/dl3el/aprs-is-msg.conf
 
  	my $msgdatei = $dir  . "aprs-is.msg";
+ 	my $aprs_rxdatei = $dir  . "aprs-is.txt";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
  	my $aprs_bcdatei = $dir  . "tg_status";
 	my $aprs_ok_datei = $dir  . "aprs-login.ok";
@@ -151,11 +154,11 @@ my $exit_script = 0;
 	$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\nCalled via: $0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
 	print_file($logdatei,$write2file) if ($verbose >= 0);
 	$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
-	print_file($msgdatei,$write2file) if ($verbose >= 0);
+	print_file($msgdatei,$write2file) if ($verbose >= 1);
 	if ((!read_config($conf)) && ($login eq "")) {
 		$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version]: no valid config found, terminating\n";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
-		print_file($msgdatei,$write2file) if ($verbose >= 0);
+		print_file($msgdatei,$write2file) if ($verbose >= 1);
 		exit 0;
 	}
 
@@ -339,7 +342,7 @@ sub parse_aprs {
 # Process data
 	if ($ack ne ":ack") {
 		$pckt_nr = $ack;
-# Payload could end with {ack#, there a substring should done
+# Payload could end with {ack#, therefore a substring should be done
 		if (((substr($srccall,0,5) eq "DL3EL") && (substr($payload,0,8) eq "?update?")) || ($destcall eq "FMNUPD")) {
 # process ?update?
 			process_update($payload);
@@ -359,13 +362,14 @@ sub parse_aprs {
 			$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$destcall,$srccall,$payload,$ack,$srcdest;
 			print_file($logdatei,$write2file);
 			$write2file = sprintf "[$message_time] FM-Funknetz: Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
+			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
+			$write2file = sprintf "%s^MSG^%s^^%s^\n",$srccall,$payload,aprs_time();
 			print_file($msgdatei,$write2file);
 			system('touch', $msgdatei . ".neu");
 		}
 	} else {
 		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 1);
 		print_file($logdatei,$write2file);
-		print_file($msgdatei,$write2file) if ($verbose >= 1);
 	}
 }
 
@@ -409,7 +413,7 @@ sub process_ack {
 }	
 sub process_update {
 	my $payload = $_[0];
-			$write2file = sprintf "[$message_time] neues Update steht bereit!\n",$payload;
+			$write2file = sprintf "[$message_time] DL3EL^^neues Update steht bereit!\n",$payload;
 			print_file($msgdatei,$write2file);
             $payload = "update";
 			open(ANSWER, ">$dbversionFile") or do {
@@ -498,7 +502,7 @@ sub process_aprs {
 	my $srccall = $_[1];
 
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 1);
-			print_file($msgdatei,$write2file) if ($verbose >= 1);
+			print_file($logdatei,$write2file) if ($verbose >= 1);
 			open(ANSWER, ">$aprs_txdatei") or do {
 						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
 						print_file($logdatei,$write2file);
@@ -507,7 +511,7 @@ sub process_aprs {
 			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
 			close ANSWER;
 			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$srccall if ($verbose >= 1);
-			print_file($msgdatei,$write2file) if ($verbose >= 1);
+			print_file($logdatei,$write2file) if ($verbose >= 1);
 }	
 
 sub extract_relais {
@@ -550,7 +554,11 @@ sub process_other {
 	my $srccall = $_[1];
 	my $datatype = "";
 	my $position = "";
-
+	my $rx_aprs_lat = "";
+	my $rx_aprs_lon = "";
+	my $aprs_txt = "";
+	my $aprs_time = "";
+	my $dist = "";
 # danach noch manuell filtern
 # APRS Data Type Identifiers
 # ! Position without timestamp
@@ -600,16 +608,21 @@ sub process_other {
 		$write2file = sprintf "[$message_time]. %s\n",$raw_data if ($verbose >= 1);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
 	} else {
+		$rx_aprs_lat = $4;
+		$rx_aprs_lon = $5;
+		$aprs_txt = $6;
+		
 		if ($srccall eq $aprs_follow) {
 			$aprs_lat = $4;
 			$aprs_lon = $5;
-			$write2file = sprintf "[$message_time] Position of station to follow %s found: %s %s\n",$srccall,$aprs_lat,$aprs_lon if ($verbose >= 0);
+			$write2file = sprintf "0^%s^^Position of station to follow %s found: %s %s^^\n",$srccall,$srccall,$aprs_lat,$aprs_lon,aprs_time() if ($verbose >= 0);
+			print_file($aprs_rxdatei,$write2file) if ($verbose >= 0);
 # Position of DL3EL-15 found: 5009.20N/00839.42
 # aprs_lat = "5009.20N"; 
 # aprs_lon = "00839.42E";
-			my $lat_dec = aprs_to_decimal($aprs_lat);
-			my $lon_dec = aprs_to_decimal($aprs_lon);			
-			my $locator = convert2loc($lat_dec,$lon_dec);
+			$aprs_lat_dec = aprs_to_decimal($aprs_lat);
+			$aprs_lon_dec = aprs_to_decimal($aprs_lon);			
+			my $locator = convert2loc($aprs_lat_dec,$aprs_lon_dec);
 			$position = $aprs_lat . "^" . $aprs_lon . "^" . $locator;
 
 			open(DBPOS, ">$aprs_follow_pos") or do {
@@ -620,12 +633,15 @@ sub process_other {
 			printf DBPOS $position;
 			close DBPOS;
 		} else {
-			my $lat_dec = aprs_to_decimal($4);
-			my $lon_dec = aprs_to_decimal($5);			
+			my $lat_dec = aprs_to_decimal($rx_aprs_lat);
+			my $lon_dec = aprs_to_decimal($rx_aprs_lon);			
 			my $locator = convert2loc($lat_dec,$lon_dec);
-			$write2file = sprintf "[$message_time]%s (%s): %s\n",$1,$locator,$6 if ($verbose >= 0);
+			$dist = calcdist($lat_dec,$lon_dec,$aprs_lat_dec,$aprs_lon_dec,"km");
+			$write2file = sprintf "[$message_time]%s (%s): %s, dist:%s from [%s %s]\n",$1,$locator,$6,$dist,$aprs_lat_dec,$aprs_lon_dec if ($verbose >= 0);
+			print_file($logdatei,$write2file) if ($verbose >= 0);
+			$write2file = sprintf "%s^%s^%s^%s^%s^%s^\n",$dist,$srccall,$locator,$aprs_txt,aprs_time(),$dist;
+			print_file($aprs_rxdatei,$write2file) if ($verbose >= 0);
 		}
-		print_file($logdatei,$write2file) if ($verbose >= 0);
 	}	
 }
 
@@ -740,7 +756,7 @@ sub send_msg {
 		$log_time = act_time();
 		$write2file = sprintf "[$log_time] TX: %s", $data;
 		print_file($logdatei,$write2file);
-		print_file($msgdatei,$write2file);
+#		print_file($msgdatei,$write2file);
 }
 
 sub print_file {
@@ -772,6 +788,11 @@ sub trim_cr {
 sub act_time {
 	$tm = localtime(time);
 	return (sprintf("%02d.%02d.%04d %02d:%02d:%02d",$tm->mday, $tm->mon,$tm->year,$tm->hour, $tm->min, $tm->sec));
+}
+
+sub aprs_time {
+		$tm = localtime(time);
+		return (sprintf("%02d:%02d:%02d",,$tm->hour, $tm->min, $tm->sec));
 }
 sub read_config {
 	$log_time = act_time();
@@ -885,6 +906,9 @@ sub read_config {
 	}
 	$old_aprs_lat = $aprs_lat; 
 	$old_aprs_lon = $aprs_lon; 
+	$aprs_lat_dec = aprs_to_decimal($aprs_lat);
+	$aprs_lon_dec = aprs_to_decimal($aprs_lon);			
+
 
 	$write2file = sprintf "[$log_time] USING aprs config: aprs_login:%s aprs_passwd:%s aprs_msg_call:%s\n", $aprs_login,$aprs_passwd,$aprs_msg_call if ($verbose >= 0);
 	$write2file .= sprintf "aprs_filter:%s aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_filter,$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 0);
@@ -1108,7 +1132,8 @@ sub connect_aprs {
 	if ($rr == 6) {
 		$write2file = sprintf "[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data\n";
 		print_file($logdatei,$write2file);
-		print_file($msgdatei,$write2file);
+		$write2file = sprintf "Error^^[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data^^\n";
+		print_file($aprs_rxdatei,$write2file);
 		unlink $aprs_ok_datei;
 #		exit -1;
 		return 0;
@@ -1116,7 +1141,42 @@ sub connect_aprs {
 		system('touch', $aprs_ok_datei);
 		$write2file = sprintf "[$log_time] Login successfull $data\n";
 		print_file($logdatei,$write2file);
-		print_file($msgdatei,$write2file);
+#		print_file($aprs_rxdatei,$write2file);
 		return 1;
 	}
 }
+
+sub calcdist {
+# 1.852 = 1 Breitenminute; am Äquator auch eine Längenminute, am Pol ist diese 0, bei  etwa 1 bis 1,5km
+	my $lat1 = (defined $_[0])? $_[0] : 0;
+	my $lon1 = (defined $_[1])? $_[1] : 0;
+	my $lat2 = (defined $_[2])? $_[2] : 0; # $latctr;
+	my $lon2 = (defined $_[3])? $_[3] : 0; # $lonctr;
+	my $kmmls = (defined $_[4])? $_[4] : "km";
+	my $calcdist = 0;
+	my $d = 0;
+	my $gc_dm = 0;
+		
+	$lat1 = $lat1/180*3.1415926;
+	$lon1 = $lon1/180*3.1415926;
+	$lat2 = $lat2/180*3.1415926;
+	$lon2 = $lon2/180*3.1415926;
+
+	if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+		$calcdist = 0;
+		}
+	else	{
+		$d = acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($lon1 - $lon2));
+		$gc_dm = ((180/(3.1415926)) * $d * (1.852)) * 60;
+		if ($kmmls eq "mls") {
+			$calcdist = $gc_dm / 1.652;
+			}
+		else	{
+			$calcdist = $gc_dm;
+			}
+		}
+	$calcdist = sprintf("%5.2f%s",$calcdist,$kmmls);
+	return($calcdist);
+}
+
+sub acos { atan2( sqrt(1 - $_[0] * $_[0]), $_[0] ) }

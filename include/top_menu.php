@@ -201,18 +201,22 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 	echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Display</b></a> | ';
+	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+	    echo '<a href="./aprs.php" style = "color: #0000ff;">APRS Monitor</a> | ';
+	    echo '<a href="./edit.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
+//	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
+	    if (file_exists(DL3EL.'/aprs-is-mqtt.msg')) {
+		echo '<a href="./edit.php?file=logb" style = "color: black;" id="log">APRS MQTT | </a> ';
+	    }
+	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
-	    echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> | ';
+	    echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a>';
 	} else {
-	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a> | ';
-	}
-	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-	    echo '<a href="./edit.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
-	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
+	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a>';
 	}
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
-	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> || <b>Full</b> Edit</a> | ';
+	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> | <b>Full</b> Edit</a> | ';
 	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a>';
 	}
 	if (file_exists(DL3EL.'/Reflector2.conf')) {
