@@ -408,7 +408,7 @@ sub process_ack {
 }	
 sub process_update {
 	my $payload = $_[0];
-			$write2file = sprintf "[$message_time] DL3EL^^neues Update steht bereit!\n",$payload;
+			$write2file = sprintf "DL3EL^Info^neues Update steht bereit!^%s^\n",$payload,aprs_time();
 			print_file($msgdatei,$write2file);
             $payload = "update";
 			open(ANSWER, ">$dbversionFile") or do {
