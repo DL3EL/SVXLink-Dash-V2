@@ -1,3 +1,12 @@
+Neues in der Version 5.28 (12.01.2026)
+- APRS MSG ist jetzt der APRS Monitor
+	Es gibt jetzt den APRS Monitor, der Positionsmeldungen der Stationen im Umkreis des
+	eigenen Standortes anzeigt. Im Prinzip sind es die gleichen DAten die bisher über den 
+	Menupunkt "APRS MSG" zu sehen waren, nur mit besserer Optik :-)
+	Der Umkreis wird über die arps.conf mit einem Filter eingestellt: 
+	aprs_filter = "m/50";
+	So werden Meldungen im UMkreis von 50km angezeigt.
+
 Neues in der Version 5.27a (10.01.2026)
 - Dashboard jetzt mit aktuellen Koordinaten möglich
 	Die APRS Erweiterung bringt einiges an zusätzlichen Möglchkeiten. Man das das Dashboard 
@@ -182,8 +191,7 @@ Neues in der Version 5.20 (28.12.2025)
 	(z.B: wie bei APRSDROID ohne SSID) und das entsprechende Passwort. Wer das nicht weiß kann es sich dort
 	https://www.darc.de/der-club/distrikte/o/ortsverbaende/aprspasscode/
 	ausrechnen lassen. Ausserdem muss das Call eingetragen werden, auf das für die Nachrichten gefiltert werden 
-	soll. Also z.B. DB0AI* für alles an DB0AI oder DB0AI-1 nur für Nachrichten an DB0AI-1. 
-	Datei abspeichern bitte nicht vergessen.
+	soll. Datei abspeichern bitte nicht vergessen.
 	
 Neues in der Version 5.19 (25.12.2025)
 - Erweiterung des Loggings
