@@ -81,17 +81,16 @@ $file = $aprs_datei;
 //	$result  = file($aprs_datei);
 //	$aprs_data = array_reverse($result);
 //	sort($aprs_data);
+// 1. Daten holen (Eindeutigkeit basierend auf dem ersten Feld, z.B. DL1FX)
 	$uniqueData = readLast100Unique($file);
+	$aprs_data = printLogData($uniqueData);
+	$nn = 0;
     } else {
-	return;
+	$nn = 30;
     }
 
 
-// 1. Daten holen (Eindeutigkeit basierend auf dem ersten Feld, z.B. DL1FX)
-$uniqueData = readLast100Unique($file);
 // 2. Daten ausgeben
-    $aprs_data = printLogData($uniqueData);
-    $nn = 0;
     while ($nn < 22) { 
 	$line = explode("^", $aprs_data[$nn]);
 	$msg = $line[3];
