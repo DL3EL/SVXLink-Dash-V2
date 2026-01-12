@@ -141,24 +141,16 @@ my $exit_script = 0;
 	unlink $aprs_ok_datei;
 
     printf "LOG: %s Logdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
-    printf "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
 	STDOUT->autoflush(1);
 	open(LOG, ">>$logdatei") or die "Fehler bei Logdatei: $logdatei\n";
-	open(MSG, ">>$msgdatei") or die "Fehler bei LOGGINGdatei: $msgdatei\n";
     printf LOG "LOG: %s LOGGINGdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
-    printf MSG "MSG: %s Logdatei: %s\n",$dir,$msgdatei if ($verbose >= 1);
-    close MSG;
     close LOG;
 #	printf LOG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n$0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
-#	printf MSG "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
 	$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\nCalled via: $0 @ARGV\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
 	print_file($logdatei,$write2file) if ($verbose >= 0);
-	$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d ($dbv)\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year;
-	print_file($msgdatei,$write2file) if ($verbose >= 1);
 	if ((!read_config($conf)) && ($login eq "")) {
 		$write2file = sprintf "DL3EL APRS-IS Message Receiver [v$version]: no valid config found, terminating\n";
 		print_file($logdatei,$write2file) if ($verbose >= 0);
-		print_file($msgdatei,$write2file) if ($verbose >= 1);
 		exit 0;
 	}
 
@@ -283,10 +275,13 @@ sub parse_aprs {
 # DJ6RG-2>T9UPV0,qAS,DB0ND-10:`~)VpHov/`"5B}439.300MHz Wolfram on Tour_1 (something invalid) -> compressed position
 # DH4FE>APDR16,TCPIP*,qAC,T2SWEDEN:=5012.46N/00842.25E>438.875MHz/A=000596      F-51          438. (something invalid)
 # DL3EL-8>APDR16,TCPIP*,qAC,T2POLNW::DL3EL    :?wx?{135
+# DL2FCQ>APNFMN,TCPIP*,qAC,T2SPAIN::DL3EL    :Text{2
 #
 # Code Alternative.
 # offener Punkt: ? kann nicht ausgewertet werden. Entgegen aller Beschreibeungen klappt die Regex damit nicht.
-	if ($raw_data =~ /([\w-]+)>([\w-]+),.*:([:;!\/=@#$%*<>T])/i) {
+# offener Punkt: T für Telemetrie löst auch bei einem T als erstem Zeichen in der Nachricht aus
+#	if ($raw_data =~ /([\w-]+)>([\w-]+),.*:([:;!\/=@#$%*<>T]{1})/i) {
+	if ($raw_data =~ /([\w-]+)>([\w-]+),.*:([:;!\/=@#$%*<>]{1})/i) {
 		$srccall = $1;
 		$srcdest = $2;
 		$datatype = $3;
@@ -329,7 +324,7 @@ sub parse_aprs {
 		# not for us, but put into Log		
 			process_other($raw_data,$srccall);
 		} else {
-			$write2file = sprintf "[$message_time] Data ignored [%s]\n",$raw_data if ($verbose >= 0);
+			$write2file = sprintf "[$message_time] Data ignored [%s], Datatyp is [%s]\n",$raw_data,$datatype if ($verbose >= 0);
 			print_file($logdatei,$write2file) if ($verbose >= 0);
 		}	
 		return 0;
@@ -814,7 +809,7 @@ sub read_config {
 
 	if ($data ne "") {
 		@array = split (/\n/, $data);
-		$aprs_login  = "N0CALL-M";
+		$aprs_login  = "N0CALL";
 		$aprs_passwd = "-1";
 		$aprs_msg_call = "N0CALL";
 	
