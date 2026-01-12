@@ -358,7 +358,7 @@ sub parse_aprs {
 			print_file($logdatei,$write2file);
 			$write2file = sprintf "[$message_time] FM-Funknetz: Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
 			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
-			$write2file = sprintf "%s^MSG^%s^%s^\n",$srccall,$payload,aprs_time();
+			$write2file = sprintf "%s^MSG^%s^^%s^\n",$srccall,$payload,aprs_time();
 			print_file($msgdatei,$write2file);
 			system('touch', $msgdatei . ".neu");
 		}
@@ -408,7 +408,7 @@ sub process_ack {
 }	
 sub process_update {
 	my $payload = $_[0];
-			$write2file = sprintf "DL3EL^Info^neues Update steht bereit!\^%s\n",aprs_time();
+			$write2file = sprintf "DL3EL^Info^neues Update steht bereit!^^%s\n",aprs_time();
 			print_file($msgdatei,$write2file);
             $payload = "update";
 			open(ANSWER, ">$dbversionFile") or do {
