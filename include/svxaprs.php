@@ -92,10 +92,10 @@ $uniqueData = readLast100Unique($file);
 // 2. Daten ausgeben
     $aprs_data = printLogData($uniqueData);
     $nn = 0;
-    while ($nn < 25) { 
+    while ($nn < 22) { 
 	$line = explode("^", $aprs_data[$nn]);
 	$msg = $line[3];
-	    $ll = 40;
+	    $ll = 35;
 	    $llm = strlen($msg);
 	    if (strlen($msg) > $ll) {
 		$msg_array = explode(" ",$msg);

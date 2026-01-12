@@ -26,12 +26,11 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.65";
+my $version = "1.70";
 my $dir = "";
 my $conf = "";
 
 # --- Konfiguration ---
-my $call_with_ssid = "DL3EL-6";
 my $server         = 'euro.aprs2.net';
 my $port           = 14580;
 my $app_name       = "DL3EL APRS Client " . $version;
@@ -40,6 +39,7 @@ my $aprs_login  = "";
 my $fmn_call  = "";
 my $aprs_passwd = "";
 my $aprs_msg_call = "";
+my $aprs_msg_call_length = 0;
 
 my $hispaddr = "";
 my $dbv = "";
@@ -304,9 +304,9 @@ sub parse_aprs {
 # Type Message found			
 #			$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
 			$destcall = $3;
-			if ($destcall eq $aprs_msg_call) {
-				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$payload if ($verbose >= 1);
-				print_file($logdatei,$write2file) if ($verbose >= 1);
+			if ($destcall eq substr($aprs_msg_call,0,$aprs_msg_call_length)) {
+				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$payload if ($verbose >= 0);
+				print_file($logdatei,$write2file) if ($verbose >= 0);
 			} else {
 				$write2file = sprintf "[$message_time] other message [%s]\n",$raw_data if ($verbose >= 1);
 				print_file($logdatei,$write2file) if ($verbose >= 1);
@@ -320,7 +320,7 @@ sub parse_aprs {
 	} else {
 		$write2file = sprintf "[$message_time] Datatyp is [%s] [%s]\n",$datatype,$raw_data if ($verbose >= 1);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
-		if (($srcdest ne "APNFMN") && ($destcall ne $aprs_msg_call)) {
+		if (($srcdest ne "APNFMN") && ($destcall ne substr($aprs_msg_call,0,$aprs_msg_call_length))) {
 		# not for us, but put into Log		
 			process_other($raw_data,$srccall);
 		} else {
@@ -831,6 +831,14 @@ sub read_config {
 		$write2file .= sprintf "aprs_lat: %s aprs_lon:%s aprs_sym:%s aprs_follow:%s\n",$aprs_lat,$aprs_lon,$aprs_sym,$aprs_follow if ($verbose >= 1);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
 	}
+# Vorgehensweise zu aprs_login
+# ist die conf Datei nicht vorhanden, wird das Call vom Dashboard ohne SSID genommen
+# für das aprs_msg_call wird dieses ebenfalls benutzt
+# gleiches gilt, wenn die Default conf DAtei genutzt wird, d.h. aprs_login auf "N0CALL" steht
+# ist in der conf ein Call hinterlegt, wird geprüft, ob die SSID numerisch ist.
+# ist das nicht der Fall wird -15 eingestellt
+# ist die SSID nicht im Bereich von -1 bis -15 (oder leer), wird sie auf -14 geändert
+
 	if ((substr($aprs_login,0,6) eq "N0CALL") ||  ($aprs_login eq "")) {
 		if ($fmn_call) {
 			$aprs_login = ($fmn_call =~ /([\w]+)[-\w]*/s)? $1 : "undef";
@@ -847,6 +855,17 @@ sub read_config {
 	if (($aprs_msg_call eq "N0CALL") ||  ($aprs_msg_call eq "")) {
 		$aprs_msg_call = $aprs_login;
 	}
+	$aprs_msg_call_length = length($aprs_msg_call);
+	if (substr($aprs_msg_call,$aprs_msg_call_length-1,1) eq "*") {
+		$aprs_msg_call_length -= 1;
+	}	
+	my $aprs_filter_conf = $aprs_filter;
+	$aprs_filter = "b/" . $aprs_msg_call;
+	if ($aprs_follow ne "") {
+		$aprs_filter .= "/" . $aprs_follow;
+	}	
+	$aprs_filter .= " " . $aprs_filter_conf;
+
 	$write2file = sprintf "[$log_time] Begin1 CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	$aprs_login = ($aprs_login =~ /([\w]+)([-]*)([-\w]*)/s)? $1 : "undef";
@@ -885,7 +904,6 @@ sub read_config {
 			($aprs_lat,$aprs_lon) = split(/\^/, $data);
 			$write2file = sprintf "[$log_time] Follower %s found with position %s %s [$data]\n", $aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
 			print_file($logdatei,$write2file) if ($verbose >= 0);
-			$aprs_filter .= " b/" . $aprs_follow;
 		}	
 	} else {
 		if ((($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E")) || (($aprs_lat ne "") && ($aprs_lon ne ""))) {
@@ -1085,13 +1103,6 @@ sub connect_aprs {
 			$aprsgroups = "g/FMNUPD/APNFMN";
 		}	
 #		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
-		if ($aprs_filter eq "") {
-			$aprs_filter = sprintf ("m/50 b/%s",$aprs_msg_call);
-			$aprs_filter = sprintf ("b/%s",$aprs_msg_call);
-			if ($aprs_follow ne "") {
-				$aprs_filter .= sprintf ("/%s",$aprs_follow);
-			}	
-		}	
 		$login = sprintf ("user %s pass %s vers %s filter %s %s",$aprs_login,$aprs_passwd,$app_name,$aprs_filter,$aprsgroups);
 	}	
 	my $login_success = "# logresp " . $aprs_login . " verified";
