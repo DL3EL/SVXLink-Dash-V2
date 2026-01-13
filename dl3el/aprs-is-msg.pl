@@ -40,6 +40,7 @@ my $fmn_call  = "";
 my $aprs_passwd = "";
 my $aprs_msg_call = "";
 my $aprs_msg_call_length = 0;
+my $aprs_msg_call_wc = 0;
 
 my $hispaddr = "";
 my $dbv = "";
@@ -264,6 +265,7 @@ sub parse_aprs {
 	my $srcdest = "undef";
 	my $destcall = "undef";
 	my $payload = "";
+	my $mtype = "";
 
 	$message_time = act_time();
 	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 1);
@@ -304,7 +306,19 @@ sub parse_aprs {
 # Type Message found			
 #			$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
 			$destcall = $3;
-			if ($destcall eq substr($aprs_msg_call,0,$aprs_msg_call_length)) {
+			my $msg_for_us = 0;
+			$mtype = "MSG";
+			if ($aprs_msg_call_wc) {
+				if (substr($destcall,0,$aprs_msg_call_length) eq substr($aprs_msg_call,0,$aprs_msg_call_length)) {
+					$msg_for_us = 1;
+					$mtype = "to: " . $destcall;
+				}	
+			} else {
+				if ($destcall eq $aprs_msg_call) {
+					$msg_for_us = 1;
+				}
+			}
+			if ($msg_for_us) {
 				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$payload if ($verbose >= 0);
 				print_file($logdatei,$write2file) if ($verbose >= 0);
 			} else {
@@ -358,7 +372,7 @@ sub parse_aprs {
 			print_file($logdatei,$write2file);
 			$write2file = sprintf "[$message_time] FM-Funknetz: Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
 			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
-			$write2file = sprintf "%s^MSG^%s^^%s^\n",$srccall,$payload,aprs_time();
+			$write2file = sprintf "%s^%s^%s^^%s^\n",$srccall,$mtype,$payload,aprs_time();
 			print_file($msgdatei,$write2file);
 			system('touch', $msgdatei . ".neu");
 		}
@@ -395,7 +409,7 @@ sub process_ack {
 	}
 
 	print_file($logdatei,$write2file) if ($verbose >= 2);
-	if (($ack ne "") && ($ack ne ":ack")) {
+	if (($ack ne "") && ($ack ne ":ack") && ($ack ne "msg")) {
 # ack first
 		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$destcall,$srccall,$payload,$ack if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -838,7 +852,7 @@ sub read_config {
 # Vorgehensweise zu aprs_login
 # ist die conf Datei nicht vorhanden, wird das Call vom Dashboard ohne SSID genommen
 # für das aprs_msg_call wird dieses ebenfalls benutzt
-# gleiches gilt, wenn die Default conf DAtei genutzt wird, d.h. aprs_login auf "N0CALL" steht
+# gleiches gilt, wenn die Default conf Datei genutzt wird, d.h. aprs_login auf "N0CALL" steht
 # ist in der conf ein Call hinterlegt, wird geprüft, ob die SSID numerisch ist.
 # ist das nicht der Fall wird -15 eingestellt
 # ist die SSID nicht im Bereich von -1 bis -15 (oder leer), wird sie auf -14 geändert
@@ -856,20 +870,6 @@ sub read_config {
 		return(0);
 	}	
 	
-	if (($aprs_msg_call eq "N0CALL") ||  ($aprs_msg_call eq "")) {
-		$aprs_msg_call = $aprs_login;
-	}
-	$aprs_msg_call_length = length($aprs_msg_call);
-	if (substr($aprs_msg_call,$aprs_msg_call_length-1,1) eq "*") {
-		$aprs_msg_call_length -= 1;
-	}	
-	my $aprs_filter_conf = $aprs_filter;
-	$aprs_filter = "b/" . $aprs_msg_call;
-	if ($aprs_follow ne "") {
-		$aprs_filter .= "/" . $aprs_follow;
-	}	
-	$aprs_filter .= " " . $aprs_filter_conf;
-
 	$write2file = sprintf "[$log_time] Begin1 CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	$aprs_login = ($aprs_login =~ /([\w]+)([-]*)([-\w]*)/s)? $1 : "undef";
@@ -896,6 +896,23 @@ sub read_config {
 	if (($aprs_passwd eq "-1") || ($aprs_passwd eq "")) {
 		$aprs_passwd = aprs_passcode($aprs_login);
 	}	
+	if (($aprs_msg_call eq "N0CALL") ||  ($aprs_msg_call eq "")) {
+		$aprs_msg_call = $aprs_login;
+	}
+	$aprs_msg_call_length = length($aprs_msg_call);
+	if (substr($aprs_msg_call,$aprs_msg_call_length-1,1) eq "*") {
+		$aprs_msg_call_length -= 1;
+		$aprs_msg_call_wc = 1;
+	} else {
+		$aprs_msg_call_wc = 0;
+	}	
+	my $aprs_filter_conf = $aprs_filter;
+	$aprs_filter = "b/" . $aprs_msg_call;
+	if ($aprs_follow ne "") {
+		$aprs_filter .= "/" . $aprs_follow;
+	}	
+	$aprs_filter .= " " . $aprs_filter_conf;
+
 ## check if station to follow and if pos avail	
 	if ($aprs_follow ne "") {
 		if (-e $aprs_follow_pos) {
@@ -913,13 +930,6 @@ sub read_config {
 		if ((($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E")) || (($aprs_lat ne "") && ($aprs_lon ne ""))) {
 			my $position = $aprs_lat . "^" . $aprs_lon;
 			write_file($position,$aprs_follow_pos);
-#			open(DBPOS, ">$aprs_follow_pos") or do {
-#					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
-#					print_file($logdatei,$write2file);
-#					die "ERROR in Filehandling: $!\n"; };
-#					# die "Fehler bei Datei: $aprs_txdatei\n";
-#			printf DBPOS $position;
-#			close DBPOS;
 		}	
 	}
 	$old_aprs_lat = $aprs_lat; 
