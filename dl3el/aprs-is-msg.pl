@@ -134,6 +134,7 @@ my $exit_script = 0;
  	my $aprs_rxdatei = $dir  . "aprs-is.txt";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
  	my $aprs_bcdatei = $dir  . "tg_status";
+	   $aprs_ok_datei
 	my $aprs_ok_datei = $dir  . "aprs-login.ok";
 	my $aprs_exit_datei = $dir  . "aprs.exit";
 	my $aprs_follow_pos = $dir  . "aprs-follow.pos";
@@ -1156,7 +1157,7 @@ sub connect_aprs {
 #		exit -1;
 		return 0;
 	} else {
-		system('touch', $aprs_ok_datei);
+##		system('touch', $aprs_ok_datei);
 #####
 		write_file($aprs_login,$aprs_ok_datei);
 #####
