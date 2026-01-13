@@ -371,7 +371,7 @@ sub parse_aprs {
 			$write2file = sprintf "[$message_time] Message to %s from %s: [%s] (%s) D:[%s]\n",$destcall,$srccall,$payload,$ack,$srcdest;
 			print_file($logdatei,$write2file);
 			$write2file = sprintf "[$message_time] FM-Funknetz: Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
-			$payload = ($payload =~ /(.*)\{/i)? $1 : "undef";
+			$payload = ($payload =~ /(.*)\{/i)? $1 : $payload;
 			$write2file = sprintf "%s^%s^%s^^%s^\n",$srccall,$mtype,$payload,aprs_time();
 			print_file($msgdatei,$write2file);
 			system('touch', $msgdatei . ".neu");
@@ -396,7 +396,7 @@ sub process_ack {
 	if ($ack eq "undef") {
 		$write2file = sprintf "[$message_time] no ack to be send [$payload]\n" if ($verbose >= 2);
 		if (substr($payload,0,3) ne "ack") {
-			$ack = "msg";
+			$ack = "no_ack";
 		} else { 
 			$ack = ":ack";
 		}	
@@ -409,7 +409,7 @@ sub process_ack {
 	}
 
 	print_file($logdatei,$write2file) if ($verbose >= 2);
-	if (($ack ne "") && ($ack ne ":ack") && ($ack ne "msg")) {
+	if (($ack ne "") && ($ack ne ":ack") && ($ack ne "no_ack")) {
 # ack first
 		$write2file = sprintf "[$message_time] Message to %s from %s: %s (%s), will be ack'd\n",$destcall,$srccall,$payload,$ack if ($verbose >= 2);
 		print_file($logdatei,$write2file) if ($verbose >= 2);
