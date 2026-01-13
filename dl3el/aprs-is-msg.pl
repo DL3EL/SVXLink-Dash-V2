@@ -934,7 +934,6 @@ sub read_config {
 	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	$write2file = "";
-	print $aprs_login;
 	return(1);
 }
 
@@ -1204,7 +1203,7 @@ sub acos { atan2( sqrt(1 - $_[0] * $_[0]), $_[0] ) }
 sub write_file {
     my $data2write = $_[0];
     my $file2write = $_[1];
-	open(FILE, ">$aprs_ok_datei") or do {
+	open(FILE, ">$file2write") or do {
 			$write2file = sprintf "[$log_time] ERROR in Filehandling ($file2write): $!\n";
 			print_file($logdatei,$write2file);
 			die "ERROR in Filehandling: $!\n"; };
