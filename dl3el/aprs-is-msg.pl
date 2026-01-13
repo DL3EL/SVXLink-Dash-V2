@@ -411,13 +411,14 @@ sub process_update {
 			$write2file = sprintf "DL3EL^Info^neues Update steht bereit!^^%s\n",aprs_time();
 			print_file($msgdatei,$write2file);
             $payload = "update";
-			open(ANSWER, ">$dbversionFile") or do {
-						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
-						print_file($logdatei,$write2file);
-						die "ERROR in Filehandling: $!\n"; };
-						# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf ANSWER $payload;
-			close ANSWER;
+			write_file($payload,$dbversionFile);
+#			open(ANSWER, ">$dbversionFile") or do {
+#						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
+#						print_file($logdatei,$write2file);
+#						die "ERROR in Filehandling: $!\n"; };
+#						# die "Fehler bei Datei: $aprs_txdatei\n";
+#			printf ANSWER $payload;
+#			close ANSWER;
 }
 sub process_wx {
 	my $srccall = $_[0];
@@ -498,13 +499,15 @@ sub process_aprs {
 
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 1);
 			print_file($logdatei,$write2file) if ($verbose >= 1);
-			open(ANSWER, ">$aprs_txdatei") or do {
-						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
-						print_file($logdatei,$write2file);
-						die "ERROR in Filehandling: $!\n"; };
-						# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
-			close ANSWER;
+			$payload = sprintf "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
+			write_file($payload,$aprs_txdatei);
+#			open(ANSWER, ">$aprs_txdatei") or do {
+#						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
+#						print_file($logdatei,$write2file);
+#						die "ERROR in Filehandling: $!\n"; };
+#						# die "Fehler bei Datei: $aprs_txdatei\n";
+#			printf ANSWER "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
+#			close ANSWER;
 			$write2file = sprintf "[$message_time] Antwort (APRS @ FM-Funknetz Dashbord von DL3EL, %s) an %s vorbereitet\n",$dbv,$srccall if ($verbose >= 1);
 			print_file($logdatei,$write2file) if ($verbose >= 1);
 }	
@@ -620,13 +623,14 @@ sub process_other {
 			my $locator = convert2loc($aprs_lat_dec,$aprs_lon_dec);
 			$position = $aprs_lat . "^" . $aprs_lon . "^" . $locator;
 
-			open(DBPOS, ">$aprs_follow_pos") or do {
-					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
-					print_file($logdatei,$write2file);
-					die "ERROR in Filehandling: $!\n"; };
-					# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf DBPOS $position;
-			close DBPOS;
+			write_file($position,$aprs_follow_pos);
+#			open(DBPOS, ">$aprs_follow_pos") or do {
+#					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
+#					print_file($logdatei,$write2file);
+#					die "ERROR in Filehandling: $!\n"; };
+#					# die "Fehler bei Datei: $aprs_txdatei\n";
+#			printf DBPOS $position;
+#			close DBPOS;
 		} else {
 			my $lat_dec = aprs_to_decimal($rx_aprs_lat);
 			my $lon_dec = aprs_to_decimal($rx_aprs_lon);			
@@ -908,13 +912,14 @@ sub read_config {
 	} else {
 		if ((($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E")) || (($aprs_lat ne "") && ($aprs_lon ne ""))) {
 			my $position = $aprs_lat . "^" . $aprs_lon;
-			open(DBPOS, ">$aprs_follow_pos") or do {
-					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
-					print_file($logdatei,$write2file);
-					die "ERROR in Filehandling: $!\n"; };
-					# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf DBPOS $position;
-			close DBPOS;
+			write_file($position,$aprs_follow_pos);
+#			open(DBPOS, ">$aprs_follow_pos") or do {
+#					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
+#					print_file($logdatei,$write2file);
+#					die "ERROR in Filehandling: $!\n"; };
+#					# die "Fehler bei Datei: $aprs_txdatei\n";
+#			printf DBPOS $position;
+#			close DBPOS;
 		}	
 	}
 	$old_aprs_lat = $aprs_lat; 
@@ -929,6 +934,7 @@ sub read_config {
 	$write2file .= sprintf "Radio Info found:%s\n",$radioinfo if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	$write2file = "";
+	print $aprs_login;
 	return(1);
 }
 
@@ -959,6 +965,7 @@ sub aprs_tx {
 			$destcall = uc $destcall;
 			print "Dest $destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$srcdest = "APNFMN";
+# wait for new identifier APFMN?
 			if (($destcall eq "FMNUPD") || ($destcall eq "FMNTUPD")) {
 				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $destcall if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
@@ -1062,19 +1069,24 @@ return ($passcode);
 sub prepare_answer_buffer {
 	my $srccall = $_[0];
 	my $text2send = $_[1];
+	my $data = "";
+	
+	$data = sprintf "%s\^%s",$srccall,$text2send;
+	write_file($data,$aprs_txdatei);
 
-			open(ANSWER, ">$aprs_txdatei") or do {
-						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
-						print_file($logdatei,$write2file);
-						die "ERROR in Filehandling: $!\n"; };
-						# die "Fehler bei Datei: $aprs_txdatei\n";
-			printf ANSWER "%s\^%s",$srccall,$text2send;
-			close ANSWER;
+#			open(ANSWER, ">$aprs_txdatei") or do {
+#						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
+#						print_file($logdatei,$write2file);
+#						die "ERROR in Filehandling: $!\n"; };
+#						# die "Fehler bei Datei: $aprs_txdatei\n";
+#			printf ANSWER "%s\^%s",$srccall,$text2send;
+#			close ANSWER;
 
 }
 
 sub connect_aprs {
 	my $rr;
+	my $data2write = "";
 	$log_time = act_time();
 # creating object interface of IO::Socket::INET modules which internally creates
 # socket, binds and connects to the TCP server running on the specific port.
@@ -1145,9 +1157,11 @@ sub connect_aprs {
 		return 0;
 	} else {
 		system('touch', $aprs_ok_datei);
+#####
+		write_file($aprs_login,$aprs_ok_datei);
+#####
 		$write2file = sprintf "[$log_time] Login successfull $data\n";
 		print_file($logdatei,$write2file);
-#		print_file($aprs_rxdatei,$write2file);
 		return 1;
 	}
 }
@@ -1186,3 +1200,16 @@ sub calcdist {
 }
 
 sub acos { atan2( sqrt(1 - $_[0] * $_[0]), $_[0] ) }
+
+sub write_file {
+    my $data2write = $_[0];
+    my $file2write = $_[1];
+	open(FILE, ">$aprs_ok_datei") or do {
+			$write2file = sprintf "[$log_time] ERROR in Filehandling ($file2write): $!\n";
+			print_file($logdatei,$write2file);
+			die "ERROR in Filehandling: $!\n"; };
+			# die "Fehler bei Datei: $file2write\n";
+	printf FILE $data2write;
+	close FILE;
+
+}

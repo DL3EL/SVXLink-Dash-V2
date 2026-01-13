@@ -16,10 +16,7 @@ include_once "functions.php";
          $dbversionFile = DL3EL . "/dbversion";
          $dbversion = file_get_contents($dbversionFile);
          if (file_exists('/etc/systemd/system/svxlink-node.service')) {
-            $dbversion = $dbversion . "(s)";
-         }  
-         if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-            $dbversion = $dbversion . "(a)";
+            $dbversion = $dbversion . "(s)(a)";
          }  
          $dbversion = " db=\"" . $dbversion . "\"";
          /* Radio */
@@ -45,7 +42,7 @@ include_once "functions.php";
          $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioinfo . " >/dev/null &";
          echo "Starting APRS " . $debug;
          exec($cmd, $output, $retval);
-         $logtext =  "APRS Dienst gestartet " . $cmd . " / " . $debug . "\n";
+         $logtext =  "APRS Dienst gestartet " . $cmd . " /" . $debug . "\n";
          addsvxlog($logtext);
       } else {
          if ((defined ('debug')) && (debug > 0)) echo "APRS: [" . $aprs_script . "]<br>";
@@ -68,12 +65,9 @@ include_once "functions.php";
                 100% { color: blue; background-color: transparent; }
             }
          </style>';
-//         echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">Neue APRS Nachricht<br>';
-//         echo '<a href="./edit.php?file=msg" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
          echo '<a href="./aprs.php" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
       }   
 	} 
-// sudo killall aprs-is-msg.pl
 ?>
 
 <div style = "width:180px;"><span style = "font-weight: bold;font-size:14px;">SVXLink Info</span></div>
@@ -143,13 +137,16 @@ if (isProcessRunning('svxlink')) {
          $aprs_login_ok =  DL3EL . "/aprs-login.ok";
          if (strlen($aprs_script)) {
 // process is running
+            $aprs_login = "";
             if (file_exists($aprs_login_ok)) {
+               $aprs_login = file_get_contents($aprs_login_ok);
+               $aprs_login = "(" . $aprs_login . ")";
                $activemod="<td style=\"background:MediumSeaGreen;color:#464646;font-weight: bold;\">";
             } else {
 // login was not successful
                $activemod="<td style=\"background:#ffffed;;color:#b5651d;font-weight: bold;\">";
             }
-            echo "<tr>".$activemod."APRS</td></tr>";
+            echo "<tr>".$activemod."APRS " . $aprs_login . "</td></tr>";
          }
       }
    } else {
