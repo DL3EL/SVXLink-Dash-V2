@@ -2,8 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+include_once "../include/settings.php";
 include_once "../include/functions.php";
-include_once "../include/config.php";
+include_once "../include/config.inc.php";
 
 ?>
 <!DOCTYPE html>
@@ -81,6 +82,9 @@ include_once "../include/config.php";
                 <?php } ?>
 
                 <?php
+                    // get variables
+                    $username = (defined('PHP_AUTH_USER'))? PHP_AUTH_USER : '';
+                    $password = '';
 
               
 
@@ -92,12 +96,16 @@ include_once "../include/config.php";
 }
                     }
                     // Check if received values match PHP_AUTH_USER and PHP_AUTH_PW
+                    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
                     if ($username == PHP_AUTH_USER && $password == PHP_AUTH_PW) {
                         // Success
                         $_SESSION['auth'] = "AUTHORISED";
+                        $logtext = username . "(" . $ip . ") authorized\n";
                     } else {
                         $_SESSION['auth'] = "UNAUTHORISED";
+                        $logtext =  username . "(" . $ip . ") unauthorized (wrong pw)\n";
                     }
+                    addsvxlog($logtext);
                     session_write_close();
                 }
 
@@ -125,6 +133,9 @@ include_once "../include/config.php";
 
                 if (isset($_POST['logoff'])) {
                     $_SESSION['auth'] = "UNAUTHORISED";
+                    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+                    $logtext =  $ip . " logged of\n";
+                    addsvxlog($logtext);
                 }
                 ?>
 

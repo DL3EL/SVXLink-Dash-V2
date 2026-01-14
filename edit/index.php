@@ -170,6 +170,9 @@ if (!$log) {
   // Save / Reload on submit//
   if ((isset($_POST['save'])) || (isset($_POST['save_reload'])) || (isset($_POST['save_restart']))) {
 
+    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+    $logtext = $file . " changed by $ip ";
+    addsvxlog($logtext);
     // Backup file
     $backup_filename = $file . "." . date("YmdHis");
     exec('sudo cp -p ' . $file . ' ' . $backup_filename);
@@ -187,6 +190,9 @@ if (!$log) {
         $prog = "svxlink";
         $command = "sudo systemctl restart svxlink 2>&1";
       }    
+      $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+      $logtext = $prog . " Restarted from $ip ";
+      addsvxlog($logtext);
       echo "restarting $prog ...";
       sleep(1);
       exec($command,$screen,$retval);
@@ -197,19 +203,17 @@ if (!$log) {
       }
     }
     if (isset($_POST['save_restart'])) {
-#      $cmd = "sudo killall aprs-is-msg.pl >/dev/null";
-#      exec($cmd, $output, $retval);
-#      $cmd = DL3EL . "/aprs-is-msg.pl >/dev/null &";
-#      echo "Starting APRS";
-#      exec($cmd, $output, $retval);
-#      $logtext =  "APRS Dienst neu gestartet\n";
+      $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
       $aprs_exit = DL3EL . "/aprs.exit";
       touch($aprs_exit);
-      $logtext =  "APRS Dienst gestoppt, Restart automatisch durch Dashboard\n";
+      $logtext =  "APRS Dienst durch " . $ip . " gestoppt, Restart automatisch durch Dashboard\n";
       addsvxlog($logtext);
      }  
   }
-} else {
+} 
+
+ else {
+/*
   if ($log ===1) {
       echo ' Nachricht an <input type="text" id="aprs" name="aprs_call" value="DL3EL" required>';
       echo '&nbsp;&nbsp;';
@@ -230,6 +234,7 @@ if (!$log) {
         }  
       }
     }  
+*/
 }
 ?>
 </body>
