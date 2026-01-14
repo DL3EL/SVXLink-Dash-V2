@@ -103,11 +103,11 @@ include_once "../include/config.inc.php";
                     if ($username == PHP_AUTH_USER && $password == PHP_AUTH_PW) {
                         // Success
                         $_SESSION['auth'] = "AUTHORISED";
-                        $logtext = username . "(" . $ip . ") authorized\n";
+                        $logtext = $username . " (" . $ip . ") authorized\n";
                         addsvxlog($logtext);
                     } else {
                         $_SESSION['auth'] = "UNAUTHORISED";
-                        $logtext =  username . "(" . $ip . ") unauthorized (wrong pw)\n";
+                        $logtext =  $username . " (" . $ip . ") unauthorized (wrong pw)\n";
                         addsvxlog($logtext);
                     }
                     session_write_close();
