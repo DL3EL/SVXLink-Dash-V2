@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include_once "../include/settings.php";
-include_once "../include/functions.php";
+//include_once "../include/functions.php";
 include_once "../include/config.inc.php";
 
 ?>
@@ -74,6 +74,9 @@ include_once "../include/config.inc.php";
                 style = "padding:0px;width:550px;background-image: linear-gradient(to bottom, #e9e9e9 50%, #bcbaba 100%);border-radius: 10px;-moz-border-radius:10px;-webkit-border-radius:10px;border: 1px solid LightGrey;margin-left:0px; margin-right:0px;margin-top:4px;margin-bottom:0px;line-height:1.6;white-space:normal;">
             <center>
                 <?php
+                $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+                $logtext = "Authorize dialog from " . $ip . "\n";
+                addsvxlog($logtext);
                 if ($_SESSION['auth'] === 'AUTHORISED') {
                     ?>
                     <h1 id="authorise" style = "color:#00ff00;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Authorised</h1>
