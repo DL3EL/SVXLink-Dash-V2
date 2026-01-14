@@ -82,7 +82,9 @@ if (($file == "log") || ($file == "loga") || ($file == "logb") || ($file == "ref
       $file = DL3EL . "/aprs-is.msg";
       $log = 1;
       echo ">Message Display: " . $file . " (reverse order)</h1>";
-      unlink($file . ".neu");
+      if (file_exists($file  . ".neu")) {
+        unlink($file . ".neu");
+      }
 
     } else {  
       $file = DL3EL . "/readme.info";

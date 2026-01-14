@@ -31,7 +31,9 @@ include_once "settings.php";
 */
 
     date_default_timezone_set('Europe/Berlin');
-    unlink($msg_datei . ".neu");
+    if (file_exists($msg_datei  . ".neu")) {
+	unlink($msg_datei . ".neu");
+    }
 
     if ($aprs_msg_avail)  {
 	echo '<BR>';
