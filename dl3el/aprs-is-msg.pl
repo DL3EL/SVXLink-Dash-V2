@@ -627,7 +627,7 @@ sub process_other {
 		if ($srccall eq $aprs_follow) {
 			$aprs_lat = $4;
 			$aprs_lon = $5;
-			$write2file = sprintf "0^%s^^Position of station to follow %s found: %s %s^^\n",$srccall,$srccall,$aprs_lat,$aprs_lon,aprs_time() if ($verbose >= 0);
+			$write2file = sprintf "0^%s^^Position of station to follow %s found: %s %s^^%s\n",$srccall,$srccall,$aprs_lat,$aprs_lon,aprs_time() if ($verbose >= 0);
 			print_file($aprs_rxdatei,$write2file) if ($verbose >= 0);
 # Position of DL3EL-15 found: 5009.20N/00839.42
 # aprs_lat = "5009.20N"; 

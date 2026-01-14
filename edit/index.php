@@ -173,7 +173,7 @@ if (!$log) {
   if ((isset($_POST['save'])) || (isset($_POST['save_reload'])) || (isset($_POST['save_restart']))) {
 
     $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-    $logtext = $file . " changed by $ip ";
+    $logtext = $file . " changed by $ip \n";
     addsvxlog($logtext);
     // Backup file
     $backup_filename = $file . "." . date("YmdHis");
@@ -193,7 +193,7 @@ if (!$log) {
         $command = "sudo systemctl restart svxlink 2>&1";
       }    
       $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-      $logtext = $prog . " Restarted from $ip ";
+      $logtext = $prog . " Restarted from $ip \n";
       addsvxlog($logtext);
       echo "restarting $prog ...";
       sleep(1);

@@ -32,6 +32,9 @@ $conns = null;
 if (isset($_POST['btnPower']))
     {
 
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "Device Shutdown from $ip \n";
+        addsvxlog($logtext);
         $retval = null;
         $screen = null;
         //$sAconn = $_POST['sAconn'];
@@ -56,6 +59,9 @@ if (isset($_POST['btnPower']))
 if (isset($_POST['btnSvxlink']))
     {
 
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "SVXLink Restarted from $ip \n";
+        addsvxlog($logtext);
         $retval = null;
         $screen = null;
         //$sAconn = $_POST['sAconn'];
@@ -68,6 +74,9 @@ if (isset($_POST['btnSvxlink']))
 if (isset($_POST['btnSvxRef']))
     {
 
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "SVXReflector Restarted from $ip \n";
+        addsvxlog($logtext);
         $retval = null;
         $screen = null;
         //$sAconn = $_POST['sAconn'];
@@ -80,6 +89,9 @@ if (isset($_POST['btnSvxRef']))
 if (isset($_POST['btnSvxlinkoff']))
     {
 
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "SVXLink shutdown from $ip \n";
+        addsvxlog($logtext);
         $retval = null;
         $screen = null;
         //$sAconn = $_POST['sAconn'];
@@ -91,6 +103,10 @@ if (isset($_POST['btnSvxlinkoff']))
 
 if (isset($_POST['btnRestartAPRS'])) {
 // if this file exists, aprs task will terminate, status.php will start it again
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+        $logtext = "APRS Restarted from $ip \n";
+        addsvxlog($logtext);
+        $retval = null;
         $aprs_exit = DL3EL . "/aprs.exit";
         touch($aprs_exit);
         $logtext =  "APRS Dienst gestoppt, Restart automatisch durch Dashboard\n";
@@ -100,6 +116,9 @@ if (isset($_POST['btnRestartAPRS'])) {
 if (isset($_POST['btnRestart']))
     {
 
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+        $logtext = "Device Restarted from $ip \n";
+        addsvxlog($logtext);
         $retval = null;
         $screen = null;
         //$sAconn = $_POST['sAconn'];
