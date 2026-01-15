@@ -58,7 +58,7 @@ include_once "include/page_top.php";
         if ($last_pos === 2) {
             echo "Position von APRS_Follow (" . $position[3] . ", " . $position[2] . ") wird verwendet";
         } else {
-            echo "Position der letzten Anfrage wird verwendet";
+            echo "Position der letzten Anfrage wird (" . $fmquery . " " . $fmlquery . ") verwendet";
         }
     } else {
         echo "keine Position oder letzte Anfrage gefunden";
