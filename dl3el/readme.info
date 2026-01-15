@@ -1,8 +1,10 @@
-Neues in der Version 5.28a (14.01.2026)
+Neues in der Version 5.28a (15.01.2026)
 - APRS Login Call jetzt im Statusfenster
-	Da das APRS Call vom FM-Funknetz Call abweicht wenn eine nicht numerische SSID 
+	Da das APRS Call vom FM-Funknetz Call abweicht, wenn eine nicht numerische SSID 
 	verwendet wird, wird das Call jetzt im Statusfenster, zusammen mit dem APRS Modul
 	angezeigt.
+	Ausserdem gibt es kosmetische Änderungen um die Position des Dashboards 
+	(wenn APRS aktiv ist) und mehr Logging in svxlink.log.
 
 Neues in der Version 5.28 (12.01.2026)
 - APRS MSG ist jetzt der APRS Monitor
