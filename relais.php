@@ -44,7 +44,7 @@ include_once "include/page_top.php";
                 $fmlquery = "";
                 $last_pos = 2;
             } else {   
-                $last_pos = 3;
+                $last_pos = 1;
             }    
             $update_list = 0;
         }
@@ -57,8 +57,6 @@ include_once "include/page_top.php";
     if ($last_pos) {
         if ($last_pos === 2) {
             echo "Position von APRS_Follow (" . $position[3] . ", " . $position[2] . ") wird verwendet";
-        } elseif ($last_pos === 3) {
-            echo "Position von APRS_Follow";
         } else {
             echo "Position der letzten Anfrage wird verwendet";
         }
