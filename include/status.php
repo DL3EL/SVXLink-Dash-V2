@@ -134,9 +134,9 @@ if (isProcessRunning('svxlink')) {
       }
       if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
          $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
-         $aprs_login_ok =  DL3EL . "/aprs-login.ok";
          if (strlen($aprs_script)) {
 // process is running
+            $aprs_login_ok =  DL3EL . "/aprs-login.ok";
             $aprs_login = "";
             if (file_exists($aprs_login_ok)) {
                $aprs_login = file_get_contents($aprs_login_ok);
@@ -432,6 +432,9 @@ if ($reflectorlogic2 != "") {
             $filepos = file_get_contents($aprspos);
             $position = explode("^",$filepos);
             echo "<br>QTH: " . $position[0] . " " . $position[1];
+            if (isset($position[3])) {
+               echo "<br>following: " . $position[3];
+            }
          }   
       }
    }      
