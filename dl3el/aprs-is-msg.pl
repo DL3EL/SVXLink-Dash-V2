@@ -65,6 +65,7 @@ my $socket;
 my $selector    = IO::Select->new(\*STDIN);
 # Koordinaten & Intervall
 # Koordinaten & Intervall
+my $locator 	  = "";
 my $aprs_lat      = "5001.00N"; 
 my $aprs_lon      = "00800.00E";
 my $aprs_sym      = "-";
@@ -78,6 +79,7 @@ my $tg_status = "";
 my $old_tgstatus = "";
 my $old_aprs_lat      = "5001.00N"; 
 my $old_aprs_lon      = "00800.00E";
+my $old_locator 	  = "";
 
 my $exit_script = 0;
 
@@ -139,6 +141,8 @@ my $exit_script = 0;
 	my $aprs_exit_datei = $dir  . "aprs.exit";
 	my $aprs_follow_pos = $dir  . "aprs-follow.pos";
 	my $dbversionFile = $dir  . "dbversion.upd";
+	my $RelaisFile = $dir  . "relais.csv";
+
 	unlink $aprs_ok_datei;
 
     printf "LOG: %s Logdatei: %s\n",$dir,$logdatei if ($verbose >= 1);
@@ -634,10 +638,16 @@ sub process_other {
 # aprs_lon = "00839.42E";
 			$aprs_lat_dec = aprs_to_decimal($aprs_lat);
 			$aprs_lon_dec = aprs_to_decimal($aprs_lon);			
-			my $locator = convert2loc($aprs_lat_dec,$aprs_lon_dec);
-			$position = $aprs_lat . "^" . $aprs_lon . "^" . $locator;
+			$locator = convert2loc($aprs_lat_dec,$aprs_lon_dec);
+			$position = $aprs_lat . "^" . $aprs_lon . "^" . $locator ."^" . $aprs_follow;
 
 			write_file($position,$aprs_follow_pos);
+# if new locator, update relaislist
+			if ($locator ne $old_locator) {
+				my $relais = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $locator . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+#				my $relais = `curl https://api.aprs.link/aprs/stationxml?callsign=$aprs 2>&1`;
+				$relais = `$relais 2>&1`;
+			}
 #			open(DBPOS, ">$aprs_follow_pos") or do {
 #					$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_follow_pos): $!\n";
 #					print_file($logdatei,$write2file);
@@ -812,6 +822,9 @@ sub read_config {
 	my $confdatei = $_[0];
 	my $par;
 	my $aprs_ssid;
+	my $locator_file;
+	my $aprs_follow_file;
+
 	if (-e $confdatei) {
 		open(INPUT, $confdatei) or die "Fehler bei Eingabedatei: $confdatei\n";
 		{
@@ -922,8 +935,13 @@ sub read_config {
 				$data = <INPUT>;
 			}    
 			close INPUT;
-			($aprs_lat,$aprs_lon) = split(/\^/, $data);
-			$write2file = sprintf "[$log_time] Follower %s found with position %s %s [$data]\n", $aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+# ggf. prüfen, ob der $aprs_follow der Richtige ist
+			($aprs_lat,$aprs_lon,$locator_file,$aprs_follow_file) = split(/\^/, $data);
+			if ($aprs_follow_file ne $aprs_follow) {
+				$write2file = sprintf "[$log_time] wrong Follower %s found with position %s %s (%s is configured) - not used\n", $aprs_follow_file,$aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+			} else {
+				$write2file = sprintf "[$log_time] Follower %s found with position %s %s [$data]\n", $aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+			}	
 			print_file($logdatei,$write2file) if ($verbose >= 0);
 		}	
 	} else {

@@ -5,6 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once "include/settings.php";
 include_once "include/page_top.php";
 ?>
+<head>
+    <meta charset="UTF-8">
+ <script type="text/javascript">
+        function reloadPage() {
+            window.location.href = window.location.pathname + "?reloaded=true";
+        }
+    </script>
+</head>
 <?php
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
 //    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
@@ -14,14 +22,15 @@ include_once "include/page_top.php";
     echo '</div>'."\n";
     echo '</td>'."\n";
 
+    $last_pos = 0;
     if (defined('DL3EL')) {
-        $ELQueryFile = DL3EL . "/el_query";
         $elquery = shell_exec('cat ' . $ELQueryFile);
         $RelaisFile = DL3EL . "/relais.csv";
         $FMQueryFile = DL3EL . "/fm_query";
         $fmquery = shell_exec('cat ' . $FMQueryFile);
         $FMLQueryFile = DL3EL . "/fml_query";
         $fmlquery = shell_exec('cat ' . $FMLQueryFile);
+        $last_pos = 1;
     } else {
         $RelaisFile = "relais.csv";
     }
@@ -31,18 +40,29 @@ include_once "include/page_top.php";
             $filepos = file_get_contents($aprspos);
             $position = explode("^",$filepos);
             if ((defined ('debug')) && (debug > 0)) echo "<br>" . $position[0] . " " . $position[1] . ":" .  $position[2];
-            $fmquery = "";
-            $fmlquery = $position[2];
-            $update_list = 1;
+            $fmquery = $position[3];
+            $fmlquery = "";
+            $update_list = 0;
+            $last_pos = 2;
         }
     } else {
         $update_list = 0;
     }     
 ?>
    <p style = "padding-left: 5px; text-align: left;"> &nbsp;
+    <?php
+    $last_pos = 0;
+    if ($last_pos) {
+        if ($last_pos === 2) {
+            echo "Position von APRS_Follow (" . $position[3] . ") wird verwendet";
+        } else {
+            echo "Position der letzen Anfrage wird verwendet";
+        }
+    }    
+?>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
         <label for="prefix">Call</label>
-        <input type="text" id="prefix" name="prefix" value=<?php echo $fmquery;?>>  
+        <input type="text" style = "width:100px" id="prefix" name="prefix" value=<?php echo $fmquery;?>>  
         <label for="locator"> oder Locator</label>
         <input type="text" id="locator" name="locator" value=<?php echo $fmlquery;?>>  
         <input type="checkbox" name="type_el" checked value="1">Echolink&nbsp;&nbsp;
@@ -55,10 +75,12 @@ include_once "include/page_top.php";
 
    </p> 
     <?php
+/*
     if ($update_list === 1) {
         $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $fmlquery . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
         echo "",exec($cmd, $output, $retval);
     }    
+*/
     $loc = "";
     $loc_found = 0;
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
@@ -87,10 +109,14 @@ include_once "include/page_top.php";
             $fmlquery = $_POST['locator'] . " >" . $FMLQueryFile;
             shell_exec("echo $fmlquery");
         }    
+        echo "<script type='text/javascript'>
+        reloadPage();
+        </script>";    
     }
 
     if (($handle = fopen($RelaisFile, "r")) !== FALSE) {
-        echo '<form method="post">';
+#        echo '<form method="post">';
+        echo '<form method="post" onsubmit="reloadPage()">';
         while (($data = fgetcsv($handle, 1000, ";", "\"", "\\")) !== FALSE) {
 //        echo "0: " . $data[0] . "/ 1:" . $data[1] . "/ 2:"  . $data[2] . "/ 3:"  . $data[3] . "/ 4:"  . $data[4] . "/ 5:" . $data[5] . "/ 6:" . $data[6] . "/ 7:"  . $data[7] . "/ 8:"  . $data[8] . "/ 9:"  . $data[9] . "/ 10:" . $data[10] . "/ 11:"  . $data[11] . "/ 12:"  . $data[12] . "<br>";
             if (!$loc_found && ($data[3] !== "Locator")) {
@@ -131,7 +157,7 @@ include_once "include/page_top.php";
 //    if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Refresh the page to show updated values
         echo "<script type='text/javascript'>
-//            reloadPage();
+        reloadPage();
         </script>";    
     }    
   ?>
