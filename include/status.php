@@ -433,7 +433,7 @@ if ($reflectorlogic2 != "") {
             $position = explode("^",$filepos);
             echo "<br>QTH: " . $position[0] . " " . $position[1];
             if (isset($position[3])) {
-               echo "<br>following: " . $position[3];
+               echo "<br>from: " . $position[3] . " (" . $position[2] . ")";
             }
          }   
       }
