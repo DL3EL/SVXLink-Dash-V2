@@ -24,7 +24,6 @@ include_once "include/page_top.php";
 
     $last_pos = 0;
     if (defined('DL3EL')) {
-        $elquery = shell_exec('cat ' . $ELQueryFile);
         $RelaisFile = DL3EL . "/relais.csv";
         $FMQueryFile = DL3EL . "/fm_query";
         $fmquery = shell_exec('cat ' . $FMQueryFile);
@@ -39,11 +38,13 @@ include_once "include/page_top.php";
         if (file_exists($aprspos)) {
             $filepos = file_get_contents($aprspos);
             $position = explode("^",$filepos);
-            if ((defined ('debug')) && (debug > 0)) echo "<br>" . $position[0] . " " . $position[1] . ":" .  $position[2];
-            $fmquery = $position[3];
-            $fmlquery = "";
+            if ((defined ('debug')) && (debug > 0)) echo "<br>" . $position[0] . " " . $position[1] . ":" .  $position[2] . ":" .  $position[3];
+            if (isset($position[3])) {
+                $fmquery = $position[3];
+                $fmlquery = "";
+                $last_pos = 2;
+            }    
             $update_list = 0;
-            $last_pos = 2;
         }
     } else {
         $update_list = 0;
@@ -51,14 +52,15 @@ include_once "include/page_top.php";
 ?>
    <p style = "padding-left: 5px; text-align: left;"> &nbsp;
     <?php
-    $last_pos = 0;
     if ($last_pos) {
         if ($last_pos === 2) {
             echo "Position von APRS_Follow (" . $position[3] . ") wird verwendet";
         } else {
-            echo "Position der letzen Anfrage wird verwendet";
+            echo "Position der letzten Anfrage wird verwendet";
         }
-    }    
+    } else {
+        echo "keine Position oder letzte Anfrage gefunden";
+    }
 ?>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
         <label for="prefix">Call</label>
