@@ -992,10 +992,13 @@ function display_config($config) {
           touch($db_File);
       }
 // 4. Update tgdb.php
+      update_tgdb();
+/*
       $tgdb_File = DL3EL_BASE . "include/tgdb.php";
       $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
       file_put_contents($tgdb_File, $content);
       include_once DL3EL_BASE . "include/tg_ext.php";
+*/
 // 5. gather some statistics
 	    $dbversionFile = DL3EL . "/dbversion";
 	    $dbversion = file_get_contents($dbversionFile);
@@ -1111,6 +1114,19 @@ echo "<br>Stat: $cmd";
             if ((defined ('debug')) && (debug > 0)) echo $file . " would be deleted<BR>";
         }
       }
+    }
+
+    function update_tgdb () {
+    // 4. Update tgdb.php
+      date_default_timezone_set('Europe/Berlin');
+      $jetzt = date("Y-m-d H:i:s");
+      $tgdb_File = DL3EL_BASE . "include/tgdb.php";
+      $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
+      $contentl = strlen($content);
+      $logtext = $jetzt . " " . $tgdb_File . " read, length:" . $contentl . "\n";
+      addlog ("L",$logtext);
+      file_put_contents($tgdb_File, $content);
+      include_once DL3EL_BASE . "include/tg_ext.php";
     }
 
     function addlog ($logfile,$logtext) {

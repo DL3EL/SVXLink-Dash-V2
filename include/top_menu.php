@@ -233,6 +233,10 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo ' | <a href="./statistic.php" style = "color: black;" id="log">Statistic</a> ';
             }
         }
+	$tgdb_File = DL3EL_BASE . "include/tgdb.php";
+	if (filesize($tgdb_File)  <= 1000) {
+	    echo ' | <a href="./include/tgdb_upd.php" style = "color: black;" id="upd">Update TGDB</a> ';
+	}
 	echo '</p>';
 }
 

@@ -8,11 +8,13 @@ use IO::Socket::INET;
 use IO::Select;
 ######
 # Todo
-# Filter prüfen, ob pos Packete empfangen werden können
-# falls, ja "moving Client einbauen", d.h. Koordinaten hier folgen einem Call
+# Filter prüfen, ob pos Packete empfangen werden können							done 15.11.2025
+# falls, ja "moving Client einbauen", d.h. Koordinaten hier folgen einem Call 	done 15.11.2025
 # ausserdem flexible Filter einbauen und die entsprechenden Pakete parsen
 # Aufwand der MQTT Integration (OpenWebRX) prüfen 
-# Beacon mit aktueller TG senden ok, 07.01.2026
+# Beacon mit aktueller TG senden ok, 											done 07.01.2026
+# aprs.txt durch buffer Logik ersetzen, die ausstehende ACKs einfordert
+# Koordinaten der aprs-is-msg.conf auf Format prüfen und Fehlermeldung im Log ausgeben
 ######
 my $entry;
 my @array;
@@ -452,13 +454,13 @@ sub process_wx {
 				my $metar2 = substr($metar,67,67);
 				$write2file = sprintf "[$message_time] Metar: [%s]\n",$metar1;
 				print_file($logdatei,$write2file);
-				prepare_answer_buffer($srccall,$metar1);
+				prepare_answer_buffer($srccall,$metar1,1);
 				aprs_tx($aprs_txdatei); 
 				$metar = $metar2;
 			} 
 			$write2file = sprintf "[$message_time] Metar: [%s]\n",$metar;
 			print_file($logdatei,$write2file);
-			prepare_answer_buffer($srccall,$metar);
+			prepare_answer_buffer($srccall,$metar,1);
 }
 
 sub process_rp {
@@ -467,7 +469,7 @@ sub process_rp {
 
 			my $position = 0;
 			my $old_position = 0;
-			my $aprs_pr = ($payload eq "?rp?")? "y" : "s";
+			my $aprs_pr = (substr($payload,0,4) eq "?rp?")? "y" : "s";
 			my $relais = "curl -s \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=$srccall&maxgateways=7&printas=csv&type_el=1&type_fr=1&kmmls=km&aprs_pr=$aprs_pr\" 2>&1";
 			$write2file = sprintf "[$message_time] Repeater: %s\n",$relais;
 			print_file($logdatei,$write2file) if ($verbose >= 1);
@@ -486,10 +488,10 @@ sub process_rp {
 					$relais = substr($relais_org,length($relais_1)+1,length($relais_org));
 					$relais_2 = extract_relais($relais);
 					$relais_1 =~ s/\^/ /g;
-					prepare_answer_buffer($srccall,$relais_1);
+					prepare_answer_buffer($srccall,$relais_1,1);
 					aprs_tx($aprs_txdatei); 
 					$relais_2 =~ s/\^/ /g;
-					prepare_answer_buffer($srccall,$relais_2);
+					prepare_answer_buffer($srccall,$relais_2,1);
 				}
 			} else {
 				@array = split (/\^/, $relais);
@@ -503,11 +505,11 @@ sub process_rp {
 					++$rr;
 					last if ($rr == 6);
 				}	
-			prepare_answer_buffer($srccall,$relais_2);
+			prepare_answer_buffer($srccall,$relais_2,1);
 			aprs_tx($aprs_txdatei); 
 			$write2file = sprintf "[$message_time] Relais1 ORG: [%s] [$relais_2]\n",$relais_1;
 			print_file($logdatei,$write2file) if ($verbose >= 1);
-			prepare_answer_buffer($srccall,$relais_1);
+			prepare_answer_buffer($srccall,$relais_1,1);
 			}	
 		}	
 
@@ -517,7 +519,7 @@ sub process_aprs {
 
 			$write2file = sprintf "[$message_time] Antwort fuer Payload %s vorbereiten\n",$payload if ($verbose >= 1);
 			print_file($logdatei,$write2file) if ($verbose >= 1);
-			$payload = sprintf "%s\^APRS @ FM-Funknetz Dashbord %s",$srccall,$dbv;
+			$payload = sprintf "%s\^APRS @ FM-Funknetz Dashbord %s^1",$srccall,$dbv;
 			write_file($payload,$aprs_txdatei);
 #			open(ANSWER, ">$aprs_txdatei") or do {
 #						$write2file = sprintf "[$log_time] ERROR in Filehandling ($aprs_txdatei): $!\n";
@@ -969,6 +971,7 @@ sub aprs_tx {
 	$log_time = act_time();
 	print "[$log_time] reading aprs tx data...\n" if ($verbose >= 3);
 	my $aprsdatei = $_[0];
+	my $no_ack = 0;
 	my $data = "";
 	my $data_len = 0;
 	my $aprs_msg = "";
@@ -988,12 +991,12 @@ sub aprs_tx {
 			}    
 			close INPUT;
 			print "Datei $aprsdatei erfolgreich geoeffnet, Laenge $data_len ($data)\n" if ($verbose >= 2);
-			($destcall,$aprs_msg) = split(/\^/, $data);
+			($destcall,$aprs_msg,$no_ack) = split(/\^/, $data);
 			$destcall = uc $destcall;
 			print "Dest $destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$srcdest = "APNFMN";
 # wait for new identifier APFMN?
-			if (($destcall eq "FMNUPD") || ($destcall eq "FMNTUPD")) {
+			if (($destcall eq "FMNUPD") || ($destcall eq "FMNTUPD") || ($no_ack)) {
 				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $destcall if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
 				send_msg($destcall,$srcdest,$aprs_login,"no-ack",$aprs_msg);
@@ -1096,9 +1099,10 @@ return ($passcode);
 sub prepare_answer_buffer {
 	my $srccall = $_[0];
 	my $text2send = $_[1];
+	my $no_ack = (defined $_[2])? 1 : 0;
 	my $data = "";
 	
-	$data = sprintf "%s\^%s",$srccall,$text2send;
+	$data = sprintf "%s\^%s^%s",$srccall,$text2send,$no_ack;
 	write_file($data,$aprs_txdatei);
 
 #			open(ANSWER, ">$aprs_txdatei") or do {
