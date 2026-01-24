@@ -428,14 +428,14 @@ if ($reflectorlogic2 != "") {
       $aprspos = DL3EL . "/aprs-follow.pos";
       if (file_exists($aprspos)) {
          $delta = time() - filemtime($aprspos);
-         if ($delta > 60) {
+//         if ($delta > 60) {
             $filepos = file_get_contents($aprspos);
             $position = explode("^",$filepos);
             echo "<br>QTH: " . $position[0] . " " . $position[1];
             if (isset($position[3])) {
                echo "<br>from: " . $position[3] . " (" . $position[2] . ")";
             }
-         }   
+//         }   
       }
    }      
    echo "</div></td></tr>";

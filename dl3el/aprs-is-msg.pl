@@ -888,6 +888,12 @@ sub read_config {
 	$write2file = sprintf "[$log_time] Begin1 CallCheck: aprs_login:%s\n", $aprs_login if ($verbose >= 0);
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	$aprs_login = ($aprs_login =~ /([\w]+)([-]*)([-\w]*)/s)? $1 : "undef";
+
+# calculate passd without ssid
+	if (($aprs_passwd eq "-1") || ($aprs_passwd eq "")) {
+		$aprs_passwd = aprs_passcode($aprs_login);
+	}	
+
 	if ($2 eq "-") {
 		$aprs_ssid = $3;
 
@@ -908,9 +914,6 @@ sub read_config {
 	print_file($logdatei,$write2file) if ($verbose >= 1);
 	}		
 	
-	if (($aprs_passwd eq "-1") || ($aprs_passwd eq "")) {
-		$aprs_passwd = aprs_passcode($aprs_login);
-	}	
 	if (($aprs_msg_call eq "N0CALL") ||  ($aprs_msg_call eq "")) {
 		$aprs_msg_call = $aprs_login;
 	}

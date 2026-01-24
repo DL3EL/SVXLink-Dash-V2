@@ -111,6 +111,10 @@ define("MODULEPATH", "/etc/svxlink/svxlink.d/");
 				exec($command,$screen,$retval);
 				addlog("L","$command\n");
 
+				$command = "sudo cp -p " . DL3EL . "/*.conf $backupDir > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
 			    chdir($backupDir);
 			    exec("sudo zip -r $backupZip * > /dev/null");
 
@@ -210,6 +214,18 @@ define("MODULEPATH", "/etc/svxlink/svxlink.d/");
 
 //				exec("sudo mv -f /tmp/config_restore/config.php /var/www/html/include/ > /dev/null");
 				$command = "sudo mv -f /tmp/config_restore/config.php " . DL3EL_BASE . "include/ > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
+				$command = "sudo mv -f /tmp/config_restore/Reflector*.conf " . DL3EL . "/ > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
+				$command = "sudo mv -f /tmp/config_restore/aprs-is.conf " . DL3EL . "/ > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
+				$command = "sudo mv -f /tmp/config_restore/aprs-is-msg.conf " . DL3EL . "/ > /dev/null";
 				exec($command,$screen,$retval);
 				addlog("L","$command\n");
 

@@ -1,3 +1,6 @@
+Neues in der Version 5.28b (24.01.2026)
+- APRS conf Datei jetzt in die Sicherung integriert
+
 Neues in der Version 5.28a (15.01.2026)
 - APRS Login Call jetzt im Statusfenster
 	Da das APRS Call vom FM-Funknetz Call abweicht, wenn eine nicht numerische SSID 
