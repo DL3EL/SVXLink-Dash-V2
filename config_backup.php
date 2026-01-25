@@ -212,6 +212,11 @@ define("MODULEPATH", "/etc/svxlink/svxlink.d/");
 				exec($command,$screen,$retval);
 				addlog("L","$command\n");
 
+//ModuleEcholink.conf etc
+				$command = "sudo mv -f /tmp/config_restore/svxlink.d/*.conf " . SVXCONFPATH . "svxlink.d/ > /dev/null";
+				exec($command,$screen,$retval);
+				addlog("L","$command\n");
+
 //				exec("sudo mv -f /tmp/config_restore/config.php /var/www/html/include/ > /dev/null");
 				$command = "sudo mv -f /tmp/config_restore/config.php " . DL3EL_BASE . "include/ > /dev/null";
 				exec($command,$screen,$retval);
