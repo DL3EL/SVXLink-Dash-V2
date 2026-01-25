@@ -237,6 +237,15 @@ define("MODULEPATH", "/etc/svxlink/svxlink.d/");
 				// Start the services
 			    	exec('sudo systemctl restart svxlink > /dev/null &');
 
+				$ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+				$logtext = "APRS Auto Restarted  (Restore) from $ip \n";
+				addsvxlog($logtext);
+				$retval = null;
+				$aprs_exit = DL3EL . "/aprs.exit";
+				touch($aprs_exit);
+				$logtext =  "APRS Dienst gestoppt, Restart automatisch durch Dashboard\n";
+				addsvxlog($logtext);
+
 				// Complete
 				$output .= "<h3 style='text-align:center'>Configuration Restoration Complete.</h3>\n";
 				$output .= "<p style='text-align:center'><br><a href='/'>Go to Dashboard...</a></p>\n";
