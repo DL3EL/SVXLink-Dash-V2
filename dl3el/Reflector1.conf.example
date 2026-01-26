@@ -1,8 +1,15 @@
 [ReflectorLogic]
-DNS_DOMAIN = hier gehört das Netz hin
-#HOSTS = IPp-Adresse
-CALLSIGN = das Call
-AUTH_KEY = "das PAsswort"
-DEFAULT_TG = DefTG
-MONITOR_TGS = MOnTGs
+# hier gehört das Netz hin, meist (reflector-network.eu)
+DNS_DOMAIN = reflector-network.de
+# IP-Adresse:Port (braucht man normalerweise nicht)
+#HOSTS = IP-Adresse:Port 
+# Call: das eigene Rufzeichen, welches für das Netz oben freigeschaltet ist
+CALLSIGN = Call
+# "das Passwort" welchen vom Netzbetreiber übermittelt wurde
+AUTH_KEY = "das Passwort"
+# die Default TG, z.B. 9
+DEFAULT_TG = 9
+# die Monitor TGs, z.B. 777 und 26269
+MONITOR_TGS = 777, 26269
+
 

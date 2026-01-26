@@ -19,6 +19,7 @@ define("KEY9", array(' D9 ','*D9#','blue'));
 define("KEY10", array(' D10 ','*D10#','red'));
 define("DTMF", "auth");
 
+// things that normally should not be changed
 // Path and file name of confguration
 define("SVXCONFPATH", "/etc/svxlink/");
 define("SVXCONFIG", "svxlink.conf");
@@ -31,10 +32,6 @@ define("MODULEPATH", "/etc/svxlink/svxlink.d/");
 define("ECHOLINKCONFIG", "ModuleEchoLink.conf");
 define("METARINFO", "ModuleMetarInfo.conf");
 define("TclVoiceMail", "no");
-        
-// Empty address API do not show connected nodes to svxreflector 
-define("URLSVXRAPI", "");
-//
 // Orange Pi Zero LTS version requires CPU_TEMP_OFFSET value 30 
 // to display CPU TEMPERATURE correctly
 define("CPU_TEMP_OFFSET","0");
@@ -55,8 +52,6 @@ define("MENUTOPAUTH", "yes");
 // In most cases you can switch to FALSE
 define("SHOWPTT","FALSE");
 //
-//define("DL3EL_BASE", "/var/www/html/SVXLink-Dash-V2.5/");
-//define("DL3EL", "/var/www/html/SVXLink-Dash-V2.5/dl3el");
 define("DL3EL_EXPERT", "no");
 //define("DL3EL_EXPERT", "yes");
 define("DL3EL_NOAUTH", "no");
@@ -68,14 +63,17 @@ define("DL3EL_SSH", "no");
 define("DL3EL_SPEC_TG", 99);
 define("DL3EL_RADIO", "Shari");
 //define("DL3EL_RADIO", "RFGuru");
+// examples, will be shown in Status and in APRS Beacon
 //define("DL3EL_RADIO", "no Radio");
 //define("DL3EL_RADIO", "SC (no Radio)");
 //define("DL3EL_RADIO", "VX7");
-define("DL3EL_DMRTG", "26269");
+//define("DL3EL_RADIO", "145.600MHz");
+//define("DL3EL_RADIO", "SC (no Radio, 145.750MHz)");
 define("DL3EL_VERSION", "public");
 //define("DL3EL_VERSION", "develop");
-define("DL3EL_LIVEDB", "no");
-//define("DL3EL_LIVEDB", "yes");
+// show splitcsreen with live_db when running on a desktop, it will never be shown on a mobile device
+//define("DL3EL_LIVEDB_AUTO", "yes");
+define("DL3EL_LIVEDB_AUTO", "no");
 // good colours are green, silver and blue. There is no colour check :-)
 define("SVXMQTT_COLOR_active", "green");
 define("SVXMQTT_COLOR_passive", "blue");
@@ -87,21 +85,25 @@ define("DL3EL_DXCLUSTER_CONT", "EU");
 define("DL3EL_SC_CHANGE", "no");
 // this string has to match the name of the card in the linux system
 define("DL3EL_SC_STRING", "Audio Device");
+// show only one IP in system-window, if there are lots of
+//define("DL3EL_SHOW_ONLY_ONE_IP", "yes");
+//define("DL3EL_SHOW_ONLY_ONE_IP", "no");
 // Time for cleanup cron job. Once a day (86400s) is sufficient
 define("DL3EL_CRON_TIMER", 86400);
+// show when next crontab run is planned
 define("DL3EL_SHOW_NEXT_RUN", "no");
 // allow update "git pull" via this dashboard (can be found in the power menu, if enabled
 // therefore for the command "git" had to be added in the file "www-data.sudoers", to activate this command, the script "upd_sudoer" has to be executed (as root)
 define("DL3EL_GIT_UPDATE", "yes");
-//
+// enable APRS Feature, if yes
 define("DL3EL_APRS_MSG", "no");
 //
-define("DL3EL_REF1_BUTTON", "Ref1");
-define("DL3EL_REF2_BUTTON", "Ref2");
+define("DL3EL_REF1_BUTTON", "TG9 & 777");
+define("DL3EL_REF2_BUTTON", "TG9 & 262");
 define("DL3EL_REF3_BUTTON", "Ref3");
 define("DL3EL_REF4_BUTTON", "Ref4");
-//
+// if set, provide call detail from FM-Funknetz and not from qrz.com
 define("DL3EL_LH_DETAIL", "FMN");
-//
+// the rest of the more static variables and constants
 include_once DL3EL_BASE ."include/config.inc.php";
 ?>
