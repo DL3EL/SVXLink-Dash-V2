@@ -1,3 +1,9 @@
+Neues in der Version 5.29 (31.01.2026)
+- diese Version wird mit dem neuen Image von Michael, DC9VQ, verteilt. In dem Release des Images 
+	sind zwei Profile vorkonfiguriert
+	ist die Möglichkeit zum Mithören des FM-Funknetz Verkehrs installiert und aktiviert
+	ist APRS Messaging installiert und aktiviert
+
 Neues in der Version 5.28b (24.01.2026)
 - APRS conf Datei jetzt in die Sicherung integriert
 
