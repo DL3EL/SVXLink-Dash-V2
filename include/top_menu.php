@@ -119,13 +119,6 @@ if (session_status() === PHP_SESSION_NONE) {
 	    if ((defined ('debug')) && (debug > 0)) echo "<br>ShowAUTH: $show_auth";
 	    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
 	    if ((defined ('debug')) && (debug > 0)) echo "<br>RemoteIP: $ip";
-	    $net1= cidr_match($ip,"192.168.0.0/16");
-	    $net2= cidr_match($ip,"44.128.0.0/10");
-	    $net3= cidr_match($ip,"44.149.160.87/32");
-	    $net4= cidr_match($ip,"44.149.162.105/32");
-	    if ($net1 == TRUE || $net2 == TRUE) {
-		$show_auth = 1;
-	    } 
 	    if (defined ('DL3EL_MASTER_IP')) {
 		$master_ip_array = explode(",", DL3EL_MASTER_IP);
 		$nn = 0;
