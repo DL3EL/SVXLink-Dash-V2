@@ -67,7 +67,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	}   
 	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
 	echo '<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls | </a> ';
-    }    
+    } else {
+	echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
+    }   
 
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;

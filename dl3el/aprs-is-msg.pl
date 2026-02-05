@@ -28,7 +28,7 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.70";
+my $version = "1.71";
 my $dir = "";
 my $conf = "";
 
@@ -925,7 +925,7 @@ sub read_config {
 		$aprs_msg_call_wc = 0;
 	}	
 	my $aprs_filter_conf = $aprs_filter;
-	$aprs_filter = "b/" . $aprs_msg_call;
+	$aprs_filter = "b/" . $aprs_msg_call . "/DL3EL";
 	if ($aprs_follow ne "") {
 		$aprs_filter .= "/" . $aprs_follow;
 	}	
