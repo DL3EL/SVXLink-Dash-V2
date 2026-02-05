@@ -8,7 +8,7 @@
     <meta name="generator" content="SVXLink" />
     <meta name="Author" content="G4NAB, SP2ONG, SP0DZ" />
     <meta name="Description" content="Dashboard for SVXLink by G4NAB, SP2ONG, SP0DZ, DL3EL" />
-    <meta name="KeyWords" content="SVXLink,G4NAB, SP2ONG, SP0DZ" />
+    <meta name="KeyWords" content="SVXLink,G4NAB, SP2ONG, SP0DZ, DL3EL" />
     <meta http-equiv="cache-control" content="max-age=0" />
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="expires" content="0" />
@@ -105,3 +105,4 @@ if (MENUBUTTON=="TOP") {
 include_once "buttons.php"; 
 }
 ?>
+

@@ -37,27 +37,37 @@ if (session_status() === PHP_SESSION_NONE) {
    }
 ?>
    <div id="display-links" align=right>
-	<p style = "padding-right: 5px; text-align: right; color: #000000;">
-	<a style = "color: black;">Display</a> |
+    <p style = "padding-right: 5px; text-align: right; color: #000000;">
+    <a style = "color: black;">Display</a> |
 <?php
-	if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
-	    include_once "include/browserdetect.php";
-	    //$mobile = 1;
-	    $show_livedb_inDB = $mobile;
-	} else {
+    if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
+	include_once "include/browserdetect.php";
+	//$mobile = 1;
+	$show_livedb_inDB = $mobile;
+    } else {
 	    $show_livedb_inDB = 1;
-	}    
+    }    
 // Hinweis zu nodes gestrichen noch ergänzen
+    if ((defined('DL3EL_MENU_AUTH_ONLY')) && (DL3EL_MENU_AUTH_ONLY === "yes")) {
+	$show_top_menu = 0;
+	if ($_SESSION['auth'] === "AUTHORISED") {
+	    $show_top_menu = 1;
+	} else {
+	    $show_top_menu = 0;
+	}
+    } else {    
+	    $show_top_menu = 1;
+    }
+    if ($show_top_menu) {
 	if ($show_livedb_inDB) {
 	    echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
 	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
 	} else {
 	    echo '<a href="./index1.php" style = "color: #000000;">Dashboard</a> | ';
 	}   
-?>
-	<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | 
-	<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls | </a> 
-<?php
+	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
+	echo '<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls | </a> ';
+    }    
 
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;
@@ -73,6 +83,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '<a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
+	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> | ';
 	}    
 	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
