@@ -6,21 +6,23 @@ include_once "config.php";
 include_once "tools.php";        
 include_once "functions.php";    
 ?>
-<span style = "font-weight: bold;font-size:14px;">SVXReflector Activity</span>
+<span style = "font-size:20px"> </span>
+<span style = "font-weight:bold; font-size:14px;">SVXReflector Activity</span>
 <fieldset style = " width:550px;box-shadow:5px 5px 20px #999;background-color:#e8e8e8e8;margin-top:10px;margin-left:0px;margin-right:0px;font-size:12px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
   <form method="post">
-  <table style = "margin-top:0px;">
+<!--  <table style = "margin-top:0px;"> -->          <!-- old -->
+    <table style = "margin-top:0px; width:650px">    <!-- new -->
     <tr height=25px>
       <th>Zeit</th>
       <th width=100px>Callsign</th>
 <?php
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
-      if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
-	echo '<th>Name</th>';
-	$DMRIDFile = "/var/lib/mmdvm/DMRIds.dat";
-	$use_names = 1;
-	$dmrIDline = file_get_contents($DMRIDFile);
-      } else {
+//      if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
+//	echo '<th>Name</th>';
+//	$DMRIDFile = "/var/lib/mmdvm/DMRIds.dat";
+//	$use_names = 1;
+//	$dmrIDline = file_get_contents($DMRIDFile);
+//      } else {
 	$DMRIDFile = DL3EL . "/DMRIds.dat";
 	$DMRIDFile_save = DL3EL . "/DMRIds.dat.save";
 	$update_script = DL3EL .'/DMRID_update.sh ';
@@ -42,7 +44,7 @@ include_once "functions.php";
 	} else {
 	  $use_names = 0;
 	}
-      }
+//      }
       $cron_File = DL3EL . "/crontab.log";
       if (file_exists($cron_File)) {
 	if ((defined ('DL3EL_CRON_TIMER')) && (DL3EL_CRON_TIMER > 0)) {
@@ -123,7 +125,7 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
       }
 //////////////////// NEU //////////////Add Name ///////////////////////////////////////////////////////////////////////////////////////
       if ($use_names) {
-	//Aufbereitung LastCall zur Suche in DMRIds.dat (nntfernt Bindestrich)
+	//Aufbereitung LastCall zur Suche in DMRIds.dat (entfernt Bindestrich)
 	$string = $call;
 	$position = strpos($string, "-");		// Stelle des "-" zurück
 	if ($position !== false) {			// Prüft, ob das Zeichen gefunden wurde
