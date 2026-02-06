@@ -76,9 +76,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
     } else {
-	echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
+	echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
-	    echo '<a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
+	    echo '| <a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
 	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> ';
 	}    
     }   
