@@ -72,27 +72,27 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
 	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> | ';
 	}    
-	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> | ';
+	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
     } else {
 	echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '<a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
-	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> | ';
+	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> ';
 	}    
     }   
 ?>
 <?php
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
-		echo '<a href="./wifi.php" style = "color: #0000ff;">Wifi</a> | ';
-		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> | ';
+		echo '<a href="./wifi.php" style = "color: #0000ff;">| Wifi</a> | ';
+		echo '<a href="./network.php" style = "color: #0000ff;">Network</a> ';
 	}	
 
 
 	if ($_SESSION['auth'] === "AUTHORISED") {
-	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log"> Log | </a> ';
+	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log">| Log </a> ';
 	}
 ?>
 <?php
@@ -125,7 +125,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}
 	if ($show_auth) {
-	    echo '<a href="./authorise.php" style = "color: crimson;">Authorise</a>';
+	    echo '<a href="./authorise.php" style = "color: crimson;"> | Authorise</a>';
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
 	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;"> | DVS</a></p>';
