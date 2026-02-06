@@ -1,18 +1,17 @@
 Neues in der Version 5.29a (06.02.2026)
 - Servicerelease 
-	im LiveDB wird jetzt die Anzahl der Verbundenen Stationen wieder koorekt anegegeben
-	die Anzeige der Vornamen in der Hauptansicht wurde verbessert, es werden jetzt nicht Vornamen
-	von Stationen mit einer DMR ID angezeit. 
+	im LiveDB wird jetzt die Anzahl der Verbundenen Stationen wieder koorekt angegeben
+	die Anzeige der Vornamen in der Hauptansicht wurde verbessert, es werden jetzt 
+	bei DL oder OE Calls nicht nur Vornamen von Stationen mit einer DMR ID angezeit. 
 	Wenn die Option DX-Cluster eingestellt ist (define("DL3EL_DXCLUSTER", "yes");) gibt es jetzt
 	direkt rechts daneben einen mit "OHC" gekennzeichneten Link. Dieser öffnet ein neues
 	Browserfenster und startet OpenHamClock (https://openhamclock.com/), ein wirklich tolles Tool
 	für Funkamateure.
-	Speziell für den Einsatz bei Relais mit öffentlichen Dashboard wurden die Anzeigemöglichen
+	Speziell für den Einsatz bei Relais mit öffentlichen Dashboard wurden die Anzeigemöglichkeiten
 	überarbeitet: Nur wenn
 	define("MENUTOP", "FULL");
-	eingestellt ist, wird die komplette Menuleiste angezeigt. Anosnten nur die Einträge, die 
-	rein zur Information dienen und nichts am System verändern könne. Im Defaultdfall ist das nur 
-	der Eintrag Dashboard. Wenn 
+	eingestellt ist, wird die komplette Menuleiste angezeigt. Ansonsten nur die Einträge, die 
+	rein zur Information dienen und nichts am System verändern könne. Wenn 
 	define("DL3EL_DXCLUSTER", "yes");
 	zusätzlich gewählt wird auch der Link zur DX-Cluster Sicht angezeigt 
 	Unverändert wird über
