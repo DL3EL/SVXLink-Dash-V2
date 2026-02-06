@@ -1,3 +1,25 @@
+Neues in der Version 5.29a (06.02.2026)
+- Servicerelease 
+	im LiveDB wird jetzt die Anzahl der Verbundenen Stationen wieder koorekt anegegeben
+	die Anzeige der Vornamen in der Hauptansicht wurde verbessert, es werden jetzt nicht Vornamen
+	von Stationen mit einer DMR ID angezeit. 
+	Wenn die Option DX-Cluster eingestellt ist (define("DL3EL_DXCLUSTER", "yes");) gibt es jetzt
+	direkt rechts daneben einen mit "OHC" gekennzeichneten Link. Dieser öffnet ein neues
+	Browserfenster und startet OpenHamClock (https://openhamclock.com/), ein wirklich tolles Tool
+	für Funkamateure.
+	Speziell für den Einsatz bei Relais mit öffentlichen Dashboard wurden die Anzeigemöglichen
+	überarbeitet: Nur wenn
+	define("MENUTOP", "FULL");
+	eingestellt ist, wird die komplette Menuleiste angezeigt. Anosnten nur die Einträge, die 
+	rein zur Information dienen und nichts am System verändern könne. Im Defaultdfall ist das nur 
+	der Eintrag Dashboard. Wenn 
+	define("DL3EL_DXCLUSTER", "yes");
+	zusätzlich gewählt wird auch der Link zur DX-Cluster Sicht angezeigt 
+	Unverändert wird über
+	//define("MENUTOPAUTH", "yes");
+	define("MENUTOPAUTH", "no");
+	eingestellt, ob der Link zum Authorisierungsdialog angezeigt werden soll oder nicht.
+
 Neues in der Version 5.29 (31.01.2026)
 - diese Version wird mit dem neuen Image von Michael, DC9VQ, verteilt. In dem Release des Images 
 	sind zwei Profile vorkonfiguriert
