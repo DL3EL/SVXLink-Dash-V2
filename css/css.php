@@ -11,7 +11,7 @@ header("Content-type: text/css");
     $tableRowOddBg = "e0e0e0";	
 ?>
 .container {
-    width: 900px;
+    width: 100%;
     text-align: left;
     background : #f1f1f1;
     margin: auto;
