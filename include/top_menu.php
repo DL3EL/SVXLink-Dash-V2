@@ -66,7 +66,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 	}   
 	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
-	echo '<a href="./monitor.php" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	echo '<a href="./monitor0.php" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 	echo '<a href="./echolink_dl3el0.php" style = "color: #0000ff;" target="_top">Echolink</a> | ';
 	echo '<a href="./relais0.php" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {

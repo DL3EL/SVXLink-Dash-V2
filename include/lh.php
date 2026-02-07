@@ -6,7 +6,7 @@ include_once "config.php";
 include_once "tools.php";        
 include_once "functions.php";    
 ?>
-<fieldset style = "background-color:#f1f1f1; margin-top:15px;height:1380px; font-size:13px; border:none;">
+<fieldset style = "background-color:#f1f1f1; margin-top:15px;height:auto; font-size:13px; border:none;">
 <span style = "font-size:20px"> </span>
 <span style = "font-weight:bold; font-size:14px;">SVXReflector Activity</span>
 <!-- 

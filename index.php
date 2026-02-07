@@ -140,10 +140,12 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     }
 
     echo '$(window).trigger(\'resize\');'."\n";
+
     echo '</script>'."\n";
     echo '<center><div id="LastHeard" style = "margin-bottom:30px;">'."\n";
     include_once "include/lh.php";
     echo '</div></center>'."\n";
+
     if ($dmr_support == "1") {
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
         echo '</div></center>'."\n";
