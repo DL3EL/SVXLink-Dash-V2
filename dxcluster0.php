@@ -26,8 +26,8 @@ include_once "include/page_top.php";
     echo '<td valign="top" style = "height:auto;border:none;  background-color:#f1f1f1;">';
     echo '<div class="content">'."\n";
 
-    echo '<center><div id="TalkGroups" style = "margin-bottom:30px;">'."\n";
-    include "include/tg.php";
+    echo '<center><div id="DX-Cluster" style = "margin-bottom:30px;">'."\n";
+    include "dxcluster.php";
     echo '</div></center>'."\n";
 //    echo "<br />\n";
     echo '</td>';

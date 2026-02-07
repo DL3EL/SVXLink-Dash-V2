@@ -26,6 +26,7 @@
 <!----
     <script type="text/javascript" src="../scripts/ptt.js"></script>
 --->
+
     <script type="text/javascript">
       $.ajaxSetup({ cache: false });
     </script>
@@ -105,4 +106,4 @@ if (MENUBUTTON=="TOP") {
 include_once "buttons.php"; 
 }
 ?>
-
+</body> 

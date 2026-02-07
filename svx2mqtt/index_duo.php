@@ -6,7 +6,7 @@
     <title>Live Dash</title>
     <style>
         body {
-            width:540px;
+            width:480px;
             background-color: #000000;
             margin-left: 20px;
 
@@ -120,13 +120,18 @@ if (defined ('SVXMQTT_COLOR_passive')) {
 }
 ?>
 
-<body style="background:#e1e1e1;">
+<!--  <body style="background:#e1e1e1;">  -->
+<body style="background:#f1f1f1;">
 <form method="post">
+<!-- 
 <fieldset style = "box-shadow:5px 5px 20px #999; background-color:#f1f1f1; height:1380px; margin-top:15px; font-size:13px; border-radius: 10px;">
      <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border-radius:10px;">
+-->
+<fieldset style = "box-shadow:5px 5px 20px #999; background-color:#f1f1f1; height:1280px; margin-top:0px; font-size:13px; border: none;">
+     <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border:none;">
         <header>
             <center>
-                <h1 style="background-color:#fififi; color:#0000ff; font:18pt arial, sans-serif;font-weight:bold;">Live Dashboard</h1>
+                <h1 style="background-color:#fififi; color:#0000ff; font:14pt arial, sans-serif;font-weight:bold;">Live Dashboard</h1>
             </center>
         </header>
 
@@ -160,12 +165,15 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                         </div>
                     </section>
     </fieldset>
-    <fieldset style="color:white; background-color:#f1f1f1; height:1500; font-size:14px; border:none; border-radius:10px;">
+    <fieldset style="color:white; background-color:#f1f1f1; height:1500; font-size:14px; border:none;">
         <form method="post">
                     <section>
                         <h3 style="color:#000000;">Zuletzt Aktiv</h3>
                         <div style="max-height:70vh; overflow:auto;">
+<!-- 
                             <fieldset style = "height:1010px;box-shadow:2px 2px 10px #999;background-color:#e8e8e8;font-size:12px;border-radius: 10px;">
+-->
+                            <fieldset style = "height:900px;;background-color:#f1f1f1;font-size:12px;border:none;">
                             <table id="lhTable">
                                 <thead>
                                     <tr style="height:24px;">

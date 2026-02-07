@@ -1,91 +1,162 @@
-<html>
 <?php
-include_once ('include/settings.php');
-?>
-
-<head>
-<link rel="shortcut icon" href="images/favicon.ico" sizes="16x16 32x32" type="image/png">
-<?php echo ("<title>" . $callsign . " Dashboard " . $dbversion . "</title>" ); ?>
-<body style="background-color:#e1e1e1;">
-</head>
-<style>
-.container {
-  display: flex;
-  height: 1600px;
-  width: 2000px;
-  justify-content: center;
-}
-.left-half div {
-  width: 950px;
-  height: 1600px;
-}
-.right-half div {
-  width: 580px;
-  height: 1600px;
-}
-
-</style>
-
-<?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-  $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
-  $logtext = "Dashboard started from $ip ";
-
-  if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
-    $useragent=$_SERVER['HTTP_USER_AGENT'];
-    if (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i',$useragent)||preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',substr($useragent,0,4))) {
-      if ((defined ('debug')) && (debug > 0)) echo "USER_AGENT (mobil):" . $_SERVER['HTTP_USER_AGENT'] . "<br>";
-      $mobile = 1;
-    } else {
-      if ((defined ('debug')) && (debug > 0)) echo "USER_AGENT (Desktop):" . $_SERVER['HTTP_USER_AGENT'] . "<br>";
-      $mobile = 0;
+    $base_dir_def = '<?php define("DL3EL_BASE", "' . __DIR__ . '/");?>' . "\n";;
+    $base_dir_dl3el_def = '<?php define("DL3EL", "' . __DIR__ . '/dl3el");?>' . "\n";;
+    $base_dir_file = __DIR__ . "/include/basedir.php";
+    if (!$handle = fopen($base_dir_file, 'w')) {
+//        die("Cannot open file ($base_dir_file) for writing. Check file permissions.");
+//        echo("Cannot open file ($base_dir_file) for writing. Check file permissions. ");
+//        echo("find " . __DIR__ . " ! -exec sudo chown svxlink:svxlink {} +");
+        exec("find " . __DIR__ . " ! -exec sudo chown svxlink:svxlink {} +");
+        if (!$handle = fopen($base_dir_file, 'w')) {
+            die("Cannot open file ($base_dir_file) for writing. Check file permissions.");
+        }
     }
-  } else {
-    $mobile = 1;
-  }  
-//    $mobile = 1;
-  if ((defined ('debug')) && (debug > 0)) echo "<br>Browser: $mobile (0=Desktop, 1=MOBIL)<br>";
-  if (!$mobile) {
-    $logtext = $logtext . "in Desktop Mode\n";
-    addsvxlog($logtext);
-    echo '<body>';
-    echo '<div class="container">';
+    fwrite($handle, $base_dir_def);
+    fwrite($handle, $base_dir_dl3el_def);
+    fclose($handle);
 
-    echo '<div class="left-half">';
-    echo '<object style="outline:none; height: 1600px;width:950px;" data=index1.php></object>';
-//    echo '<object style="margin-left:10px; outline:none; height:1200px; width:950px;" data=index1.php></object>';
-    echo '</div>';
+if ((!file_exists('include/config.inc.php')) && (file_exists('include/config.inc.php.example')) ) {
+    copy('include/config.inc.php.example', 'include/config.inc.php');
+    sleep(3); 
+}
 
-    echo '<div class="right-half">';
-    echo '<object style="outline:none; height: 1600px; width:580px;" data=svx2mqtt/index_duo.php></object>';
-//    echo '<object style="outline:none; height:1200px; width:580px" data=svx2mqtt/index_duo.php></object>';
-    echo '</div>';
+if ((!file_exists('include/config.php')) && (file_exists('include/config.php.example')) ) {
+    copy('include/config.php.example', 'include/config.php');
+    sleep(3); 
+}
 
-    echo '</div>';
+if ((!file_exists('include/buttons.php')) && (file_exists('include/buttons.php.example')) ) {
+    copy('include/buttons.php.example', 'include/buttons.php');
+    sleep(3); 
+}
 
-    echo '</body>';
+include_once "include/settings.php";
+include_once "include/functions.php";
 
-  } else {
-    $logtext =  $logtext . "in Mobile Mode\n";
-    addsvxlog($logtext);
-    $uri=$_SERVER['REQUEST_URI'];
-    $StringExplo=explode("/",$_SERVER['REQUEST_URI']);
-    $HeadTo=$StringExplo[0]."/index1.php";
-    if (($StringExplo[1] === "index.php") || ($uri === "/")) {
-      $HeadTo = "/index1.php";
-    } else {
-      $HeadTo = "/" . $StringExplo[1] . "/index1.php";
-    }  
-//echo "URI: " . $_SERVER['REQUEST_URI'] . "<br>";
-//echo "String: 1:$StringExplo[0] 2:$StringExplo[1] 3:$StringExplo[2]<br>";
-//echo "new Header: $HeadTo<br>";
-    Header("Location: ".$HeadTo);
-    exit;
-  }
+if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
+// always stay logged on
+    $_SESSION['auth'] = "AUTHORISED";
+} else {
+   if (empty($_SESSION['auth'])) {
+      $_SESSION['auth'] = "UNAUTHORISED";
+   }
+}    
+
+if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
+    $svxConfigFile = SVXCONFPATH.SVXCONFIG;
+    if (fopen($svxConfigFile,'r')) {
+        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
+        if (defined('DL3EL_SC_STRING')) {
+            $sc_port_cmp = DL3EL_SC_STRING;
+        } else {    
+            $sc_port_cmp = "Audio Device";
+        }
+        $sc_port_linux = 'aplay -l | grep "' . $sc_port_cmp . '"';
+        $sc = 'aplay -l | grep "Audio Device"';
+        $sc = substr(shell_exec($sc),5,1);
+         $sc_port_name = $svxconfig['SimplexLogic']['RX']; 
+         $sc_port = substr($svxconfig[$sc_port_name]['AUDIO_DEV'],12,5); 
+         if ($sc != $sc_port) {
+            echo "<b>Soundcard&nbsp;mismatch:<br>Card:" . $sc . "/" . substr($svxconfig[$sc_port_name]['AUDIO_DEV'],5,8) . "</b>, will be changed";
+            $sc_port_raw = $svxconfig[$sc_port_name]['AUDIO_DEV']; 
+            echo "Data old: " . $sc_port_raw;
+            $sc_port_new = substr($svxconfig[$sc_port_name]['AUDIO_DEV'],0,12) . $sc; 
+            echo ", will be changed to Data new: " . $sc_port_new . "<br>";
+            $content = file_get_contents($svxConfigFile);
+            $backup_filename = $svxConfigFile . "." . date("YmdHis");
+            exec('sudo cp -p ' . $svxConfigFile . ' ' . $backup_filename);
+            $content = str_replace($sc_port_raw,$sc_port_new,$content); 
+            file_put_contents($svxConfigFile, $content);
+            echo "done, now restarting svxlink..<br>";
+            sleep(1);
+            exec('sudo systemctl restart svxlink 2>&1', $screen, $retval);
+            if ($retval === 0) {
+                echo "SVXLink sucessfull restartet, please reload page";
+            } else {
+                echo "SVXLink restart failure, check log";
+            }
+         }   
+    }
+}
+
+include_once "include/page_top.php";
+
+if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
+    $dmr_support = "1";
+    include_once "dvs_code.php";
+} else {
+    $dmr_support = "0";
+    $dmrtg = "no DMR";
+}    
+// for debug, switch off dmr_support
+//    $dmr_support = "0";
+if ((defined ('debug')) && (debug > 0)) echo "DVS Support: $dmr_support";
+$refchg = DL3EL.'Reflector1.conf';
+if ((defined ('debug')) && (debug > 0)) echo "Auth:" . $_SESSION['auth'] . "<br>";
+if ($_SESSION['auth'] === "AUTHORISED") {
+    if (file_exists(DL3EL.'/Reflector1.conf')) {
+        include_once "ref_change.php";
+    }
+}   
 
 ?>
-</html>
+
+<?php
+    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
+    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
+    echo '<div class="nav" style = "margin-bottom:1px;margin-top:10px;">'."\n";
+
+    echo '<script type="text/javascript">'."\n";
+    echo 'function reloadStatusInfo(){'."\n";
+    echo '$("#statusInfo").load("include/status.php",function(){ setTimeout(reloadStatusInfo,3000) });'."\n";
+    echo '}'."\n";
+    echo 'setTimeout(reloadStatusInfo,3000);'."\n";
+    echo '$(window).trigger(\'resize\');'."\n";
+    echo '</script>'."\n";
+    echo '<div id="statusInfo" style = "margin-bottom:30px;">'."\n";
+    include_once "include/status.php";
+    echo '</div>'."\n";
+    echo '</div>'."\n";
+    echo '</td>'."\n";
+
+    echo '<td valign="top" style = "height:auto;border:none;  background-color:#f1f1f1;">';
+    echo '<div class="content">'."\n";
+    echo '<script type="text/javascript">'."\n";
+
+    echo 'function reloadLastHeard(){'."\n";
+    echo '  $("#LastHeard").load("include/lh.php",function(){ setTimeout(reloadLastHeard,3000) });'."\n";
+    echo '}'."\n";
+    echo 'setTimeout(reloadLastHeard,3000);'."\n";
+
+    if ($dmr_support == "1") {
+        echo 'function reloadLastHeardDMR(){'."\n";
+        echo '  $("#LastHeardDMR").load("/DVSwitch/include/lh.php",function(){ setTimeout(reloadLastHeardDMR,3000) });'."\n";
+        echo '}'."\n";
+        echo 'setTimeout(reloadLastHeardDMR,3000);'."\n";
+    }
+
+    echo '$(window).trigger(\'resize\');'."\n";
+    echo '</script>'."\n";
+    echo '<center><div id="LastHeard" style = "margin-bottom:30px;">'."\n";
+    include_once "include/lh.php";
+    echo '</div></center>'."\n";
+    if ($dmr_support == "1") {
+        echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
+        echo '</div></center>'."\n";
+    }    
+    echo "<br />\n";
+    echo '</td>';
+    // Live DB
+    echo '<td style = "border:none;">';
+		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
+    echo '</td></tr></table>';
+?>
+
+<?php
+include_once "include/page_bottom.php";
+    ?>
+

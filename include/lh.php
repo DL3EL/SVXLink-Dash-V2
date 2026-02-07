@@ -6,9 +6,13 @@ include_once "config.php";
 include_once "tools.php";        
 include_once "functions.php";    
 ?>
+<fieldset style = "background-color:#f1f1f1; margin-top:15px;height:1380px; font-size:13px; border:none;">
 <span style = "font-size:20px"> </span>
 <span style = "font-weight:bold; font-size:14px;">SVXReflector Activity</span>
+<!-- 
 <fieldset style = " width:550px;box-shadow:5px 5px 20px #999;background-color:#e8e8e8e8;margin-top:10px;margin-left:0px;margin-right:0px;font-size:12px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+-->
+<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:10px;margin-left:0px;margin-right:0px;font-size:12px; border:none;">
   <form method="post">
 <!--  <table style = "margin-top:0px;"> -->          <!-- old -->
     <table style = "margin-top:0px; width:650px">    <!-- new -->
@@ -80,10 +84,7 @@ include_once "functions.php";
 include_once "tgdb.php";    
 ?>
       <th width=100px>TG #</th>
-<!--
-	<th width=30px> M </th>
--->
-	<th width=30px> A </th>
+      <th width=30px> A </th>
       <th>TG Name</th>
     </tr>
 <?php
@@ -172,4 +173,5 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 }
 ?>
   </table></form>
+</fieldset>
 </fieldset>
