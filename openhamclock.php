@@ -27,10 +27,13 @@ include_once "include/page_top.php";
     echo '<div class="content">'."\n";
 //    echo '<p align="left">';
 //    echo '<iframe src="http://192.168.241.99:3030/"  style = "width:1615px; height:690px"></iframe>';
-    echo '<iframe src="http://openhamclock.com/"  style="display: block; margin-left: 0; margin-right: 20%;width:60%; height:800px"></iframe>';
+//    echo '<iframe src="http://openhamclock.com/"  style="display: block; margin-left: 0; margin-right: 20%;width:60%; height:800px"></iframe>';
 //    echo '<iframe src="https://www.beiderwieden.de/imode/index.html"  style = "width:100%; height:690px"></iframe>';
+    echo '<div class="left-half">';
+    echo '<object style="outline:none; height: 800px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
+    echo '</div>';
 //    echo '</p>';
     echo '</td></tr></table>';
 ?>
 <?php 
-// include_once "include/page_bottom.php"; ?>
+ include_once "include/page_bottom.php"; ?>
