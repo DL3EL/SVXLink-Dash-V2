@@ -47,6 +47,7 @@ if (session_status() === PHP_SESSION_NONE) {
     } else {
 	    $show_livedb_inDB = 1;
     }    
+    $show_livedb_inDB = 0;
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;
     } else {    
