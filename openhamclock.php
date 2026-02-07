@@ -19,21 +19,17 @@ include_once "include/page_top.php";
     echo '$(window).trigger(\'resize\');'."\n";
     echo '</script>'."\n";
     echo '<div id="statusInfo" style = "margin-bottom:30px;">'."\n";
-    include "include/status.php";
+    include_once "include/status.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
     echo '</td>'."\n";
-    echo '<td valign="top"  style = "height:500px;text-align: left; border:none;  background-color:#f1f1f1;">';
+    echo '<td valign="top"  style = "height:360px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
     echo '<div class="content">'."\n";
-//    echo '<p align="left">';
-//    echo '<iframe src="http://192.168.241.99:3030/"  style = "width:1615px; height:690px"></iframe>';
-//    echo '<iframe src="http://openhamclock.com/"  style="display: block; margin-left: 0; margin-right: 20%;width:60%; height:800px"></iframe>';
-//    echo '<iframe src="https://www.beiderwieden.de/imode/index.html"  style = "width:100%; height:690px"></iframe>';
-    echo '<div class="left-half">';
+//    echo '<div class="left-half">';
     echo '<object style="outline:none; height: 800px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
     echo '</div>';
 //    echo '</p>';
     echo '</td></tr></table>';
-?>
-<?php 
+echo ' <center>';
  include_once "include/page_bottom.php"; ?>
+?>

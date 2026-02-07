@@ -1,5 +1,7 @@
 
 <div class="content">
+<center>
+
 <?php
 /*
 if ($_SESSION['auth'] !== "AUTHORISED") {

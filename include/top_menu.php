@@ -36,8 +36,8 @@ if (session_status() === PHP_SESSION_NONE) {
       $_SESSION['auth'] = "UNAUTHORISED";
    }
 ?>
-   <div id="display-links" align=right>
-    <p style = "padding-right: 5px; text-align: right; color: #000000;">
+   <div id="display-links" align=center>
+    <p style = "padding-right: 5px; text-align: center; color: #000000;">
     <a style = "color: black;">Display</a> |
 <?php
     if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
@@ -47,7 +47,6 @@ if (session_status() === PHP_SESSION_NONE) {
     } else {
 	    $show_livedb_inDB = 1;
     }    
-
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;
     } else {    
@@ -62,7 +61,8 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
 	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
 	} else {
-	    echo '<a href="./index1.php" style = "color: #000000;">Dashboard</a> | ';
+	    echo '<a href="./index.php" style = "color: #000000;" target="OHC">Dashboard</a> | ';
+
 	}   
 	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
 	echo '<a href="./monitor.php" style = "color: crimson;" id="log">MonitorCalls | </a> ';
@@ -70,7 +70,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./relais.php" style = "color: #0000ff;">FM Relais</a> | ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '<a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
-	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> | ';
+	    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
+		echo '<a href="./openhamclock.php" style = "color: #0000ff;" target="OHC">OHC | </a> ';
+	    } else {
+		echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> | ';
+	    }
 	}    
 	echo '<a href="./config_backup.php" style = "color: #0000ff;">Backup/Restore</a> ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
@@ -79,7 +83,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '| <a href="./dxcluster.php" style = "color: #0000ff;">DX</a> | ';
-	    echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> ';
+	    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
+		echo '<a href="./openhamclock.php" style = "color: #0000ff;" target="OHC">OHC</a> ';
+	    } else{
+		echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> ';
+	    }
 	}    
     }   
 ?>
@@ -134,7 +142,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
 	}
 	echo '</div>';
-	echo '<div id="full-edit-links"  align=right>';
+	echo '<div id="full-edit-links"  align=center>';
 
    if ($_SESSION['auth'] === "AUTHORISED") {
 

@@ -30,7 +30,7 @@ include_once "functions.php";
 	$logfile =  DL3EL .'/DMRID_update.log';
 	$jetzt = date("Y-m-d H:i:s");
 	// für Tests
-	// touch -m -t 202508101421 DMRIds.dat
+	// sudo touch -m -t 202508101421 DMRIds.dat
 //	$upd = update_file($DMRIDFile, $update_script, $logfile, 30);
 	$upd = update_file($DMRIDFile, $update_script, $logfile, 86400);
 	$dmrIDline = file_get_contents($DMRIDFile);
