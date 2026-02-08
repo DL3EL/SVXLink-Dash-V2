@@ -203,7 +203,7 @@ if (isset($_POST['btnDashUpdate']))
                 addsvxlog($content);
                 $logtext =  "Update not successful\n";
         } else {       
-    addsvxlog("Step 1\n");
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 1\n");
                 $dbversionFile = DL3EL . "/dbversion";
                 $new_dbversion = file_get_contents($dbversionFile);
                 list($dbversion, $rest) = explode(" ", $new_dbversion);
@@ -214,30 +214,29 @@ if (isset($_POST['btnDashUpdate']))
                     $dbversion = $dbversion . "(a)";
                 }  
                 $gitversion = file_get_contents("gitversion");
-    addsvxlog("Step 2\n");
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 2\n");
                 if (DL3EL_GIT_UPDATE === "nocheck") {
                   $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
                 } else {
                   $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
                 }        
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
-    addsvxlog("Step 3\n");
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 3\n");
                 if (!strlen($fmnetwork)) {
                     $fmnetwork = getfmnetwork();
                 }     
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
                 $useragent = str_replace(";",",",$useragent); 
 
-    addsvxlog("Step 4\n");
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 4\n");
                 $logtext =  "Github Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
-                addsvxlog($logtext);
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
                 $dbversionFile = DL3EL . "/dbversion.upd";
                 $dbversionFilecontent = "up2date";
                 file_put_contents($dbversionFile, $dbversionFilecontent);
-    addsvxlog("Step 5\n");
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 5\n");
                 $logtext =  "$old_dbversion Update to version $gitversion successful\n";
 // if this file exists, aprs task will terminate, status.php will start it again
                 $aprs_exit = DL3EL . "/aprs.exit";
