@@ -42,4 +42,4 @@ include_once "include/page_top.php";
 
 echo ' <center>';
  include_once "include/page_bottom.php"; ?>
-?>
+
