@@ -129,7 +129,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
      <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border-radius:10px;">
 -> äusserer Rahmen des LiveDB
 -->
-<fieldset style = "box-shadow:5px 5px 20px #999; background-color:#f1f1f1; height:920px; margin-top:0px; font-size:13px; border:none;">
+<fieldset style = "box-shadow:5px 5px 20px #999; background-color:#f1f1f1; height:820px; margin-top:0px; font-size:13px; border:none;">
      <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border:none;">
         <header>
             <center>
@@ -170,7 +170,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
 <!-- 
     <fieldset style="color:white; background-color:#f1f1f1; height:1500; font-size:14px; border:none;">
 -->
-    <fieldset style="color:white; background-color:#f1f1f1; height:600px; font-size:14px; border:none;">
+    <fieldset style="color:white; background-color:#f1f1f1; height:500px; font-size:14px; border:none;">
         <form method="post">
                     <section>
                         <h3 style="color:#000000;">Zuletzt Aktiv</h3>
@@ -179,7 +179,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                             <fieldset style = "height:1010px;box-shadow:2px 2px 10px #999;background-color:#e8e8e8;font-size:12px;border-radius: 10px;">
 -> innerer Rahmen des LiveDB
 -->
-                            <fieldset style = "height:600px;;background-color:#f1f1f1;font-size:12px;border:none;">
+                            <fieldset style = "height:500px;;background-color:#f1f1f1;font-size:12px;border:none;">
                             <table id="lhTable">
                                 <thead>
                                     <tr style="height:24px;">
