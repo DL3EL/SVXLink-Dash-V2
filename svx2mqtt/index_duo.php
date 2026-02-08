@@ -133,7 +133,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
      <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border:none;">
         <header>
             <center>
-                <h1 style="background-color:#fififi; color:#0000ff; font:12pt arial, sans-serif;font-weight:bold;">Live Dashboard  FM-Funknetz (DJ1JAY/DL4EM)</h1>
+                <h1 style="background-color:#fififi; color:#0000ff; font:12pt arial, sans-serif;font-weight:bold;">Live Dashboard  FM-Funknetz</h1>
             </center>
         </header>
 
