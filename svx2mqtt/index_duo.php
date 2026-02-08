@@ -133,7 +133,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
      <fieldset style="color:white; background-color:#f1f1f1; height:240px; font-size:14px; border:none; border:none;">
         <header>
             <center>
-                <h1 style="background-color:#fififi; color:#0000ff; font:12pt arial, sans-serif;font-weight:bold;">Live Dashboard (DJ1JAY/DL4EM)</h1>
+                <h1 style="background-color:#fififi; color:#0000ff; font:12pt arial, sans-serif;font-weight:bold;">Live Dashboard  FM-Funknetz (DJ1JAY/DL4EM)</h1>
             </center>
         </header>
 
@@ -465,6 +465,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
 
 </fieldset>
     <!-- SIMPLE Button 
+    <center><small><br>Live Date vom FM-Funknetz.de <br> basierend auf dem MQTT Livedashboard von DJ1JAY<br>(integriert von Frank, DL4EM)</small></center>
     <center>
     <a href="../index.php"><button class="white"
     style="border:none; border-radius:10px; margin-top:10px; color:white; background-color:#0000ff; height: 35px; width:180px; font-siz>
