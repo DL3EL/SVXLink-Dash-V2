@@ -26,13 +26,14 @@ include_once "include/page_top.php";
     echo '<td valign="top"  style = "height:360px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
     echo '<div class="content">'."\n";
 //    echo '<div class="left-half">';
-    echo '<object style="outline:none; height: 800px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
+    $call_script = $_GET['id'];
+    echo '<object style="outline:none; height: 850px;width:1500px;justify-content: left;" data=' . $call_script . '></object>';
+//    echo '<object style="outline:none; height: 850px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
+//	echo '<object style="outline:none; width:600px; height:900px; justify-content: left;" data=' . $call_script . '></object>';
     echo '</div>';
-//    echo '</p>';
     // Live DB
-    echo '<td valign="top" style = "border:none;">';
-		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
-    echo '</td></tr></table>';
+    include_once "caller_svxmqtt.php"; 
+    echo '</tr></table>';
 
 echo ' <center>';
  include_once "include/page_bottom.php"; ?>

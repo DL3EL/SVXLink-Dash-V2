@@ -40,14 +40,6 @@ if (session_status() === PHP_SESSION_NONE) {
     <p style = "padding-right: 5px; text-align: center; color: #000000;">
     <a style = "color: black;">Display</a> |
 <?php
-    if ((defined('DL3EL_LIVEDB_AUTO')) && (DL3EL_LIVEDB_AUTO === "yes")) {
-	include_once "include/browserdetect.php";
-	//$mobile = 1;
-	$show_livedb_inDB = $mobile;
-    } else {
-	    $show_livedb_inDB = 1;
-    }    
-    $show_livedb_inDB = 0;
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;
     } else {    
@@ -58,13 +50,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
     } 	
     if ($show_top_menu) {
-	if ($show_livedb_inDB) {
-	    echo '<a href="./index.php" style = "color: #000000;">Dashboard</a> | ';
-	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
-	} else {
-	    echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> | ';
-
-	}   
+	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> | ';
 //	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
 	echo '<a href="./caller.php?id=tg" style = "color: #000000;">Talk Groups</a> | ';
 	echo '<a href="./caller.php?id=monitor" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
@@ -74,28 +60,24 @@ if (session_status() === PHP_SESSION_NONE) {
 //	echo '<a href="./caller.php?id=relais" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
 
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
-//	    echo '<a href="./dxcluster0.php" style = "color: #0000ff;" target="_top">DX</a> | ';
 	    echo '<a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
-	    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
-		echo '<a href="./openhamclock.php" style = "color: #0000ff;"  target="_top">OHC | </a> ';
-	    } else {
-		echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> | ';
-	    }
+	    echo '<a href="./caller_extern.php?id=http://openhamclock.com" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
 	}    
+	if (defined('DL3EL_OPENWEBRX')) {
+	    echo '<a href="./caller_extern.php?id=' . DL3EL_OPENWEBRX . ' style = "color: #0000ff;"  Starget="_top">OWR | </a> ';
+	}    
+	echo '<a href="./caller_extern.php?id=http://stream.fm-funknetz.de" style = "color: #0000ff;"  target="_top">Voice FMN | </a> ';
 	echo '<a href="./config_backup.php" style = "color: #0000ff;" target="_top">Backup/Restore</a> ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
     } else {
-	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> ';
+	echo '<a href="./index.php" style = "color: #0000ff;" target="_top">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
-//	    echo '| <a href="./dxcluster0.php" style = "color: #0000ff;" target="_top">DX</a> | ';
 	    echo '| <a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
-	    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
-		echo '<a href="./openhamclock.php" style = "color: #0000ff;">OHC</a> ';
-	    } else{
-		echo '<a href="https://openhamclock.com" style = "color: #0000ff;" target="OHC">OHC</a> ';
-	    }
+//	    echo '<a href="./openhamclock.php" style = "color: #0000ff;">OHC</a> ';
 	}    
+	echo '<a href="./caller_extern.php?id=http://openhamclock.com" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
+	echo '<a href="./caller_extern.php?id=http://stream.fm-funknetz.de" style = "color: #0000ff;"  target="_top">Voice FMN | </a> ';
     }   
 ?>
 <?php

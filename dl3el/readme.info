@@ -1,3 +1,27 @@
+Neues in der Version 5.30 (08.02.2026)
+- openhamclock jetzt komplett ins Bildschirmlayout integriert
+	Es ist m.E. sinnvoller die Daten von openhamclock zusätzlich zu den Statusdaten und dem Livedashboard
+	zu sehen. Daher habe ich, nach Rücksprache mit Chris, K0CJH, (dem Author von openhamclock) die Webseite
+	jetzt komplett in mein Dashboard integriert.
+	Dazu war es nötig, das gesamte Layout zu überarbeiten, das habe ich die letzten Tage zusammen mit
+	Frank, DL4EM, umgesetzt. Die wesentlichen Änderungen sind jetzt:
+	- wann immer möglich und sinnvoll wird jetzt am linken Rand das Statusfenster angezeigt
+	- wann immer möglich und sinnvoll wird jetzt am rechten Rand das LibeDashboard vom FM-Funknetz angezeigt
+	- das LiveDB ist jetzt in das Browserfenster integriert. Es gab Probleme mit bestimmten Browser 
+	  im Apple Umfeld, das ist damit hoffentlich erledigt
+	- wir können jetzt mit variablen Bildschirmbrieten arbeiten, d.h. bei der Anzeige von openhamclock wird mehr
+	  Bildschirmplatz verwendet, als bei andere Anzeigen
+	- für die beiden Menus Echolink und Relais funktioniert das leider noch nicht: work in progress.
+	- wenn die Anzeige vom Livedashboard nicht erwünscht ist, kann man das durch die Variable 
+	  define("DL3EL_LIVEDB_AUTO", "no");
+	  abschalten. Nur wenn diese Variable oder alteranativ "DL3EL_LIVEDB" auf "yes" stehen, wird das 
+	  LiveDB angezeigt.
+- der "WebSDR" von Jens, DJ1JAY, mit dem man alle Stream des FM-Funknetz hören kann ist jetzt ebenfalls integriert 
+	und über den Menuepunkt	"Voice FMN" erreichbar
+- man kann jetzt in der config.php einen OpenWebRX Empfänger eintragen, z.B.:
+	define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
+	Nach dem Relaod des Dashboards, ist dieser WebSDR über den Menuepunkt "OWR" erreichbar
+	
 Neues in der Version 5.29a (06.02.2026)
 - Servicerelease 
 	im LiveDB wird jetzt die Anzahl der Verbundenen Stationen wieder koorekt angegeben

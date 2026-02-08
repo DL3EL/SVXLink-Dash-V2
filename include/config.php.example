@@ -72,14 +72,15 @@ define("DL3EL_RADIO", "Shari");
 define("DL3EL_VERSION", "public");
 //define("DL3EL_VERSION", "develop");
 // show splitcsreen with live_db when running on a desktop, it will never be shown on a mobile device
-//define("DL3EL_LIVEDB_AUTO", "yes");
-define("DL3EL_LIVEDB_AUTO", "no");
+define("DL3EL_LIVEDB_AUTO", "yes");
+//define("DL3EL_LIVEDB_AUTO", "no");
 // good colours are green, silver and blue. There is no colour check :-)
 define("SVXMQTT_COLOR_active", "green");
 define("SVXMQTT_COLOR_passive", "blue");
 //define("DL3EL_DXCLUSTER", "yes");
 define("DL3EL_DXCLUSTER", "no");
 define("DL3EL_DXCLUSTER_CONT", "EU");
+//define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
 // if you are unable to configure the system with *only* one soundcard for svxlink, the index to the card could be different after a reboot
 // setting DL3EL_SC_CHANGE to "yes" enables the dashboard to select the correct soundcard and restart svxlink on the first run after reboot.
 define("DL3EL_SC_CHANGE", "no");
