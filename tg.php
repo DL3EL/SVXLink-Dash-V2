@@ -29,12 +29,14 @@ include_once "include/page_top.php";
     echo '<center><div id="TalkGroups" style = "margin-bottom:30px;">'."\n";
     include "include/tg.php";
     echo '</div></center>'."\n";
-//    echo "<br />\n";
+    echo "<br />\n";
     echo '</td>';
+/*
     // Live DB
     echo '<td valign="top" style = "border:none;">';
 //		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
 		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
+*/
     echo '</td></tr></table>';
 ?>
 <?php include_once "include/page_bottom.php"; ?>

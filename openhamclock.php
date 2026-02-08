@@ -29,7 +29,11 @@ include_once "include/page_top.php";
     echo '<object style="outline:none; height: 800px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
     echo '</div>';
 //    echo '</p>';
+    // Live DB
+    echo '<td valign="top" style = "border:none;">';
+		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
     echo '</td></tr></table>';
+
 echo ' <center>';
  include_once "include/page_bottom.php"; ?>
 ?>

@@ -30,23 +30,33 @@ include_once "include/page_top.php";
         $FMLQueryFile = DL3EL . "/fml_query";
         $fmlquery = shell_exec('cat ' . $FMLQueryFile);
         $last_pos = 1;
+        $relais_act = DL3EL . "/relais.act";
     } else {
         $RelaisFile = "relais.csv";
     }
     if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
         $aprspos = DL3EL . "/aprs-follow.pos";
         if (file_exists($aprspos)) {
-            $filepos = file_get_contents($aprspos);
-            $position = explode("^",$filepos);
-            if ((defined ('debug')) && (debug > 0)) echo "<br>" . $position[0] . " " . $position[1] . ":" .  $position[2] . ":" .  $position[3];
-            if (isset($position[3])) {
-                $fmquery = $position[3];
-                $fmlquery = "";
-                $last_pos = 2;
-            } else {   
+            $delta = time() - filemtime($aprspos);
+// 43.200 = 12h
+            if ($delta < 43200) {
+//            if ($delta < 30) {
+                $filepos = file_get_contents($aprspos);
+                $position = explode("^",$filepos);
+                if ((defined ('debug')) && (debug > 0)) echo "<br>" . $position[0] . " " . $position[1] . ":" .  $position[2] . ":" .  $position[3];
+                if (isset($position[3])) {
+                    $fmquery = $position[3];
+                    $fmlquery = "";
+                    $last_pos = 2;
+                    $update_list = 1;
+                } else {   
+                    $last_pos = 1;
+                }    
+                $update_list = 0;
+            } else {
                 $last_pos = 1;
+                $update_list = 0;
             }    
-            $update_list = 0;
         }
     } else {
         $update_list = 0;
@@ -56,12 +66,12 @@ include_once "include/page_top.php";
     <?php
     if ($last_pos) {
         if ($last_pos === 2) {
-            echo "Position von APRS_Follow (" . $position[3] . ", " . $position[2] . ") wird verwendet";
+            echo "Position von APRS_Follow (" . $position[3] . ", " . $position[2] . ") wird verwendet [$last_pos]";
         } else {
-            echo "Position der letzten Anfrage wird (" . $fmquery . " " . $fmlquery . ") verwendet";
+            echo "Position der letzten Anfrage wird (" . $fmquery . " " . $fmlquery . ") verwendet [$last_pos]";
         }
     } else {
-        echo "keine Position oder letzte Anfrage gefunden";
+        echo "keine Position oder letzte Anfrage gefunden [$last_pos]";
     }
 ?>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
@@ -79,12 +89,15 @@ include_once "include/page_top.php";
 
    </p> 
     <?php
-/*
-    if ($update_list === 1) {
-        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $fmlquery . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+
+    if ($last_pos === 2) {
+//        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $fmlquery . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=" . $position[3] . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
         echo "",exec($cmd, $output, $retval);
+        $update_list = 1;
+        touch($relais_act);
     }    
-*/
+
     $loc = "";
     $loc_found = 0;
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
@@ -98,24 +111,19 @@ include_once "include/page_top.php";
             $loc = $_POST['locator'];
             $loc_found = 1;
         }
-    
-//        echo "EL: " . $query_el . "&nbsp; FMR" . $query_fr . "<br>";
-//        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=" . $_POST['prefix'] . $query_el . $query_fr . $query_fhs . "&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+   
         $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?" . $query_loc . $query_el . $query_fr . $query_fhs . "&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
-//        $cmd = "wget -O " . $RelaisFile . " -q \"https://relais.dl3el.de/FM-Relais/DM7DS/relaisgeo_fmn_el.php\"";
-//        echo "<br>Aufruf: " . $cmd . "<br>";
         if ((defined ('debug')) && (debug > 0)) echo "Call: $cmd<br>";
         echo "",exec($cmd, $output, $retval);
         $update_list = 1;
+        touch($relais_act);
+
         if (defined('DL3EL')) {
             $fmquery = $_POST['prefix'] . " >" . $FMQueryFile;
             shell_exec("echo $fmquery");
             $fmlquery = $_POST['locator'] . " >" . $FMLQueryFile;
             shell_exec("echo $fmlquery");
         }    
-        echo "<script type='text/javascript'>
-        reloadPage();
-        </script>";    
     }
 
     if (($handle = fopen($RelaisFile, "r")) !== FALSE) {
@@ -149,14 +157,17 @@ include_once "include/page_top.php";
             }
         }
         fclose($handle);
-        if ($update_list === 1) {
+        $relais_act = DL3EL . "/relais.act";
+        if (file_exists($relais_act)) {
             $cmd = "wget -O- -q \"http://relais.dl3el.de/cgi-bin/metar.pl?sel=gridsq&gs=" . $loc . "\"";
             echo "",exec($cmd, $output, $retval);
-        }    
+            unlink($relais_act);
+        }   
         echo '</form>';
     } else {
       echo "wrong file: " . $RelaisFile ."<br>";  
     }
+/*
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
 //    if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Refresh the page to show updated values
@@ -164,6 +175,7 @@ include_once "include/page_top.php";
         reloadPage();
         </script>";    
     }    
+*/
   ?>
 </table>
 

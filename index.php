@@ -109,7 +109,6 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
     echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
     echo '<div class="nav" style = "margin-bottom:1px;margin-top:10px;">'."\n";
-
     echo '<script type="text/javascript">'."\n";
     echo 'function reloadStatusInfo(){'."\n";
     echo '$("#statusInfo").load("include/status.php",function(){ setTimeout(reloadStatusInfo,3000) });'."\n";
@@ -152,10 +151,15 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     }    
     echo "<br />\n";
     echo '</td>';
+    include_once "caller_svxmqtt.php"; 
+/*
     // Live DB
     echo '<td style = "border:none;">';
-		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
-    echo '</td></tr></table>';
+//		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
+		echo '<object style="outline:none; width:600px; height:900px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
+    echo '</td>
+*/
+    echo '</tr></table>';
 ?>
 
 <?php
