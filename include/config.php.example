@@ -80,6 +80,10 @@ define("SVXMQTT_COLOR_passive", "blue");
 //define("DL3EL_DXCLUSTER", "yes");
 define("DL3EL_DXCLUSTER", "no");
 define("DL3EL_DXCLUSTER_CONT", "EU");
+//define("DL3EL_EXTERNWEB_WIDTH", "1000");
+//define("DL3EL_OPENHAMCLOCK", "no");
+define("DL3EL_OPENHAMCLOCK", "yes");
+define("DL3EL_FMFUNKNETZ", "no");
 //define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
 // if you are unable to configure the system with *only* one soundcard for svxlink, the index to the card could be different after a reboot
 // setting DL3EL_SC_CHANGE to "yes" enables the dashboard to select the correct soundcard and restart svxlink on the first run after reboot.
