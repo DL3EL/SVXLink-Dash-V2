@@ -167,11 +167,12 @@ if (isset($_POST['btnDashUpdate']))
         exec($command,$output,$retval);
         $command = $file . " " . $gitdir . " >>" . $log . " 2>&1";
         exec($command,$output,$retval);
-        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
+        echo '<textarea name="content" rows="2" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
         $content = file_get_contents($log);
         exec("find " . DL3EL_BASE . "* ! -exec sudo chown $owner:$group {} +");
         if (str_contains($content,'error: Your local changes to the following files would be overwritten')) {
                 $content = $content . "\nDatei Inkonsistenz zu Github \n";
+        addsvxlog($content);
                 $pos1 = stripos($content, "merge:");
                 $pos2 = stripos($content, "Please");
                 $str = substr($content,$pos1,$pos2-$pos1);
@@ -186,6 +187,8 @@ if (isset($_POST['btnDashUpdate']))
                     $content = $content . $mvfile;
                     $cmd = $file . " " . $file . ".bak\n";
                     $content = $content . "Datei wird umbenannt:\nrename " . $cmd;
+                    $logtext =  "Datei wird umbenannt:\nrename " . $cmd;
+                    addsvxlog($logtext);
                     if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
                        echo "no renaming, development\n";
                        $content = $content .  "no renaming, development";
@@ -222,6 +225,8 @@ if (isset($_POST['btnDashUpdate']))
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
                 $useragent = str_replace(";",",",$useragent); 
 
+                $logtext =  "Github Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
+                addsvxlog($logtext);
                 $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
                 if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
                 exec($cmd);
