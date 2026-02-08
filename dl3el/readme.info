@@ -20,7 +20,12 @@ Neues in der Version 5.30 (08.02.2026)
 	und über den Menuepunkt	"Voice FMN" erreichbar
 - man kann jetzt in der config.php einen OpenWebRX Empfänger eintragen, z.B.:
 	define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
-	Nach dem Relaod des Dashboards, ist dieser WebSDR über den Menuepunkt "OWR" erreichbar
+	Nach dem Relaad des Dashboards, ist dieser WebSDR über den Menuepunkt "OWR" erreichbar
+- da die externen WebSeiten durchaus recht breit werden können, ist im Moment eine Defaultbreite von 1500px eingestellt.
+	Wenn das zu breit ist, kann man dies über die Variable
+	define("DL3EL_EXTERNWEB_WIDTH", "1000");
+	in der config.php einstellen, je nach Bildschirmgröße. Es findet keine Fehlerprüfung statt, die Größe 
+	ist in "px", das "px" darf nicht angegeben werden.
 	
 Neues in der Version 5.29a (06.02.2026)
 - Servicerelease 
