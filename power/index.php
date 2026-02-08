@@ -153,16 +153,21 @@ if (isset($_POST['btnDashUpdate']))
         $owner = 'svxlink';
         $group = 'svxlink';
 
+        $logtext =  "Starting git download..\n";
+        addsvxlog($logtext);
         $command = "sudo chown $owner:$group " . escapeshellarg($file) . " >" . $log . " 2>&1";
         $output = [];
         $return_var = 0;
         exec($command, $output, $return_var);
+        $logtext =  "git update done..\n";
+        addsvxlog($logtext);
         $retval = null;
         $screen = null;
         $command = "sudo chmod g+x " . $file . " >>" . $log . " 2>&1";
         exec($command,$output,$retval);
         $command = $file . " " . $gitdir . " >>" . $log . " 2>&1";
         exec($command,$output,$retval);
+        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
         $content = file_get_contents($log);
         exec("find " . DL3EL_BASE . "* ! -exec sudo chown $owner:$group {} +");
         if (str_contains($content,'error: Your local changes to the following files would be overwritten')) {
