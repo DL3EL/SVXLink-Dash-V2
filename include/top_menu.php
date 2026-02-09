@@ -66,8 +66,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '<a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
 	}    
-	if ((!defined('DL3EL_OPENHAMCLOCK')) || ((defined('DL3EL_OPENHAMCLOCK')) && (DL3EL_OPENHAMCLOCK === "yes"))) {
+	if (!defined('DL3EL_OPENHAMCLOCK')) {
 	    echo '<a href="./caller_extern.php?id=https://openhamclock.com" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
+	} else {
+	    if (DL3EL_OPENHAMCLOCK !== "no") {
+		echo '<a href="./caller_extern.php?id=' . DL3EL_OPENHAMCLOCK . '" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
+	    }
 	}    
 	if (defined('DL3EL_OPENWEBRX')) {
 	    echo '<a href="./caller_extern.php?id=' . DL3EL_OPENWEBRX . ' style = "color: #0000ff;"  Starget="_top">OWR | </a> ';
