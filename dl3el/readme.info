@@ -7,6 +7,13 @@ Neues in der Version 5.30a (09.02.2026)
 	in dem die Variabe
 	define("DL3EL_SVXCUBE", "http://192.168.1.1");
 	mit der richtigen IP Adresse versorgt wird.
+- individuelle externe Links eintragen
+	es ist jetzt möglich in der letzen Zeile des Hauptmenues bis zu 4 individuelle Links einzutragen. Dafür müssen 
+	die Variablen
+	define("DL3EL_EXTERNx", "http://44.149.162.ip/");
+	define("DL3EL_EXTERNx_NAME", "Link1");
+	das "x" muss durch die Zahlen 1 - 4 ersetzt werden. DNS Namen sind auch möglich
+
 - Servicerelease 
 	die Logik für das FM-Funknetz LiveDashboard wurde noch einmal umgestellt:
 	- die Variable "DL3EL_LIVEDB_AUTO" wird jetzt nicht mehr ausgewertet

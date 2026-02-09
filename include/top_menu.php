@@ -83,7 +83,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    $cubeip = "http://" . $cubeip . ":8081";
 	    echo '| <a href="./caller_extern.php?id=' . $cubeip . '" style = "color: #0000ff;"  Starget="_top">SVXCube </a> ';
 	} else {
-	    if ((defined('DL3EL_SVXCUBE')) && (DL3EL_DXCLUSTER === "yes")) {
+	    if (defined('DL3EL_SVXCUBE'))  {
 		echo '| <a href="./caller_extern.php?id=' . DL3EL_SVXCUBE . ' style = "color: #0000ff;"  Starget="_top">SVXCube</a> ';
 	    }    
 	}    
@@ -224,6 +224,38 @@ if (session_status() === PHP_SESSION_NONE) {
 	} else {
 	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a>';
 	}
+	if (defined('DL3EL_EXTERN1'))  {
+	    if (defined('DL3EL_EXTERN1_NAME'))  {
+		$linktext = DL3EL_EXTERN1_NAME;
+	    } else {
+		$linktext = DL3EL_EXTERN1;
+	    }
+	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+	}    
+	if (defined('DL3EL_EXTERN2'))  {
+	    if (defined('DL3EL_EXTERN2_NAME'))  {
+		$linktext = DL3EL_EXTERN2_NAME;
+	    } else {
+		$linktext = DL3EL_EXTERN2;
+	    }
+	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+	}    
+	if (defined('DL3EL_EXTERN3'))  {
+	    if (defined('DL3EL_EXTERN3_NAME'))  {
+		$linktext = DL3EL_EXTERN3_NAME;
+	    } else {
+		$linktext = DL3EL_EXTERN3;
+	    }
+	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+	}    
+	if (defined('DL3EL_EXTERN4'))  {
+	    if (defined('DL3EL_EXTERN4_NAME'))  {
+		$linktext = DL3EL_EXTERN4_NAME;
+	    } else {
+		$linktext = DL3EL_EXTERN4;
+	    }
+	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+	}    
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> | <b>Full</b> Edit</a> | ';
 	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a>';
