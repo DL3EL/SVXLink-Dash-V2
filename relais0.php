@@ -1,24 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-include_once "include/settings.php";
-include_once "include/page_top.php";
-?>
-<head>
-    <meta charset="UTF-8">
- <script type="text/javascript">
-        function reloadPage() {
-            window.location.href = window.location.pathname + "?reloaded=true";
-        }
-    </script>
-</head>
-<?php
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-//    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
-//    echo '<td valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
     echo '<div class="nav" style = "margin-bottom:1px;margin-top:1px;">'."\n";
-
     echo '</div>'."\n";
     echo '</td>'."\n";
 
@@ -74,10 +56,7 @@ include_once "include/page_top.php";
         echo "keine Position oder letzte Anfrage gefunden [$last_pos]";
     }
 ?>
-<!-- 
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
--->
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?id=relais0"; ?>">
         <label for="prefix">Call</label>
         <input type="text" style = "width:100px" id="prefix" name="prefix" value=<?php echo $fmquery;?>>  
         <label for="locator"> oder Locator</label>
@@ -91,11 +70,10 @@ include_once "include/page_top.php";
 
 
    </p> 
-    <?php
-
+<?php
     if ($last_pos === 2) {
 //        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $fmlquery . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
-        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=" . $position[3] . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=" . $position[3] . "&type_el=1&type_fr=1&printas=csv&maxgateways=35&nohtml=yes&quelle=y\"";
         echo "",exec($cmd, $output, $retval);
         $update_list = 1;
         touch($relais_act);
@@ -104,8 +82,6 @@ include_once "include/page_top.php";
     $loc = "";
     $loc_found = 0;
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
-//    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-echo "Query gedrückt, jetzt werden die Daten aktualisiert<br>";
         if (isset($_POST['type_el'])) { $query_el = "&type_el=" . $_POST['type_el'];}
         if (isset($_POST['type_fr'])) { $query_fr = "&type_fr=" . $_POST['type_fr'];}
         if (isset($_POST['type_fhs'])) { $query_fhs = "&type_fhs=" . $_POST['type_fhs'];}
@@ -116,7 +92,7 @@ echo "Query gedrückt, jetzt werden die Daten aktualisiert<br>";
             $loc_found = 1;
         }
    
-        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?" . $query_loc . $query_el . $query_fr . $query_fhs . "&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
+        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?" . $query_loc . $query_el . $query_fr . $query_fhs . "&printas=csv&maxgateways=35&nohtml=yes&quelle=y\"";
         if ((defined ('debug')) && (debug > 0)) echo "Call: $cmd<br>";
         echo "",exec($cmd, $output, $retval);
         $update_list = 1;
@@ -129,16 +105,11 @@ echo "Query gedrückt, jetzt werden die Daten aktualisiert<br>";
             shell_exec("echo $fmlquery");
         }    
     }
-        $relais_act = DL3EL . "/relais.act";
-        if (file_exists($relais_act)) {
-            echo "jetzt Ausgabe der aktuellen Daten<br>";
-        } else {
-            echo "jetzt Ausgabe der alten, gespeicherten Daten<br>";
-        }
     if (($handle = fopen($RelaisFile, "r")) !== FALSE) {
-//       echo '<form method="post">';
-//        echo '<form method="post" onsubmit="reloadPage()">';
-//        echo '<form method="post" onsubmit="relais.php">';
+        $relais_act = DL3EL . "/relais.act";
+        if (!file_exists($relais_act)) {
+            echo "gespeicherte Daten des letzen Aufrufs<br>";
+        }
         while (($data = fgetcsv($handle, 1000, ";", "\"", "\\")) !== FALSE) {
 //        echo "0: " . $data[0] . "/ 1:" . $data[1] . "/ 2:"  . $data[2] . "/ 3:"  . $data[3] . "/ 4:"  . $data[4] . "/ 5:" . $data[5] . "/ 6:" . $data[6] . "/ 7:"  . $data[7] . "/ 8:"  . $data[8] . "/ 9:"  . $data[9] . "/ 10:" . $data[10] . "/ 11:"  . $data[11] . "/ 12:"  . $data[12] . "<br>";
             if (!$loc_found && ($data[3] !== "Locator")) {
@@ -161,8 +132,6 @@ echo "Query gedrückt, jetzt werden die Daten aktualisiert<br>";
                 } else {
                     $echolink_conn = "";
                 }    
-//                substr($data[4], 0, 20);
-//                echo "<tr><td>" . $bold_b . $data[0] . $bold_e . "</td><td>" . $data[1] . "</td><td>"  . $data[2] . "</td><td>"  . $data[3] . "</td><td>" . $bold_b . $data[4] . $bold_e . "</td><td>"  . $data[9] . "</td><td>"  . $echolink_conn . "</td><td>"  . $data[11] . "</td></tr>";
                 echo "<tr><td>" . $bold_b . $data[0] . $bold_e . "</td><td>" . $data[1] . "</td><td>"  . $data[2] . "</td><td>"  . $data[3] . "</td><td>" . $bold_b . substr($data[4], 0, 50) . $bold_e . "</td><td>"  . $data[9] . "</td><td>"  . $echolink_conn . "</td><td>"  . $data[11] . "</td></tr>";
             }
         }
@@ -177,16 +146,7 @@ echo "Query gedrückt, jetzt werden die Daten aktualisiert<br>";
     } else {
       echo "wrong file: " . $RelaisFile ."<br>";  
     }
-/*
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
-//    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Refresh the page to show updated values
-        echo "<script type='text/javascript'>
-        reloadPage();
-        </script>";    
-    }    
-*/
-  ?>
+?>
 </table>
 
 <?php
@@ -197,4 +157,3 @@ if (isset($_POST["jmptoE"])) {
 }
 
 ?>
-<?php include_once "include/page_bottom.php"; ?>

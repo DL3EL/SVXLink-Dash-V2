@@ -52,16 +52,16 @@ if (session_status() === PHP_SESSION_NONE) {
     if ($show_top_menu) {
 	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> | ';
 //	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
-	echo '<a href="./caller.php?id=tg" style = "color: #000000;">Talk Groups</a> | ';
+	echo '<a href="./caller.php?id=include/tg" style = "color: #000000;">Talk Groups</a> | ';
 	if (((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "top"))) {
 	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
 	}    
-//	echo '<a href="./caller.php?id=monitor" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
-	echo '<a href="./monitor.php" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
-	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;" target="_top">Echolink</a> | ';
-//	echo '<a href="./caller.php?id=echolink_dl3el" style = "color: #0000ff;" target="_top">Echolink</a> | ';
-	echo '<a href="./relais.php" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
-//	echo '<a href="./caller.php?id=relais" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
+	echo '<a href="./caller.php?id=monitor0" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+//	echo '<a href="./monitor.php" style = "color: crimson;" id="log" target="_top">MonitorCalls0 | </a> ';
+//	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;" target="_top">Echolink0</a> | ';
+	echo '<a href="./caller.php?id=echolink_dl3el0" style = "color: #0000ff;" target="_top">Echolink</a> | ';
+//	echo '<a href="./relais.php" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
+	echo '<a href="./caller.php?id=relais0" style = "color: #0000ff;" >FM Relais</a> | ';
 
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '<a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
@@ -94,7 +94,7 @@ if (session_status() === PHP_SESSION_NONE) {
     } else {
 	echo '<a href="./index.php" style = "color: #0000ff;" target="_top">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
-	    echo '| <a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
+	    echo '| <a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> ';
 	}    
     }   
 ?>

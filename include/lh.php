@@ -130,28 +130,28 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 	$string = $call;
 	$position = strpos($string, "-");		// Stelle des "-" zurück
 	if ($position !== false) {			// Prüft, ob das Zeichen gefunden wurde
-	  $call = substr($string, 0, $position);}	//schneidet ab "-" ab
-
-	  // Suche Name zum Call in DMRIds.da
-	  $arr2 = $call;
-	  $pos = strpos($dmrIDline, $arr2." ");
-	  if ($pos != false) {
-	    $name = substr($dmrIDline, ($pos + strlen($arr2." ")));
-	    $name = ltrim($name, " ");
-	    $x = strpos($name, "\n");
-	    $y = strpos($name, " ");
-	    $name = rtrim($name, " ");
-	    if ($x < $y) {
-	      $name = substr($name, 0, $x);
-	      echo "<td align=\"left\" style=\"font-weight:bold;color:#464646;\">&nbsp;<b>".$name."&nbsp;</b></td>";
-	    } else {
-	      $name = substr($name, 0, $y);
-	      echo "<td align=\"left\" style=\"font-weight:bold;color:#464646;\">&nbsp;<b>".$name."&nbsp;</b></td>";
-	    }
-	  } else {
-	    echo "<td align=\"left\" style=\"font-weight:bold;color:#464646;\">&nbsp;<b>&nbsp;</b></td>";
-	  }
+	  $call = substr($string, 0, $position);	//schneidet ab "-" ab
 	}
+	  // Suche Name zum Call in DMRIds.da
+	$arr2 = $call;
+	$pos = strpos($dmrIDline, $arr2." ");
+	if ($pos != false) {
+	  $name = substr($dmrIDline, ($pos + strlen($arr2." ")));
+	  $name = ltrim($name, " ");
+	  $x = strpos($name, "\n");
+	  $y = strpos($name, " ");
+	  $name = rtrim($name, " ");
+	  if ($x < $y) {
+	    $name = substr($name, 0, $x);
+	    echo "<td align=\"left\" style=\"font-weight:bold;color:#464646;\">&nbsp;<b>".$name."&nbsp;</b></td>";
+	  } else {
+	    $name = substr($name, 0, $y);
+	    echo "<td align=\"left\" style=\"font-weight:bold;color:#464646;\">&nbsp;<b>".$name."&nbsp;</b></td>";
+	  }
+	} else {
+	  echo "<td align=\"left\" style=\"font-weight:bold;color:#464646;\">&nbsp;<b>&nbsp;</b></td>";
+	}
+      }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////      //echo "<td align=\"left\">&nbsp;<span style=\"color:#b5651d;font-weight:bold;\">$listElem[2]</span></td>";
       $tgnumber = substr($listElem[2],3);
       $name=isset($tgdb_array[$tgnumber])? $tgdb_array[$tgnumber] : '';

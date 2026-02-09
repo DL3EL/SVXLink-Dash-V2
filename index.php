@@ -151,14 +151,8 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     }    
     echo "<br />\n";
     echo '</td>';
-    include_once "caller_svxmqtt.php"; 
-/*
     // Live DB
-    echo '<td style = "border:none;">';
-//		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
-		echo '<object style="outline:none; width:600px; height:900px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
-    echo '</td>
-*/
+    include_once "caller_svxmqtt.php"; 
     echo '</tr></table>';
 ?>
 
