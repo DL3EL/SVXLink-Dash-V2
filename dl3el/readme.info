@@ -1,3 +1,9 @@
+Neues in der Version 5.30b (10.02.2026)
+- Servicerelease 
+	Nach viel Debuggen ist es mir endlich gelungen die Funktionen MinitorCalls, Echolink und FM_Relais in das 
+	neue Design einzubauen. Ausserdem passen jetzt die in den EIngabfelder stehenden Werte (Call, bzw. Locator) 
+	zur angezeigten Auflistung.
+	
 Neues in der Version 5.30a (09.02.2026)
 - Link zum SVXCube Controller
 	im neuen Image von Michael, DC9VQ, wird ja der SVXCube von Jens, DJ1JAY unterstützt. Wenn das System erkennt

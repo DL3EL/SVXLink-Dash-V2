@@ -1,20 +1,15 @@
 <?php
-    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<div class="nav" style = "margin-bottom:1px;margin-top:1px;">'."\n";
-    echo '</div>'."\n";
-    echo '</td>'."\n";
-
     $last_pos = 0;
     if (defined('DL3EL')) {
         $RelaisFile = DL3EL . "/relais.csv";
         $FMQueryFile = DL3EL . "/fm_query";
-        $fmquery = shell_exec('cat ' . $FMQueryFile);
+        $fmquery = file_get_contents($FMQueryFile);
         $FMLQueryFile = DL3EL . "/fml_query";
-        $fmlquery = shell_exec('cat ' . $FMLQueryFile);
+        $fmlquery = file_get_contents($FMLQueryFile);
         $last_pos = 1;
         $relais_act = DL3EL . "/relais.act";
     } else {
-        $RelaisFile = "relais.csv";
+        return;
     }
     if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
         $aprspos = DL3EL . "/aprs-follow.pos";
@@ -43,34 +38,7 @@
     } else {
         $update_list = 0;
     }     
-?>
-   <p style = "padding-left: 5px; text-align: left;"> &nbsp;
-    <?php
-    if ($last_pos) {
-        if ($last_pos === 2) {
-            echo "Position von APRS_Follow (" . $position[3] . ", " . $position[2] . ") wird verwendet [$last_pos]";
-        } else {
-            echo "Position der letzten Anfrage wird (" . $fmquery . " " . $fmlquery . ") verwendet [$last_pos]";
-        }
-    } else {
-        echo "keine Position oder letzte Anfrage gefunden [$last_pos]";
-    }
-?>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?id=relais0"; ?>">
-        <label for="prefix">Call</label>
-        <input type="text" style = "width:100px" id="prefix" name="prefix" value=<?php echo $fmquery;?>>  
-        <label for="locator"> oder Locator</label>
-        <input type="text" id="locator" name="locator" value=<?php echo $fmlquery;?>>  
-        <input type="checkbox" name="type_el" checked value="1">Echolink&nbsp;&nbsp;
-        <input type="checkbox" name="type_fr" checked value="1">FM Funknetz&nbsp;&nbsp;
-        <input type="checkbox" name="type_fhs" value="1">FM Funknetz Hotspots&nbsp;&nbsp;
-        <button type="submit">Query</button>
-        <input type="hidden" name="form_submitted" value="1">
-    </form>
 
-
-   </p> 
-<?php
     if ($last_pos === 2) {
 //        $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=gridsq&gs=" . $fmlquery . "&type_el=1&type_fr=1&printas=csv&maxgateways=20&nohtml=yes&quelle=y\"";
         $cmd = "wget -O " . $RelaisFile . " -q \"http://relais.dl3el.de/cgi-bin/relais.pl?sel=ctrcall&ctrcall=" . $position[3] . "&type_el=1&type_fr=1&printas=csv&maxgateways=35&nohtml=yes&quelle=y\"";
@@ -99,17 +67,14 @@
         touch($relais_act);
 
         if (defined('DL3EL')) {
-            $fmquery = $_POST['prefix'] . " >" . $FMQueryFile;
-            shell_exec("echo $fmquery");
-            $fmlquery = $_POST['locator'] . " >" . $FMLQueryFile;
-            shell_exec("echo $fmlquery");
+            $fmquery = $_POST['prefix'];
+            file_put_contents($FMQueryFile, $fmquery);
+            $fmlquery = $_POST['locator'];
+            file_put_contents($FMLQueryFile, $fmlquery);
         }    
     }
+    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
     if (($handle = fopen($RelaisFile, "r")) !== FALSE) {
-        $relais_act = DL3EL . "/relais.act";
-        if (!file_exists($relais_act)) {
-            echo "gespeicherte Daten des letzen Aufrufs<br>";
-        }
         while (($data = fgetcsv($handle, 1000, ";", "\"", "\\")) !== FALSE) {
 //        echo "0: " . $data[0] . "/ 1:" . $data[1] . "/ 2:"  . $data[2] . "/ 3:"  . $data[3] . "/ 4:"  . $data[4] . "/ 5:" . $data[5] . "/ 6:" . $data[6] . "/ 7:"  . $data[7] . "/ 8:"  . $data[8] . "/ 9:"  . $data[9] . "/ 10:" . $data[10] . "/ 11:"  . $data[11] . "/ 12:"  . $data[12] . "<br>";
             if (!$loc_found && ($data[3] !== "Locator")) {
@@ -147,6 +112,17 @@
       echo "wrong file: " . $RelaisFile ."<br>";  
     }
 ?>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?id=relais0"; ?>">
+        <label for="prefix">Call</label>
+        <input type="text" style = "width:100px" id="prefix" name="prefix" value=<?php echo $fmquery;?>>  
+        <label for="locator"> oder Locator</label>
+        <input type="text" id="locator" name="locator" value=<?php echo $fmlquery;?>>  
+        <input type="checkbox" name="type_el" checked value="1">Echolink&nbsp;&nbsp;
+        <input type="checkbox" name="type_fr" checked value="1">FM Funknetz&nbsp;&nbsp;
+        <input type="checkbox" name="type_fhs" value="1">FM Funknetz Hotspots&nbsp;&nbsp;
+        <button type="submit">Query</button>
+        <input type="hidden" name="form_submitted" value="1">
+    </form>
 </table>
 
 <?php
