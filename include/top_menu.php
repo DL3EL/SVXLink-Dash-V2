@@ -75,18 +75,18 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_FMFUNKNETZ')) && (DL3EL_FMFUNKNETZ === "yes")) {
 	    echo '<a href="./caller_extern.php?id=https://stream.fm-funknetz.de" style = "color: #0000ff;"  target="_top">Voice FMN | </a> ';
 	}    
-	echo '<a href="./config_backup.php" style = "color: #0000ff;" target="_top">Backup/Restore</a> ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
 	if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
             $cubeip = str_replace(' ', '<br />', exec('hostname -I | awk \'{print $1}\''));
 	    $cubeip = "http://" . $cubeip . ":8081";
-	    echo '| <a href="./caller_extern.php?id=' . $cubeip . '" style = "color: #0000ff;"  Starget="_top">SVXCube </a> ';
+	    echo '<a href="./caller_extern.php?id=' . $cubeip . '" style = "color: #0000ff;"  Starget="_top">SVXCube | </a> ';
 	} else {
 	    if (defined('DL3EL_SVXCUBE'))  {
-		echo '| <a href="./caller_extern.php?id=' . DL3EL_SVXCUBE . ' style = "color: #0000ff;"  Starget="_top">SVXCube</a> ';
+		echo '<a href="./caller_extern.php?id=' . DL3EL_SVXCUBE . ' style = "color: #0000ff;"  Starget="_top">SVXCube | </a> ';
 	    }    
 	}    
+	echo '<a href="./config_backup.php" style = "color: #0000ff;" target="_top">Backup/Restore</a> ';
     } else {
 	echo '<a href="./index.php" style = "color: #0000ff;" target="_top">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
