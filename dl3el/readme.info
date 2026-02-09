@@ -1,3 +1,22 @@
+Neues in der Version 5.30a (09.02.2026)
+- Link zum SVXCube Controller
+	im neuen Image von Michael, DC9VQ, wird ja der SVXCube von Jens, DJ1JAY unterstützt. Wenn das System erkennt
+	das der Controller vorhanden ist, wird im Hauptmenu ein Pukt "SVXCube" eingefügt, der zum Dashboard des 
+	Controlelrs führt.
+	Wer die Unterstützung für den SVXCube nicht installiert aber einen SVXCUbe hat, kann die Seite erreichen
+	in dem die Variabe
+	define("DL3EL_SVXCUBE", "http://192.168.1.1");
+	mit der richtigen IP Adresse versorgt wird.
+- Servicerelease 
+	die Logik für das FM-Funknetz LiveDashboard wurde noch einmal umgestellt:
+	- die Variable "DL3EL_LIVEDB_AUTO" wird jetzt nicht mehr ausgewertet
+	- define("DL3EL_LIVEDB", "no"); schaltet das LiveDB komplett aus
+	- define("DL3EL_LIVEDB", "top"); erzeugt einen Link zum LiveDB im Hauptmenu, die Anzeige erfolgt
+	  dann mittig auf dem Bildschirm
+	- define("DL3EL_LIVEDB", "right"); zeigt das LiveDB rechts neben dem normalen Inhalt
+	- wen die Variable "DL3EL_LIVEDB" nicht definiert ist, wird das LiveDB rechts neben dem normalen Inhalt
+	  angezeigt
+	
 Neues in der Version 5.30 (08.02.2026)
 - openhamclock jetzt komplett ins Bildschirmlayout integriert
 	Es ist m.E. sinnvoller die Daten von openhamclock zusätzlich zu den Statusdaten und dem Livedashboard

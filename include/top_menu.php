@@ -53,7 +53,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> | ';
 //	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
 	echo '<a href="./caller.php?id=tg" style = "color: #000000;">Talk Groups</a> | ';
-	echo '<a href="./caller.php?id=monitor" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	if (((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "top"))) {
+	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
+	}    
+//	echo '<a href="./caller.php?id=monitor" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	echo '<a href="./monitor.php" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;" target="_top">Echolink</a> | ';
 //	echo '<a href="./caller.php?id=echolink_dl3el" style = "color: #0000ff;" target="_top">Echolink</a> | ';
 	echo '<a href="./relais.php" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
@@ -74,6 +78,15 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./config_backup.php" style = "color: #0000ff;" target="_top">Backup/Restore</a> ';
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
+	if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
+            $cubeip = str_replace(' ', '<br />', exec('hostname -I | awk \'{print $1}\''));
+	    $cubeip = "http://" . $cubeip . ":8081";
+	    echo '| <a href="./caller_extern.php?id=' . $cubeip . '" style = "color: #0000ff;"  Starget="_top">SVXCube </a> ';
+	} else {
+	    if ((defined('DL3EL_SVXCUBE')) && (DL3EL_DXCLUSTER === "yes")) {
+		echo '| <a href="./caller_extern.php?id=' . DL3EL_SVXCUBE . ' style = "color: #0000ff;"  Starget="_top">SVXCube</a> ';
+	    }    
+	}    
     } else {
 	echo '<a href="./index.php" style = "color: #0000ff;" target="_top">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
