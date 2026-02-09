@@ -4,7 +4,7 @@
 // DL3EL_LIVEDB undiefined: LiveDB rechts
 
 	if ($_SESSION['auth'] !== "AUTHORISED") {
-        echo "not authorized<br>";
+	    if ((defined ('debug')) && (debug > 0)) echo "not authorized<br>";
 	    return;
     }
     if ((!defined('DL3EL_LIVEDB')) || ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "right"))) {
