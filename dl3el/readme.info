@@ -3,7 +3,16 @@ Neues in der Version 5.30b (10.02.2026)
 	Nach viel Debuggen ist es mir endlich gelungen die Funktionen MinitorCalls, Echolink und FM_Relais in das 
 	neue Design einzubauen. Ausserdem passen jetzt die in den EIngabfelder stehenden Werte (Call, bzw. Locator) 
 	zur angezeigten Auflistung.
-	
+
+- Openhamclock jetzt auch lokal aufrufbar
+	Man kann openhamclock auch lojkal, z.B. auf einem Raspberry installieren. Wenn man diese Funktion nutzen 
+	möchte, so muss die IP Adresse (oder der DNS Name) in die entsprechende Variable eingetragen sein:
+	define("DL3EL_OPENHAMCLOCK", "http://192.168.1.1:3030/");
+	Ganz allgmein gilt:
+	DL3EL_OPENHAMCLOCK fehlt: openhamclock.com wird verlinkt
+	DL3EL_OPENHAMCLOCK hat lokale Adresse: lokale Installation von openhamclock wird verlinkt
+	define("DL3EL_OPENHAMCLOCK", "no"): der Link zu openhamclock wird unterdrückt.
+		
 Neues in der Version 5.30a (09.02.2026)
 - Link zum SVXCube Controller
 	im neuen Image von Michael, DC9VQ, wird ja der SVXCube von Jens, DJ1JAY unterstützt. Wenn das System erkennt
@@ -49,7 +58,10 @@ Neues in der Version 5.30 (08.02.2026)
 	  abschalten. Nur wenn diese Variable oder alteranativ "DL3EL_LIVEDB" auf "yes" stehen, wird das 
 	  LiveDB angezeigt.
 - der "WebSDR" von Jens, DJ1JAY, mit dem man alle Stream des FM-Funknetz hören kann ist jetzt ebenfalls integriert 
-	und über den Menuepunkt	"Voice FMN" erreichbar
+	und über den Menuepunkt	"Voice FMN" erreichbar, Dafür muss
+	define("DL3EL_FMFUNKNETZ", "yes");
+	in der config.php eingetragen sein.
+	
 - man kann jetzt in der config.php einen OpenWebRX Empfänger eintragen, z.B.:
 	define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
 	Nach dem Relaad des Dashboards, ist dieser WebSDR über den Menuepunkt "OWR" erreichbar
