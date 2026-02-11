@@ -38,7 +38,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
    <div id="display-links" align=center>
     <p style = "padding-right: 5px; text-align: center; color: #000000;">
-    <a style = "color: black;">Display</a> |
+    <a style = "color: black;">Display:</a>
 <?php
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;
@@ -163,7 +163,8 @@ if (session_status() === PHP_SESSION_NONE) {
 		$version = $version . " Update available";
 	    }
 	}    
-	echo '<a href="./edit.php?file=info" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+//	echo '<a href="./edit.php?file=info" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<button name="btn_expert" type="submit" >' . $kn_exp . '</button>';
 	echo '<button name="btn_normal" type="submit" >' . $kn_nor . '</button>';
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -212,7 +213,8 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
-	echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Display</b></a> | ';
+	echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Display:</b></a> ';
+//	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html style = "color: #0000ff;">Hilfe</a> | ';
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 //	    echo '<a href="./aprs.php" style = "color: #0000ff;">APRS Monitor</a> | ';
 	    echo '<a href="./caller.php?id=aprs" style = "color: #0000ff;">APRS Monitor</a> | ';
