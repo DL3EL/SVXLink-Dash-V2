@@ -27,7 +27,7 @@ button "Dashboard Update (GitHub)" in the Power Menu. A simple click installs th
 <p><b>Receiver for APRS Messages:</b> there has been a rework and optimisation. Please refer to the relase-notes in the dashboard ("Neues in ..") starting with version 5.20 (28.12.2025) for a detailed description how to configure it. The manual entry into the crontab is not necessary anymore.
  </p>
 <br>
-<p>for more detailled information, please read "Neues in Version ..." in the Dashbard or here: <b>https://github.com/DL3EL/SVXLink-Dash-V2/blob/main/dl3el/readme.info</b></p>
+<p>for more detailled information, please read "Neues in ..." in the Dashbard or here: <b>https://github.com/DL3EL/SVXLink-Dash-V2/blob/main/dl3el/readme.info</b></p>
 <p>Have fun and feedback is welcome<br> Thomas, DL3EL</p><hr>
 # SVXLink-Dashboard-V2
 <h1>SVXLink Node dashboard repository inspired by a pi-star dashboard</h1>
