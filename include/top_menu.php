@@ -68,11 +68,17 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '<a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
 	}    
-	if ((!defined('DL3EL_OPENHAMCLOCK')) || (DL3EL_OPENHAMCLOCK !== "no")) {
+	if (!defined('DL3EL_OPENHAMCLOCK')) {
+	    $openhamclock = "https://openhamclock.com/";
+	} else {    
+	    $openhamclock = DL3EL_OPENHAMCLOCK;
+	}
+
+	if ($openhamclock !== "no") {
 	    if ((defined('DL3EL_OPENHAMCLOCK_TAB')) && (DL3EL_OPENHAMCLOCK_TAB === "new")) {
-		echo '<a href="' . DL3EL_OPENHAMCLOCK . '" style = "color: #0000ff;" target="OHC" rel="noopener noreferrer">OHC | </a> ';
+		echo '<a href="' . $openhamclock . '" style = "color: #0000ff;" target="OHC" rel="noopener noreferrer">OHC | </a> ';
 	    } else{
-		echo '<a href="./caller_extern.php?id=' . DL3EL_OPENHAMCLOCK . '" style = "color: #0000ff;">OHC | </a> ';
+		echo '<a href="./caller_extern.php?id=' . $openhamclock . '" style = "color: #0000ff;">OHC | </a> ';
 	    }    
 	}    
 	if (defined('DL3EL_OPENWEBRX')) {
