@@ -90,9 +90,9 @@ if (SHOWPTT=="TRUE") {
 // now including the volume buttons
     include_once "ptt.html";
 }
-/// neu audio
 
 if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['auth'] === "AUTHORISED")) {
+/// neu audio
     include_once "ptt.html";
     echo '<button class="button link" onclick="playAudioToggle(8001, this)">
     <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>

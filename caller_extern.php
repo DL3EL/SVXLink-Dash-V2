@@ -36,7 +36,7 @@ include_once "include/page_top.php";
         }    
     }        
     echo '<object style="outline:none; height: 850px;width:' . $extern_width .'px;justify-content: left;" data=' . $call_script . '></object>';
-//    echo '<object style="outline:none; height: 850px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
+//  echo '<object style="outline:none; height: 850px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';
 //	echo '<object style="outline:none; width:600px; height:900px; justify-content: left;" data=' . $call_script . '></object>';
     echo '</div>';
     // Live DB
