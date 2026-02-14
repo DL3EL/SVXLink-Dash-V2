@@ -122,7 +122,11 @@ if (isset($_POST['button_on'])) { ls_change("unmute"); }
 
 echo '<p></p>';
 echo '<span style="display: inline;">';
-echo '<button id="myButton" onclick="executeCommand()" style = "margin-right:90px; width:150px; color:white; background-color:green; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>PTT off</b></button>';
+// only if PTT is activated
+// we need the mixer routine for voce traffic anyway
+if (SHOWPTT=="TRUE") {
+    echo '<button id="myButton" onclick="executeCommand()" style = "margin-right:90px; width:150px; color:white; background-color:green; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>PTT off</b></button>';
+}
 echo '<form action="" method="post" style="display: inline;" >';
 
 //read Speaker on/off from amixer

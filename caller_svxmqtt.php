@@ -7,7 +7,7 @@
 	    if ((defined ('debug')) && (debug > 0)) echo "not authorized<br>";
 	    return;
     }
-    if ((!defined('DL3EL_LIVEDB')) || ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "right"))) {
+    if ((!defined('DL3EL_LIVEDB')) || ((defined('DL3EL_LIVEDB')) && ((DL3EL_LIVEDB === "right") || (DL3EL_LIVEDB === "yes")))) {
     // Live DB
         echo '<td valign="top" style = "border:none;">';
 //		echo '<object style="outline:none; width:500px; height:1412px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';

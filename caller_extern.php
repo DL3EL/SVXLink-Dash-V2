@@ -25,10 +25,15 @@ include_once "include/page_top.php";
     echo '<div class="content">'."\n";
 //    echo '<div class="left-half">';
     $call_script = $_GET['id'];
-	if (defined('DL3EL_EXTERNWEB_WIDTH')) {
-        $extern_width = DL3EL_EXTERNWEB_WIDTH;
+    if (isset($_GET['wid']) && !empty($_GET['wid'])) {
+        // Parameter vorhanden und nicht leer
+        $extern_width = $_GET['wid'];
     } else {
-        $extern_width = 1500;
+        if (defined('DL3EL_EXTERNWEB_WIDTH')) {
+            $extern_width = DL3EL_EXTERNWEB_WIDTH;
+        } else {
+            $extern_width = 1500;
+        }    
     }        
     echo '<object style="outline:none; height: 850px;width:' . $extern_width .'px;justify-content: left;" data=' . $call_script . '></object>';
 //    echo '<object style="outline:none; height: 850px;width:1500px;justify-content: left;" data=http://openhamclock.com/></object>';

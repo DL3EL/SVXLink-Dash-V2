@@ -11,12 +11,12 @@
         echo "",exec($cmd, $output, $retval);
         if (defined('DL3EL')) {
             $elquery = $_POST['prefix'];
-            file_put_contents($ELQueryFile, $fmquery);
+            file_put_contents($ELQueryFile, $elquery);
         }    
     }    
 ?>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?id=echolink_dl3el0"; ?>">
-        <label for="prefix">Prefix abfragen (DL für Deutschland)</label>
+        <label for="prefix"> Prefix abfragen (DL für Deutschland)</label>
         <input type="text" id="prefix" name="prefix" value=<?php echo $elquery;?> required>
         <button type="submit">Query</button>
         <input type="hidden" name="form_submitted" value="1">
