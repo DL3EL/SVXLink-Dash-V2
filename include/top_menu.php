@@ -69,7 +69,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
 	}    
 	if (!defined('DL3EL_OPENHAMCLOCK')) {
-	    echo '<a href="./caller_extern.php?id=https://openhamclock.com" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
+	    echo '<a href="./caller_extern.php?id=https://openhamclock.com" style = "color: #0000ff;">OHC | </a> ';
 	} else {
 	    if (DL3EL_OPENHAMCLOCK !== "no") {
 		if ((defined('DL3EL_OPENHAMCLOCK_TAB')) && (DL3EL_OPENHAMCLOCK_TAB === "new")) {
