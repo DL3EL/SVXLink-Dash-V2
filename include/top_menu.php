@@ -38,7 +38,9 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
    <div id="display-links" align=center>
     <p style = "padding-right: 5px; text-align: center; color: #000000;">
+    <b>
     <a style = "color: black;">Display:</a>
+    </b>
 <?php
     if ((defined('MENUTOP')) && (MENUTOP === "FULL")) {
 	$show_top_menu = 1;
@@ -53,7 +55,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> | ';
 //	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
 	echo '<a href="./caller.php?id=include/tg" style = "color: #000000;">Talk Groups</a> | ';
-	if (((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "top"))) {
+	if ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "top")) {
 	    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
 	}    
 	echo '<a href="./caller.php?id=monitor0" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
@@ -70,7 +72,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a href="./caller_extern.php?id=https://openhamclock.com" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
 	} else {
 	    if (DL3EL_OPENHAMCLOCK !== "no") {
-		echo '<a href="./caller_extern.php?id=' . DL3EL_OPENHAMCLOCK . '" style = "color: #0000ff;"  Starget="_top">OHC | </a> ';
+		if ((defined('DL3EL_OPENHAMCLOCK_TAB')) && (DL3EL_OPENHAMCLOCK_TAB === "new")) {
+		    echo '<a href="' . DL3EL_OPENHAMCLOCK . '" style = "color: #0000ff;" target="OHC" rel="noopener noreferrer">OHC | </a> ';
+		} else{
+		    echo '<a href="./caller_extern.php?id=' . DL3EL_OPENHAMCLOCK . '" style = "color: #0000ff;">OHC | </a> ';
+		}    
 	    }
 	}    
 	if (defined('DL3EL_OPENWEBRX')) {
@@ -90,9 +96,9 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a href="./caller_extern.php?id=' . DL3EL_SVXCUBE . ' style = "color: #0000ff;"  Starget="_top">SVXCube | </a> ';
 	    }    
 	}    
-	echo '<a href="./config_backup.php" style = "color: #0000ff;" target="_top">Backup/Restore</a> ';
+	echo '<a href="./config_backup.php" style = "color: #000000;" target="_top">Backup/Restore</a> ';
     } else {
-	echo '<a href="./index.php" style = "color: #0000ff;" target="_top">Dashboard</a> ';
+	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 	    echo '| <a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> ';
 	}    
@@ -101,8 +107,8 @@ if (session_status() === PHP_SESSION_NONE) {
 <?php
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
-		echo '<a href="./wifi.php" style = "color: #0000ff;" target="_top">| Wifi</a> | ';
-		echo '<a href="./network.php" style = "color: #0000ff;" target="_top">Network</a> ';
+		echo '<a href="./wifi.php" style = "color: #000000;" target="_top">| Wifi</a> | ';
+		echo '<a href="./network.php" style = "color: #000000;" target="_top">Network</a> ';
 	}	
 
 
@@ -164,7 +170,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}    
 //	echo '<a href="./edit.php?file=info" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Neues in ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe für ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<button name="btn_expert" type="submit" >' . $kn_exp . '</button>';
 	echo '<button name="btn_normal" type="submit" >' . $kn_nor . '</button>';
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -217,7 +223,7 @@ if (session_status() === PHP_SESSION_NONE) {
 //	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html style = "color: #0000ff;">Hilfe</a> | ';
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 //	    echo '<a href="./aprs.php" style = "color: #0000ff;">APRS Monitor</a> | ';
-	    echo '<a href="./caller.php?id=aprs" style = "color: #0000ff;">APRS Monitor</a> | ';
+	    echo '<a href="./caller.php?id=aprs" style = "color: black;">APRS Monitor</a> | ';
 	    echo '<a href="./edit.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
 //	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
 	    if (file_exists(DL3EL.'/aprs-is-mqtt.msg')) {
@@ -226,9 +232,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
-	    echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a>';
+	    echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> ';
 	} else {
-	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a>';
+	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a> ';
 	}
 	if (defined('DL3EL_EXTERN1'))  {
 	    if (defined('DL3EL_EXTERN1_NAME'))  {
@@ -236,7 +242,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	    } else {
 		$linktext = DL3EL_EXTERN1;
 	    }
-	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . ' style = "color: black;">' . $linktext . '</a> ';
+	    if ((defined('DL3EL_EXTERN1_TAB')) && (DL3EL_EXTERN1_TAB === "new")) {
+		    echo '| <a href="' . DL3EL_EXTERN1 . '" style = "color: black;" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
+		} else{
+		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . ' style = "color: black;">' . $linktext . '</a> ';
+		}    
 	}    
 	if (defined('DL3EL_EXTERN2'))  {
 	    if (defined('DL3EL_EXTERN2_NAME'))  {
@@ -244,7 +255,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	    } else {
 		$linktext = DL3EL_EXTERN2;
 	    }
-	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . ' style = "color: black;">' . $linktext . '</a> ';
+	    if ((defined('DL3EL_EXTERN2_TAB')) && (DL3EL_EXTERN2_TAB === "new")) {
+		    echo '| <a href="' . DL3EL_EXTERN2 . '" style = "color: black;" target="extern2" rel="noopener noreferrer">' . $linktext . '</a> ';
+		} else{
+		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . ' style = "color: black;">' . $linktext . '</a> ';
+		}    
 	}    
 	if (defined('DL3EL_EXTERN3'))  {
 	    if (defined('DL3EL_EXTERN3_NAME'))  {
@@ -252,7 +268,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	    } else {
 		$linktext = DL3EL_EXTERN3;
 	    }
-	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . ' style = "color: #000000;">' . $linktext . '</a> ';
+	    if ((defined('DL3EL_EXTERN3_TAB')) && (DL3EL_EXTERN3_TAB === "new")) {
+		    echo '| <a href="' . DL3EL_EXTERN3 . '" style = "color: black;" target="extern3" rel="noopener noreferrer">' . $linktext . '</a> ';
+		} else{
+		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . ' style = "color: black;">' . $linktext . '</a> ';
+		}    
 	}    
 	if (defined('DL3EL_EXTERN4'))  {
 	    if (defined('DL3EL_EXTERN4_NAME'))  {
@@ -260,29 +281,34 @@ if (session_status() === PHP_SESSION_NONE) {
 	    } else {
 		$linktext = DL3EL_EXTERN4;
 	    }
-	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . ' style = "color: #0000ff;">' . $linktext . '</a> ';
+//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . ' style = "color: black;">' . $linktext . '</a> ';
+	    if ((defined('DL3EL_EXTERN4_TAB')) && (DL3EL_EXTERN4_TAB === "new")) {
+		    echo '| <a href="' . DL3EL_EXTERN4 . '" style = "color: black;" target="extern4" rel="noopener noreferrer">' . $linktext . '</a> ';
+		} else{
+		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . ' style = "color: black;">' . $linktext . '</a> ';
+		}    
 	}    
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> | <b>Full</b> Edit</a> | ';
-	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a>';
+	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector2.conf')) {
-	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a>';
+	    echo '| <a href="./edit.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector3.conf')) {
-	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a>';
+	    echo '| <a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector4.conf')) {
-	    echo ' | <a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a>';
+	    echo '| <a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a> ';
 	}
         if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
             if (file_exists('./statistic.php')) {
-		echo ' | <a href="./statistic.php" style = "color: black;" id="log">Statistic</a> ';
+		echo '| <a href="./statistic.php" style = "color: black;" id="log">Statistic</a> ';
             }
         }
 	$tgdb_File = DL3EL_BASE . "include/tgdb.php";
 	if (filesize($tgdb_File)  <= 1000) {
-	    echo ' | <a href="./include/tgdb_upd.php" style = "color: black;" id="upd">Update TGDB</a> ';
+	    echo '| <a href="./include/tgdb_upd.php" style = "color: black;" id="upd">Update TGDB</a> ';
 	}
 	echo '</p>';
 }

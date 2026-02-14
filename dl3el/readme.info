@@ -1,3 +1,13 @@
+Neues in der Version 5.30d (14.02.2026)
+- Servicerelease 
+	Es wurde eine neue komplette Doku erstellt, sie ist jetzt über den blauen Button "Hilfe" früher "Neues in.." zu 
+	erreichen. Der erste Link in der Anzeige führt zu den bekannten Releasenotes, die den letzen Update beschreiben. 
+	Danach folgt eine strukturierte Beschreibung des kompletten Dashboard.
+	
+	Das Feedback zur Integration von OpenHamClock war mehr als positiv. Ich habe jetzt wieder die Option eingebaut, dass 
+	die Webseite in einem eigenen BrowserTab angezeigt werden kann. Wers mag.
+	define("DL3EL_OPENHAMCLOCK_TAB", "new");
+	
 Neues in der Version 5.30c (11.02.2026)
 - Servicerelease 
 	NAch dem Abschluss der großen Änderungen vom vergangenen Wochende ist es jetzt dringend notwendig, die Dokumentation 
@@ -13,7 +23,7 @@ Neues in der Version 5.30b (10.02.2026)
 	zur angezeigten Auflistung.
 
 - Openhamclock jetzt auch lokal aufrufbar
-	Man kann openhamclock auch lojkal, z.B. auf einem Raspberry installieren. Wenn man diese Funktion nutzen 
+	Man kann openhamclock auch lokal, z.B. auf einem Raspberry installieren. Wenn man diese Funktion nutzen 
 	möchte, so muss die IP Adresse (oder der DNS Name) in die entsprechende Variable eingetragen sein:
 	define("DL3EL_OPENHAMCLOCK", "http://192.168.1.1:3030/");
 	Ganz allgmein gilt:

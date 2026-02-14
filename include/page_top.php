@@ -93,6 +93,7 @@ if (SHOWPTT=="TRUE") {
 /// neu audio
 
 if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['auth'] === "AUTHORISED")) {
+    include_once "ptt.html";
     echo '<button class="button link" onclick="playAudioToggle(8001, this)">
     <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
     </button>';
