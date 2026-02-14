@@ -65,7 +65,6 @@ include_once "functions.php";
                 100% { color: blue; background-color: transparent; }
             }
          </style>';
-         echo '<a href="./aprs.php" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
          echo '<a href="./caller.php?id=aprs" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
       }   
 	} 
