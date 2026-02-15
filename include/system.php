@@ -17,7 +17,11 @@ $disk_used = shell_exec("df -h | awk '\$NF==\"/\"{printf \"%s\",$5}'");
 $cpuLoad = sys_getloadavg();
 $core_nums = trim(shell_exec("grep -P '^processor' /proc/cpuinfo | wc -l"));
 $load = round($cpuLoad[0]/($core_nums + 1)*100, 2);
-if ($load < 75) { $cpuLoadHTML = "<td style=\"background: #1d1\">".$load."&nbsp;%</td>\n"; }
+if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
+    if ($load < 75) { $cpuLoadHTML = "<td style=\"background: #00bb00\">".$load."&nbsp;%</td>\n"; }
+} else {    
+    if ($load < 75) { $cpuLoadHTML = "<td style=\"background: #1d1\">".$load."&nbsp;%</td>\n"; }
+}    
 if ($load >= 75) { $cpuLoadHTML = "<td style=\"background: #fa0\">".$load."&nbsp;%</td>\n"; }
 if ($load >= 85) { $cpuLoadHTML = "<td style=\"background: #f00;color: white;\"><b>".$load."&nbsp;% </b></td>\n"; }
 
@@ -26,7 +30,11 @@ if (file_exists('/sys/class/thermal/thermal_zone0/temp')) {
     if ($cpuTempCRaw !="") {
         $cpuTempC = round(abs($cpuTempCRaw)/ 1000) + CPU_TEMP_OFFSET; 
         $cpuTempF = round(+$cpuTempC * 9 / 5 + 32);
-        if ($cpuTempC < 55) { $cpuTempHTML = "<td style=\"background: #1d1;\">".$cpuTempC."&deg;C</td>\n"; }
+        if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
+            if ($cpuTempC < 55) { $cpuTempHTML = "<td style=\"background: #00bb00;\">".$cpuTempC."&deg;C</td>\n"; }
+        } else {    
+            if ($cpuTempC < 55) { $cpuTempHTML = "<td style=\"background: #1d1;\">".$cpuTempC."&deg;C</td>\n"; }
+        }    
         if ($cpuTempC >= 55) { $cpuTempHTML = "<td style=\"background: #fa0;\">".$cpuTempC."&deg;C</td>\n"; }
         if ($cpuTempC >= 70) { $cpuTempHTML = "<td style=\"background: #f00;color:white;\">".$cpuTempC."&deg;C </td>\n"; }
     } else { $cpuTempHTML = "<td style=\"background: white\">---</td>\n"; }
@@ -35,7 +43,12 @@ if (file_exists('/sys/class/thermal/thermal_zone0/temp')) {
 // Voltage check
 $throttled = trim(shell_exec('vcgencmd get_throttled'));
 $voltageStatus = (strpos($throttled, '0x50000') !== false) ? 'Low' : 'OK';
-$voltageColor = ($voltageStatus == 'Low') ? '#fa0' : '#1d1';
+
+if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
+    $voltageColor = ($voltageStatus == 'Low') ? '#ffaa00' : '#00bb00';
+} else {    
+    $voltageColor = ($voltageStatus == 'Low') ? '#fa0' : '#1d1';
+}    
 $voltageHTML = "<td style=\"background: $voltageColor;\">$voltageStatus</td>\n";
 
 // Operating System Info

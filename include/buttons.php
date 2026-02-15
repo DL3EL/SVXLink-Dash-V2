@@ -205,7 +205,12 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
     if ($display) {
         echo '<form action="" method="POST" style = "margin-top:4px;">';
         echo '<center>';
-        echo '<label style = "text-shadow: 1px 1px 1px Lightgrey, 0 0 0.5em LightGrey, 0 0 1em whitesmoke;font-weight:bold;color:#464646;" for="dtmfsvx">DTMF command (must end with #):</label>  ';
+        if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
+            echo '<label style = "font-size:18px; font-weight:bold; color:#464646;" for="dtmfsvx">DTMF command (must end with #):</label>  ';
+        } else {
+            echo '<label style = "text-shadow: 1px 1px 1px Lightgrey, 0 0 0.5em LightGrey, 0 0 1em whitesmoke;font-weight:bold;color:#464646;" for="dtmfsvx">DTMF command (must end with #):</label>  ';
+        }        
+
         echo '<input type="text" id="dtmfsvx" name="dtmfsvx">';
         echo '<input type="submit" value="Send DTMF code" class="green"><br>';
         echo '</center>';

@@ -106,8 +106,16 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
       echo"<tr height=24px style=\"font-size:12.5px;>\">";
       echo"<td align=\"center\"> $local_time </td>";
       if ($listElem[3] == "OFF" ) {$bgcolor="";}
-//      if ($listElem[3] == "ON" ) {$bgcolor=""; $tximg="<img src=images/tx.gif height=21 alt='TXing' title='TXing' style=\"vertical-align: middle;\">";}
-      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
+// normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
+      if ($listElem[3] == "ON" ) {
+	if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
+echo "DM: " . DL3EL_DARK_MODE;
+	  $bgcolor="style=\"background-color:#bfefff;\"";
+	} else {
+echo "DM: NO";
+	  $bgcolor="style=\"background-color:#00FF00;\"";
+	}
+      }
       $ref = substr($listElem[1],0,3);
       $call=$listElem[1];
       $ssid = strpos($listElem[1],"-");
