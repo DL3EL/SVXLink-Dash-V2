@@ -131,6 +131,10 @@ echo '<form action="" method="post" style="display: inline;" >';
 
 //read Speaker on/off from amixer
 $status = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $7}'");
+if (substr($status,0,14) === "amixer: Unable") {
+// zumindest bei DB0HTV ist das so
+    $status = exec("amixer -c" . $sc . " get Lineout |grep % |awk '{print $7}'");
+}    
 
 if ($status == "[on]") {
 	$volume = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
