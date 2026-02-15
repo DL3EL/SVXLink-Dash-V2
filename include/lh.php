@@ -109,10 +109,8 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
 	if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
-echo "DM: " . DL3EL_DARK_MODE;
 	  $bgcolor="style=\"background-color:#bfefff;\"";
 	} else {
-echo "DM: NO";
 	  $bgcolor="style=\"background-color:#00FF00;\"";
 	}
       }
