@@ -35,7 +35,7 @@ if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'
     if ($file === "info") {
       echo "ausnahmsweise";
     } else {
-      echo "not authorized";
+      echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
       return;
     }  
 }  

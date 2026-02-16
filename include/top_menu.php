@@ -313,6 +313,8 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '| <a href="./include/tgdb_upd.php" style = "color: black;" id="upd">Update TGDB</a> ';
 	}
 	echo '</p>';
+} else {
+    	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950&noauth" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe &nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 }
 
 

@@ -6,6 +6,10 @@ include_once "include/tgdb.php";
       $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
     }
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
+    if ($_SESSION['auth'] !== 'AUTHORISED') {
+        echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
+        return;
+    }
     $tgmon = explode(",",$svxconfig['ReflectorLogic']['MONITOR_TGS']);
     $tgmons = "";
     $tgnames = "";

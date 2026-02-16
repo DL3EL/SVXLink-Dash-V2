@@ -23,9 +23,14 @@ include_once "include/page_top.php";
     echo '</div>'."\n";
     echo '</td>'."\n";
 
-    echo '<td valign="top"  style = "height:500px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
-    echo '<iframe src="./rf"  style = "width:615px; height:600px"></iframe>';
-    echo '</td>';
+    if (($_SESSION['auth'] === 'AUTHORISED') || (isset($_GET['noauth']) && !empty($_GET['wid']))) {
+        echo '<td valign="top"  style = "height:500px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
+        echo '<iframe src="./rf"  style = "width:615px; height:600px"></iframe>';
+        echo '</td>';
+    } else {
+        echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
+    }
+        
 ?>
 </tr></table>
 <?php

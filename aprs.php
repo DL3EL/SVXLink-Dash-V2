@@ -20,9 +20,15 @@ include_once "include/page_top.php";
     include_once "include/status.php";
     echo '</div>'."\n";
     echo '</div>'."\n";
+
+    if ($_SESSION['auth'] !== 'AUTHORISED') {
+        echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
+        echo '</table>';
+        return;
+    }
+
     echo '<div class="content">'."\n";
     echo '<script type="text/javascript">'."\n";
-
     echo 'function reloadSVXDXC(){'."\n";
     echo '  $("#svxdxc").load("include/svxaprs.php",function(){ setTimeout(reloadSVXDXC,5000) });'."\n";
     echo '}'."\n";

@@ -25,7 +25,12 @@ include_once "include/page_top.php";
     echo '</td>'."\n";
     echo '<td valign="top"  style = "height:500px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
     echo '<div class="content">'."\n";
-    echo '<iframe src="svx2mqtt/index.php"  style = "width:615px; height:690px"></iframe>';
+    if ($_SESSION['auth'] !== 'AUTHORISED') {
+        echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
+        return;
+    } else {
+        echo '<iframe src="svx2mqtt/index.php"  style = "width:615px; height:690px"></iframe>';
+    }    
     echo '</td></tr></table>';
 ?>
 <?php include_once "include/page_bottom.php"; ?>
