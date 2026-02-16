@@ -45,7 +45,14 @@ include_once "include/functions.php";
 	</div>
 		</div>
 		
-<?php // include_once "include/top_menu.php"; ?>
+<?php 
+    if ($_SESSION['auth'] !== 'AUTHORISED') {
+		include_once "include/top_menu.php";        
+		echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
+        return;
+    }
+
+ ?>
 <div id="display-links" align=right>
 	<p style = "padding-right: 5px; text-align: right; color: #000000;">
 	<a style = "color: black;">Display</a> |
