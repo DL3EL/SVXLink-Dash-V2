@@ -24,10 +24,10 @@ Setting <b>DL3EL_SC_CHANGE</b> to "yes" enables the dashboard to select the corr
 The string <b>DL3EL_SC_STRING</b> has to match the name of the card in the linux system.<br>
 <p><b>Update via git pull:</b> as I have taken action, that the user defined files sa818.json, config.php and config.inc.php are not changed by the update, you have to pay attention of changes happen in the respective ".example" files and evaluate, if you apply this to your files. If you set the variable <b>DL3EL_GIT_UPDATE</b> to "yes" (default), you find the 
 button "Dashboard Update (GitHub)" in the Power Menu. A simple click installs the latest update from GitHub and shows in the middle window the result. You can try this at any time, if there are no updates, you will see the message "Already up to date.". If there are any errors, correct them and try again. Most frequent errors happen, if you change one of the files, whioch should be updated. Best way forward then is to rename the file, do the update and later compare both files.
-<p><b>Receiver for APRS Messages:</b> there has been a rework and optimisation. Please refer to the relase-notes in the dashboard ("Neues in ..") starting with version 5.20 (28.12.2025) for a detailed description how to configure it. The manual entry into the crontab is not necessary anymore.
+<p><b>Receiver for APRS Messages:</b> there has been a rework and optimisation. Please refer to the relase-notes in the dashboard ("Hilfe ..") starting with version 5.20 (28.12.2025) for a detailed description how to configure it. The manual entry into the crontab is not necessary anymore.
  </p>
 <br>
-<p>for more detailled information (in German, as nearly all users are from Germany), please read "Neues in ..." in the Dashbard or here: <b>https://github.com/DL3EL/SVXLink-Dash-V2/blob/main/dl3el/readme.info</b></p>
+<p>for more detailled information (in German, as nearly all users are from Germany), please read the online documentation in the dashboard or here: <b>http://relais.dl3el.de/FM-Funknetz/hilfe.html</b></p>
 <p>Have fun and feedback is welcome<br> Thomas, DL3EL</p><hr>
 # SVXLink-Dashboard-V2
 <h1>SVXLink Node dashboard repository inspired by a pi-star dashboard</h1>
