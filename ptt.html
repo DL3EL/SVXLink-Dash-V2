@@ -103,6 +103,10 @@ function ls_change($value) {
         $sc = 0;
     }    
     $new_value = execute_amixer("sudo amixer -c" . $sc . " set Speaker " . $value);
+    if ((substr($new_value,0,14) === "amixer: Unable") || (!strlen($new_value))) {
+        // zumindest bei DB0HTV ist das so
+        $new_value = execute_amixer("sudo amixer -c" . $sc . " set Lineout " . $value);
+    }    
     $new_value =  parse_amixer_value($new_value);
 }
 
@@ -138,6 +142,9 @@ if ((substr($status,0,14) === "amixer: Unable") || (!strlen($status))) {
 
 if ($status == "[on]") {
 	$volume = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
+    if ((substr($volume,0,14) === "amixer: Unable") || (!strlen($volume))) {
+        $volume = exec("amixer -c" . $sc . " get Lineout |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
+    }
 	$color = "#7a4a4a";
 	echo '<button name="button_off" type="submit" style = "margin-right:15px; width:70px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:16px;"><img src=images/speaker_off.png></button>';
         $color = "darkred";
@@ -145,14 +152,13 @@ if ($status == "[on]") {
 	echo '<font style="margin-right:10px; width:30px; color:black; font-size:16px">' . $volume . '</font>';
 	$color = "seagreen";
 	echo '<button name="buttonB" type="submit" style = "margin-right:100px; width:30px; border-radius:8px;color:white; border-color:transparent; background-color:' . $color .';height:28px; font-size:18px;"><b>+</b></button>';
-        }
-   else {
+} else {
 	$volume = "&ensp;<img src=images/speaker_off_b.png>&emsp;";
 	$color = "#4a7a7a";
 	echo '<button name="button_on" type="submit" style = "margin-right:55px; width:70px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:16px;"><img src=images/speaker.png></button>';
-        $color = "transparent";
-        echo '<font style="margin-right:140px; width:30px;">' . $volume . '</font>';
-        }
+    $color = "transparent";
+    echo '<font style="margin-right:140px; width:30px;">' . $volume . '</font>';
+}
 ?>
 </form>
 </span>
