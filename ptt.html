@@ -103,7 +103,7 @@ function ls_change($value) {
         $sc = 0;
     }    
     $new_value = execute_amixer("sudo amixer -c" . $sc . " set Speaker " . $value);
-    if ((substr($new_value,0,14) === "amixer: Unable") || (!strlen($new_value))) {
+    if ((substr($new_value[0],0,14) === "amixer: Unable") || (!strlen($new_value[0]))) {
         // zumindest bei DB0HTV ist das so
         $new_value = execute_amixer("sudo amixer -c" . $sc . " set Lineout " . $value);
     }    
