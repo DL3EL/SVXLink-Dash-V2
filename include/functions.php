@@ -1042,6 +1042,20 @@ function display_config($config) {
       $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
       addsvxlog($logtext);
     }
+// 7a. Clear MQTT log
+      $db_File = DL3EL_BASE . "svx2mqtt/mqtt.log";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
+// 7b. Clear MQTT Data
+      $db_File = DL3EL_BASE . "svx2mqtt/mqtt.data";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
 
 
 /*
