@@ -1030,6 +1030,20 @@ function display_config($config) {
             $logtext =  "Update to version $gitversion possible\n";
             addsvxlog($logtext);
         }
+// 7. start mqtt Task, if possible
+    $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+    if (!strlen($mqtt_script)) {
+      $debug = "";
+      if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
+      $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $debug . " >/dev/null &";
+      echo "Starting MQTT " . $cmd . "<br>";
+      exec($cmd, $output, $retval);
+      echo "$output $retval<br>";
+      $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
+      addsvxlog($logtext);
+    }
+
+
 /*
 	    exec("sudo zip config.zip config.php > /dev/null");
       $owner = 'svxlink';

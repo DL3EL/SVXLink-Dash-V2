@@ -149,6 +149,22 @@ if (isProcessRunning('svxlink')) {
             echo "<tr>".$activemod."APRS " . $aprs_login . "</td></tr>";
          }
       }
+      $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+      if (strlen($mqtt_script)) {
+// process is running, check if heartbeat is comming
+         $mqtt_data = DL3EL_BASE . "svx2mqtt/mqtt.data";
+         if (file_exists($mqtt_data)) {
+            $delta = time() - filemtime($mqtt_data);
+            if ($delta < 15) {
+// something received, heartbeat every 11s
+               $activemod="<td style=\"background:MediumSeaGreen;color:#464646;font-weight: bold;\">";
+            } else {
+// nothing received within 14s
+               $activemod="<td style=\"background:#ffffed;;color:#b5651d;font-weight: bold;\">";
+            }
+            echo "<tr>".$activemod."MQTT</td></tr>";
+         }
+      }
    } else {
       echo "<tr><td style=\"background: #ffffed;\" ><span style=\"color:#b0b0b0;\"><b>No Modules</b></span></td></tr>";
    }
