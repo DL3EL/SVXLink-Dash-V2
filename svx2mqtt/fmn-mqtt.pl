@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Time::Piece;
 eval {
-    use Net::MQTT::Simple;
+    require Net::MQTT::Simple;
 };	
 if($@) {
     print "Folgender Fehler ist aufgetreten: $@\n"; 
