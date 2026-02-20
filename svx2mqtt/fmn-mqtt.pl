@@ -5,6 +5,7 @@ use strict;
 use utf8;
 use Time::Piece;
 eval {
+# needs: sudo cpan Net::MQTT::Simple
     require Net::MQTT::Simple;
 };	
 if($@) {
