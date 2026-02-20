@@ -4,7 +4,13 @@ use warnings;
 use strict;
 use utf8;
 use Time::Piece;
-use Net::MQTT::Simple;
+eval {
+    use Net::MQTT::Simple;
+};	
+if($@) {
+    print "Folgender Fehler ist aufgetreten: $@\n"; 
+    exit;
+}
 
 # Variables:
 my $dir = "";
