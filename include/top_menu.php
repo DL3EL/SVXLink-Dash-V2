@@ -127,7 +127,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #000000;" target="_top">| Wifi</a> | ';
-		echo '<a href="./network.php" style = "color: #000000;" target="_top">Network</a> ';
+		echo '<a href="./network.php" style = "color: #000000;" target="_top">Network</a> | ';
+		if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
+		    echo '<a href="./mobile/index.php" style = "color: #000000;" target="_top">mobile</a> ';
+		}    
 	}	
 
 
