@@ -128,11 +128,10 @@ if (session_status() === PHP_SESSION_NONE) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
 		echo '<a href="./wifi.php" style = "color: #000000;" target="_top">| Wifi</a> | ';
 		echo '<a href="./network.php" style = "color: #000000;" target="_top">Network</a> | ';
-		if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
-		    echo '<a href="./mobile/index.php" style = "color: #000000;" target="_top">mobile</a> ';
-		}    
 	}	
-
+	if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
+	    echo '<a href="./mobile/index.php" style = "color: #000000;" target="_top">mobile</a> ';
+	}    
 
 	if ($_SESSION['auth'] === "AUTHORISED") {
 	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log">| Log </a> ';
