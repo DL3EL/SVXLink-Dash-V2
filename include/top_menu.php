@@ -248,8 +248,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Display:</b></a> ';
 //	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html style = "color: #0000ff;">Hilfe</a> | ';
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-//	    echo '<a href="./aprs.php" style = "color: #0000ff;">APRS Monitor</a> | ';
-	    echo '<a href="./caller.php?id=aprs" style = "color: black;">APRS Monitor</a> | ';
+//	    echo '<a href="./aprs.php" style = "color: black;">APRS Monitor</a> | ';
+//	    echo '<a href="./caller.php?id=aprs" style = "color: black;">APRS Monitor</a> | ';
+	    echo '<a href="./caller.php?id=aprs0" style = "color: black;">APRS Monitor</a> | ';
 	    echo '<a href="./edit.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
 //	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
 	    if (file_exists(DL3EL.'/aprs-is-mqtt.msg')) {

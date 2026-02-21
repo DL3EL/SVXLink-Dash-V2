@@ -36,9 +36,13 @@ include_once "settings.php";
     }
 
     if ($aprs_msg_avail)  {
-	echo '<BR>';
-	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-	echo "<tr><td><b>From</b></td><td><b>Type</b></td><td><b>Messages (" . date("H:i:s") .")</b></td><td><b>Zeit</b></td></tr>";
+	echo '<BR><BR><BR>';
+	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; background-color:#f1f1f1;">';
+	echo '<thead>';
+	echo '<tr style = "border:none;background-color:#f1f1f1;">';
+	echo "<th><b>From</b></th><th><b>Type</b></th><th><b>Messages (" . date("H:i:s") .")</b></th><th><b>Zeit</b></th></tr>";
+	echo '</thead>';
+
 	$nn = 0;
 	while ($nn < 10) { 
 	    $line = explode("^", $aprs_msg[$nn]);
@@ -61,16 +65,19 @@ include_once "settings.php";
 	    } 
 	    $llm = strlen($aprs_msg[$nn]);
 	    if ($llm) {
-		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>". $line[4] . "</td><td>" .  $line[3] . "</td></tr>";
+//		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>". $line[4] . "</td><td>" .  $line[3] . "</td></tr>";
+		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>". $line[4] . "</td></tr>";
 	    }
 	    ++$nn;
     }
-	echo "</td></Tr>";
+//	echo "</td></Tr>";
     echo '</table>';
     echo '<br><br>';
     }    
-    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo "<tr><td><b>Call</b></td><td><b>Locator</b></td><td><b>APRS Info letzter Update (" . date("H:i:s") .")</b></td><td><b></b></td><td><b>Zeit</b></td></tr>";
+    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;">';
+    echo '<tr style = "border:none;background-color:#f1f1f1;">';
+//    echo "<tr><td><b>Call</b></td><td><b>Locator</b></td><td><b>APRS Info letzter Update (" . date("H:i:s") .")</b></td><td><b></b></td><td><b>Zeit</b></td></tr>";
+    echo "<tr><th><b>Call</b></th><th><b>Locator</b></th><th><b>APRS Info letzter Update (" . date("H:i:s") .")</b></th><th><b></b></th><th><b>Zeit</b></th></tr>";
 /*
     while ($nn < 100) { 
 	$line_neu[$nn] = $aprs_data[$nn]);

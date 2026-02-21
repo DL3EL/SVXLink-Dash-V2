@@ -244,7 +244,7 @@ include_once "../include/tgdb.php";
 
     echo '<form method="post">';
     echo '<table style = "width: 500px; text-align: left; margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<br><br><span style="color:000000;font-weight:bold;">FM Funknetz Live Activity</span>';
+    echo '<br><br><span style="color:000000;font-weight:bold;"><a href="https://dashboard.fm-funknetz.de/" target="fmn">FM Funknetz Live Activity</a></span>';
 
     echo '<thead>';
     echo '<tr style="height:24px;">';
