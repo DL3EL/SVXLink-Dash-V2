@@ -53,7 +53,12 @@ include_once "../include/tgdb.php";
     $anzahl_zeilen = count($zeilen_array); 
     $mqtt_start_ts = 0;
 
-		$friend_call_array = explode(",", DL3EL_FRIENDS);
+
+    if (defined ('DL3EL_FRIENDS')) {
+      $friend_call_array = explode(",", DL3EL_FRIENDS);
+    } else {
+      $friend_call_array[0] = 0;
+    }    
 
     if ((defined ('debug')) && (debug > 0)) echo "<tr><td><b>MQTT RX</b></td></tr>";
     if ($anzahl_zeilen > 3000) {
