@@ -11,6 +11,8 @@ include_once "../include/tgdb.php";
     }
 
 // test ob mqtt installiert: /usr/local/bin/mqtt-simple
+    start_mqtt();
+/*    
     $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
     if (!strlen($mqtt_script)) {
       $debug = "";
@@ -22,6 +24,7 @@ include_once "../include/tgdb.php";
       $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
       addsvxlog($logtext);
     }
+*/
 // colours for buttons
 // good colours are green, silver and blue. There is no colour check :-)
 //define ("SVXMQTT_COLOR_active", "#CECECE");

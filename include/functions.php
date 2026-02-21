@@ -1031,6 +1031,8 @@ function display_config($config) {
             addsvxlog($logtext);
         }
 // 7. start mqtt Task, if possible
+    start_mqtt();
+/*
     $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
     if (!strlen($mqtt_script)) {
       $debug = "";
@@ -1042,6 +1044,8 @@ function display_config($config) {
       $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
       addsvxlog($logtext);
     }
+*/
+
 // 7a. Clear MQTT log
       $db_File = DL3EL_BASE . "svx2mqtt/mqtt.log";
       $db_File_size = filesize($db_File);
@@ -1209,6 +1213,20 @@ echo "<br>Stat: $cmd";
           $fmnetwork = "confErr";
       }
       return $fmnetwork;
+    }
+
+    function start_mqtt () {
+      $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+      if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+        $debug = "";
+        if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
+        $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $debug . " >/dev/null &";
+        echo "Starting MQTT " . $cmd . "<br>";
+        exec($cmd, $output, $retval);
+        echo "$output $retval<br>";
+        $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
+        addsvxlog($logtext);
+      }
     }
 ?>
     
