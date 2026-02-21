@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include "../include/settings.php";
 
+///* running in ptt.html -> move to include functions.php
 // Function to execute amixer command and retrieve output
 function execute_amixer($command) {
     $output = [];
@@ -14,7 +15,8 @@ function execute_amixer($command) {
     if ((defined ('debug')) && (debug > 2)) echo "<br>";
     return $output;
 }
-
+//*/
+///* running in ptt.html
 // Function to parse current values from amixer output
 function parse_amixer_value($output) {
     $nn = 0;
@@ -34,7 +36,7 @@ function parse_amixer_value($output) {
     }
     return null;
 }
-
+//*/
 // Function to calculate percentage relative to maximum permitted value and return as whole number
 function calculate_percentage($current_value, $max_value) {
     if (!is_numeric($current_value)) { $current_value = 0; }    
@@ -105,138 +107,84 @@ $max_values = [
 <head>
     <meta charset="UTF-8">
     <link href="../css/css.php" type="text/css" rel="stylesheet" />
-    <style type="text/css">
-        body {
-            background-color: #eee;
-            font-size: 18px;
-            font-family: Arial;
-            font-weight: 300;
-            margin: 2em auto;
-            max-width: 40em;
-            line-height: 1.5;
-            color: #444;
-            padding: 0 0.5em;
-        }
-
-        h1,
-        h2,
-        h3 {
-            line-height: 1.2;
-        }
-
-        a {
-            color: #607d8b;
-        }
-
-        .highlighter-rouge {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: .2em;
-            font-size: .8em;
-            overflow-x: auto;
-            padding: .2em .4em;
-        }
-
-        pre {
-            margin: 0;
-            padding: .6em;
-            overflow-x: auto;
-        }
-
-        #player {
-            position: relative;
-            width: 205px;
-            overflow: hidden;
-            direction: ltl;
-        }
-
-        textarea {
-            background-color: #111;
-            border: 1px solid #000;
-            color: #ffffff;
-            padding: 1px;
-            font-family: courier new;
-            font-size: 10px;
-        }
-    </style>
  <script type="text/javascript">
         function reloadPage() {
             window.location.href = window.location.pathname + "?reloaded=true";
         }
     </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body style="background-color: #e1e1e1;font: 11pt arial, sans-serif;">
     <center>
-        <fieldset style="border:#3083b8 2px groove;box-shadow:5px 5px 20px #999; background-color:#f1f1f1; width:555px;margin-top:15px;margin-left:0px;margin-right:5px;font-size:13px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
-            <div style="padding:0px;width:550px;background-image: linear-gradient(to bottom, #e9e9e9 50%, #bcbaba 100%);border-radius: 10px;-moz-border-radius:10px;-webkit-border-radius:10px;border: 1px solid LightGrey;margin-left:0px; margin-right:0px;margin-top:4px;margin-bottom:0px;line-height:1.6;white-space:normal;">
-                <center>
-                    <h1 id="svxlink" style="color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Configurator</h1>
-                    <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">AMixer settings</h3>
-                    <!-- HTML Form to adjust ALSA settings -->
-                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
-                        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Headphone - TX Levels</h3>
-                        <label for="headphone">Set for 65 (0-100):</label>
-                        <input type="number" id="headphone" name="headphone" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['headphone'], $max_values['headphone'])); ?>" required>
-                        <br>
-                        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Microphone - Not Used</h3>
-                        <label for="mic">(0-100): Set to 0</label>
-                        <input type="number" id="mic" name="mic" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['mic'], $max_values['mic'])); ?>" required>
-                        <br>
-                        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Capture - RX Levels</h3>
-                        <label for="capture">(0-100) Set for 25:</label>
-                        <input type="number" id="capture" name="capture" min="0" max="200" value="<?php echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); ?>" required>
-                        <br>
-                        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>
-                        <label for="autogain">Set to OFF for optimum control</label>
-                        <select id="autogain" name="autogain" required>
-                        <option value="0" <?php  if ($current_autogain === '0' || $current_autogain === 'off')  echo 'selected'; ?>>Off</option>
-                        <option value="1" <?php  if ($current_autogain === '1' || $current_autogain === 'on')  echo 'selected'; ?>>On</option>
-                        </select>
+    <h1 id="svxlink" style="color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Configurator</h1>
+    <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">AMixer settings</h3>
+    <!-- HTML Form to adjust ALSA settings -->
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
+        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Headphone - TX Levels</h3>
+            <label for="headphone">Set for 65 (0-100):</label>
+            <input type="number" id="headphone" name="headphone" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['headphone'], $max_values['headphone'])); ?>" required>
+            <br>
+        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Microphone - Not Used</h3>
+            <label for="mic">(0-100): Set to 0</label>
+            <input type="number" id="mic" name="mic" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['mic'], $max_values['mic'])); ?>" required>
+            <br>
+        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Capture - RX Levels</h3>
+            <label for="capture">(0-100) Set for 25:</label>
+            <input type="number" id="capture" name="capture" min="0" max="200" value="<?php echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); ?>" required>
+            <br>
+        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>
+            <label for="autogain">Set to OFF for optimum control</label>
+            <select id="autogain" name="autogain" required>
+            <option value="0" <?php  if ($current_autogain === '0' || $current_autogain === 'off')  echo 'selected'; ?>>Off</option>
+            <option value="1" <?php  if ($current_autogain === '1' || $current_autogain === 'on')  echo 'selected'; ?>>On</option>
+        </select>
 
-                         <?php 
-                            $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
-                            if (fopen($svxConfigFile,'r')) {
-                                $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
-                                $sc_port_name = $svxconfig['SimplexLogic']['RX']; 
-                                $sc_port_raw = $svxconfig[$sc_port_name]['AUDIO_DEV']; 
-                                if (defined('DL3EL_SC_STRING')) {
-                                    $sc_port_cmp = DL3EL_SC_STRING;
-                                } else{    
-                                    $sc_port_cmp = "Audio Device";
-                                }
-                                $sc_port_linux = 'aplay -l | grep "' . $sc_port_cmp . '"';
-                                $sc_port_linux = shell_exec($sc_port_linux);
-                                echo "<br>Soundcard configuration: <b>" . $sc_port_raw . "</b> (svxlink.conf" . ")<br>";
-                                echo "<b>" . $sc_port_linux . " (Linux)<br>";
-                            }    
-                        ?>
-                        <br>
-                        <button type="submit">Apply Settings</button>
-                         <?php 
-                            if (defined('DL3EL_RADIO') ) {
-                                $svxRadio = DL3EL_RADIO;
-                                if ($svxRadio == "SC (no Radio)") {
-                                    echo '<br>';
-                                    echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save SoundCard Settings</button>';
-                                    echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore SoundCard Settings</button>';
-                                }    
-                                if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
-                                    echo '<br>';
-                                    echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save ' . $svxRadio . ' Sound Settings</button>';
-                                    echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore ' . $svxRadio . ' Sound Settings</button>';
-                                }    
-                            }   
-                        ?>
-                        <input type="hidden" name="form_submitted" value="1">
-                    </form>
-                </center>
-            </div>
-        </fieldset>
+        <?php 
+            $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
+            if (fopen($svxConfigFile,'r')) {
+                $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
+                $sc_port_name = $svxconfig['SimplexLogic']['RX']; 
+                $sc_port_raw = $svxconfig[$sc_port_name]['AUDIO_DEV']; 
+                if (defined('DL3EL_SC_STRING')) {
+                    $sc_port_cmp = DL3EL_SC_STRING;
+                } else{    
+                    $sc_port_cmp = "Audio Device";
+                }
+                $sc_port_linux = 'aplay -l | grep "' . $sc_port_cmp . '"';
+                $sc_port_linux = shell_exec($sc_port_linux);
+                echo "<br>Soundcard configuration: <b>" . $sc_port_raw . "</b> (svxlink.conf" . ")<br>";
+                echo "<b>" . $sc_port_linux . " (Linux)<br>";
+            }    
+        ?>
+        <br>
+        <button type="submit">Apply Settings</button>
+        <?php 
+            if (defined('DL3EL_RADIO') ) {
+                $svxRadio = DL3EL_RADIO;
+// Soundcard?
+//              if ($svxRadio == "SC (no Radio)") {
+                if (substr($svxRadio,0,3) === "SC ") {
+                    echo '<br>';
+                    echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save SoundCard Settings</button>';
+                    echo '<br>';
+                    echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore SoundCard Settings</button>';
+                }    
+                if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+                    echo '<br>';
+                    echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save ' . $svxRadio . ' Sound Settings</button>';
+                    echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore ' . $svxRadio . ' Sound Settings</button>';
+                }    
+            }   
+            echo '<br>';
+            echo '<button id=jumptoAm name=jmptoAm type="submit" class="green" style = "height:30px; width:200px; font-size:12px;" value=\"9990\">Parrot 9990 (Modulations Test)</button>';
+            echo '<button id=jumptoAm name=jmptoAm type="submit" class="green" style = "height:30px; width:200px; font-size:12px;" value=\"9998\">Parrot 9998 (Modulations Test)</button>';
+        ?>
+        <input type="hidden" name="form_submitted" value="1">
+    </form>
     </center>
 
     <?php
-
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_submitted'])) {
         if (isset($_POST['headphone'])) {
             $headphone_percentage = intval($_POST['headphone']);
@@ -280,10 +228,33 @@ $max_values = [
             $command = DL3EL . "/arestore.sh  2>&1";
             exec($command,$screen,$retval);
         }
+
         // Refresh the page to show updated values
         echo "<script type='text/javascript'>
         reloadPage();
-    </script>";    }
+        </script>";    
+
+        if (isset($_POST["jmptoAm"])) {
+            $exec= "echo '*91" . $_POST['jmptoAm'] . "#' > /tmp/dtmf_svx";
+            exec($exec,$output);
+            echo "<meta http-equiv='refresh' content='0'>";
+            $logtext = "DTMF via Dashboard: "  . $_POST['jmptoAm'];
+        }    
+    
+
+    }
+    echo '<div id="content" style = "margin-bottom:30px;">'."\n";
+    $call_script = "parrot_mqtt.php";
+    $rate = 1000;
+    echo '<script type="text/javascript">'."\n";
+    echo 'function reloadmqtt(){'."\n";
+    echo '  $("#content").load("' . $call_script . '",function(){ setTimeout(reloadmqtt,' . $rate . ') });'."\n";
+    echo '}'."\n";
+    echo 'setTimeout(reloadmqtt,' . $rate . ');'."\n";
+    echo '$(window).trigger(\'resize\');'."\n";
+    echo '</script>'."\n";
+        
+    echo '</div>'."\n";
     ?>
 </body>
 

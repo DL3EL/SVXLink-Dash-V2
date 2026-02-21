@@ -236,8 +236,11 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">AMixer</a> | ';
 		echo '<a href="./rf.php" style = "color: black;" id="radio">Radio</a> | ';
 	    }
-	    if ($svxRadio == "SC (no Radio)") {
-		echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">AMixer</a> | ';
+// Soundcard?
+	    if (substr($svxRadio,0,3) === "SC ") {
+//		echo '<a href="./ameditor.php?id=amixer" style = "color: black;" id="amixer">1AMixer</a> | ';
+//		echo '<a href="./caller.php?id=amixer/index&refresh=5" style = "color: black;" id="amixer">2AMixer</a> | ';
+		echo '<a href="./caller.php?id=amixer/index" style = "color: black;" id="amixer">AMixer</a> | ';
 	    }
 	}
 	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';

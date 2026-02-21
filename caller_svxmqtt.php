@@ -49,7 +49,7 @@
             echo '<object style="outline:none; width:500px; height:850px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
         }
 
-        echo '<center><small>Live Daten vom FM-Funknetz.de<br>basierend auf dem MQTT Livedashboard von DJ1JAY<br>(integriert von Frank, DL4EM)</small></center>';
+//        echo '<center><small>Live Daten vom FM-Funknetz.de basierend auf dem MQTT Livedashboard von DJ1JAY<br>(integriert von Frank, DL4EM)</small></center>';
         echo '</td>';
     }   
    
