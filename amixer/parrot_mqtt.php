@@ -26,8 +26,8 @@ include_once "../include/settings.php";
 //get timestamp (if we need it)
             $timestamp_start = strpos($line, '^');
             if ($timestamp_start !== false) {
-                $timestamp = substr($line, $timestamp_start);
-                $timestamp = trim($timestamp,"\^");
+                $timestampl = substr($line, $timestamp_start);
+                $timestampl = trim($timestampl,"\^");
             }  
             // 1. Den JSON-Teil sauber ausschneiden (ab der Position nach dem Doppelpunkt)
             // Wir suchen die erste "{" Klammer
@@ -46,10 +46,11 @@ include_once "../include/settings.php";
                         $timestamp = $line_e['timestamp'];
                         $summary = $line_e['summary'];
                         $recommendation = $line_e['recommendation'];
+                        date_default_timezone_set('Europe/Berlin');
                         $ts = date("H:i:s",$timestamp);
 
                         echo "<br>Soundcheck für $call, Ergebnis von $ts: <b>$recommendation[rating_text]</b> (Papagei TG $tg)<br> ";
-                        echo "Empfehlung: $recommendation[message]<br>";
+                        echo "Empfehlung: $recommendation[message] :local:$tsl<br>";
                         echo "Empfehlung: $recommendation[action], Level-Status: $recommendation[level_status]<br><br>Details:";
                         echo '<table style = "text-align: left;"';
                         echo "<tr> <td>Ergebnis:</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td></td><td></td><td>&nbsp;&nbsp;</td></tr>";
