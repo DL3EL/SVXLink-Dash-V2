@@ -10,6 +10,7 @@ include_once "../include/tgdb.php";
         return;
     }
 
+// test ob mqtt installiert: /usr/local/bin/mqtt-simple
     $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
     if (!strlen($mqtt_script)) {
       $debug = "";
@@ -55,7 +56,11 @@ include_once "../include/tgdb.php";
 		$friend_call_array = explode(",", DL3EL_FRIENDS);
 
     if ((defined ('debug')) && (debug > 0)) echo "<tr><td><b>MQTT RX</b></td></tr>";
-    $nn = $anzahl_zeilen - 3000;
+    if ($anzahl_zeilen > 3000) {
+      $nn = $anzahl_zeilen - 3000;
+    } else {
+      $nn = 0;
+    }  
 //valid records
 //[19.02.2026 12:39:24] /server/mqtt/heartbeat: 324973 seconds^1771628950^
 //[19.02.2026 12:39:22] /server/statethr/1: {"time":"12:39:21", "talk":"stop", "call":"DB0BLO", "tg":"13055", "server":"1"}^1771628950^
