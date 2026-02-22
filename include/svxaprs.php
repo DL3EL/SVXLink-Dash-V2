@@ -1,8 +1,11 @@
 <?php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 include_once "settings.php";
+echo '<br><br><span><b>APRS Monitor</b></span><br><br>';
 // last 1000 Spots
 //$url="https://dxc.jo30.de/dxcache/spots";
     $aprs_datei = DL3EL . "/aprs-is.txt";
@@ -36,8 +39,9 @@ include_once "settings.php";
     }
 
     if ($aprs_msg_avail)  {
-	echo '<BR><BR><BR>';
-	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; background-color:#f1f1f1;">';
+//	echo '<BR>';
+//	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; background-color:#f1f1f1;">';
+	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
 	echo '<thead>';
 	echo '<tr style = "border:none;background-color:#f1f1f1;">';
 	echo "<th><b>From</b></th><th><b>Type</b></th><th><b>Messages (" . date("H:i:s") .")</b></th><th><b>Zeit</b></th></tr>";
