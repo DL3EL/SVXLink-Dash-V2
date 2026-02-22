@@ -147,12 +147,17 @@ function readLast100Unique($filename) {
     if (!file_exists($filename)) {
         return [];
     }
-
     // Die gesamte Datei in ein Array laden
     $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     
+    $anzahl_zeilen = count($lines); 
+    if ($anzahl_zeilen > 100) {
+	$anzahl_zeilen = 100;
+    }
+    $anzahl_zeilen = $anzahl_zeilen *-1;
     // Die letzten 100 Zeilen extrahieren
-    $last100 = array_slice($lines, -100);
+//    $last100 = array_slice($lines, -100);
+    $last100 = array_slice($lines, $anzahl_zeilen);
     
     // Reihenfolge umkehren, damit wir mit der aktuellsten Zeile beginnen
     $last100 = array_reverse($last100);

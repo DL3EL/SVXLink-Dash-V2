@@ -981,11 +981,31 @@ function display_config($config) {
       $db_File = DL3EL . "/aprs-is.msg";
       $db_File_size = filesize($db_File);
       if ($db_File_size > 100000) {
+        $content = file_get_contents($db_File);
+        $zeilen_array = explode("\n", $content);
+        $anzahl_zeilen = count($zeilen_array); 
+// save the last 25 Messages
+        $nn = $anzahl_zeilen - 25;
+        $mm = 0;
+        While ($nn < $anzahl_zeilen) {
+          $zeilen_array_save[$mm] = $zeilen_array[$nn];
+          ++$nn;
+          ++$mm;
+        }  
+        rename($db_File, $db_File . ".bak");
+        touch($db_File);
+        $content = implode("\n", $zeilen_array_save);
+        file_put_contents($db_File, $content);
+     }
+// 3c. Clear APRSFiles log
+      $db_File = DL3EL . "/aprs-is.log";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
           rename($db_File, $db_File . ".bak");
           touch($db_File);
       }
-// 3c. Clear APRSFiles log
-      $db_File = DL3EL . "/aprs-is.log";
+// 3d. Clear APRSFiles log
+      $db_File = DL3EL . "/aprs-is.txt";
       $db_File_size = filesize($db_File);
       if ($db_File_size > 100000) {
           rename($db_File, $db_File . ".bak");
