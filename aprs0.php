@@ -35,7 +35,6 @@ if (session_status() === PHP_SESSION_NONE) {
           addsvxlog($logtext);
         }  
     }
-
     echo '</div>'."\n";
     echo '</td>';
         include_once "caller_svxmqtt.php"; 

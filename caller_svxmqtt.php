@@ -25,6 +25,10 @@
         } else {
                 $mqtt = 0;
         }    
+// test ob mqtt installiert: /usr/local/bin/mqtt-simple
+        if (file_exists("/usr/local/bin/mqtt-simple")) {
+            $mqtt = 1;
+        }    
         if (defined('DL3EL_MQTT')) {
             if (DL3EL_MQTT === "no") {
                 $mqtt = 0;

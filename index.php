@@ -106,8 +106,9 @@ if ($_SESSION['auth'] === "AUTHORISED") {
 ?>
 
 <?php
-    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
+    echo '<table style = "margin-right:20px;border:none;border-collapse:collapse;background-color:#f1f1f1;">';
+	echo '<tr style = "border:none;background-color:#f1f1f1;">';
+    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:none;background-color:#f1f1f1;">';
     echo '<div class="nav" style = "margin-bottom:1px;margin-top:10px;">'."\n";
     echo '<script type="text/javascript">'."\n";
     echo 'function reloadStatusInfo(){'."\n";

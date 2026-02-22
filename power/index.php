@@ -210,7 +210,10 @@ if (isset($_POST['btnDashUpdate']))
                 if (file_exists('/etc/systemd/system/svxlink-node.service')) {
                   $dbversion = $dbversion . "(s)";
                 }  
-                if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+//                if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+                $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
+                if (strlen($aprs_script)) {
+                // process is running
                     $dbversion = $dbversion . "(a)";
                 }  
                 $gitversion = file_get_contents("gitversion");

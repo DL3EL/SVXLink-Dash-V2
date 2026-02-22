@@ -1,4 +1,4 @@
-<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">
+<table style = "margin-top:12px;margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">
 <?php
     if (defined('DL3EL')) {
         $ELQueryFile = DL3EL . "/el_query";

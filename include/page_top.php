@@ -73,7 +73,13 @@
 </div></div>
     <div class="text"style = "padding-right:230px">
 </div>
-<?php include_once "top_menu.php"; ?>
+<?php
+    if ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes")) {
+        include_once "top_menu_neu.php"; 
+    } else {
+        include_once "top_menu.php"; 
+    }
+?>
 <div class="content"><center>
 <div style = "margin-top:0px;">
 </div></center>

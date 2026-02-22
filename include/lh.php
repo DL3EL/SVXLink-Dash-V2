@@ -5,21 +5,18 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once "config.php";         
 include_once "tools.php";        
 include_once "functions.php";    
-?>
-<fieldset style = "background-color:#f1f1f1; margin-top:15px;height:auto; font-size:13px; border:none;">
-<span style = "font-size:20px"> </span>
-<span style = "font-weight:bold; font-size:14px;">SVXReflector Activity</span>
-<!-- 
-<fieldset style = " width:550px;box-shadow:5px 5px 20px #999;background-color:#e8e8e8e8;margin-top:10px;margin-left:0px;margin-right:0px;font-size:12px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
--->
-<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:10px;margin-left:0px;margin-right:0px;font-size:12px; border:none;">
-  <form method="post">
-<!--  <table style = "margin-top:0px;"> -->          <!-- old -->
-    <table style = "margin-top:0px; width:650px">    <!-- new -->
-    <tr height=25px>
-      <th>Zeit</th>
-      <th width=100px>Callsign</th>
-<?php
+
+
+echo '<span style = "font-size:25px"> </span>';
+echo '<span style = "font-weight:bold; font-size:15px;">SVXReflector Activity</span>';
+//echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:10px;font-size:12px; border:none;">';
+
+echo '<form method="post">';
+echo '<table style = "margin-top:4px;margin-right:10px; width:650px">';
+echo '<tr height=25px>';
+echo '<th>Zeit</th>';
+echo '<th width=100px>Callsign</th>';
+
 // Suche Name zum Call in DMRIds.dat, prüfen ob id Datei vorhanden und Inhalt > 1MB, dann Überschrift einblenden
 //      if (file_exists("/var/lib/mmdvm/DMRIds.dat")) {
 //	echo '<th>Name</th>';
@@ -179,5 +176,5 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 }
 ?>
   </table></form>
-</fieldset>
-</fieldset>
+<!-- </fieldset> -->
+<!-- </fieldset> -->

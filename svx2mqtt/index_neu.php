@@ -10,9 +10,6 @@ include_once "../include/tgdb.php";
         return;
     }
 
-// test ob mqtt installiert: /usr/local/bin/mqtt-simple
-    start_mqtt();
-/*    
     $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
     if (!strlen($mqtt_script)) {
       $debug = "";
@@ -24,60 +21,35 @@ include_once "../include/tgdb.php";
       $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
       addsvxlog($logtext);
     }
-*/
-// colours for buttons
-// good colours are green, silver and blue. There is no colour check :-)
-//define ("SVXMQTT_COLOR_active", "#CECECE");
-//define ("SVXMQTT_COLOR_friends", "orange");
-//define ("SVXMQTT_COLOR_active", "green");
-//define ("SVXMQTT_COLOR_passive", "blue");
+if (defined ('SVXMQTT_COLOR_active')) {
+  $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";
+} else {
+  $SVXMQTT_COLOR1_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR2_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR3_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
+  $svxmqtt_color_active = $SVXMQTT_COLOR2_active;
+}
 
-  if (defined ('SVXMQTT_COLOR_active')) {
-    $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";
-  } else {
-    $svxmqtt_color_active = "green";
-  }
+if (defined ('SVXMQTT_COLOR_passive')) {
+  $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;";
+} else {
+  $SVXMQTT_COLOR1_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR2_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
+  $SVXMQTT_COLOR3_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
+  $svxmqtt_color_passive = $SVXMQTT_COLOR3_passive;
+}
 
-  if (defined ('SVXMQTT_COLOR_passive')) {
-    $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;";
-  } else {
-    $svxmqtt_color_passive = "blue";
-  }
-
-  if (defined ('SVXMQTT_COLOR_friends')) {
-    $svxmqtt_color_friends = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_friends . ";color:white;font-weight:bold;font-size:14px;";
-  } else {
-    $svxmqtt_color_friends = "green";
-  }
-// file with mqtt data
     $file = DL3EL_BASE . "svx2mqtt/mqtt.data";
     $content = file_get_contents($file);
     $zeilen_array = explode("\n", $content);
     $anzahl_zeilen = count($zeilen_array); 
+    $umgekehrte_zeilen = array_reverse($zeilen_array);
+    $content = implode("\n", $umgekehrte_zeilen);
     $mqtt_start_ts = 0;
-
-
-    if (defined ('DL3EL_FRIENDS')) {
-      $friend_call_array = explode(",", DL3EL_FRIENDS);
-    } else {
-      $friend_call_array[0] = 0;
-    }    
-
     if ((defined ('debug')) && (debug > 0)) echo "<tr><td><b>MQTT RX</b></td></tr>";
-    if ($anzahl_zeilen > 3000) {
-      $nn = $anzahl_zeilen - 3000;
-    } else {
-      $nn = 0;
-    }  
-//valid records
-//[19.02.2026 12:39:24] /server/mqtt/heartbeat: 324973 seconds^1771628950^
-//[19.02.2026 12:39:22] /server/statethr/1: {"time":"12:39:21", "talk":"stop", "call":"DB0BLO", "tg":"13055", "server":"1"}^1771628950^
-//[21.02.2026 00:09:10] /server/state/loginz: 507^1771628950^
-//[20.02.2026 17:38:28] DL3EL: MQTT Start^1771605508^
-//[21.02.2026 08:08:15] /server/mqtt/parrot/9990/analysis: {"tg": 9990, "callsign": "DO3FHS-APP", "timestamp": 1771535167.418658, "summary": {"avg_rms_db": -28.4, "max_peak_db": 0.0, "min_rms_db": -49.3, "max_rms_db": -2.1, "dynamics_db": 47.2, "clip_percent": 12.6, "silence_percent": 2.9, "total_frames": 579, "active_frames": 562, "duration_s": 11.6}, "recommendation": {"rating": 3, "rating_text": "\ud83d\udfe0 Grenzwertig", "level_status": "borderline", "message": "Clipping etwas hoch (13%).", "action": "Optional: TX-Pegel leicht reduzieren", "avg_rms_db": -28.4, "max_peak_db": 0.0, "clip_percent": 12.6, "meter_position": 72.0}}^1771657695^
-//[21.02.2026 08:08:15] /server/mqtt/parrot/9990/status: {"tg": 9990, "callsign": "", "status": "online", "timestamp": 1771558480.0964217}^1771657695^
-
-
+    $nn = $anzahl_zeilen - 3000;
+//[19.02.2026 12:39:24] /server/mqtt/heartbeat: 324973 seconds
+//[19.02.2026 12:39:22] /server/statethr/1: {"time":"12:39:21", "talk":"stop", "call":"DB0BLO", "tg":"13055", "server":"1"}
     While ($nn < $anzahl_zeilen) {
       $line = $zeilen_array[$nn];
       if (strlen($line)) {
@@ -111,15 +83,18 @@ include_once "../include/tgdb.php";
               if ($talk_state === "start") {
                 $array[$call]["time_1"] = $time;
                 $array[$call]["time_2"] = time()- $timestamp . "s";
+                $array[$call]["dauer"] = time() - $timestamp;
                 $array[$call]["dauera"] = time() - $timestamp;
                 $array[$call]["dauerp"] = 0;
                 $array[$call]["talker"] = "1";
+                $array[$call]["ts"] = $timestamp;
                 $array[$call]["ts-start"] = $timestamp;
                 $array[$call]["ts-stop"] = 0;
               } else {
                 if (isset($array[$call]["time_1"])) {
                   $array[$call]["time_2"] = $time;
                   $array[$call]["talker"] = "2";
+                  $array[$call]["dauer"] = 0;
                   $array[$call]["dauera"] = 0;
                   $ts_start = $array[$call]["ts-start"];
                   $time_1_start = $array[$call]["time_1"];
@@ -132,17 +107,19 @@ include_once "../include/tgdb.php";
                   $tgnumber = $tg;
                   $name=trim(isset($tgdb_array[$tgnumber])? $tgdb_array[$tgnumber] : '---');;
                   $array[$call]["tgn"] = $name;
+                  $array[$call]["ts"] = $timestamp;
                   $array[$call]["ts-start"] = $ts_start;
                   $array[$call]["ts-stop"] = $timestamp;
+                  $array[$call]["dauer"] = 0;
                   $array[$call]["dauerp"] = $array[$call]["ts-stop"] - $array[$call]["ts-start"];
                 } else {
                     $array[$call]["talker"] = "3";
                     $array[$call]["time_1"] = 0;
                     $array[$call]["time_2"] = 0;
+                    $array[$call]["ts"] = 0;
+                    $array[$call]["dauer"] = 0;
                     $array[$call]["dauera"] = 0;
                     $array[$call]["dauerp"] = 0;
-                    $array[$call]["ts-start"] =0;
-                    $array[$call]["ts-stop"] = 0;
 //                    unset($array[$call]);
                 }    
               }  
@@ -157,6 +134,7 @@ include_once "../include/tgdb.php";
               }  
               $array[$call]["tg"] = sprintf("&nbsp;<button style=cursor:pointer;border-radius:8px;width:85px;%s;font-weight:bold;font-size:14px; type=submit id=jumptoA name=jmptoA class=active_id value=\"%s\">%s</button>",$svxmqtt_color, $tg,$tg);
               $array[$call]["tgn"] = $name;
+              $array[$call]["ts"] = $timestamp;
             } else {
               echo "<tr><td>JSON $json_string JSON-Fehler: " . json_last_error_msg() . " im String: $json_string</td></tr>";
             }
@@ -196,7 +174,9 @@ include_once "../include/tgdb.php";
         if ($key === "talk_state") $talk_state = $value;
         if ($key === "tg") $tg = $value;
         if ($key === "tgn") $tgn = $value;
+        if ($key === "ts") $ts = $value;
         if ($key === "talker") $act = $value;
+        if ($key === "dauer") $dauer = $value;
         if ($key === "dauera") $dauera = $value;
         if ($key === "dauerp") $dauerp = $value;
         if ($key === "ts-start") $ts_start = $value;
@@ -210,26 +190,12 @@ include_once "../include/tgdb.php";
           $call = substr($call, 0, $timestamp_start);
         }  
       }  
-
-      $color_friend = "";
-      foreach ($friend_call_array as $fcall) {
-// look for friends
-        trim($fcall);
-// add " " to the call for exact match
-        $fcall = $fcall . " ";
-        $ccall = substr($call,0,strlen($fcall)-1) . " ";
-        if ($ccall === $fcall) {
-          $color_friend =  $svxmqtt_color_friends;
-          break;
-        }
-      }
-
       if ($time_1) {
         if ((defined ('debug')) && (debug > 0)) {
           $debug = $tg . "/" . $ts_start . "/" . $mqtt_start_ts;
           $line = $act . "<tr style='height:24px;'><td>" . $call . "&nbsp;</td><td>" .  $debug . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $ts_start . "&nbsp;</td><td>" .  $time_2 . "&nbsp;[DA:" . $dauera . ", DP:" . $dauerp . "] </td></tr>";
         } else {
-          $line = $act . "<tr style='height:24px;" . $color_friend . "'><td>" . $call . "&nbsp;</td><td>" .  $tg . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $time_1 . "&nbsp;</td><td>" .  $time_2 . "&nbsp;</td></tr>";
+          $line = $act . "<tr style='height:24px;'><td>" . $call . "&nbsp;</td><td>" .  $tg . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $time_1 . "&nbsp;</td><td>" .  $time_2 . "&nbsp;</td></tr>";
         }    
         if (($act) && ($ts_start < $mqtt_start_ts)) {
             if ((defined ('debug')) && (debug > 0)) echo "unterdrückt (stop fehlt): $line</td></tr>";
@@ -241,11 +207,12 @@ include_once "../include/tgdb.php";
       }    
     }
     krsort($array_time);
+	
+echo '<span style = "font-size:25px"> </span>';
+    echo '<span style = "font-weight:bold; font-size:15px;">FM-Funknetz Live Activity</span>';
 
     echo '<form method="post">';
-    echo '<table style = "width: 500px; text-align: left; margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<br><br><span style="color:000000;font-weight:bold;"><a href="https://dashboard.fm-funknetz.de/" target="fmn">FM Funknetz Live Activity</a></span>';
-
+    echo '<table style = "width: 500px; text-align: left; margin-top: 5px; margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
     echo '<thead>';
     echo '<tr style="height:24px;">';
     echo '<th style="width:22%;">&nbsp;&nbsp;Call</th>';
@@ -263,7 +230,7 @@ include_once "../include/tgdb.php";
       }  
     }
 //    echo '</table>';
-    echo "<br><br>";
+//    echo "<br><br>";
     echo "<tr> <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
     echo "<tr> <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;zuletzt aktiv</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
 //    echo '<table style = "width: 500px; text-align: left; margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
@@ -287,12 +254,5 @@ include_once "../include/tgdb.php";
       if ($nn > 30) break;
   }
 //    echo "<tr> <td>&nbsp;</td></tr>";
-// Bedingung, wann der Ton kommen soll
-$warnton = true;
-
-if ($warnton) {
-    // sound.mp3 muss im gleichen Verzeichnis liegen
-    //echo '<audio src="/usr/share/svxlink/sounds/en_US-heather-16k/Default/one.wav" autoplay></audio>';
-}
 ?>
 </table></form>

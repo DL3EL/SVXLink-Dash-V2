@@ -134,6 +134,8 @@ my $exit_script = 0;
 # @reboot /var/www/html/dl3el/aprs-is-msg.pl
 # "/var/www/html" should be replaced with the running directroy of the svxlink dasboard
 # all necessary definitgion have to made in the file /var/www/html/dl3el/aprs-is-msg.conf
+#/var/www/html/FM-Funknetz/dl3el/aprs-is-msg.pl c=DL3EL-HS db=v5.30g by DL3EL(s)(a) ri=(432.9500MHz, T71.9)
+# DL3EL APRS-IS Message Receiver [v1.71] Start: 15:11:31 am 18.02.2026 (v5.30g by DL3EL(s)(a))
 
  	my $msgdatei = $dir  . "aprs-is.msg";
  	my $aprs_rxdatei = $dir  . "aprs-is.txt";
@@ -735,7 +737,7 @@ sub send_keepalive {
 		if (($aprs_lat eq "5001.00N") &&	($aprs_lon eq "00800.00E")) {
 			$data = sprintf ("%s>%s,TCPIP*:\n",$k_srccall,$k_destcall);
 		} else {
-			$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz APRS-Client (by DL3EL) %s\n",$k_srccall,$k_destcall,$aprs_init);
+			$data = sprintf ("%s>%s,TCPIP*:!$aprs_lat/$aprs_lon$aprs_sym FM-Funknetz APRS-Client ($dbv) %s\n",$k_srccall,$k_destcall,$aprs_init);
 		}	
 		$socket->send($data);
 		$log_time = act_time();
@@ -998,7 +1000,9 @@ sub aprs_tx {
 			$destcall = uc $destcall;
 			print "Dest $destcall, Src: $aprs_login, Text: $aprs_msg\n" if ($verbose >= 2);
 			$srcdest = "APNFMN";
-# wait for new identifier APFMN?
+# wait for new identifier APFMN? approved 15.02.2025
+# APFMNM = messages
+# APFMNU = updates
 			if (($destcall eq "FMNUPD") || ($destcall eq "FMNTUPD") || ($no_ack)) {
 				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $destcall if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);

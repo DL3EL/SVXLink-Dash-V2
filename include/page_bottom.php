@@ -27,7 +27,7 @@ echo ' <center>';
     echo '</div>'."\n";
 ?>
 <!--- Please do not remove copyright info -->
-<center><span title="Dashboard" style = "font: 7pt arial, sans-serif;">SvxLink Dashboard Ver 2.5 ©  G4NAB, SP2ONG, SP0DZ, DL3EL <?php $cdate=date("Y"); if ($cdate > "2021") {$cdate="2021-".date("Y");} echo $cdate ; ?>
+<center><span title="Dashboard" style = "font: 7pt arial, sans-serif;">SvxLink Dashboard Ver 2.5 ©  G4NAB, SP2ONG, SP0DZ, DL3EL, DL4EM <?php $cdate=date("Y"); if ($cdate > "2021") {$cdate="2021-".date("Y");} echo $cdate ; ?>
 </div>
 </fieldset>
 <br>

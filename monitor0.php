@@ -5,7 +5,8 @@ include_once "include/tgdb.php";
     if (fopen($svxConfigFile,'r')) {
       $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
     }
-    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
+echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:12px;margin-left:10px;margin-right:10px;font-size:14px; border:none;">';
+    echo '<table style = "margin-top:0px;margin-right:0px;margin-left:0px;margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
     if ($_SESSION['auth'] !== 'AUTHORISED') {
         echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
         return;
@@ -45,3 +46,4 @@ include_once "include/tgdb.php";
 
 ?>
 </table>
+

@@ -5,7 +5,11 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include_once "settings.php";
-echo '<br><br><span><b>APRS Monitor</b></span><br><br>';
+echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:15px;margin-left:10px;margin-right:10px;font-size:14px; border:none;">';
+//echo '<span><b>APRS Monitor</b><br></span>';
+echo '<span><b>APRS Monitor</b></span>'; // <br> ist hier nicht mehr nötig
+
+
 // last 1000 Spots
 //$url="https://dxc.jo30.de/dxcache/spots";
     $aprs_datei = DL3EL . "/aprs-is.txt";
@@ -41,7 +45,9 @@ echo '<br><br><span><b>APRS Monitor</b></span><br><br>';
     if ($aprs_msg_avail)  {
 //	echo '<BR>';
 //	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; background-color:#f1f1f1;">';
-	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
+//	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
+//	echo '<table style="margin-top: 15px;margin-left:10px;margin-right:20px; border-collapse: collapse; background-color: #f1f1f1; ...">';
+	echo '<table style=" border-collapse: collapse; background-color: #f1f1f1; ...">';
 	echo '<thead>';
 	echo '<tr style = "border:none;background-color:#f1f1f1;">';
 	echo "<th><b>From</b></th><th><b>Type</b></th><th><b>Messages (" . date("H:i:s") .")</b></th><th><b>Zeit</b></th></tr>";
@@ -129,11 +135,15 @@ $file = $aprs_datei;
 	++$nn;
     }
     echo "</td></Tr>";
+echo '<fieldset>';
+
     echo '</table>';
 
 ?>
 </center>
-</div><br></div></fieldset>
+</div><br></div>
+<!-- </fieldset> -->
+
 
 <?php
 
