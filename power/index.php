@@ -316,37 +316,49 @@ if (isset($_POST['btnrstc710']))
         $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
         $github = ".g";
 //        if (!filesize('versioncheck')) {
+
+        if ((defined ('debug')) && (debug > 0)) $content = ".g";
         if ($content === ".g")  {
-//            $cmd = "wget -T 10  -O versioncheck http://192.68.17.16/FM-Relais/dbversion";
-//            $content = trim(shell_exec('cat versioncheck'));
-            $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
-        $github = ".r";
-        }        
-        list($gitversion, $rest) = explode(" ", $content);
-        $gitversionf = $gitversion . $github;
-        file_put_contents("gitversion",$gitversionf);
+            $git_file  = "https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
+            echo "<br><br><br>Github Versionprüfung konnte nicht ausgeführt werden. Die Datei <br><a href='$git_file' target='git'>$git_file</a> <br>konnte nicht gelesen werden<br";
+//            $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
+//              $github = ".r";
+        } else {       
+            list($gitversion, $rest) = explode(" ", $content);
+            $gitversionf = $gitversion . $github;
+            file_put_contents("gitversion",$gitversionf);
+        }
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);
         list($version, $rest) = explode(" ", $dbversion);
-        echo '<br><br><br>';
-        if ($gitversion !== $version) {
-            echo "<br>Github Version:$gitversion installierte Version:$version, bitte Update ausführen<br>";
-            echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+        if ($content === ".g")  {
+// version read not possible
+            $gitversion = $content;
+            echo "<br><br><br>Bitte auf den Link klicken und auf die Fehlermeldung im neuen Tab achten. Es könnte z.B. an PiHole o.ä. liegen.<br";
+            if ((defined('DL3EL_GIT_ENFORCE')) && (DL3EL_GIT_ENFORCE === "yes")) {
+                echo '<br><br><button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+            }
         } else {
-            if (DL3EL_GIT_UPDATE === "nocheck") {
-              echo "<br>Github Version:$gitversion installierte Version:$version,<br>Versionscheck abgeschaltet, Update ist möglich<br>";
-              if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
+            echo '<br><br><br>';
+            if ($gitversion !== $version) {
+                echo "<br>Github Version:$gitversion installierte Version:$version, bitte Update ausführen<br>";
                 echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
-              } else {
-                  echo "ACHTUNG: nur für erfahrene Benutzer, es kann sein, dass noch nicht freigegebene Updates heruntergeladen werden, die das System beschädigen<br>";
-                  echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
-              }        
-            } else{
-                if ($update_available) {
-                    echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
-                } else{
-                    echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
-                }    
+            } else {
+                if (DL3EL_GIT_UPDATE === "nocheck") {
+                    echo "<br>Github Version:$gitversion installierte Version:$version,<br>Versionscheck abgeschaltet, Update ist möglich<br>";
+                    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
+                        echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+                    } else {
+                        echo "ACHTUNG: nur für erfahrene Benutzer, es kann sein, dass noch nicht freigegebene Updates heruntergeladen werden, die das System beschädigen<br>";
+                        echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+                    }        
+                } else {
+                    if ($update_available) {
+                        echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+                    } else {
+                        echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+                    }    
+                }
             }  
         }
   }
