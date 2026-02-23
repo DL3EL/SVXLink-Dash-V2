@@ -1,8 +1,16 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
-include_once 'settings.php';	
+include_once 'settings.php';
+include_once 'basedir.php';
+include_once 'config.php';
 }
+
+//$public_spezial = true;			// Option Relais Dashboard
+$normal = true;				// Option Normal User
+$expert = true;				// Option Expert User
+$develop = true;			// Option Develop
+$reflector = true;			// Option Reflector Config
 
 /*
     $knowledgeFile = DL3EL . "/knowledge";
@@ -13,7 +21,7 @@ include_once 'settings.php';
 	    $knowledge = "Expert";
 	} else {
 	    $knowledge = "Normal";
-	}    
+	}
     }
     if (isset($_POST['btn_expert'])) {
 	define("DL3EL_EXPERT", "yes");
@@ -37,9 +45,9 @@ include_once 'settings.php';
    if (empty($_SESSION['auth'])) {
       $_SESSION['auth'] = "UNAUTHORISED";
    }
-*/   
-   
-///////////////////// Klappleiste ////////////////////////////////////
+*/
+
+///////////////////// Drop Down Menu ///////////////////////////////////////////////
 echo '<br>';
 // 1. Display Funktionen
 function display($display) {
@@ -89,102 +97,111 @@ function logdat($logdat) {
     $call_logdat = refconf($_POST['logdat']);
 }
 
-// Hilfe & Info Button
-	echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) .'"> ';
+
+// Option Dashboard für Relais eingeschränktes Menu ///////////////////////////////////////////////////////////////////////////////////
+if ($public_spezial == true) {
+// Dashboard Button
+//	echo '<span style="margin-right:10px;font-weight:bold;">Display: <span>';
+	echo '<a href="./index.php" style="margin-right:10px;color:#CD6600" target="_top">Dashboard</a>| ';
+	echo '<a href="./caller.php?id=include/svxdxc&refresh=15" style = "color: #0000ff;" target="_top">&nbsp;DX</a>';
+	} else {
+
+// Option Standart Dashboard mit Drop Down Menu ////////////////////////////////////////////////////////////////////////////////////////
+// Help & Info Button
+        echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) .'"> ';
         list($version, $rest) = explode(" ", $dbversion);
 
         $dbversionFile = DL3EL . "/dbversion.upd";
         if (file_exists($dbversionFile)) {
-	    $content = file_get_contents($dbversionFile);
-	    if ($content === "update") {
-		$version = $version . " Update available";
-	    }
-	}    
-	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950" 
-			style="text-align:left;margin-right:20px;border-radius:8px;color:white;
-			border-color:transparent;background-color:blue;font-size:20px;" 
-			id="info">Hilfe für ' . $version . '</a>';
-?>
+            $content = file_get_contents($dbversionFile);
+            if ($content === "update") {
+                $version = $version . " Update available";
+            }
+        }
+        echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950"
+                        style="text-align:left;margin-right:20px;border-radius:8px;color:white;
+                        border-color:transparent;background-color:blue;font-size:20px;"
+                        id="info">Hilfe für ' . $version . '</a>';
 
-<!-- ///////////////////// Klappleiste Definitionen //////////////////////////////////// -->
+// Dashboard return Button
+echo '<a href="./index.php" style="margin-right:10px;color:#CD6600" target="_top">Dashboard</a>';
 
-<form method="post" action="">
+/////////////////////// Drop Down Menu Optionen ////////////////////////////////////
+echo '<form method="post" action="">';
 
-<!-- Buttons 1 Display Funktionen -->
-<select style="font-size:16px;" name="display" onchange="this.form.submit()">
-  <option style="color:gray;" value="0">DISPLAY</option>
-  <option value="1">Dashboard</option>
-  <option value="2">Talk Groups</option>
-  <option value="3">Monitor Calls</option>
-  <option value="4">Echolink</option>
-  <option value="5">FM Relais</option>
-  <option value="6">DX Cluster</option>
-  <option value="7">OpenWebRx</option>
-  <option value="8">Voice FMN</option>
-  <option value="9">APRS Monitor</option>
-<!--  <option value="10">Live Log View</option> -->
-</select>
-<noscript><input type="submit" value="send"></noscript>
+// Buttons 1 Display Funktionen
+echo '<select style="font-size:16px;" name="display" onchange="this.form.submit()">';
+	echo '<option style="color:gray;" value="0">DISPLAY</option>';
+//	echo '<option value="1">Dashboard</option>';
+	echo '<option value="2">Talk Groups</option>';
+	echo '<option value="3">Monitor Calls</option>';
+	echo '<option value="4">Echolink</option>';
+	echo '<option value="5">FM Relais</option>';
+	echo '<option value="6">DX Cluster</option>';
+	echo '<option value="7">OpenWebRx</option>';
+	echo '<option value="8">Voice FMN</option>';
+	echo '<option value="9">APRS Monitor</option>';
+echo '</select>';
 
-<!-- Buttons 2 System Eintellunegen -->
-<select style="font-size:16px;" name="svxsystem" onchange="this.form.submit()">
-  <option style="color:gray;" value="0">SYSTEM</option>
-  <option value="1">Wifi</option>
-  <option value="2">Network</option>
-<!--  <option value="3">Backup & Restore</option> -->
-</select>
-<noscript><input type="submit" value="send"></noscript>
+// Buttons 2 System Eintellunegen
+if ($develop == true) {
+echo '<select style="font-size:16px;" name="svxsystem" onchange="this.form.submit()">';
+	echo '<option style="color:gray;" value="0">SYSTEM</option>';
+	echo '<option value="1">Wifi</option>';
+	echo '<option value="2">Network</option>';
+	echo '<option value="3">Backup & Restore</option>';
+echo '</select>';
+}
 
-<!-- Buttons 3 Expert Edit -->
-<select style="font-size:16px;" name="expertedit" onchange="this.form.submit()">
-  <option style="color:gray;" value="0">EXPERT EDIT</option>
-  <option value="1">SVXLink Conf</option>
-  <option value="2">Echolink Conf</option>
-  <option value="3">Metar Info Conf</option>
-  <option value="4">APRS Conf</option>
-  <option value="5">AMixer</option>
-  <option value="6">Radio</option>
-  <option value="7">Node Info</option>
-  <option value="8">config.php</option>
-</select>
-<noscript><input type="submit" value="send"></noscript>
+// Buttons 3 Expert Edit
+if ($expert == true) {
+echo '<select style="font-size:16px;" name="expertedit" onchange="this.form.submit()">';
+	echo '<option style="color:gray;" value="0">EXPERT EDIT</option>';
+	echo '<option value="1">SVXLink Conf</option>';
+	echo '<option value="2">Echolink Conf</option>';
+	echo '<option value="3">Metar Info Conf</option>';
+	echo '<option value="4">APRS Conf</option>';
+	echo '<option value="5">AMixer</option>';
+	echo '<option value="6">Radio</option>';
+	echo '<option value="7">Node Info</option>';
+	echo '<option value="8">config.php</option>';
+echo '</select>';
+}
 
-<!-- Buttons 4 Normal Edit -->
-<select style="font-size:16px;" name="normaledit" onchange="this.form.submit()">
-  <option style="color:gray;" value="0">NORMAL EDIT</option>
-  <option value="1">SVXLink Conf</option>
-  <option value="2">Echolink Conf</option>
-  <option value="3">Metar Info Conf</option>
-  <option value="4">AMixer</option>
-  <option value="5">Radio</option>
-  <option value="6">Node Info</option>
-<!--  <option value="7">TCL Voice Mail</option> -->
-  
-</select>
-<noscript><input type="submit" value="send"></noscript>
+// Buttons 4 Normal Edit
+if ($normal == true) {
+echo '<select style="font-size:16px;" name="normaledit" onchange="this.form.submit()">';
+	echo '<option style="color:gray;" value="0">NORMAL EDIT</option>';
+	echo '<option value="1">SVXLink Conf</option>';
+	echo '<option value="2">Echolink Conf</option>';
+	echo '<option value="3">Metar Info Conf</option>';
+	echo '<option value="4">AMixer</option>';
+	echo '<option value="5">Radio</option>';
+	echo 'option value="6">Node Info</option>';
+//  echo '<option value="7">TCL Voice Mail</option>';
+echo '</select>';
+}
 
-<!-- Buttons 5 Reflector Config-->
-<select style="font-size:16px;" name="refconf" onchange="this.form.submit()">
-  <option style="color:gray;" value="0">REF CONF</option>
-  <option value="1">REF 1</option>
-  <option value="2">Ref 2</option>
-  <option value="3">Ref 3</option>
-  <option value="4">Ref 4</option>
-</select>
-<noscript><input type="submit" value="send"></noscript>
+// Buttons 5 Reflector Config
+if ($reflector == true) {
+echo '<select style="font-size:16px;" name="refconf" onchange="this.form.submit()">';
+	echo '<option style="color:gray;" value="0">REF CONF</option>';
+	echo '<option value="1">REF 1</option>';
+	echo '<option value="2">Ref 2</option>';
+	echo '<option value="3">Ref 3</option>';
+	echo '<option value="4">Ref 4</option>';
+echo '</select>';
+}
 
-<!-- Buttons 6 Log Dateien -->
-<select style="font-size:16px;" name="logdat" onchange="this.form.submit()">
-  <option style="color:gray;" value="0">LOG FILES</option>
-  <option value="1">SVXLink Live Log</option>
-  <option value="2">SVXLink Log</option>
-  <option value="3">APRS Log</option>
-</select>
-<noscript><input type="submit" value="send"></noscript>
+// Buttons 6 Log Dateien
+echo '<select style="font-size:16px;" name="logdat" onchange="this.form.submit()">';
+	echo '<option style="color:gray;" value="0">LOG FILES</option>';
+	echo '<option value="1">SVXLink Live Log</option>';
+	echo '<option value="2">SVXLink Log</option>';
+	echo '<option value="3">APRS Log</option>';
+echo '</select>';
 
-<?php
-//Backup & Restore Button
-echo '<a href="./config_backup.php" style = "margin-left:10px;font-size:18px;color:#cd6600;" target="_top">Backup</a> ';
+echo '<noscript><input type="submit" value="send"></noscript>';
 
 // Button Authorise
 if ((defined('MENUTOPAUTH')) && (MENUTOPAUTH === "no")) {
@@ -207,259 +224,245 @@ if (defined ('DL3EL_MASTER_IP')) {
 				break;
 			}
 			++$nn;
-	}    
+	}
 }
 if ($show_auth) {
     echo '<a href="./authorise.php" style="color:crimson;margin-left:10px;font-size:18px;">Authorise</a>';
 }
 
-// Button Power	
+// Button Power
 echo '<a style="color:green;margin-left:10px;font-size:18px;" href="./editor.php?id=power">Power</a>';
 echo '</form>';
 echo '<br>';
 echo '<div id="display-links" align=center>';
-	
-///////////////////// Klappleiste Funktionen ////////////////////////////////////
+
+///////////////////// Drop Down Menu Funktionen ////////////////////////////////////
 ///////////////////// DISPLAY ///////////////////////////////////////
+/*
 // Dashboard
 if ($call_display == 1) {
-include "./index.php";
+	$site = './index.php';
+	echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
+*/
 
 // Talk Groups
 if ($call_display == 2) {
-$_GET['id'] = 'include/tg';
-include 'caller.php';
+	$site = './caller.php?id=include/tg';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Monitor Calls
 if ($call_display == 3) {
-$_GET['id'] = 'monitor0';
-include 'caller.php';
+	$site = './caller.php?id=monitor0';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Echolink
 if ($call_display == 4) {
-$_GET['id'] = 'echolink_dl3el0';
-include 'caller.php';
+	$site = './caller.php?id=echolink_dl3el0';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // FM Relais
 if ($call_display == 5) {
-$_GET['id'] = 'relais0';
-include 'caller.php';
+	$site = './caller.php?id=relais0';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // DX Cluster
-/// Problem Timer ///
 if ($call_display == 6) {
-if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
-	$_GET['id'] = "dxcluster";
-//	$file_ref = "include/svxdxc&refresh=15";
-//	$_GET['id'] = $file_ref;
-//	$_GET['refresh'] = "15";
-	include './caller.php';
-	}
+	$site = './caller.php?id=include/svxdxc&refresh=15';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // OpenWebRx
 if ($call_display == 7) {
-	if (defined('DL3EL_OPENWEBRX')) {
-	$_GET['id'] = 'https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150';
-	include 'caller_extern.php';	
-	}    
+	$site = './caller_extern.php?id=https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // FM Funknetz Stream
 if ($call_display == 8) {
-	if ((defined('DL3EL_FMFUNKNETZ')) && (DL3EL_FMFUNKNETZ === "yes")) {
-		$_GET['id'] = 'https://stream.fm-funknetz.de';
-		include 'caller_extern.php';	
-	}    
+	$site = './caller_extern.php?id=https://stream.fm-funknetz.de';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // APRS Monitor
 if ($call_display == 9) {
-	$_GET['id'] = 'aprs';
-	include 'caller.php';
+	$site = './caller.php?id=aprs';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 ///////////////////// SYSTEM ///////////////////////////////////////
-// Wifi 
+// Wifi
 if ($call_svxsystem == 1) {
-include "./wifi.php";	
+	$site = './wifi.php';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
-// Network 
+// Network
 if ($call_svxsystem == 2) {
-include "./network.php";	
+	$site = './network.php';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
-/*
-// Backup & Restore 
+// Backup & Restore
 if ($call_svxsystem == 3) {
-echo '<object style="outline:none; width:750; height:780;" data="http://./config_backup.php"></object>';	
+	$site = './config_backup.php';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
-*/
 
 ///////////////////// EXPERT EDIT ///////////////////////////////////////
-
 // SVXLink Config
 if ($call_expertedit == 1) {
-// . SVXCONFPATH . SVXCONFIG . muss überall umgesetzt werden
-$file_edit="/etc/svxlink/svxlink.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';  
+	$file_path = SVXCONFPATH;
+	$file_edit = $file_path .'svxlink.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Echolink Config
 if ($call_expertedit == 2) {
-
-$file_edit="/etc/svxlink/svxlink.d/ModuleEchoLink.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';  
+	$file_path = MODULEPATH;
+	$file_edit = $file_path .'ModuleEchoLink.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // MetarInfo Config
 if ($call_expertedit == 3) {
-
-$file_edit="/etc/svxlink/svxlink.d/ModuleMetarInfo.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';  
+	$file_path = MODULEPATH;
+	$file_edit = $file_path .'ModuleMetarInfo.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // APRS Config
 if ($call_expertedit == 4) {
-
-$file_edit="/var/www/html/TEST/dl3el/aprs-is-msg.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';  
+	$file_path = DL3EL;
+	$file_edit = $file_path .'/aprs-is-msg.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // AMixer
 if ($call_expertedit == 5) {
-$_GET['id'] = 'amixer/index';
-include './caller.php';  
+	$site = './caller.php?id=amixer/index';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Radio
 if ($call_expertedit == 6) {
-include './rf.php';  
+	$site = './rf.php';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Node Info
 if ($call_expertedit == 7) {
-
-$file_edit="/etc/svxlink/node_info.json";
-$_GET['file'] = $file_edit;
-include './edit.php';  
+	$file_path = SVXCONFPATH;
+	$file_edit = $file_path .'node_info.json';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
+}
 
 // config.php
-$file_edit=DL3EL_BASE . "include/config.pgp";
-$_GET['file'] = $file_edit;
-include './edit.php';  
-
-//echo '<a href="./edit.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
-
+if ($call_expertedit == 8) {
+	$file_path = DL3EL_BASE;
+	$file_edit = $file_path .'include/config.php';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 ///////////////////// NORMAL EDIT ///////////////////////////////////////
-
 //SVXLink Conig
 if ($call_normaledit == 1) {
-	$_GET['id'] = 'svxlink';
-	include './editor.php';  
+	$site = './editor.php?id=svxlink';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Echolink
 if ($call_normaledit == 2) {
-	$_GET['id'] = 'echolink';
-	include './editor.php';  
+	$site = './editor.php?id=echolink';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Metar Info
 if ($call_normaledit == 3) {
-	$_GET['id'] = 'amixer/index';
-	include './caller.php';  
+	$site = './editor.php?id=metarinfo';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // AMixer
 if ($call_normaledit == 4) {
-	$_GET['id'] = 'amixer/index';
-	include './caller.php';  
+	$site = './caller.php?id=amixer/index';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Radio
 if ($call_normaledit == 5) {
-	include './rf.php'; 
+	$site = './rf.php';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // Node Info
 if ($call_normaledit == 6) {
-	$_GET['id'] = 'nodeInfo';
-	include './editor.php';  
+	$site = './editor.php?id=nodeInfo';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
-// TCL Voice Mail
-//if ($call_normaledit == 7) {
-//	$_GET['id'] = 'tclvoicemail';
-//	include './editor.php';  
-//}
-
 /////////////////// Reflektor Edit //////////////////////////////////////
-
 // REF 1
 if ($call_refconf == 1) {
-$file_edit="/var/www/html/TEST/dl3el/Reflector1.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';
+$file_path = DL3EL;
+$file_edit = $file_path .'/Reflector1.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // REF 2
 if ($call_refconf == 2) {
-$file_edit="/var/www/html/TEST/dl3el/Reflector2.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';
+$file_path = DL3EL;
+$file_edit = $file_path .'/Reflector2.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // REF 3
 if ($call_refconf == 3) {
-$file_edit="/var/www/html/TEST/dl3el/Reflector3.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';
+$file_path = DL3EL;
+$file_edit = $file_path .'/Reflector3.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // REF 4
 if ($call_refconf == 4) {
-$file_edit="/var/www/html/TEST/dl3el/Reflector4.conf";
-$_GET['file'] = $file_edit;
-include './edit.php';
+$file_path = DL3EL;
+$file_edit = $file_path .'/Reflector4.conf';
+	$site = "edit.php?file=$file_edit";
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 ////////////////// Anzeige Log Files  //////////////////////////////////////
-
 // SVXLink Live Log
 if ($call_logdat == 1) {
-	if ($_SESSION['auth'] === "AUTHORISED") {
-	$_GET['id'] = 'log';
-	include './editor.php';
-	}	
+	$site = './editor.php?id=log';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // SVXLink Log
 if ($call_logdat == 2) {
-	$file_show="log";
-	$_GET['file'] = $file_show;
-	include_once './edit.php';
+	$site = 'edit.php?file=log';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
 
 // APRS Log
 if ($call_logdat == 3) {
-	$file_show="loga";
-	$_GET['file'] = $file_show;
-	include_once './edit.php';
+	$site = 'edit.php?file=loga';
+        echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 }
-
+}
 
 ?>
 
