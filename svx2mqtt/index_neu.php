@@ -2,8 +2,12 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include_once "../include/settings.php";
-include_once "../include/tgdb.php";    
+//include_once "../include/settings.php";
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/settings.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/tgdb.php';
+//include_once "../include/tgdb.php";    
+
+//echo "Ich bin gerade hier: " . getcwd();
 
     if ($_SESSION['auth'] !== 'AUTHORISED') {
         echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
@@ -47,7 +51,13 @@ if (defined ('SVXMQTT_COLOR_passive')) {
     $content = implode("\n", $umgekehrte_zeilen);
     $mqtt_start_ts = 0;
     if ((defined ('debug')) && (debug > 0)) echo "<tr><td><b>MQTT RX</b></td></tr>";
-    $nn = $anzahl_zeilen - 3000;
+    $nn = 0;
+    if ((defined ('debug')) && (debug > 0)) echo "$nn  $anzahl_zeilen ($file)<br>";
+    if ($anzahl_zeilen > 3000) {
+      $nn = $anzahl_zeilen - 3000;
+    } else {
+      $nn = 0;
+    }  
 //[19.02.2026 12:39:24] /server/mqtt/heartbeat: 324973 seconds
 //[19.02.2026 12:39:22] /server/statethr/1: {"time":"12:39:21", "talk":"stop", "call":"DB0BLO", "tg":"13055", "server":"1"}
     While ($nn < $anzahl_zeilen) {
@@ -96,8 +106,8 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                   $array[$call]["talker"] = "2";
                   $array[$call]["dauer"] = 0;
                   $array[$call]["dauera"] = 0;
-                  $ts_start = $array[$call]["ts-start"];
-                  $time_1_start = $array[$call]["time_1"];
+                  $ts_start = $array[$call]["ts-start"] ?? 0; 
+                  $time_1_start = $array[$call]["time_1"] ?? 0;
 // komplettes qso, $call ändern um doppelte zu verhindern
                   $call = $call . "^" . $ts_start;
                   $array[$call]["time_1"] = $time_1_start;

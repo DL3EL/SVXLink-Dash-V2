@@ -23,20 +23,6 @@ echo '<span><b>APRS Monitor</b></span>'; // <br> ist hier nicht mehr nötig
 	$aprs_msg_avail = 0;
     }
 
-/*
-// 8.12.2025, jetzt wird die DAtei mit den aktuellsten EInträge zuerst geliefert. Das war mal anders....
-    $dx_max = 0;
-    foreach ($spotter as $dx_array) {
-	if ((defined ('debug')) && (debug > 2)) echo "($dx_max): " . $spotter[$dx_max]['spotted'] . "<br>";
-    ++$dx_max;
-    }
-    --$dx_max;
-    $nn = 30;
-//    $dx_max = 999;
-    $dx_min = $dx_max - $nn;
-    $dx = $dx_max;
-*/
-
     date_default_timezone_set('Europe/Berlin');
     if (file_exists($msg_datei  . ".neu")) {
 	unlink($msg_datei . ".neu");
@@ -141,7 +127,7 @@ echo '<fieldset>';
 
 ?>
 </center>
-</div><br></div>
+<!-- </div><br></div>-->
 <!-- </fieldset> -->
 
 

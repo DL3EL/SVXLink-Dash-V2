@@ -81,12 +81,12 @@ echo '<th width=100px>Callsign</th>';
 include_once "tgdb.php";    
 ?>
       <th width=100px>TG #</th>
-      <th width=30px> A </th>
+<!-- <th width=30px> A </th>  -->
       <th>TG Name</th>
     </tr>
 <?php
 $i = 0;
-for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
+for ($i = 0;  ($i <= 35); $i++) { //Last 35 calls
   if (isset($lastHeard[$i])) {
     $listElem = $lastHeard[$i];
     if ( $listElem[1] ) {
@@ -158,12 +158,13 @@ for ($i = 0;  ($i <= 20); $i++) { //Last 20 calls
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////      //echo "<td align=\"left\">&nbsp;<span style=\"color:#b5651d;font-weight:bold;\">$listElem[2]</span></td>";
       $tgnumber = substr($listElem[2],3);
       $name=isset($tgdb_array[$tgnumber])? $tgdb_array[$tgnumber] : '';
-      echo "<td align=\"left\">&nbsp;<span style=\"color:#b5651d;font-weight:bold;\">$tgnumber</span></td>";
+//      echo "<td align=\"left\">&nbsp;<span style=\"color:#b5651d;font-weight:bold;\">$tgnumber</span></td>";
+      echo "<td><button type=submit id=jumptoA name=jmptoA class=active_id value=\"$tgnumber\">$tgnumber</button></td>";
       //echo "<td><button type=submit id=jumptoM name=jmptoM class=monitor_id value=\"$listElem[2]\"><i class=\"material-icons\"style=\"font-size:12px;\">$listElem[3]</i></button></td>";
       //echo "<td onlick='monitorTmpTG(".$tgnumber.")'> M </a></td>";
       //echo "<td><button> T </button></td>";
 //      echo "<td><button type=submit id=jumptoA name=jmptoA class=active_id value=\"$listElem[2]\"><i class=\"material-icons\"style=\"font-size:12px;\">$listElem[4]</i></button></td>";
-      echo "<td><button type=submit id=jumptoA name=jmptoA class=active_id value=\"$listElem[2]\"><i class=\"material-icons\"style=\"font-size:15px;\">cell_tower</i></button></td>";
+//      echo "<td><button type=submit id=jumptoA name=jmptoA class=active_id value=\"$listElem[2]\"><i class=\"material-icons\"style=\"font-size:15px;\">cell_tower</i></button></td>";
       //$tgnumber = substr($listElem[2],3);
       //$name=$tgdb_array[$tgnumber];
 
