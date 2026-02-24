@@ -60,12 +60,13 @@ my $mqttdatei = $dir  . "mqtt.data";
 
 # init mqtt
 # Connect to broker
-
+my $mqtt_client_id = sprintf "%s%s", "DL3EL-Dashboard",time();;
+$ENV{MQTT_CLIENT_ID} = $mqtt_client_id;
 my $mqtt = Net::MQTT::Simple->new('FM-Funknetz.de');
     STDOUT->autoflush(1);
-    print "MQTT started mit Log: $logdatei um $log_time\n";
+    print "MQTT started mit Log: $logdatei um $log_time (ClientID:$mqtt_client_id)\n";
     $log_time = act_time();
-    $write2file = sprintf "[$log_time] DL3EL MQTT RCVR MQTT started\n";
+    $write2file = sprintf "[$log_time] DL3EL MQTT RCVR (ClientID:%s) MQTT started\n",$mqtt_client_id;
     print_file($logdatei,$write2file) if ($verbose >= 0);
  
 # Depending if authentication is required, login to the broker
