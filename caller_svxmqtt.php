@@ -38,6 +38,7 @@
         }
         if ($mqtt) {
             echo '<div id="svxmqtt" style = "margin-bottom:30px;">'."\n";
+            $svx_include = 1;
             include "svx2mqtt/index_neu.php";      
             $rate = 1000;
             $call_script = "svx2mqtt/index_neu.php";      
