@@ -25,23 +25,24 @@ if (session_status() === PHP_SESSION_NONE) {
       addsvxlog($logtext);
     }
 if (defined ('SVXMQTT_COLOR_active')) {
-  $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";
-} else {
-  $SVXMQTT_COLOR1_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
-  $SVXMQTT_COLOR2_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
-  $SVXMQTT_COLOR3_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
-  $svxmqtt_color_active = $SVXMQTT_COLOR2_active;
-}
+    $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";
+  } else {
+    $svxmqtt_color_active = "green";
+  }
 
-if (defined ('SVXMQTT_COLOR_passive')) {
-  $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;";
-} else {
-  $SVXMQTT_COLOR1_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:blue;color:white;font-weight:bold;font-size:14px;";
-  $SVXMQTT_COLOR2_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:green;color:white;font-weight:bold;font-size:14px;";
-  $SVXMQTT_COLOR3_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:silver;color:black;font-weight:bold;font-size:14px;";
-  $svxmqtt_color_passive = $SVXMQTT_COLOR3_passive;
-}
+  if (defined ('SVXMQTT_COLOR_passive')) {
+    $svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;";
+  } else {
+    $svxmqtt_color_passive = "blue";
+  }
 
+  if (defined ('SVXMQTT_COLOR_friends')) {
+    $svxmqtt_color_friends = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_friends . ";color:white;font-weight:bold;font-size:14px;";
+  } else {
+    $svxmqtt_color_friends = "green";
+  }
+
+// file with mqtt data
     $file = DL3EL_BASE . "svx2mqtt/mqtt.data";
     $content = file_get_contents($file);
     $zeilen_array = explode("\n", $content);
@@ -57,8 +58,27 @@ if (defined ('SVXMQTT_COLOR_passive')) {
     } else {
       $nn = 0;
     }  
-//[19.02.2026 12:39:24] /server/mqtt/heartbeat: 324973 seconds
-//[19.02.2026 12:39:22] /server/statethr/1: {"time":"12:39:21", "talk":"stop", "call":"DB0BLO", "tg":"13055", "server":"1"}
+
+    if (defined ('DL3EL_FRIENDS')) {
+      $friend_call_array = explode(",", DL3EL_FRIENDS);
+    } else {
+      $friend_call_array[0] = 0;
+    }    
+
+    if ((defined ('debug')) && (debug > 0)) echo "<tr><td><b>MQTT RX</b></td></tr>";
+    if ($anzahl_zeilen > 3000) {
+      $nn = $anzahl_zeilen - 3000;
+    } else {
+      $nn = 0;
+    }  
+//valid records
+//[19.02.2026 12:39:24] /server/mqtt/heartbeat: 324973 seconds^1771628950^
+//[19.02.2026 12:39:22] /server/statethr/1: {"time":"12:39:21", "talk":"stop", "call":"DB0BLO", "tg":"13055", "server":"1"}^1771628950^
+//[21.02.2026 00:09:10] /server/state/loginz: 507^1771628950^
+//[20.02.2026 17:38:28] DL3EL: MQTT Start^1771605508^
+//[21.02.2026 08:08:15] /server/mqtt/parrot/9990/analysis: {"tg": 9990, "callsign": "DO3FHS-APP", "timestamp": 1771535167.418658, "summary": {"avg_rms_db": -28.4, "max_peak_db": 0.0, "min_rms_db": -49.3, "max_rms_db": -2.1, "dynamics_db": 47.2, "clip_percent": 12.6, "silence_percent": 2.9, "total_frames": 579, "active_frames": 562, "duration_s": 11.6}, "recommendation": {"rating": 3, "rating_text": "\ud83d\udfe0 Grenzwertig", "level_status": "borderline", "message": "Clipping etwas hoch (13%).", "action": "Optional: TX-Pegel leicht reduzieren", "avg_rms_db": -28.4, "max_peak_db": 0.0, "clip_percent": 12.6, "meter_position": 72.0}}^1771657695^
+//[21.02.2026 08:08:15] /server/mqtt/parrot/9990/status: {"tg": 9990, "callsign": "", "status": "online", "timestamp": 1771558480.0964217}^1771657695^
+
     While ($nn < $anzahl_zeilen) {
       $line = $zeilen_array[$nn];
       if (strlen($line)) {
@@ -199,12 +219,27 @@ if (defined ('SVXMQTT_COLOR_passive')) {
           $call = substr($call, 0, $timestamp_start);
         }  
       }  
+
+      $color_friend = "";
+      foreach ($friend_call_array as $fcall) {
+// look for friends
+        trim($fcall);
+// add " " to the call for exact match
+        $fcall = $fcall . " ";
+        $ccall = substr($call,0,strlen($fcall)-1) . " ";
+        if ($ccall === $fcall) {
+          $color_friend =  $svxmqtt_color_friends;
+          if ((defined ('debug')) && (debug > 0)) echo "Friends check: $ccall === $fcall <br>";
+          break;
+        }
+      }
       if ($time_1) {
         if ((defined ('debug')) && (debug > 0)) {
           $debug = $tg . "/" . $ts_start . "/" . $mqtt_start_ts;
           $line = $act . "<tr style='height:24px;'><td>" . $call . "&nbsp;</td><td>" .  $debug . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $ts_start . "&nbsp;</td><td>" .  $time_2 . "&nbsp;[DA:" . $dauera . ", DP:" . $dauerp . "] </td></tr>";
         } else {
-          $line = $act . "<tr style='height:24px;'><td>" . $call . "&nbsp;</td><td>" .  $tg . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $time_1 . "&nbsp;</td><td>" .  $time_2 . "&nbsp;</td></tr>";
+//          $line = $act . "<tr style='height:24px;'><td>" . $call . "&nbsp;</td><td>" .  $tg . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $time_1 . "&nbsp;</td><td>" .  $time_2 . "&nbsp;</td></tr>";
+          $line = $act . "<tr style='height:24px;" . $color_friend . "'><td>" . $call . "&nbsp;</td><td>" .  $tg . "&nbsp;</td><td>"  .  $tgn . "&nbsp;</td><td>" .  $time_1 . "&nbsp;</td><td>" .  $time_2 . "&nbsp;</td></tr>";
         }    
         if (($act) && ($ts_start < $mqtt_start_ts)) {
             if ((defined ('debug')) && (debug > 0)) echo "unterdrückt (stop fehlt): $line</td></tr>";
@@ -218,7 +253,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
     krsort($array_time);
 	
 echo '<span style = "font-size:25px"> </span>';
-    echo '<span style = "font-weight:bold; font-size:15px;">FM-Funknetz Live Activity</span>';
+    echo '<span style = "font-weight:bold; font-size:15px;"><a href="https://dashboard.fm-funknetz.de/" target="fmn">FM-Funknetz Live Activity</a></span>';
     if ((defined ('debug')) && (debug > 0)) echo "Ich bin gerade hier: " . getcwd();
 
     echo '<form method="post">';
@@ -239,22 +274,8 @@ echo '<span style = "font-size:25px"> </span>';
         echo substr($line,1);
       }  
     }
-//    echo '</table>';
-//    echo "<br><br>";
     echo "<tr> <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
     echo "<tr> <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;zuletzt aktiv</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-//    echo '<table style = "width: 500px; text-align: left; margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
-/*
-    echo '<thead>';
-    echo '<tr style="height:24px;">';
-    echo '<th style="width:22%;">&nbsp;&nbsp;Call</th>';
-    echo '<th style="width:12%">TG</th>';
-    echo '<th style="width:40%">TG Name</th>';
-    echo '<th style="width:12%">von</th>';
-    echo '<th style="width:13%">bis</th>';
-    echo '</tr>';
-    echo '</thead>';
-*/
     $nn = 0;
     foreach ($array_time as $line) {
       if (substr($line,0,1) === "0") { 
@@ -263,6 +284,5 @@ echo '<span style = "font-size:25px"> </span>';
       }  
       if ($nn > 30) break;
   }
-//    echo "<tr> <td>&nbsp;</td></tr>";
 ?>
 </table></form>
