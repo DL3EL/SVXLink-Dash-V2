@@ -103,6 +103,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined('DL3EL_FMFUNKNETZ')) && (DL3EL_FMFUNKNETZ === "yes")) {
 	    echo '<a href="./caller_extern.php?id=https://stream.fm-funknetz.de" style = "color: #0000ff;"  target="_top">Voice FMN | </a> ';
 	}    
+// FM-Funknetz WebChat
+	if ((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "yes")) {
+	    echo '<a href="./caller_extern.php?id=https://dashboard.fm-funknetz.de/chat_jd10/index.php?id=' . $callsign . '" style = "color: #0000ff;"  target="_top">FMN WebChat | </a> ';
+	}    
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
 	if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {

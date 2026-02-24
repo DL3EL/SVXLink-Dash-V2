@@ -944,12 +944,14 @@ sub read_config {
 			close INPUT;
 # ggf. prüfen, ob der $aprs_follow der Richtige ist
 			($aprs_lat,$aprs_lon,$locator_file,$aprs_follow_file) = split(/\^/, $data);
-			if ($aprs_follow_file ne $aprs_follow) {
-				$write2file = sprintf "[$log_time] wrong Follower %s found with position %s %s (%s is configured) - not used\n", $aprs_follow_file,$aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
-			} else {
-				$write2file = sprintf "[$log_time] Follower %s found with position %s %s [$data]\n", $aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+			if (defined $aprs_follow_file) {
+				if ($aprs_follow_file ne $aprs_follow) {
+					$write2file = sprintf "[$log_time] wrong Follower %s found with position %s %s (%s is configured) - not used\n", $aprs_follow_file,$aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+				} else {
+					$write2file = sprintf "[$log_time] Follower %s found with position %s %s [$data]\n", $aprs_follow,$aprs_lat,$aprs_lon if ($verbose >= 0);
+				}	
+				print_file($logdatei,$write2file) if ($verbose >= 0);
 			}	
-			print_file($logdatei,$write2file) if ($verbose >= 0);
 		}	
 	} else {
 		if ((($aprs_lat ne "5001.00N") && ($aprs_lon ne "00800.00E")) || (($aprs_lat ne "") && ($aprs_lon ne ""))) {

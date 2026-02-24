@@ -15,6 +15,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
     $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
     if (!strlen($mqtt_script)) {
+      start_mqtt();
+/*
       $debug = "";
       if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
       $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $debug . " >/dev/null &";
@@ -23,6 +25,7 @@ if (session_status() === PHP_SESSION_NONE) {
       echo "$output $retval<br>";
       $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
       addsvxlog($logtext);
+*/
     }
 if (defined ('SVXMQTT_COLOR_active')) {
     $svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;";

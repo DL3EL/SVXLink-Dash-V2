@@ -1240,14 +1240,26 @@ echo "<br>Stat: $cmd";
     }
 
     function start_mqtt() {
+      $svxConfigFile = SVXCONFPATH . SVXCONFIG;
+      $callsign = "N0Call";
+      if (fopen($svxConfigFile,'r')) { 
+        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+        if (isset($svxconfig['ReflectorLogic'])) {
+          $section = 'ReflectorLogic';
+        } else {
+          $section = 'SimplexLogic';
+        }	 
+        $callsign = isset($svxconfig[$section]['CALLSIGN']) ? $svxconfig[$section]['CALLSIGN'] : 'NOCALL';
+      }  
       $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
       if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
         $debug = "";
         if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
-        $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $debug . " >/dev/null &";
+        $mqttid = "c=" . $callsign . " ";
+        $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $mqttid . $debug . " >/dev/null &";
         echo "Starting MQTT <br>" . $cmd . "<br>";
-        exec($cmd, $output, $retval);
         $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
+        exec($cmd, $output, $retval);
         addsvxlog($logtext);
       }
     }

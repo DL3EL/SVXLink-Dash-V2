@@ -16,6 +16,7 @@ if($@) {
 # Variables:
 my $dir = "";
 my $conf = "";
+my $callsign = "";
 my $entry;
 my @array;
 my $login = "";
@@ -50,9 +51,13 @@ my $mqtt_exit_datei = $dir  . "mqtt.exit";
 	    print "Debug On, Level: $verbose\n" if $verbose;
 	} 
 	if (substr($a,0,2) eq "d=") {
-	    $dir = substr($a,2,length($a-2));
+	    $dir = substr($a,2,length($a)-2);
 	    $ dir = $dir . "/dl3el";
 	    print "dir: $dir\n" if $verbose;
+	}
+	if (substr($a,0,2) eq "c=") {
+	    $callsign = substr($a,2,length($a)-2);
+	    print "db callsign: $callsign\n" if $verbose;
 	}
     }
 
@@ -60,7 +65,7 @@ my $mqttdatei = $dir  . "mqtt.data";
 
 # init mqtt
 # Connect to broker
-my $mqtt_client_id = sprintf "%s%s", "DL3EL-Dashboard",time();;
+my $mqtt_client_id = sprintf "%s-%s", $callsign,time();;
 $ENV{MQTT_CLIENT_ID} = $mqtt_client_id;
 my $mqtt = Net::MQTT::Simple->new('FM-Funknetz.de');
     STDOUT->autoflush(1);
