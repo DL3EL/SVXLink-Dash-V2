@@ -18,8 +18,9 @@ include_once "functions.php";
          if (file_exists('/etc/systemd/system/svxlink-node.service')) {
             $dbversion = $dbversion . "(s)(a)";
          }  
-         $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
-         if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+         if (file_exists("/usr/local/bin/mqtt-simple")) {
+            $dbversion = $dbversion . "(m)";
+         } else {
             $dbversion = $dbversion . "(m)";
          }
          $dbversion = " db=\"" . $dbversion . "\"";
