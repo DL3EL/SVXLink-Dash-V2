@@ -113,6 +113,13 @@ if (isset($_POST['btnRestartAPRS'])) {
         addsvxlog($logtext);
     }  
 
+if (isset($_POST['btnRestartMQTT'])) {
+        $command = "sudo killall fmn-mqtt.pl 2>&1";
+        exec($command,$screen,$retval);
+        $logtext =  "MQTT Dienst gestoppt, Restart automatisch durch Dashboard\n";
+        addsvxlog($logtext);
+    }  
+
 if (isset($_POST['btnRestart']))
     {
 
@@ -244,6 +251,10 @@ if (isset($_POST['btnDashUpdate']))
 // if this file exists, aprs task will terminate, status.php will start it again
                 $aprs_exit = DL3EL . "/aprs.exit";
                 touch($aprs_exit);
+// kill fmn-mqtt.pl, status.php will start it again
+                $command = "sudo killall fmn-mqtt.pl 2>&1";
+                exec($command,$screen,$retval);
+                
         }
         // Display in textarea           
         addsvxlog($logtext);
@@ -283,6 +294,8 @@ if (isset($_POST['btnrstc710']))
 	<!--button name="btnLcd" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart Lcd Service</button>
 	<BR-->
 	<button name="btnRestartAPRS" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart APRS Task</button>
+        <br>
+	<button name="btnRestartMQTT" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart MQTT Task</button>
         <br>
 	<button name="btnRestart" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart Device</button>
         <br>
