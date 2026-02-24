@@ -198,17 +198,17 @@ if (session_status() === PHP_SESSION_NONE) {
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
 	if ($knowledge == "Expert") {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Full</b> Edit</a> | ';
-	    echo '<a href="./edit.php?file=' . SVXCONFPATH . SVXCONFIG . '" style = "color: black;" id="svxlink">SVXLink</a> | ';
+	    echo '<a href="./caller.php?file=' . SVXCONFPATH . SVXCONFIG . '" style = "color: black;" id="svxlink">SVXLink</a> | ';
 	    if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
-		echo '<a href="./edit.php?file=' . SVXCONFPATH . 'svxreflector.conf" style = "color: black;" id="svxlink">SVXRef</a> | ';
+		echo '<a href="./caller.php?file=' . SVXCONFPATH . 'svxreflector.conf" style = "color: black;" id="svxlink">SVXRef</a> | ';
 	    }
-	    echo '<a href="./edit.php?file=' . MODULEPATH . ECHOLINKCONFIG . '" style = "color: black;" id="echolink">EchoLink</a> | ';
-	    echo '<a href="./edit.php?file=' . MODULEPATH . METARINFO . '" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
-	    echo '<a href="./edit.php?file=' . SVXCONFPATH . 'node_info.json" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
+	    echo '<a href="./caller.php?file=' . MODULEPATH . ECHOLINKCONFIG . '" style = "color: black;" id="echolink">EchoLink</a> | ';
+	    echo '<a href="./caller.php?file=' . MODULEPATH . METARINFO . '" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
+	    echo '<a href="./caller.php?file=' . SVXCONFPATH . 'node_info.json" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
 	    if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-		echo '<a href="./edit.php?file=' . DL3EL . '/aprs-is-msg.conf" style = "color: black;" id="aprs">aprs.conf</a> | ';
+		echo '<a href="./caller.php?file=' . DL3EL . '/aprs-is-msg.conf" style = "color: black;" id="aprs">aprs.conf</a> | ';
 	    }
-	    echo '<a href="./edit.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
+	    echo '<a href="./caller.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
 	    if ((file_exists('/etc/default/shellinabox')) && ((defined('DL3EL_SSH')) && (strncmp(DL3EL_SSH, "yes", 3) === 0))) {
 		$getPortCommand = "grep -m 1 'SHELLINABOX_PORT=' /etc/default/shellinabox | awk -F '=' '/SHELLINABOX_PORT=/ {print $2}'";
 		$shellPort = exec($getPortCommand);    
@@ -218,7 +218,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }	
 //	    echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">Amixer</a> | ';
 	    if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
-		echo '<a href="./edit.php?file=TclVoiceMail.conf" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
+		echo '<a href="./caller.php?file=TclVoiceMail.conf" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
 	    }
 	} else {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Edit</a> | ';
@@ -252,17 +252,17 @@ if (session_status() === PHP_SESSION_NONE) {
 //	    echo '<a href="./aprs.php" style = "color: black;">APRS Monitor</a> | ';
 //	    echo '<a href="./caller.php?id=aprs" style = "color: black;">APRS Monitor</a> | ';
 	    echo '<a href="./caller.php?id=aprs0" style = "color: black;">APRS Monitor</a> | ';
-	    echo '<a href="./edit.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
-//	    echo '<a href="./edit.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
+	    echo '<a href="./caller.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
+//	    echo '<a href="./caller.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
 	    if (file_exists(DL3EL.'/aprs-is-mqtt.msg')) {
-		echo '<a href="./edit.php?file=logb" style = "color: black;" id="log">APRS MQTT | </a> ';
+		echo '<a href="./caller.php?file=logb" style = "color: black;" id="log">APRS MQTT | </a> ';
 	    }
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
-	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
-	    echo '<a href="./edit.php?file=ref" style = "color: black;" id="log">R-Log</a> ';
+	    echo '<a href="./caller.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
+	    echo '<a href="./caller.php?file=ref" style = "color: black;" id="log">R-Log</a> ';
 	} else {
-	    echo '<a href="./edit.php?file=log" style = "color: black;" id="log">SVX Log</a> ';
+	    echo '<a href="./caller.php?file=log" style = "color: black;" id="log">SVX Log</a> ';
 	}
 	if (defined('DL3EL_EXTERN1'))  {
 	    if (defined('DL3EL_EXTERN1_NAME'))  {
@@ -318,16 +318,16 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> | <b>Full</b> Edit</a> | ';
-	    echo '<a href="./edit.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a> ';
+	    echo '<a href="./caller.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector2.conf')) {
-	    echo '| <a href="./edit.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a> ';
+	    echo '| <a href="./caller.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector3.conf')) {
-	    echo '| <a href="./edit.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a> ';
+	    echo '| <a href="./caller.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector4.conf')) {
-	    echo '| <a href="./edit.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a> ';
+	    echo '| <a href="./caller.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a> ';
 	}
         if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
             if (file_exists('./statistic.php')) {

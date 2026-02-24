@@ -1028,6 +1028,10 @@ function display_config($config) {
 	    if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
         $dbversion = $dbversion . "(a)";
       }  
+      $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+      if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+        $dbversion = $dbversion . "(m)";
+      }
       if (!strlen($fmnetwork)) {
         $fmnetwork = getfmnetwork();
       }     
@@ -1235,15 +1239,14 @@ echo "<br>Stat: $cmd";
       return $fmnetwork;
     }
 
-    function start_mqtt () {
+    function start_mqtt() {
       $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
       if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
         $debug = "";
         if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
         $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $debug . " >/dev/null &";
-        echo "Starting MQTT " . $cmd . "<br>";
+        echo "Starting MQTT <br>" . $cmd . "<br>";
         exec($cmd, $output, $retval);
-        echo "$output $retval<br>";
         $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
         addsvxlog($logtext);
       }

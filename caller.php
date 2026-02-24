@@ -5,73 +5,86 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once "include/settings.php";
 include_once "include/page_top.php";
 
-///// aus index.php
-    echo '<table style = "margin-right:20px;border:none;border-collapse:collapse;background-color:#f1f1f1;">';
-    echo '<tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:none;background-color:#f1f1f1;">';
-    echo '<div class="nav" style = "margin-bottom:1px;margin-top:10px;">'."\n";
+echo '<table style="margin-right:20px; border:none; border-collapse:collapse; background-color:#f1f1f1;">';
+echo '<tr style="border:none; background-color:#f1f1f1;">';
 
-    echo '<script type="text/javascript">'."\n";
-    echo 'function reloadStatusInfo(){'."\n";
-    echo '$("#statusInfo").load("include/status.php",function(){ setTimeout(reloadStatusInfo,3000) });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadStatusInfo,3000);'."\n";
-    echo '$(window).trigger(\'resize\');'."\n";
-    echo '</script>'."\n";
-    echo '<div id="statusInfo" style = "margin-bottom:30px;">'."\n";
-    include_once "include/status.php";
-    echo '</div>'."\n";
-    echo '</div>'."\n";
-    echo '</td>'."\n";
-////
+// LINKER BEREICH (Status)
+echo '<td width="200px" valign="top" class="hide" style="height:auto; border:none; background-color:#f1f1f1; width:100%;">';
+    echo '<div id="statusInfo" style="margin-bottom:30px;">';
+        include_once "include/status.php";
+    echo '</div>';
+    
+    // Script für Status (Intervall)
+    echo '<script type="text/javascript">
+        function reloadStatusInfo(){
+            $("#statusInfo").load("include/status.php", function(){ 
+                setTimeout(reloadStatusInfo, 3000); 
+            });
+        }
+        setTimeout(reloadStatusInfo, 3000);
+    </script>';
+echo '</td>';
+
+// RECHTER BEREICH (Content)
+echo '<td valign="top" style="height:auto; border:none; background-color:#f1f1f1;">';
+    
+    // Ein Wrapper-Div innerhalb der Zelle sorgt für die Ränder (10px links und rechts)
+    echo '<div style="padding-left:10px; padding-right:10px; width: auto;">';
+        
+        // Dies ist der Ziel-Container für den Reload
+        echo '<div id="content_area" style="display: block;">';
+            if (isset($_GET['file']) && !empty($_GET['file'])) {
+                $file = $_GET['file']; 
+                $call_script = "./edit/index.php?file=" . $file;
+                echo '<object style="outline:none; width:950px; height:900px;" data="' . $call_script . '"></object>';
+            } else {    
+                $call_script = $_GET['id'] . ".php";
+            
+                if (($call_script === "amixer/index.php") || ($call_script === "power/index.php")) {
+                    echo '<object style="outline:none; width:600px; height:900px;" data="' . $call_script . '"></object>';
+                } else {    
+                    // Falls das inkludierte File selbst Tabellen hat, 
+                    // verhindert das umschließende Div, dass diese am Rand kleben
+                    include $call_script;
+                }
+            }
+        echo '</div>'; // Ende #content_area
+        
+    echo '</div>'; // Ende Padding-Wrapper
+echo '</td>';
 /*
-    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;">';
-    echo '<tr style = "border:none;background-color:#f1f1f1;">';
-    echo '<td width="200px" valign="top" class="hide" style = "height:auto;border:0;background-color:#f1f1f1;">';
-    echo '<div class="nav" style = "margin-bottom:1px;margin-top:10px;">'."\n";
-
-    echo '<script type="text/javascript">'."\n";
-    echo 'function reloadStatusInfo(){'."\n";
-    echo '  $("#statusInfo").load("include/status.php",function(){ setTimeout(reloadStatusInfo,3000) });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadStatusInfo,3000);'."\n";
-    echo '$(window).trigger(\'resize\');'."\n";
-    echo '</script>'."\n";
-    echo '<div id="statusInfo" style = "margin-bottom:30px;">'."\n";
-    include_once "include/status.php";
-    echo '</div>'."\n";
-    echo '</div>'."\n";
-    echo '</td>'."\n";
-*/    
-
-    echo '<div class="content">'."\n";
-    echo '<td valign="top" style = "margin-right=10px;height:auto;border:none;  background-color:#f1f1f1;">';
-    echo '<div id="content" style = "margin-bottom:00px;">'."\n";
-//echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:15px;margin-left:10px;margin-right:20px;font-size:14px; border:none;">';
-
-    $call_script = $_GET['id'] . ".php";
-    if ($call_script === "amixer/index.php") {
-        echo '<object style="outline:none; width:600px; height:900px; justify-content: left;" data=' . $call_script . '></object>';
-    } else {    
-        include $call_script;
-    }
-//
+// RECHTER BEREICH (Content)
+echo '<td valign="top" style="height:auto; border:none; background-color:#f1f1f1; padding-left:10px;margin-top:1px;margin-right:10px;margin-left:10px;margin-bottom:0px;">';
+    // Dies ist der Ziel-Container für den Reload
+    echo '<div id="content_area">';
+        $call_script = $_GET['id'] . ".php";
+        
+        if ($call_script === "amixer/index.php") {
+            echo '<object style="outline:none; width:600px; height:900px;" data="' . $call_script . '"></object>';
+        } else {    
+            include $call_script;
+        }
+    echo '</div>';
+*/
+    // Script für den Seiten-Content (nur wenn refresh gesetzt ist)
     if (isset($_GET['refresh']) && !empty($_GET['refresh'])) {
-        $rate = $_GET['refresh'] * 1000;
-        echo '<script type="text/javascript">'."\n";
-        echo 'function reloadCurrPage(){'."\n";
-        echo '  $("#content").load("' . $call_script . '",function(){ setTimeout(reloadCurrPage,' . $rate . ') });'."\n";
-        echo '}'."\n";
-        echo 'setTimeout(reloadCurrPage,' . $rate . ');'."\n";
-        echo '$(window).trigger(\'resize\');'."\n";
-        echo '</script>'."\n";
-    }    
-//	echo '<object style="outline:none; width:600px; height:900px; justify-content: left;" data=' . $call_script . '></object>';
-//
-//echo '</fieldset>';
-    echo '</div></center>'."\n";
-    echo '</td>';
+        $rate = intval($_GET['refresh']) * 1000;
+        echo '<script type="text/javascript">
+            function reloadCurrPage(){
+                // Wir laden den Inhalt in #content_area
+                $("#content_area").load("' . $call_script . '", function(){ 
+                    setTimeout(reloadCurrPage, ' . $rate . '); 
+                });
+            }
+            setTimeout(reloadCurrPage, ' . $rate . ');
+        </script>';
+    }
+echo '</td>';
+// --- 3. GANZ RECHTER BEREICH (MQTT / Caller) ---
+echo '<td valign="top" style="width:250px; border:none; background-color:#f1f1f1; padding-left:10px;">';
     include_once "caller_svxmqtt.php"; 
-    echo '</tr></table>';
+echo '</td>';
+echo '</tr>';
+echo '</table>';
 include_once "include/page_bottom.php"; 
 ?>
