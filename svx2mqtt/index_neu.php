@@ -2,12 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-//include_once "../include/settings.php";
-include_once $_SERVER['DOCUMENT_ROOT'] . '/include/settings.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/include/tgdb.php';
-//include_once "../include/tgdb.php";    
+include_once "../include/settings.php";
+include_once "../include/tgdb.php";    
 
-//echo "Ich bin gerade hier: " . getcwd();
 
     if ($_SESSION['auth'] !== 'AUTHORISED') {
         echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
@@ -220,6 +217,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
 	
 echo '<span style = "font-size:25px"> </span>';
     echo '<span style = "font-weight:bold; font-size:15px;">FM-Funknetz Live Activity</span>';
+    if ((defined ('debug')) && (debug > 0)) echo "Ich bin gerade hier: " . getcwd();
 
     echo '<form method="post">';
     echo '<table style = "width: 500px; text-align: left; margin-top: 5px; margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
