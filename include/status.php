@@ -18,6 +18,10 @@ include_once "functions.php";
          if (file_exists('/etc/systemd/system/svxlink-node.service')) {
             $dbversion = $dbversion . "(s)(a)";
          }  
+         $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+         if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+            $dbversion = $dbversion . "(m)";
+         }
          $dbversion = " db=\"" . $dbversion . "\"";
          /* Radio */
          $radioinfo = "";
@@ -68,7 +72,12 @@ include_once "functions.php";
          echo '<a href="./caller.php?id=aprs" class="blink-msg" id="msg">!!! Neue APRS Nachricht !!!</a><br>';
       }   
 	} 
-
+   $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+   if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+      if ((!defined('DL3EL_MQTT')) || ((defined('DL3EL_MQTT')) && (DL3EL_MQTT !== "no"))) {
+         start_mqtt();
+      }   
+   }
 
 echo '<div style = "width:180px;"><span style = "font-weight: bold;font-size:14px;">SVXLink Info</span></div>';
 //echo '<fieldset style = "width:170px;background-color:#e8e8e8e8;margin-right:3px;font-size:12px;border-radius:10px;">';
