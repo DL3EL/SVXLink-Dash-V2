@@ -10,5 +10,7 @@ include_once "functions.php";
       addlog ("L",$logtext);
       file_put_contents($tgdb_File, $content);
       include_once DL3EL_BASE . "include/tg_ext.php";
+	echo '<a href="../index.php" style = "color: #000000;" target="_top">zurück zum Dashboard</a>';
+
 ?>
 
