@@ -130,7 +130,7 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a href="./network.php" style = "color: #000000;" target="_top">Network</a> | ';
 	}	
 	if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
-	    echo '<a href="./mobile/index.php" style = "color: #000000;" target="_top">mobile</a> ';
+	    echo '| <a href="./mobile/index.php" style = "color: #000000;" target="_top">mobile</a> ';
 	}    
 
 	if ($_SESSION['auth'] === "AUTHORISED") {
@@ -244,7 +244,8 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a href="./caller.php?id=amixer/index" style = "color: black;" id="amixer">AMixer</a> | ';
 	    }
 	}
-	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
+//	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
+	echo '<a href="./caller.php?id=power/index" style = "color: green;">Power</a></p>';
 	echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Display:</b></a> ';
 //	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html style = "color: #0000ff;">Hilfe</a> | ';
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
