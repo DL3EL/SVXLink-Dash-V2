@@ -1,3 +1,15 @@
+<style>
+a.hreflink:link,
+a.hreflink:visited {
+    color: black;
+    text-decoration: underline;
+}
+
+a.hreflink:hover {
+    color: #009900;	
+    text-decoration: underline;
+}
+</style>
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -53,20 +65,20 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
     } 	
     if ($show_top_menu) {
-	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> | ';
+	echo '<a class="hreflink" href="./index.php" target="_top">Dashboard</a> | ';
 //	echo '<a href="./tg.php" style = "color: #000000;">Talk Groups</a> | ';
-	echo '<a href="./caller.php?id=include/tg" style = "color: #000000;">Talk Groups</a> | ';
+	echo '<a class="hreflink" href="./caller.php?id=include/tg" ">Talk Groups</a> | ';
 
 
 	if ((defined('DL3EL_LIVEDB')) && (DL3EL_LIVEDB === "top")) {
 	    if (defined('DL3EL_MQTT')) {
 		if (DL3EL_MQTT === "no") {
-		    echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
+		    echo '<a class="hreflink" href="./svx2mqtt.php">LIVE DB</a> | ';
 		} else {
-		    echo '| <a href="./caller.php?id=svx2mqtt/index_neu&refresh=1" style = "color: #0000ff;" target="_top">LIVE DB</a> ';
+		    echo '| <a class="hreflink" href="./caller.php?id=svx2mqtt/index_neu&refresh=1">LIVE DB</a> ';
 		}    
 	    } else {
-		echo '<a href="./svx2mqtt.php" style = "color: #0000ff;">LIVE DB</a> | ';
+		echo '<a class="hreflink" href="./svx2mqtt.php">LIVE DB</a> | ';
 	    }
 	}    
 	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
@@ -76,13 +88,13 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 //	echo '<a href="./monitor.php" style = "color: crimson;" id="log" target="_top">MonitorCalls0 | </a> ';
 //	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;" target="_top">Echolink0</a> | ';
-	echo '<a href="./caller.php?id=echolink_dl3el0" style = "color: #0000ff;" target="_top">Echolink</a> | ';
+	echo '<a class="hreflink" href="./caller.php?id=echolink_dl3el0" >Echolink</a> | ';
 //	echo '<a href="./relais.php" style = "color: #0000ff;" target="_top">FM Relais</a> | ';
-	echo '<a href="./caller.php?id=relais0" style = "color: #0000ff;" >FM Relais</a> | ';
+	echo '<a class="hreflink" href="./caller.php?id=relais0" " >FM Relais</a> | ';
 
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 //	    echo '<a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> | ';
-	    echo '<a href="./caller.php?id=include/svxdxc&refresh=15" style = "color: #0000ff;" target="_top">DX</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?id=include/svxdxc&refresh=15" >DX</a> | ';
 ////	    echo '<a href="./caller_refresh.php?id=include/svxdxc" style = "color: #0000ff;" target="_top">DX_R</a> | ';
 	}    
 	if (!defined('DL3EL_OPENHAMCLOCK')) {
@@ -93,53 +105,53 @@ if (session_status() === PHP_SESSION_NONE) {
 
 	if ($openhamclock !== "no") {
 	    if ((defined('DL3EL_OPENHAMCLOCK_TAB')) && (DL3EL_OPENHAMCLOCK_TAB === "new")) {
-		echo '<a href="' . $openhamclock . '" style = "color: #0000ff;" target="OHC" rel="noopener noreferrer">OHC | </a> ';
+		echo '<a class="hreflink" href="' . $openhamclock . '" target="OHC" rel="noopener noreferrer">OHC | </a> ';
 	    } else{
-		echo '<a href="./caller_extern.php?id=' . $openhamclock . '" style = "color: #0000ff;">OHC | </a> ';
+		echo '<a class="hreflink" href="./caller_extern.php?id=' . $openhamclock . '" ">OHC | </a> ';
 	    }    
 	}    
 	if (defined('DL3EL_OPENWEBRX')) {
-	    echo '<a href="./caller_extern.php?id=' . DL3EL_OPENWEBRX . '" style = "color: #0000ff;"  Starget="_top">OWR | </a> ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_OPENWEBRX . '" >OWR | </a> ';
 	}    
 	if ((defined('DL3EL_FMFUNKNETZ')) && (DL3EL_FMFUNKNETZ === "yes")) {
-	    echo '<a href="./caller_extern.php?id=https://stream.fm-funknetz.de" style = "color: #0000ff;"  target="_top">Voice FMN | </a> ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://stream.fm-funknetz.de" >Voice FMN | </a> ';
 	}    
 // FM-Funknetz WebChat
 	if ((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "yes")) {
-	    echo '<a href="./caller_extern.php?id=https://dashboard.fm-funknetz.de/chat_jd10/index.php?id=' . $callsign . '" style = "color: #0000ff;"  target="_top">FMN WebChat | </a> ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://dashboard.fm-funknetz.de/chat_jd10/index.php?id=' . $callsign . '" >FMN WebChat | </a> ';
 	}    
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
 	if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
             $cubeip = str_replace(' ', '<br />', exec('hostname -I | awk \'{print $1}\''));
 	    $cubeip = "http://" . $cubeip . ":8081";
-	    echo '<a href="./caller_extern.php?id=' . $cubeip . '" style = "color: #0000ff;"  Starget="_top">SVXCube | </a> ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=' . $cubeip . '" >SVXCube | </a> ';
 	} else {
 	    if (defined('DL3EL_SVXCUBE'))  {
-		echo '<a href="./caller_extern.php?id=' . DL3EL_SVXCUBE . '" style = "color: #0000ff;"  Starget="_top">SVXCube | </a> ';
+		echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_SVXCUBE . '" >SVXCube | </a> ';
 	    }    
 	}    
-	echo '<a href="./config_backup.php" style = "color: #000000;" target="_top">Backup/Restore</a> ';
+	echo '<a class="hreflink" href="./config_backup.php" >Backup/Restore</a> ';
     } else {
-	echo '<a href="./index.php" style = "color: #000000;" target="_top">Dashboard</a> ';
+	echo '<a class="hreflink" href="./index.php" >Dashboard</a> ';
 	if ((defined('DL3EL_DXCLUSTER')) && (DL3EL_DXCLUSTER === "yes")) {
 //	    echo '| <a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> ';
-	    echo '| <a href="./caller.php?id=include/svxdxc&refresh=15" style = "color: #0000ff;" target="_top">DX</a> | ';
+	    echo '| <a class="hreflink" href="./caller.php?id=include/svxdxc&refresh=15" >DX</a> | ';
 	}    
     }   
 ?>
 <?php
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
-		echo '<a href="./wifi.php" style = "color: #000000;" target="_top">| Wifi</a> | ';
-		echo '<a href="./network.php" style = "color: #000000;" target="_top">Network</a> | ';
+		echo '<a class="hreflink" href="./wifi.php" >| Wifi</a> | ';
+		echo '<a class="hreflink" href="./network.php" >Network</a> | ';
 	}	
 	if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
-	    echo '| <a href="./mobile/index.php" style = "color: #000000;" target="_top">mobile</a> ';
+	    echo '| <a class="hreflink" href="./mobile/index.php" >mobile</a> ';
 	}    
 
 	if ($_SESSION['auth'] === "AUTHORISED") {
-	    echo '<a href="./editor.php?id=log" style = "color: crimson;" id="log">| Log </a> ';
+	    echo '<a class="hreflink" href="./editor.php?id=log" id="log">| Log </a> ';
 	}
 ?>
 <?php
@@ -172,14 +184,14 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}
 	if ($show_auth) {
-	    echo '<a href="./authorise.php" style = "color: crimson;"> | Authorise</a>';
+	    echo '<a class="hreflink" href="./authorise.php" > | Authorise</a>';
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
-	    echo '<a href="/DVSwitch/index.php" style = "color: #0000ff;"> | DVS</a></p>';
+	    echo '<a class="hreflink" href="/DVSwitch/index.php" > | DVS</a></p>';
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 //	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
-	    echo '<a href="./caller.php?id=/" style = "color: #0000ff;" >| Reflector</a></p>';
+	    echo '<a class="hreflink" href="./caller.php?id=/" >| Reflector</a></p>';
 	}
 	echo '</div>';
 	echo '<div id="full-edit-links"  align=center>';
@@ -207,71 +219,71 @@ if (session_status() === PHP_SESSION_NONE) {
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
 	if ($knowledge == "Expert") {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Full</b> Edit</a> | ';
-	    echo '<a href="./caller.php?file=' . SVXCONFPATH . SVXCONFIG . '" style = "color: black;" id="svxlink">SVXLink</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . SVXCONFPATH . SVXCONFIG . '" id="svxlink">SVXLink</a> | ';
 	    if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
-		echo '<a href="./caller.php?file=' . SVXCONFPATH . 'svxreflector.conf" style = "color: black;" id="svxlink">SVXRef</a> | ';
+		echo '<a class="hreflink" href="./caller.php?file=' . SVXCONFPATH . 'svxreflector.conf" id="svxlink">SVXRef</a> | ';
 	    }
-	    echo '<a href="./caller.php?file=' . MODULEPATH . ECHOLINKCONFIG . '" style = "color: black;" id="echolink">EchoLink</a> | ';
-	    echo '<a href="./caller.php?file=' . MODULEPATH . METARINFO . '" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
-	    echo '<a href="./caller.php?file=' . SVXCONFPATH . 'node_info.json" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . MODULEPATH . ECHOLINKCONFIG . '" id="echolink">EchoLink</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . MODULEPATH . METARINFO . '" id="metarinfo">MetarInfo</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . SVXCONFPATH . 'node_info.json" class="hreflink" id="nodeInfo">NodeInfo</a> | ';
 	    if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-		echo '<a href="./caller.php?file=' . DL3EL . '/aprs-is-msg.conf" style = "color: black;" id="aprs">aprs.conf</a> | ';
+		echo '<a class="hreflink" href="./caller.php?file=' . DL3EL . '/aprs-is-msg.conf" id="aprs">aprs.conf</a> | ';
 	    }
-	    echo '<a href="./caller.php?file=' . DL3EL_BASE . 'include/config.php" style = "color: black;" id="configphp">config.php</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . DL3EL_BASE . 'include/config.php" id="configphp">config.php</a> | ';
 	    if ((file_exists('/etc/default/shellinabox')) && ((defined('DL3EL_SSH')) && (strncmp(DL3EL_SSH, "yes", 3) === 0))) {
 		$getPortCommand = "grep -m 1 'SHELLINABOX_PORT=' /etc/default/shellinabox | awk -F '=' '/SHELLINABOX_PORT=/ {print $2}'";
 		$shellPort = exec($getPortCommand);    
 		if ($shellPort == 4200) {
-		    echo '<a href="./ssh.php" style = "color: black;">SSH</a> | ';
+		    echo '<a class="hreflink" href="./ssh.php" >SSH</a> | ';
 		}
 	    }	
 //	    echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">Amixer</a> | ';
 	    if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
-		echo '<a href="./caller.php?file=TclVoiceMail.conf" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
+		echo '<a class="hreflink" href="./caller.php?file=TclVoiceMail.conf" id="tclvoicemail">TclVoiceMail</a> | ';
 	    }
 	} else {
-	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;">Edit</a> | ';
-	    echo '<a href="./editor.php?id=svxlink" style = "color: black;" id="svxlink">SVXLink</a> | ';
-	    echo '<a href="./editor.php?id=echolink" style = "color: black;" id="echolink">EchoLink</a> | ';
-	    echo '<a href="./editor.php?id=metarinfo" style = "color: black;" id="metarinfo">MetarInfo</a> | ';
-	    echo '<a href="./editor.php?id=nodeInfo" style = "color: black;" id="nodeInfo">NodeInfo</a> | ';
+	    echo '<a style = "padding-right: 5px; text-align: right; <a style = "color: black;">Edit</a> | ';
+	    echo '<a class="hreflink" href="./editor.php?id=svxlink" id="svxlink">SVXLink</a> | ';
+	    echo '<a class="hreflink" href="./editor.php?id=echolink" id="echolink">EchoLink</a> | ';
+	    echo '<a class="hreflink" href="./editor.php?id=metarinfo" id="metarinfo">MetarInfo</a> | ';
+	    echo '<a class="hreflink" href="./editor.php?id=nodeInfo" id="nodeInfo">NodeInfo</a> | ';
 	    if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
-		echo '<a href="./editor.php?id=tclvoicemail" style = "color: black;" id="tclvoicemail">TclVoiceMail</a> | ';
+		echo '<a class="hreflink" href="./editor.php?id=tclvoicemail" id="tclvoicemail">TclVoiceMail</a> | ';
 	    }
 	}	
 	if (defined('DL3EL_RADIO')) {
 	    $svxRadio = DL3EL_RADIO;
 	    if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
-		echo '<a href="./caller.php?id=amixer/index" style = "color: black;" id="amixer">AMixer</a> | ';
+		echo '<a class="hreflink" href="./caller.php?id=amixer/index" id="amixer">AMixer</a> | ';
 //		echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">AMixer</a> | ';
-		echo '<a href="./rf.php" style = "color: black;" id="radio">Radio</a> | ';
+		echo '<a class="hreflink" href="./rf.php" id="radio">Radio</a> | ';
 	    }
 // Soundcard?
 	    if (substr($svxRadio,0,3) === "SC ") {
 //		echo '<a href="./ameditor.php?id=amixer" style = "color: black;" id="amixer">1AMixer</a> | ';
 //		echo '<a href="./caller.php?id=amixer/index&refresh=5" style = "color: black;" id="amixer">2AMixer</a> | ';
-		echo '<a href="./caller.php?id=amixer/index" style = "color: black;" id="amixer">AMixer</a> | ';
+		echo '<a class="hreflink" href="./caller.php?id=amixer/index" id="amixer">AMixer</a> | ';
 	    }
 	}
-//	echo '<a href="./editor.php?id=power" style = "color: green;">Power</a></p>';
-	echo '<a href="./caller.php?id=power/index" style = "color: green;">Power</a></p>';
-	echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Display:</b></a> ';
+//	echo '<a class="hreflink" href="./editor.php?id=power" style = "color: green;">Power</a></p>';
+	echo '<a class="hreflink" href="./caller.php?id=power/index" >Power</a></p>';
+	echo '<a style = "padding-right: 5px; text-align: right; " <a style = "color: black;"><b>Display:</b></a> ';
 //	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html style = "color: #0000ff;">Hilfe</a> | ';
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 //	    echo '<a href="./aprs.php" style = "color: black;">APRS Monitor</a> | ';
-//	    echo '<a href="./caller.php?id=aprs" style = "color: black;">APRS Monitor</a> | ';
-	    echo '<a href="./caller.php?id=aprs0" style = "color: black;">APRS Monitor</a> | ';
-	    echo '<a href="./caller.php?file=loga" style = "color: black;" id="log">APRS Log</a> | ';
+//	    echo '<a href="./caller.php?id=aprs" >APRS Monitor</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?id=aprs0" >APRS Monitor</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=loga" id="log">APRS Log</a> | ';
 //	    echo '<a href="./caller.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
 	    if (file_exists(DL3EL.'/aprs-is-mqtt.msg')) {
-		echo '<a href="./caller.php?file=logb" style = "color: black;" id="log">APRS MQTT | </a> ';
+		echo '<a class="hreflink" class="hreflink" href="./caller.php?file=logb" id="log">APRS MQTT | </a> ';
 	    }
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
-	    echo '<a href="./caller.php?file=log" style = "color: black;" id="log">L-Log</a> | ';
-	    echo '<a href="./caller.php?file=ref" style = "color: black;" id="log">R-Log</a> ';
+	    echo '<a class="hreflink" href="./caller.php?file=log" id="log">L-Log</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=ref" id="log">R-Log</a> ';
 	} else {
-	    echo '<a href="./caller.php?file=log" style = "color: black;" id="log">SVX Log</a> ';
+	    echo '<a class="hreflink" href="./caller.php?file=log" id="log">SVX Log</a> ';
 	}
 	if (defined('DL3EL_EXTERN1'))  {
 	    if (defined('DL3EL_EXTERN1_NAME'))  {
@@ -281,9 +293,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 //	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . ' style = "color: black;">' . $linktext . '</a> ';
 	    if ((defined('DL3EL_EXTERN1_TAB')) && (DL3EL_EXTERN1_TAB === "new")) {
-		    echo '| <a href="' . DL3EL_EXTERN1 . '" style = "color: black;" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN1 . '" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
 		} else{
-		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . '" style = "color: black;">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN1 . '" >' . $linktext . '</a> ';
 		}    
 	}    
 	if (defined('DL3EL_EXTERN2'))  {
@@ -294,9 +306,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 //	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . ' style = "color: black;">' . $linktext . '</a> ';
 	    if ((defined('DL3EL_EXTERN2_TAB')) && (DL3EL_EXTERN2_TAB === "new")) {
-		    echo '| <a href="' . DL3EL_EXTERN2 . '" style = "color: black;" target="extern2" rel="noopener noreferrer">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN2 . '" target="extern2" rel="noopener noreferrer">' . $linktext . '</a> ';
 		} else{
-		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . '" style = "color: black;">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN2 . '" >' . $linktext . '</a> ';
 		}    
 	}    
 	if (defined('DL3EL_EXTERN3'))  {
@@ -307,9 +319,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 //	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . ' style = "color: #000000;">' . $linktext . '</a> ';
 	    if ((defined('DL3EL_EXTERN3_TAB')) && (DL3EL_EXTERN3_TAB === "new")) {
-		    echo '| <a href="' . DL3EL_EXTERN3 . '" style = "color: black;" target="extern3" rel="noopener noreferrer">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN3 . '" target="extern3" rel="noopener noreferrer">' . $linktext . '</a> ';
 		} else{
-		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . '" style = "color: black;">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN3 . '" >' . $linktext . '</a> ';
 		}    
 	}    
 	if (defined('DL3EL_EXTERN4'))  {
@@ -320,36 +332,37 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 //	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . ' style = "color: black;">' . $linktext . '</a> ';
 	    if ((defined('DL3EL_EXTERN4_TAB')) && (DL3EL_EXTERN4_TAB === "new")) {
-		    echo '| <a href="' . DL3EL_EXTERN4 . '" style = "color: black;" target="extern4" rel="noopener noreferrer">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN4 . '" target="extern4" rel="noopener noreferrer">' . $linktext . '</a> ';
 		} else{
-		    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . '" style = "color: black;">' . $linktext . '</a> ';
+		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN4 . '" >' . $linktext . '</a> ';
 		}    
 	}    
 	if (file_exists(DL3EL.'/Reflector1.conf')) {
-	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> | <b>Full</b> Edit</a> | ';
-	    echo '<a href="./caller.php?file=' . DL3EL . '/Reflector1.conf" style = "color: black;" id="reflector1">Reflector1.conf</a> ';
+//	    echo '<span style = "padding-right: 5px; text-align: right;" | <b>Full</b> Edit</span>: ';
+	    echo ' | <b>Full</b> Edit: ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector1.conf" id="reflector1">Reflector1.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector2.conf')) {
-	    echo '| <a href="./caller.php?file=' . DL3EL . '/Reflector2.conf" style = "color: black;" id="reflector1">Reflector2.conf</a> ';
+	    echo '| <a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector2.conf" id="reflector1">Reflector2.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector3.conf')) {
-	    echo '| <a href="./caller.php?file=' . DL3EL . '/Reflector3.conf" style = "color: black;" id="reflector1">Reflector3.conf</a> ';
+	    echo '| <a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector3.conf" id="reflector1">Reflector3.conf</a> ';
 	}
 	if (file_exists(DL3EL.'/Reflector4.conf')) {
-	    echo '| <a href="./caller.php?file=' . DL3EL . '/Reflector4.conf" style = "color: black;" id="reflector1">Reflector4.conf</a> ';
+	    echo '| <a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector4.conf" id="reflector1">Reflector4.conf</a> ';
 	}
         if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
             if (file_exists('./statistic.php')) {
-		echo '| <a href="./statistic.php" style = "color: black;" id="log">Statistic</a> ';
+		echo '| <a class="hreflink" href="./statistic.php" id="log">Statistic</a> ';
             }
         }
 	$tgdb_File = DL3EL_BASE . "include/tgdb.php";
 	if (filesize($tgdb_File)  <= 1000) {
-	    echo '| <a href="./include/tgdb_upd.php" style = "color: black;" id="upd">Update TGDB</a> ';
+	    echo '| <a class="hreflink" href="./include/tgdb_upd.php" id="upd">Update TGDB</a> ';
 	}
 	echo '</p>';
 } else {
-    	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950&noauth" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe &nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    	echo '<a class="hreflink" href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950&noauth" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe &nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 }
 
 
