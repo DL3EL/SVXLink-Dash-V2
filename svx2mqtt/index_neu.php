@@ -1,3 +1,16 @@
+<style>
+a.hreflink:link,
+a.hreflink:visited {
+    color: black;
+    text-decoration: underline;
+}
+
+a.hreflink:hover {
+    color: #009900;	
+    text-decoration: underline;
+}
+</style>
+
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -256,7 +269,9 @@ if (defined ('SVXMQTT_COLOR_active')) {
     krsort($array_time);
 	
 echo '<span style = "font-size:25px"> </span>';
-    echo '<span style = "font-weight:bold; font-size:15px;"><a href="https://dashboard.fm-funknetz.de/" target="fmn">FM-Funknetz Live Activity</a></span>';
+//    echo '<span style = "font-weight:bold; font-size:15px;"><a href="https://dashboard.fm-funknetz.de/" target="fmn">FM-Funknetz Live Activity</a></span>';
+    echo '<a class="hreflink" href="https://dashboard.fm-funknetz.de/" style="font-weight:bold; font-size:15px;" " target="fmn"></u>FM-Funknetz Live Activity</a>';
+
     if ((defined ('debug')) && (debug > 0)) echo "Ich bin gerade hier: " . getcwd();
 
     echo '<form method="post">';
