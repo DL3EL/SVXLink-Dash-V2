@@ -6,12 +6,23 @@ if (session_status() === PHP_SESSION_NONE) {
 	include_once 'config.php';
 }
 
+
+$datei = "dl3el/menu";
+    $menu_now = file_get_contents($datei);
+//	echo $menu_now;
+if ($menu_now == "dropdown") {
+
+
+
+
 // Option Relais Dashboard
 $public_relais = false;
 
 // User Grundeinstellung			
 $normal = true;				// Option Normal User
 $expert = false;			// Option Expert User
+
+
 
 // Option Develop
 if (DL3EL_VERSION == "develop") {
@@ -230,6 +241,7 @@ if ($public_relais == true) {
 	// Buttons 2 System Eintellunegen
 	echo '<select style="font-size:16px;" name="svxsystem" onchange="this.form.submit()">';
 	echo '<option value="" hidden disabled selected>SYSTEM</option>';
+	echo '<option value="4">Classic Menü</option>';
 	echo '<option value="1">Wifi</option>';
 	if ($develop == true) {
 		echo '<option value="2">Network</option>';
@@ -328,7 +340,6 @@ if ($public_relais == true) {
 	}
 
 	// Button Power
-//	echo '<a style="color:green;margin-left:10px;font-size:18px;" href="./editor.php?id=power">Power</a>';
 	echo '<a style="color:green;margin-left:10px;font-size:18px;" href="./caller.php?id=power/index" >Power</a>';
 	echo '</form>';
 	echo '<br>';
@@ -441,6 +452,14 @@ if ($public_relais == true) {
 	if ($call_svxsystem == 3) {
 		$site = './config_backup.php';
 		echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
+	}
+	
+	// Classic Menü
+	if ($call_svxsystem == 4) {
+	$datei = "dl3el/menu";
+	$menu_change = "classic";
+	file_put_contents($datei, $menu_change);		
+	echo '<meta http-equiv="refresh" content="0;url= ./index.php">';		
 	}
 
 ///////////////////// EXPERT EDIT ///////////////////////////////////////
@@ -592,6 +611,10 @@ if ($public_relais == true) {
 		$site = 'edit.php?file=loga';
 		echo '<meta http-equiv="refresh" content="0;url=' . htmlspecialchars($site) . '">';
 	}
-}
+
+	echo '</div>';
+  }
+
+} 
 
 ?>
