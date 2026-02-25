@@ -75,7 +75,12 @@
 </div>
 <?php
     if ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes")) {
-        include_once "top_menu_neu.php"; 
+        include_once "select_menu.php"; 
+        if ($menuType == "dropdown") {
+            include_once "top_menu_neu.php"; 
+        } else {
+            include_once "top_menu.php"; 
+        }    
     } else {
         include_once "top_menu.php"; 
     }

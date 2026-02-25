@@ -106,6 +106,10 @@ my $mqtt = Net::MQTT::Simple->new('FM-Funknetz.de');
     print LOG "MQTT Subscribed: server/mqtt/parrot/9998/analysis/#\n";
     $mqtt->subscribe("/server/mqtt/parrot/9998/status/#", \&received);
     print LOG "MQTT Subscribed: server/mqtt/parrot/9998/status/#\n";
+    $mqtt->subscribe("/server/state/monitoredTG/#", \&received);
+    print LOG "MQTT Subscribed: server/state/monitoredTG/#\n";  
+    $mqtt->subscribe("/server/state/activeTG/#", \&received);
+    print LOG "MQTT Subscribed: server/state/activeTG/#\n";
     close LOG; 
 
 # [20.02.2026 11:45:16] /server/statethr/1: {"time":"11:45:15", "talk":"stop", "call":"EchoLink", "tg":"2", "server":"1"}^1771584316^

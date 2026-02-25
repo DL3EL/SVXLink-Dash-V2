@@ -32,9 +32,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	$kn_exp = "Expert";
 	$kn_nor = "<b>Normal</b>";
     }
-   if (empty($_SESSION['auth'])) {
-      $_SESSION['auth'] = "UNAUTHORISED";
-   }
+    include_once DL3EL_BASE . "/include/select_menu.php";    
+    if (empty($_SESSION['auth'])) {
+	$_SESSION['auth'] = "UNAUTHORISED";
+    }
 ?>
    <div id="display-links" align=center>
     <p style = "padding-right: 5px; text-align: center; color: #000000;">
@@ -199,6 +200,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe für ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<button name="btn_expert" type="submit" >' . $kn_exp . '</button>';
 	echo '<button name="btn_normal" type="submit" >' . $kn_nor . '</button>';
+	if ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes")) {
+	    echo '&nbsp;<button name="btn_dropdown" type="submit" >' . $menu_dropdown . '</button>';
+	    echo '<button name="btn_classic" type="submit" >' . $menu_classic . '</button>';
+	}    
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
 	if ($knowledge == "Expert") {
 	    echo '<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"><b>Full</b> Edit</a> | ';
