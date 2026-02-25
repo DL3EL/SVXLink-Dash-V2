@@ -1,3 +1,17 @@
+<style>
+  table {
+    border-collapse: collapse; /* Verhindert doppelte Rahmen */
+    border: none;              /* Entfernt den Außenrahmen */
+	max-width:98%;
+	margin-left:10px;
+	margin-right:10px;
+  }
+  table td, table th {
+    //border: none;              /* Entfernt Rahmen um Zellen */
+    padding: 0;                /* Entfernt Innenabstände der Zellen */
+  }
+</style>
+
 <?php
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -5,9 +19,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include_once "settings.php";
-echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:15px;margin-left:10px;margin-right:10px;font-size:14px; border:none;">';
+//echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:15px;margin-left:10px;margin-right:10px;font-size:14px; border:none;">';
 //echo '<span><b>APRS Monitor</b><br></span>';
-echo '<span><b>APRS Monitor</b></span>'; // <br> ist hier nicht mehr nötig
+//echo '<span><b>APRS Monitor</b></span>'; // <br> ist hier nicht mehr nötig
 
 
 // last 1000 Spots
@@ -27,13 +41,17 @@ echo '<span><b>APRS Monitor</b></span>'; // <br> ist hier nicht mehr nötig
     if (file_exists($msg_datei  . ".neu")) {
 	unlink($msg_datei . ".neu");
     }
+	echo '<span style = "font-size:50px"> </span>';
+	echo '<span style = "font-weight:bold; font-size:15px;">APRS Monitor</span>';
 
     if ($aprs_msg_avail)  {
 //	echo '<BR>';
 //	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; background-color:#f1f1f1;">';
 //	echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
 //	echo '<table style="margin-top: 15px;margin-left:10px;margin-right:20px; border-collapse: collapse; background-color: #f1f1f1; ...">';
-	echo '<table style=" border-collapse: collapse; background-color: #f1f1f1; ...">';
+
+	echo '<table style = "font-size:16px;border:none; border-collapse:collapse; background-color:#f1f1f1;">';
+//	echo '<table style=" border-collapse: collapse; background-color: #f1f1f1; ...">';
 	echo '<thead>';
 	echo '<tr style = "border:none;background-color:#f1f1f1;">';
 	echo "<th><b>From</b></th><th><b>Type</b></th><th><b>Messages (" . date("H:i:s") .")</b></th><th><b>Zeit</b></th></tr>";
@@ -70,7 +88,8 @@ echo '<span><b>APRS Monitor</b></span>'; // <br> ist hier nicht mehr nötig
     echo '</table>';
     echo '<br><br>';
     }    
-    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;">';
+//    echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;">';
+    echo '<table style = "font-size:16px; border:none; border-collapse:collapse; background-color:#f1f1f1;">';
     echo '<tr style = "border:none;background-color:#f1f1f1;">';
 //    echo "<tr><td><b>Call</b></td><td><b>Locator</b></td><td><b>APRS Info letzter Update (" . date("H:i:s") .")</b></td><td><b></b></td><td><b>Zeit</b></td></tr>";
     echo "<tr><th><b>Call</b></th><th><b>Locator</b></th><th><b>APRS Info letzter Update (" . date("H:i:s") .")</b></th><th><b></b></th><th><b>Zeit</b></th></tr>";
@@ -121,7 +140,7 @@ $file = $aprs_datei;
 	++$nn;
     }
     echo "</td></Tr>";
-echo '<fieldset>';
+//echo '<fieldset>';
 
     echo '</table>';
 
