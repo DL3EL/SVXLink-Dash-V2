@@ -33,9 +33,13 @@ if (!strlen($mqtt_script)) {
 }
 
 // Farben definieren (unverändert)
-$svxmqtt_color_active = defined('SVXMQTT_COLOR_active') ? "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;" : "green";
-$svxmqtt_color_passive = defined('SVXMQTT_COLOR_passive') ? "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;" : "blue";
-$svxmqtt_color_friends = defined('SVXMQTT_COLOR_friends') ? SVXMQTT_COLOR_friends : "green";
+$svxmqtt_color_active = defined('SVXMQTT_COLOR_active') ? SVXMQTT_COLOR_active  : "green";
+$svxmqtt_color_active = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:$svxmqtt_color_active;color:white;font-weight:bold;font-size:14px;";
+//$svxmqtt_color_active = defined('SVXMQTT_COLOR_active') ? "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_active . ";color:white;font-weight:bold;font-size:14px;" : "green";
+$svxmqtt_color_passive = defined('SVXMQTT_COLOR_active') ? SVXMQTT_COLOR_passive  : "blue";
+$svxmqtt_color_passive = "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:$svxmqtt_color_passive;color:white;font-weight:bold;font-size:14px;";
+//$svxmqtt_color_passive = defined('SVXMQTT_COLOR_passive') ? "style=cursor:pointer;border:none;border-radius:8px;width:85px;background-color:" . SVXMQTT_COLOR_passive . ";color:white;font-weight:bold;font-size:14px;" : "blue";
+$svxmqtt_color_friends = defined('SVXMQTT_COLOR_friends') ? SVXMQTT_COLOR_friends : "orange";
 
 $file = DL3EL_BASE . "svx2mqtt/mqtt.data";
 $friend_call_array = defined('DL3EL_FRIENDS') ? explode(",", DL3EL_FRIENDS) : [0];

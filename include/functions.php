@@ -1034,7 +1034,7 @@ function display_config($config) {
         $dbversion = $dbversion . "(a)";
       }  
       $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
-      if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+      if ((strlen($mqtt_script)) || (file_exists("/usr/local/bin/mqtt-simple"))) {
         $dbversion = $dbversion . "(m)";
       }
       if (!strlen($fmnetwork)) {

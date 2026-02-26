@@ -225,6 +225,10 @@ if (isset($_POST['btnDashUpdate']))
                 // process is running
                     $dbversion = $dbversion . "(a)";
                 }  
+                $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+                if (strlen($mqtt_script)) {
+                    $dbversion = $dbversion . "(m)";
+                }
                 $gitversion = file_get_contents("gitversion");
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 2\n");
                 if (DL3EL_GIT_UPDATE === "nocheck") {
