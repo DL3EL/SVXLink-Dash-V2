@@ -272,6 +272,17 @@ if (isset($_POST['btnrstc710']))
         exec($command,$screen,$retval);
 }
 
+if (isset($_POST['btnCleanUp']))
+    {
+
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "System Cleanup enforced from $ip \n";
+        addsvxlog($logtext);
+        $cron_File = DL3EL . "/crontab.log";
+	    $cron = start_cron($cron_File,$callsign,$fmnetwork);
+	    touch($cron_File);
+}
+
 } else {
   echo '<h1 id="power" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">You are not authorised to make changes here.</h1>';
  
@@ -372,6 +383,11 @@ if (isset($_POST['btnrstc710']))
                         echo '<button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
                     } else {
                         echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
+                        echo "<br><br>";
+                        handle_cleanup();
+                        echo "<br>Der Cleanup Lauf läuft automatisch alle 24 Stunden.<br>Es ist normalerweise nicht notwendig, einen Cleanup Lauf manuell anzustarten.<br>";
+                        echo "Sollte es im System Unregelmäffigkeiten geben und ein adhoc Cleanup Lauf wird empfohlen, kann dieser hier gestartet werden.<br>";
+                        echo '<button name="btnCleanUp" type="submit" class="bleu" style = "height:30px; width:400px; font-size:12px;">jetzt CleanUp starten</button>';
                     }    
                 }
             }  
