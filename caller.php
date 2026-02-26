@@ -32,53 +32,33 @@ echo '<td valign="top" style="height:auto; border:none; background-color:#f1f1f1
     echo '<div style="padding-left:10px; padding-right:10px; width: auto;">';
         
         // Dies ist der Ziel-Container für den Reload
-        echo '<div id="content_area" style="display: block;">';
+//        echo '<div id="content_area" style="display: block;">';
+
+echo '<div id="content_area">';
+
             if (isset($_GET['file']) && !empty($_GET['file'])) {
                 $file = $_GET['file']; 
                 $call_script = "./edit/index.php?file=" . $file;
                 echo '<object style="outline:none; width:950px; height:900px;" data="' . $call_script . '"></object>';
             } else {    
                 $call_script = $_GET['id'] . ".php";
-            
                 if (($call_script === "amixer/index.php") || ($call_script === "power/index.php")) {
                     echo '<object style="outline:none; width:600px; height:900px;" data="' . $call_script . '"></object>';
                 } else {    
                     // Falls das inkludierte File selbst Tabellen hat, 
                     // verhindert das umschließende Div, dass diese am Rand kleben
-                    include $call_script;
+    $id = htmlspecialchars($_GET['id']);
+    $call_script = $id . ".php";
+    include $call_script;
+//                    include $call_script;
                 }
             }
         echo '</div>'; // Ende #content_area
         
     echo '</div>'; // Ende Padding-Wrapper
 echo '</td>';
-/*
-// RECHTER BEREICH (Content)
-echo '<td valign="top" style="height:auto; border:none; background-color:#f1f1f1; padding-left:10px;margin-top:1px;margin-right:10px;margin-left:10px;margin-bottom:0px;">';
-    // Dies ist der Ziel-Container für den Reload
-    echo '<div id="content_area">';
-        $call_script = $_GET['id'] . ".php";
-        
-        if ($call_script === "amixer/index.php") {
-            echo '<object style="outline:none; width:600px; height:900px;" data="' . $call_script . '"></object>';
-        } else {    
-            include $call_script;
-        }
-    echo '</div>';
-*/
-    // Script für den Seiten-Content (nur wenn refresh gesetzt ist)
-    if (isset($_GET['refresh']) && !empty($_GET['refresh'])) {
-        $rate = intval($_GET['refresh']) * 1000;
-        echo '<script type="text/javascript">
-            function reloadCurrPage(){
-                // Wir laden den Inhalt in #content_area
-                $("#content_area").load("' . $call_script . '", function(){ 
-                    setTimeout(reloadCurrPage, ' . $rate . '); 
-                });
-            }
-            setTimeout(reloadCurrPage, ' . $rate . ');
-        </script>';
-    }
+
+
 echo '</td>';
 // --- 3. GANZ RECHTER BEREICH (MQTT / Caller) ---
 echo '<td valign="top" style="width:250px; border:none; background-color:#f1f1f1; padding-left:10px;">';
@@ -86,5 +66,32 @@ echo '<td valign="top" style="width:250px; border:none; background-color:#f1f1f1
 echo '</td>';
 echo '</tr>';
 echo '</table>';
+
+// ... (nach den schließenden </td> Tags, ganz am Ende vor page_bottom)
+if (isset($_GET['refresh']) && !empty($_GET['refresh'])) {
+    $rate = intval($_GET['refresh']) * 1000;
+    $ajax_url = $id . ".php"; 
+
+    echo '<script type="text/javascript">
+        function reloadCurrPage(){
+            console.log("Starte AJAX Update für: ' . $ajax_url . '");
+            $.ajax({
+                url: "' . $ajax_url . '",
+                cache: false,
+                success: function(data){
+                    $("#content_area").html(data);
+                    console.log("Update erfolgreich um: " + new Date().toLocaleTimeString());
+                },
+                complete: function() {
+                    setTimeout(reloadCurrPage, ' . $rate . ');
+                }
+            });
+        }
+        $(document).ready(function() {
+            setTimeout(reloadCurrPage, ' . $rate . ');
+        });
+    </script>';
+}
+
 include_once "include/page_bottom.php"; 
 ?>

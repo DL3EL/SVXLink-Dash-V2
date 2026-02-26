@@ -11,6 +11,74 @@ include_once "../include/settings.php";
 // file with mqtt data
 
     $file = DL3EL_BASE . "svx2mqtt/mqtt.data";
+    $all_calls = [];
+    if (file_exists($file)) {
+        $data = shell_exec("tail -c 128000 " . escapeshellarg($file));
+        $lines = explode("\n", $data);
+        $pattern_parrot_9990 = "/server/mqtt/parrot/9990/analysis";
+        $pattern_parrot_9998 = "/server/mqtt/parrot/9998/analysis";
+        $found_9990 = false;
+        $found_9998 = false;
+        for ($i = count($lines) - 1; $i >= 0; $i--) {
+            $is_9990 = (strpos($lines[$i], $pattern_parrot_9990) !== false);
+            $is_9998 = (strpos($lines[$i], $pattern_parrot_9998) !== false);
+            if (($is_9990 && !$found_9990) || ($is_9998 && !$found_9998)) {
+                $line = $lines[$i];
+                $start = strpos($line, '[');
+                $end = strrpos($line, ']'); 
+                $timestamp_start = strpos($line, '^');
+                if ($timestamp_start !== false) {
+                    $timestampl = substr($line, $timestamp_start);
+                    $timestampl = trim($timestampl,"\^");
+                }  
+                // 1. Den JSON-Teil sauber ausschneiden (ab der Position nach dem Doppelpunkt)
+                // Wir suchen die erste "{" Klammer
+                $json_start = strpos($line, '{');
+                if ($json_start !== false) {
+                    $json_end = strpos($line, '^');
+                    $json_string = substr($line, $json_start,$json_end-$json_start);
+                    $json_string = trim($json_string);
+                    // 2. Den String in ein PHP-Array umwandeln
+                    $line_e = json_decode($json_string, true,3);
+                    if ($line_e !== null && json_last_error() === JSON_ERROR_NONE) {
+                        $tg = $line_e['tg'];
+                        $call = $line_e['callsign'];
+                        $fcall = substr($call,0,strlen($ccall)-1) . " ";
+                        if ($ccall === $fcall) {
+                            $timestamp = $line_e['timestamp'];
+                            $summary = $line_e['summary'];
+                            $recommendation = $line_e['recommendation'];
+                            date_default_timezone_set('Europe/Berlin');
+                            $ts = date("H:i:s",$timestamp);
+
+                            echo "<br>Soundcheck für $call, Ergebnis von $ts: <b>$recommendation[rating_text]</b> (Papagei TG $tg)<br> ";
+//                            echo "Empfehlung: $recommendation[message] :local:$tsl<br>";
+                            echo "Empfehlung: $recommendation[message] <br>";
+                            echo "Empfehlung: $recommendation[action], Level-Status: $recommendation[level_status]<br><br>Details:";
+                            echo '<table style = "text-align: left;"';
+                            echo "<tr> <td>Ergebnis:</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td></td><td></td><td>&nbsp;&nbsp;</td></tr>";
+                            echo "<tr><td>avg_rms_db</td><td> $summary[avg_rms_db] </td><td>&nbsp;&nbsp;</td><td>max_peak_db</td><td>$summary[max_peak_db]</td><td>&nbsp;&nbsp;</td><td>max_rms_db</td><td>$summary[max_rms_db]</td></tr>";
+                            echo "<tr><td>dynamics_db</td><td> $summary[dynamics_db] </td><td>&nbsp;&nbsp;</td><td>clip_percent</td><td>$summary[clip_percent]</td><td>&nbsp;&nbsp;</td><td>silence_percent</td><td>$summary[silence_percent]</td></tr>";
+                            echo "<tr><td>total_frames</td><td> $summary[total_frames] </td><td>&nbsp;&nbsp;</td><td>active_frames</td><td>$summary[active_frames]</td><td>&nbsp;&nbsp;</td><td>duration_s</td><td>$summary[duration_s]</td></tr>";
+                            echo "<tr> <td>Empfehlungen:</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td></td><td></td><td>&nbsp;&nbsp;</td></tr>";
+                            echo "<tr><td>avg_rms_db</td><td> $recommendation[avg_rms_db] </td><td>&nbsp;&nbsp;</td><td>max_peak_db</td><td> $recommendation[max_peak_db] </td><td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td></tr>";
+                            $meter_position = sprintf("%01.2f", $recommendation["meter_position"]);
+                            echo "<tr><td>clip_percent</td><td>$recommendation[clip_percent]</td><td>&nbsp;&nbsp;</td><td>meter_position</td><td>$meter_position</td><td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td></tr>";
+                            echo '</table';
+                            break;
+                        }
+                    }
+                } else {
+                    echo "JSON $json_string JSON-Fehler: " . json_last_error_msg() . " im String: $json_string";
+                }
+            }
+        }
+    }
+
+
+
+/*
+// ab hier alter Code
     $content = file_get_contents($file);
     $zeilen_array = explode("\n", $content);
     $anzahl_zeilen = count($zeilen_array); 
@@ -71,6 +139,7 @@ include_once "../include/settings.php";
     }
     ++$nn;
 }
+*/
 /*
                         echo"$call 1: $tg $timestamp ($ts) $summary[avg_rms_db] $recommendation[rating] $recommendation[rating_text]<br>";
                         echo"$call 2: $summary[avg_rms_db] $summary[max_peak_db] $summary[min_rms_db] $summary[max_rms_db] $summary[dynamics_db] $summary[clip_percent] <br>";

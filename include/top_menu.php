@@ -81,8 +81,10 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a class="hreflink" href="./svx2mqtt.php">LIVE DB</a> | ';
 	    }
 	}    
-	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
-	    echo '<a href="./caller.php?id=monitor0&refresh=' . DL3EL_MONREFRESH . '" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+//	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
+        if (file_exists("/usr/local/bin/mqtt-simple")) {
+//	    echo '<a href="./caller.php?id=monitor0&refresh=' . DL3EL_MONREFRESH . '" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	    echo '<a href="./caller.php?id=monitor&refresh=15" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 	} else {
 	    echo '<a href="./caller.php?id=monitor0" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 	}    

@@ -254,7 +254,12 @@ if ($reflectorlogic1 != "") {
          if (!file_exists($svxTGact)) {
             file_put_contents($svxStatusFile, $tgselect);
             touch($svxTGact);
-         }
+         } else {
+            $old_tg_act = file_get_contents($svxStatusFile);
+            if ($tgselect !== $old_tg_act) {
+               file_put_contents($svxStatusFile, $tgselect);
+            }
+         }   
       }      
    }
    echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";

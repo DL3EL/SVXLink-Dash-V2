@@ -138,7 +138,12 @@ if ($_SESSION['auth'] === "AUTHORISED") {
         echo '}'."\n";
         echo 'setTimeout(reloadLastHeardDMR,3000);'."\n";
     }
-
+// --- NEU: Reload für die aktive TG Teilnehmer ---
+    echo 'function reloadActiveTGCalls(){'."\n";
+    echo '  $("#ActiveTGCalls").load("active_tg_calls.php", function(){ setTimeout(reloadActiveTGCalls, 30000) });'."\n";
+    echo '}'."\n";
+    echo 'setTimeout(reloadActiveTGCalls, 3000);'."\n";
+// ------------------------------------------------
     echo '$(window).trigger(\'resize\');'."\n";
 
     echo '</script>'."\n";
@@ -150,7 +155,11 @@ if ($_SESSION['auth'] === "AUTHORISED") {
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
         echo '</div></center>'."\n";
     }    
-    echo "<br />\n";
+// --- NEU: Container für die Anzeige ---
+    echo '<center><div id="ActiveTGCalls" style = "margin-bottom:30px;">'."\n";
+    include_once "active_tg_calls.php"; // Initiales Laden beim Seitenaufruf
+    echo '</div></center>'."\n";
+// --------------------------------------    echo "<br />\n";
     echo '</td>';
     // Live DB
     include_once "caller_svxmqtt.php"; 
