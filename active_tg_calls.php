@@ -83,7 +83,7 @@ echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collap
                     return '<a class="hreflink" style="white-space: nowrap; text-decoration: none; font-weight: 500;" href="' . $url . '" target="_blank">' . htmlspecialchars($c) . '</a>';
                 }, $all_calls);
 
-                $chunks = array_chunk($linked_calls, 9);
+                $chunks = array_chunk($linked_calls, 8);
                 $rows = [];
                 foreach ($chunks as $chunk) {
                     $rows[] = implode(", ", $chunk);

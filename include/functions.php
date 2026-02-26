@@ -928,11 +928,16 @@ function display_config($config) {
         } 
       }
 
-    function start_cron($cron_File,$callsign,$fmnetwork) {
+    function start_cron($cron_File,$callsign,$fmnetwork,$enforce) {
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       $logtext = $jetzt . " starting cron ($cron_File $callsign $fmnetwork)\n";
-      addlog ("L",$logtext);
+      if (!isset($enforce)) {
+        $cleanup_mode = "L";
+      } else {
+        $cleanup_mode = "F";
+      }  
+      addlog ($cleanup_mode,$logtext,1);
       if ((defined ('debug')) && (debug > 0)) echo "Start cron Job um $jetzt <br>";
 
       $max_kept = 10;
@@ -1056,19 +1061,6 @@ function display_config($config) {
         }
 // 7. start mqtt Task, if possible
     start_mqtt();
-/*
-    $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
-    if (!strlen($mqtt_script)) {
-      $debug = "";
-      if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
-      $cmd = DL3EL_BASE . "svx2mqtt/fmn-mqtt.pl " . $debug . " >/dev/null &";
-      echo "Starting MQTT " . $cmd . "<br>";
-      exec($cmd, $output, $retval);
-      echo "$output $retval<br>";
-      $logtext =  "MQTT Dienst gestartet " . $cmd . "\n";
-      addsvxlog($logtext);
-    }
-*/
 
 // 7a. Clear MQTT log
       $db_File = DL3EL_BASE . "svx2mqtt/mqtt.log";
@@ -1085,7 +1077,11 @@ function display_config($config) {
           touch($db_File);
       }
 
-
+// Ende
+    date_default_timezone_set('Europe/Berlin');
+    $jetzt = date("Y-m-d H:i:s");
+    $logtext = $jetzt . " ending cron ($cron_File $callsign $fmnetwork)\n";
+    addlog ($cleanup_mode,$logtext,1);
 /*
 	    exec("sudo zip config.zip config.php > /dev/null");
       $owner = 'svxlink';
@@ -1105,6 +1101,8 @@ echo "<br>Stat: $cmd";
     }  
 
     function delete_old_copies($globber,$max_kept,$cron_File,$test) {
+      date_default_timezone_set('Europe/Berlin');
+      $jetzt = date("Y-m-d H:i:s");
       if ((defined ('debug')) && (debug > 0)) echo "GL: $globber, max: $max_kept <br>";
       $numberoffiles = 0;
       $file_array = glob($globber);
@@ -1263,5 +1261,54 @@ echo "<br>Stat: $cmd";
         addsvxlog($logtext);
       }
     }
+
+    function select_menu() {
+      $menuFile = DL3EL . "/menu";
+      if (file_exists($menuFile)) {
+        $menuType = trim(file_get_contents($menuFile));
+      } else {
+        if ((defined('MENU_TYPE')) && ((MENU_TYPE === "dropdown") || (MENU_TYPE === "classic"))) {
+          $menuType = MENU_TYPE;
+        } else {
+          $menuType = "classic";
+        }
+      }  
+
+      if (isset($_POST['btn_dropdown'])) {
+        $menuType = "dropdown";
+        file_put_contents($menuFile, $menuType);
+      }
+      if (isset($_POST['btn_classic'])) {
+        $menuType = "classic";
+        file_put_contents($menuFile, $menuType);
+      }
+      if ($menuType == "dropdown") {
+        $menu_dropdown = "<b>dropdown</b>";
+        $menu_classic = "classic";
+      } else {
+        $menu_dropdown = "dropdown";
+        $menu_classic = "<b>classic</b>";
+      }
+    }  
+
+    function handle_cleanup () {
+      $cron_File = DL3EL . "/crontab.log";
+      if (file_exists($cron_File)) {
+        if ((defined ('DL3EL_CRON_TIMER')) && (DL3EL_CRON_TIMER > 0)) {
+          $timer = DL3EL_CRON_TIMER;
+        } else {
+          $timer = 86400;
+        }
+        $delta = time() - filemtime($cron_File);
+        $target = filemtime($cron_File) + $timer;
+        date_default_timezone_set('Europe/Berlin');
+        echo "Nächster \"Cleanup\"-Lauf: " . date ("d.m.y H:i:s ", $target) . "<br>";;
+
+        if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>x";
+      
+      }  
+    }  
+
+
 ?>
     
