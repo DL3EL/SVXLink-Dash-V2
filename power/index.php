@@ -344,18 +344,14 @@ if (isset($_POST['btnCleanUp']))
         //echo "",exec($cmd, $output, $retval);
         //$content = trim(shell_exec('cat versioncheck'));
         $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
-        $github = ".g";
-//        if (!filesize('versioncheck')) {
 
         if ((defined ('debug')) && (debug > 0)) $content = ".g";
         if ($content === ".g")  {
             $git_file  = "https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
             echo "<br><br><br>Github Versionprüfung konnte nicht ausgeführt werden. Die Datei <br><a href='$git_file' target='git'>$git_file</a> <br>konnte nicht gelesen werden<br";
-//            $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
-//              $github = ".r";
         } else {       
             list($gitversion, $rest) = explode(" ", $content);
-            $gitversionf = $gitversion . $github;
+            $gitversionf = $gitversion;
             file_put_contents("gitversion",$gitversionf);
         }
         $dbversionFile = DL3EL . "/dbversion";
@@ -366,7 +362,7 @@ if (isset($_POST['btnCleanUp']))
             $gitversion = $content;
             echo "<br><br><br>Bitte auf den Link klicken und auf die Fehlermeldung im neuen Tab achten. Es könnte z.B. an PiHole o.ä. liegen.<br";
             if ((defined('DL3EL_GIT_ENFORCE')) && (DL3EL_GIT_ENFORCE === "yes")) {
-                echo '<br><br><button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub) auf Version ' . $gitversion . '</button>';
+                echo '<br><br><button name="btnDashUpdate" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Dashboard Update (GitHub)</button>';
             }
         } else {
             echo '<br><br><br>';
