@@ -115,30 +115,62 @@ $file = $aprs_datei;
 
 
 // 2. Daten ausgeben
-    while ($nn < 22) { 
-	$line = explode("^", $aprs_data[$nn]);
-	$msg = $line[3];
-	    $ll = 35;
-	    $llm = strlen($msg);
-	    if (strlen($msg) > $ll) {
-		$msg_array = explode(" ",$msg);
-		$msgn = "";
-		foreach ($msg_array as $msg_word) {
-		    if (strlen($msg_word) > $ll) {
-			$msg_word = "";
-		    }
-		    $msgn = $msgn . $msg_word . " ";
-		    if (strlen($msgn) > $ll) {
-			$msgn = $msgn . "<br>";
-			$ll = $ll + 40;
-		    }
-		}
-		$msg = $msgn;
-		if ((defined ('debug')) && (debug > 0)) $msg = $msg . "<br>[" . $msgn . "]," . $llm;
-	    } 
-	echo "<tr><td>" . $line[1] . "</td><td>" . $line[2] . "</td><td>" . $msg . "</td><td>". $line[5] . "</td><td>" .  $line[4] . "</td></tr>";
-	++$nn;
+while ($nn < 22) { 
+    if (!isset($aprs_data[$nn])) break;
+
+    // trim entfernt versteckte Zeilenumbrüche am Ende der Zeile
+    $line = explode("^", trim($aprs_data[$nn]));
+
+    // Grundvariablen zuweisen
+    $call_raw = $line[1] ?? "";
+    $msg      = $line[3] ?? "";
+    $locator  = $line[2] ?? "";
+    $dist     = $line[5] ?? "";
+    $zeit     = $line[4] ?? "";
+    
+    $call_aprsfi = $call_raw;
+
+    // Link-Logik: Falls URL in Feld 6 vorhanden ist
+    if (isset($line[6]) && !empty(trim($line[6]))) {
+        // Säubern der URL von Steuerzeichen (falls vorhanden)
+        $url = preg_replace('/[\x00-\x1F\x7F]/', '', trim($line[6]));
+        $call_aprsfi = '<a href=\"' . $url . '\" target=\"aprs\" rel=\"opener\">' . $call_raw . '</a>';
     }
+
+    // Zeilenumbruch-Logik für lange Nachrichten
+    $ll = 35;
+    $llm = strlen($msg);
+    if ($llm > $ll) {
+        $msg_array = explode(" ", $msg);
+        $msgn = "";
+        foreach ($msg_array as $msg_word) {
+            if (strlen($msg_word) > $ll) {
+                $msg_word = "";
+            }
+            $msgn .= $msg_word . " ";
+            if (strlen($msgn) > $ll) {
+                $msgn .= "<br>";
+                $ll += 40;
+            }
+        }
+        $msg = $msgn;
+        if (defined('debug') && debug > 0) {
+            $msg .= "<br>[" . $msgn . "]," . $llm;
+        }
+    } 
+
+    // Tabellenausgabe
+    echo "<tr>";
+    echo "<td>" . $call_aprsfi . "</td>";
+    echo "<td>" . $locator . "</td>";
+    echo "<td>" . $msg . "</td>";
+    echo "<td>" . $dist . "</td>";
+    echo "<td>" . $zeit . "</td>";
+    echo "</tr>\n";
+
+    unset($url); // Wichtig für den nächsten Schleifendurchlauf
+    ++$nn;
+}
     echo "</td></Tr>";
 //echo '<fieldset>';
 
