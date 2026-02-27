@@ -666,7 +666,7 @@ sub process_other {
 			$dist = calcdist($lat_dec,$lon_dec,$aprs_lat_dec,$aprs_lon_dec,"km");
 			$write2file = sprintf "[$message_time]%s (%s): %s, dist:%s from [%s %s]\n",$1,$locator,$6,$dist,$aprs_lat_dec,$aprs_lon_dec if ($verbose >= 0);
 			print_file($logdatei,$write2file) if ($verbose >= 0);
-			$write2file = sprintf "%s^%s^%s^%s^%s^%s^\n",$dist,$srccall,$locator,$aprs_txt,aprs_time(),$dist;
+			$write2file = sprintf "%s^%s^%s^%s^%s^%s^https://aprs.fi/?call=%s&others=1^\n",$dist,$srccall,$locator,$aprs_txt,aprs_time(),$dist,$srccall;
 			print_file($aprs_rxdatei,$write2file) if ($verbose >= 0);
 		}
 	}	
