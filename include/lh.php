@@ -66,7 +66,7 @@ echo '<th width=100px>Callsign</th>';
 	}
 	if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>x";
 	if ($delta > $timer) {
-	    $cron = start_cron($cron_File,$callsign,$fmnetwork);
+	    $cron = start_cron($cron_File,$callsign,$fmnetwork,"L");
 	    touch($cron_File);
 	}  
       } else {

@@ -283,7 +283,7 @@ if (isset($_POST['btnCleanUp']))
         $logtext = "System Cleanup enforced from $ip \n";
         addsvxlog($logtext);
         $cron_File = DL3EL . "/crontab.log";
-	    $cron = start_cron($cron_File,$callsign,$fmnetwork);
+	    $cron = start_cron($cron_File,$callsign,$fmnetwork,"F");
 	    touch($cron_File);
 }
 
