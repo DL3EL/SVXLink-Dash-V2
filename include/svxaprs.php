@@ -132,9 +132,7 @@ while ($nn < 22) {
 
     // Link-Logik: Falls URL in Feld 6 vorhanden ist
     if (isset($line[6]) && !empty(trim($line[6]))) {
-        // Säubern der URL von Steuerzeichen (falls vorhanden)
-        $url = preg_replace('/[\x00-\x1F\x7F]/', '', trim($line[6]));
-        $call_aprsfi = '<a href=\"' . $url . '\" target=\"aprs\" rel=\"opener\">' . $call_raw . '</a>';
+        $call_aprsfi = "<a href=\"" . $line[6] . "\" target=\"aprs\" rel=\"opener\">" . $call_raw . "</a>";
     }
 
     // Zeilenumbruch-Logik für lange Nachrichten
@@ -168,7 +166,7 @@ while ($nn < 22) {
     echo "<td>" . $zeit . "</td>";
     echo "</tr>\n";
 
-    unset($url); // Wichtig für den nächsten Schleifendurchlauf
+//    unset($url); // Wichtig für den nächsten Schleifendurchlauf
     ++$nn;
 }
     echo "</td></Tr>";
