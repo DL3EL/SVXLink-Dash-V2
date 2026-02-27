@@ -105,7 +105,7 @@ my $srch_pref = $_[0];
 	@array = split (/<\/tr>/, $el_content);
 
 	foreach $entry (@array) {
-		$elcall = ($entry =~ /<td>([\w]+)(-R|-L|<\/td>)/i)? $1 : "undef";
+		$elcall = ($entry =~ /<td>([\w\*]+)(-R|-L|<\/td>)/i)? $1 : "undef";
 		if ($elcall ne "undef") {
             $ssid = $2;
 			$elcall = $elcall . $2 if (substr($2,0,1) eq "-");

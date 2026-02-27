@@ -133,6 +133,9 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_SVXCUBE . '" >SVXCube | </a> ';
 	    }    
 	}    
+	if ((defined('DL3EL_QSOLINK')) && (DL3EL_QSOLINK === "yes")) {
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://qsolink.websdrbordeaux.fr/dashboard.html">QSOLinkDB | </a> ';
+	}
 	echo '<a class="hreflink" href="./config_backup.php" >Backup/Restore</a> ';
     } else {
 	echo '<a class="hreflink" href="./index.php" >Dashboard</a> ';

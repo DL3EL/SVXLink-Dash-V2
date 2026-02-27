@@ -70,21 +70,45 @@ define("DL3EL_RADIO", "Shari");
 //define("DL3EL_RADIO", "145.600MHz");
 //define("DL3EL_RADIO", "SC (no Radio, 145.750MHz)");
 define("DL3EL_VERSION", "public");
-//define("DL3EL_VERSION", "develop");
-// show splitcsreen with live_db when running on a desktop, it will never be shown on a mobile device
-define("DL3EL_LIVEDB_AUTO", "yes");
-//define("DL3EL_LIVEDB_AUTO", "no");
+// show splitcsreen with live_db when running on a desktop
+//define("DL3EL_LIVEDB", "top");
+//define("DL3EL_LIVEDB", "yes");
+//define("DL3EL_LIVEDB", "no");
+//define("DL3EL_LIVEDB", "right");
+// good colours are green, silver and blue. There is no colour check :-)
+//define ("SVXMQTT_COLOR_active", "#CECECE");
+//define ("SVXMQTT_COLOR_friends", "orange");
+//define ("SVXMQTT_COLOR_active", "green");
+//define ("SVXMQTT_COLOR_passive", "blue");
+// if mqtt service is installed as explained in V5.31, the friendslist is available
+//define("DL3EL_FRIENDS", "DL5ZR,DL3EL,DL4EM,DJ1JAY,DO7FJK,OE1XSM,DG4ZP,DB0CGW");
+
 // good colours are green, silver and blue. There is no colour check :-)
 define("SVXMQTT_COLOR_active", "green");
 define("SVXMQTT_COLOR_passive", "blue");
+//define("DL3EL_MQTT", "yes");
 //define("DL3EL_DXCLUSTER", "yes");
 define("DL3EL_DXCLUSTER", "no");
 define("DL3EL_DXCLUSTER_CONT", "EU");
+// width for external web sites
 //define("DL3EL_EXTERNWEB_WIDTH", "1000");
-//define("DL3EL_OPENHAMCLOCK", "no");
 define("DL3EL_OPENHAMCLOCK", "yes");
-define("DL3EL_FMFUNKNETZ", "no");
+define("DL3EL_OPENHAMCLOCK_TAB", "new");
+// also possible, but not necessary
+define("DL3EL_OPENHAMCLOCK", "https://openhamclock.com/");
+//define("DL3EL_OPENHAMCLOCK", "no");
+// own installation of openhamclock
+//define("DL3EL_OPENHAMCLOCK", "http://192.168.1.1:3030/");
+// FM-Funknetz WebSDR
+define("DL3EL_FMFUNKNETZ", "yes");
+//define("DL3EL_FMFUNKNETZ", "no");
 //define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
+// if you want to see the svxcube, but do not have the svxcube mqtt option installed
+define("DL3EL_SVXCUBE", "http://192.168.1.1");
+// up to 4 external web sites possiible, if _TAB has value "new", then site is opened in a new tab
+define("DL3EL_EXTERN1", "http://44.149.162.74/");
+define("DL3EL_EXTERN1_NAME", "Z05 Ref");
+define("DL3EL_EXTERN1_TAB", "new");
 // if you are unable to configure the system with *only* one soundcard for svxlink, the index to the card could be different after a reboot
 // setting DL3EL_SC_CHANGE to "yes" enables the dashboard to select the correct soundcard and restart svxlink on the first run after reboot.
 define("DL3EL_SC_CHANGE", "no");
@@ -107,8 +131,14 @@ define("DL3EL_REF1_BUTTON", "TG9 & 777");
 define("DL3EL_REF2_BUTTON", "TG9 & 262");
 define("DL3EL_REF3_BUTTON", "Ref3");
 define("DL3EL_REF4_BUTTON", "Ref4");
+// use dark mode
+//define("DL3EL_DARK_MODE", "yes");
 // if set, provide call detail from FM-Funknetz and not from qrz.com
 define("DL3EL_LH_DETAIL", "FMN");
+// FM-Funknetz WebChat is shown
+define("DL3EL_WEBCHAT", "yes");
+// QSO-Link Dashboard is shown
+define("DL3EL_QSOLINK", "no");
 // the rest of the more static variables and constants
 include_once DL3EL_BASE ."include/config.inc.php";
 ?>
