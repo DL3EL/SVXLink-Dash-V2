@@ -139,10 +139,16 @@ if ($_SESSION['auth'] === "AUTHORISED") {
         echo 'setTimeout(reloadLastHeardDMR,3000);'."\n";
     }
 // --- NEU: Reload für die aktive TG Teilnehmer ---
-    echo 'function reloadActiveTGCalls(){'."\n";
-    echo '  $("#ActiveTGCalls").load("active_tg_calls.php", function(){ setTimeout(reloadActiveTGCalls, 30000) });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadActiveTGCalls, 3000);'."\n";
+    $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+    if ((strlen($mqtt_script)) || (file_exists("/usr/local/bin/mqtt-simple"))) {
+      $mqtt = 1;
+      echo 'function reloadActiveTGCalls(){'."\n";
+      echo '  $("#ActiveTGCalls").load("active_tg_calls.php", function(){ setTimeout(reloadActiveTGCalls, 30000) });'."\n";
+      echo '}'."\n";
+      echo 'setTimeout(reloadActiveTGCalls, 3000);'."\n";
+    } else {
+      $mqtt = 0;
+    } 
 // ------------------------------------------------
     echo '$(window).trigger(\'resize\');'."\n";
 
@@ -156,9 +162,11 @@ if ($_SESSION['auth'] === "AUTHORISED") {
         echo '</div></center>'."\n";
     }    
 // --- NEU: Container für die Anzeige ---
-    echo '<center><div id="ActiveTGCalls" style = "margin-bottom:30px;">'."\n";
-    include_once "active_tg_calls.php"; // Initiales Laden beim Seitenaufruf
-    echo '</div></center>'."\n";
+      if ($mqtt) {
+        echo '<center><div id="ActiveTGCalls" style = "margin-bottom:30px;">'."\n";
+        include_once "active_tg_calls.php"; // Initiales Laden beim Seitenaufruf
+        echo '</div></center>'."\n";
+      }  
 // --------------------------------------    echo "<br />\n";
     echo '</td>';
     // Live DB

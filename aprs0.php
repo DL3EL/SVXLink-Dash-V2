@@ -2,28 +2,26 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-    echo '<div id="content" style = "margin-bottom:30px;">'."\n";
-    $call_script = "include/svxaprs.php";
-    include $call_script;
-    $rate = 10000;
-    echo '<script type="text/javascript">'."\n";
-    echo 'function reloadaprs(){'."\n";
-    echo '  $("#content").load("' . $call_script . '",function(){ setTimeout(reloadaprs,' . $rate . ') });'."\n";
-    echo '}'."\n";
-    echo 'setTimeout(reloadaprs,' . $rate . ');'."\n";
-    echo '$(window).trigger(\'resize\');'."\n";
-    echo '</script>'."\n";
-        
-    echo '</div>'."\n";
+// 1. Bereich für die APRS Daten (Block-Element)
+echo '<div id="aprs_data_container" style="display: block; min-height: 20px;">';
+  // Optional: Hier könntest du svxaprs.php direkt einmal inkludieren, 
+  // damit beim ersten Laden keine Verzögerung entsteht.
+  include "include/svxaprs.php"; 
+echo '</div>';
 
-    echo '<form method="post">';
-      echo ' Nachricht an <input type="text" id="aprs" name="aprs_call" value="DL3EL" required>';
+// 2. Ein Trenner oder Abstandshalter (Optional)
+//echo '<hr style="margin: 20px 0;">';
+
+// 3. Das Formular (Ebenfalls als Block oder in eigenem Div)
+echo '<div id="aprs_form_container" style="margin-top: 10px;">';
+    echo '<form method="post" style="display: inline;">';
+      echo ' Nachricht an <input type="text" name="aprs_call" value="DL3EL" required>';
       echo '&nbsp;&nbsp;';
-      echo '<input type="text" style = "width:300px" id="aprs" name="aprs_msg" value="Text" required>';
+      echo '<input type="text" style="width:300px" name="aprs_msg" value="Text" required>';
       echo '&nbsp;&nbsp;';
       echo '<input type="submit" name="senden" value="senden">';  
     echo '</form>';
-    // Save / Reload on submit//
+echo '</div>';
     if ((isset($_POST['senden'])) || (isset($_POST['cancel']))) {
         $aprs_call = $_POST['aprs_call'];
         if ($aprs_call !== "Call") {
@@ -35,8 +33,19 @@ if (session_status() === PHP_SESSION_NONE) {
           addsvxlog($logtext);
         }  
     }
-    echo '</div>'."\n";
-    echo '</td>';
+
+// 4. Das Script (unverändert, zielt auf den Container oben)
+$rate = 10000;
+echo '<script type="text/javascript">
+function reloadaprs(){
+    $("#aprs_data_container").load("include/svxaprs.php", function(){ 
+        setTimeout(reloadaprs, ' . $rate . '); 
+    });
+}
+// Wir starten den Timer, aber laden nicht sofort neu, 
+// da wir oben per "include" die Daten schon einmalig geladen haben.
+setTimeout(reloadaprs, ' . $rate . ');
+</script>';
         include_once "caller_svxmqtt.php"; 
     echo '</tr></table>';
 include_once "include/page_bottom.php"; 
