@@ -23,8 +23,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
 if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "YES")) || ($_SESSION['auth'] === 'AUTHORISED')) {
 
-include_once  '../include/settings.php';
-include_once  '../include/functions.php';
+if (!isset($svx_include)) {
+    include_once "../include/settings.php";
+}
 
 
 // load the connlist

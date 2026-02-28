@@ -113,6 +113,7 @@ if (isProcessRunning('svxlink')) {
       }
    }
    echo "</table>\n";
+   $modecho = "False";
    if ((defined ('debug')) && (debug > 0)) echo "R1:$reflectorlogic1 R2:$reflectorlogic2<br>";
    echo "<table style=\"margin-top:2px;margin-bottom:13px;\">\n";
    if (($check_logics[0]=="RepeaterLogic") && (isset($svxconfig['RepeaterLogic']['MODULES']))) { 
@@ -122,7 +123,6 @@ if (isProcessRunning('svxlink')) {
       $modules = explode(",",str_replace('Module','',$svxconfig['SimplexLogic']['MODULES'])); 
    } else {
       //$modules=""; 
-      $modecho = "False";
    }
 //   $inReflectorDefaultLang = explode(",", $svxconfig[$reflectorlogic1]['DEFAULT_LANG']);
 
@@ -140,6 +140,8 @@ if (isProcessRunning('svxlink')) {
 
          if ($key=="EchoLink") {
             $modecho ="True";
+         } else {
+            $modecho ="False";
          }
       }
       if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {

@@ -47,10 +47,10 @@ echo '<div id="content_area">';
                 } else {    
                     // Falls das inkludierte File selbst Tabellen hat, 
                     // verhindert das umschließende Div, dass diese am Rand kleben
-    $id = htmlspecialchars($_GET['id']);
-    $call_script = $id . ".php";
-    include $call_script;
-//                    include $call_script;
+                    $id = htmlspecialchars($_GET['id']);
+                    $call_script = $id . ".php";
+                    $svx_include = 1;
+                    include $call_script;
                 }
             }
         echo '</div>'; // Ende #content_area
