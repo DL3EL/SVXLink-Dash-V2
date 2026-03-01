@@ -28,7 +28,7 @@ my $message_time = "";
 my $log_time = "";
 my $write2file = "";
 my $tm = localtime(time);
-my $version = "1.71";
+my $version = "1.72";
 my $dir = "";
 my $conf = "";
 
@@ -360,7 +360,7 @@ sub parse_aprs {
 	if ($ack ne ":ack") {
 		$pckt_nr = $ack;
 # Payload could end with {ack#, therefore a substring should be done
-		if (((substr($srccall,0,5) eq "DL3EL") && (substr($payload,0,8) eq "?update?")) || ($destcall eq "FMNUPD")) {
+		if (((substr($srccall,0,5) eq "DL3EL") && (substr($payload,0,8) eq "?update?")) || ($destcall eq "FMNUPD") || ($destcall eq "APFMNU")) {
 # process ?update?
 			process_update($payload);
 		}	
@@ -721,7 +721,8 @@ my @loc;
 sub send_keepalive {
 	my $k_srccall = $_[0];
 	my $k_srcdest = "TCPIP*";
-	my $k_destcall = "APRS";
+#	my $k_destcall = "APRS";
+	my $k_destcall = "APFMNB";
 	my $aprs_init = "";
 
 # mal beobachten ob das bei HTV oder FT gegen einen Verbindungsabbruch hilft
@@ -1005,7 +1006,7 @@ sub aprs_tx {
 # wait for new identifier APFMN? approved 15.02.2025
 # APFMNM = messages
 # APFMNU = updates
-			if (($destcall eq "FMNUPD") || ($destcall eq "FMNTUPD") || ($no_ack)) {
+			if (($destcall eq "FMNUPD") || ($destcall eq "APFMNU") || ($no_ack)) {
 				$write2file = sprintf "[$log_time] aprs_tx destcall: %s (no-ack)\n", $destcall if ($verbose >= 2);
 				print_file($logdatei,$write2file) if ($verbose >= 2);
 				send_msg($destcall,$srcdest,$aprs_login,"no-ack",$aprs_msg);
@@ -1032,7 +1033,8 @@ sub beacon_tx {
 	my $data_len = 0;
 	my $aprs_msg = "";
 #	$srcdest = "APNFMN";
-	my $srcdest = "APRS";
+#	my $srcdest = "APRS";
+	my $srcdest = "APFMNB";
 # my $tg_status = "";
 # my $old_tgstatus = "";
 
@@ -1150,9 +1152,9 @@ sub connect_aprs {
 # we can override the config with par login
 	if ($login eq "") {
 		if  ($verbose >= 2) {
-			$aprsgroups = "g/FMNUPD/APNFMN/FMNTUPD";
+			$aprsgroups = "g/FMNUPD/APNFMN/FMNTUPD/APFMNB/APFMNM/APFMNU";
 		} else {
-			$aprsgroups = "g/FMNUPD/APNFMN";
+			$aprsgroups = "g/FMNUPD/APNFMN/APFMNB/APFMNM/APFMNU";
 		}	
 #		$login = sprintf ("user %s pass %s vers dl3el_pos 0.1 filter b/%s %s",$aprs_login,$aprs_passwd,$aprs_msg_call,$aprsgroups);
 		$login = sprintf ("user %s pass %s vers %s filter %s %s",$aprs_login,$aprs_passwd,$app_name,$aprs_filter,$aprsgroups);

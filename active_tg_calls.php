@@ -70,9 +70,13 @@ echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collap
                 echo '<div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">';
                     echo '<span>TG ' . $active_tg . ' (' . $name . ')';
                     if ($tgselect) {
-                        echo '&nbsp;<a style="color:white;" href="./caller_extern.php?id=https://chat.fm-funknetz.de/index.php?call=' . $callsign . '&tg=' . $active_tg . '" >FMN WebChat (' . $tgselect . ')</a> </span>';
-                        $content = '&nbsp;<a style="color:white;" href="./caller_extern.php?id=\"https://chat.fm-funknetz.de/index.php?call=' . $callsign . '&tg=' . $active_tg . '\"" >FMN WebChat</a> </span>';
-                        addsvxlog($content);
+                        // 1. Die Ziel-URL sauber zusammenbauen
+                        $target_url = "https://chat.fm-funknetz.de/index.php?call=" . $callsign . "&tg=" . $active_tg;
+                        // 2. Die URL für den Einsatz im Link codieren
+                        $encoded_url = urlencode($target_url);
+                        // 3. Den Link generieren
+                        $link = './caller_extern.php?id=' . $encoded_url;
+                        echo '&nbsp;<a style="color:white;" href="' . $link . '" >FMN WebChat (' . $tgselect . ')</a> </span>';
                     } else {
                         echo"</span>";
                     }   
