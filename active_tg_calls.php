@@ -18,7 +18,7 @@ $file = DL3EL_BASE . "svx2mqtt/mqtt.data";
 $all_calls = [];
 
 if (file_exists($file)) {
-    $data = shell_exec("tail -c 25600 " . escapeshellarg($file));
+    $data = shell_exec("tail -c 51200 " . escapeshellarg($file));
     $lines = explode("\n", $data);
 
     $pattern_active = "/activeTG/" . $active_tg . ":";
@@ -60,6 +60,7 @@ $anzahl = count($all_calls);
 
 // --- 3. AUSGABE ---
 $name = isset($tgdb_array[$active_tg]) ? $tgdb_array[$active_tg] : '---';
+   $tgselect = trim(getSVXTGSelect($reflectorlogic1));
 
 echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collapse: collapse; border: none;">';
     echo '<thead>';
@@ -67,7 +68,14 @@ echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collap
             // Hier nutzen wir dein CSS-definiertes <th>
             echo '<th style="text-align: left; padding: 8px 10px;">';
                 echo '<div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">';
-                    echo '<span>TG ' . $active_tg . ' (' . $name . ')</span>';
+                    echo '<span>TG ' . $active_tg . ' (' . $name . ')';
+                    if ($tgselect) {
+                        echo '&nbsp;<a style="color:white;" href="./caller_extern.php?id=https://chat.fm-funknetz.de/index.php?call=' . $callsign . '&tg=' . $active_tg . '" >FMN WebChat (' . $tgselect . ')</a> </span>';
+                        $content = '&nbsp;<a style="color:white;" href="./caller_extern.php?id=\"https://chat.fm-funknetz.de/index.php?call=' . $callsign . '&tg=' . $active_tg . '\"" >FMN WebChat</a> </span>';
+                        addsvxlog($content);
+                    } else {
+                        echo"</span>";
+                    }   
                     echo '<span style="font-weight: normal; font-size: 0.85em;">' . $anzahl . ' Calls | Stand: ' . $update_time . '</span>';
                 echo '</div>';
             echo '</th>';

@@ -143,9 +143,9 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     if ((strlen($mqtt_script)) || (file_exists("/usr/local/bin/mqtt-simple"))) {
       $mqtt = 1;
       echo 'function reloadActiveTGCalls(){'."\n";
-      echo '  $("#ActiveTGCalls").load("active_tg_calls.php", function(){ setTimeout(reloadActiveTGCalls, 30000) });'."\n";
+      echo '  $("#ActiveTGCalls").load("active_tg_calls.php", function(){ setTimeout(reloadActiveTGCalls, 15000) });'."\n";
       echo '}'."\n";
-      echo 'setTimeout(reloadActiveTGCalls, 3000);'."\n";
+      echo 'setTimeout(reloadActiveTGCalls, 15000);'."\n";
     } else {
       $mqtt = 0;
     } 
