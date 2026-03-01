@@ -120,7 +120,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 // FM-Funknetz WebChat
 	if ((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "yes")) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://dashboard.fm-funknetz.de/chat_jd10/index.php?id=' . $callsign . '" >FMN WebChat | </a> ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://chat.fm-funknetz.de/index.php?call=' . $callsign . '">FMN WebChat | </a> ';
 	}    
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
