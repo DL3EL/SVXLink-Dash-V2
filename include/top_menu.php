@@ -217,9 +217,8 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe für ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<button name="btn_expert" type="submit" >' . $kn_exp . '</button>';
 	echo '<button name="btn_normal" type="submit" >' . $kn_nor . '</button>';
-	if ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes")) {
+	if ((!defined('DL4EM_TOPMENU')) || ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes"))) {
 	    echo '&nbsp;<button name="btn_dropdown" type="submit" >' . $menu_dropdown . '</button>';
-	    echo '<button name="btn_classic" type="submit" >' . $menu_classic . '</button>';
 	}    
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
 	if ($knowledge == "Expert") {

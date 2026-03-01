@@ -69,7 +69,7 @@ echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collap
             echo '<th style="text-align: left; padding: 8px 10px;">';
                 echo '<div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">';
                     echo '<span>TG ' . $active_tg . ' (' . $name . ')';
-                    if ($tgselect) {
+                    if (((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "yes")) && ($tgselect)) {
                         // 1. Die Ziel-URL sauber zusammenbauen
                         $target_url = "https://chat.fm-funknetz.de/index.php?call=" . $callsign . "&tg=" . $active_tg;
                         // 2. Die URL für den Einsatz im Link codieren
