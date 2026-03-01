@@ -182,7 +182,7 @@ if (isset($_POST['btnDashUpdate']))
                     $dbversionFile = DL3EL . "/dbversion";
                     $new_dbversion = file_get_contents($dbversionFile);
                     list($dbversion, $rest) = explode(" ", $new_dbversion);
-                    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net='Update Abbruch'\"";
+                    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=Update Abbruch\"";
                     exec($cmd);
                     addsvxlog($cmd . "\n");
                 }    
