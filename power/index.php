@@ -178,15 +178,7 @@ if (isset($_POST['btnDashUpdate']))
         $command = $file . " " . $gitdir . " >>" . $log . " 2>&1";
         exec($command,$output,$retval);
         echo '<textarea name="content" rows="2" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
-                  if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
-                    $dbversionFile = DL3EL . "/dbversion";
-                    $new_dbversion = file_get_contents($dbversionFile);
-                    list($dbversion, $rest) = explode(" ", $new_dbversion);
-                    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=Update Abbruch\"";
-                    exec($cmd);
-                    addsvxlog($cmd . "\n");
-                }    
-      $content = file_get_contents($log);
+        $content = file_get_contents($log);
         exec("find " . DL3EL_BASE . "* ! -exec sudo chown $owner:$group {} +");
         if (str_contains($content,'error: Your local changes to the following files would be overwritten')) {
                 $content = $content . "\nDatei Inkonsistenz zu Github \n";
@@ -219,15 +211,13 @@ if (isset($_POST['btnDashUpdate']))
                 }        
                 $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
                 addsvxlog($content);
-/*
-                if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
-                    $dbversionFile = DL3EL . "/dbversion";
-                    $new_dbversion = file_get_contents($dbversionFile);
-                    list($dbversion, $rest) = explode(" ", $new_dbversion);
-                    $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=Abrruch\"";
-                    exec($cmd);
-                }    
-*/
+// send Update crashed msg
+                $dbversionFile = DL3EL . "/dbversion";
+                $new_dbversion = file_get_contents($dbversionFile);
+                list($dbversion, $rest) = explode(" ", $new_dbversion);
+                $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=Update Abbruch\"";
+                exec($cmd);
+//
                 $logtext =  "Update not successful\n";
         } else {       
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 1\n");
