@@ -60,7 +60,9 @@ $anzahl = count($all_calls);
 
 // --- 3. AUSGABE ---
 $name = isset($tgdb_array[$active_tg]) ? $tgdb_array[$active_tg] : '---';
-   $tgselect = trim(getSVXTGSelect($reflectorlogic1));
+//   $tgselect = trim(getSVXTGSelect($reflectorlogic1));
+    $reflectorlogic1 = 'ReflectorLogic';
+    $tgselect = trim(getSVXTGSelect($reflectorlogic1));
 
 echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collapse: collapse; border: none;">';
     echo '<thead>';

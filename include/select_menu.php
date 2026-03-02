@@ -5,11 +5,11 @@
   if (file_exists($menuFile)) {
     $menuType = trim(file_get_contents($menuFile));
   } else {
-    if ((defined('MENU_TYPE')) && ((MENU_TYPE === "dropdown") || (MENU_TYPE === "classic"))) {
-      $menuType = MENU_TYPE;
-    } else {
+//    if ((defined('MENU_TYPE')) && ((MENU_TYPE === "dropdown") || (MENU_TYPE === "classic"))) {
+//      $menuType = MENU_TYPE;
+//    } else {
       $menuType = "classic";
-    }
+//    }
   }
 
       if (isset($_POST['btn_dropdown'])) {

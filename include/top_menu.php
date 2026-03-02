@@ -146,10 +146,9 @@ if (session_status() === PHP_SESSION_NONE) {
     }   
 ?>
 <?php
-	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0)) {
+	if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
-		echo '<a class="hreflink" href="./wifi.php" >| Wifi</a> | ';
-		echo '<a class="hreflink" href="./network.php" >Network</a> | ';
+		echo '| <a class="hreflink" href="./network.php" >Network</a> ';
 	}	
 	if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
 	    echo '| <a class="hreflink" href="./mobile/index.php" >mobile</a> ';
@@ -217,7 +216,8 @@ if (session_status() === PHP_SESSION_NONE) {
 	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe für ' . $version . '&nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<button name="btn_expert" type="submit" >' . $kn_exp . '</button>';
 	echo '<button name="btn_normal" type="submit" >' . $kn_nor . '</button>';
-	if ((!defined('DL4EM_TOPMENU')) || ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes"))) {
+//	if ((!defined('DL4EM_TOPMENU')) || ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes"))) {
+	if ((defined('DL4EM_TOPMENU')) && (DL4EM_TOPMENU === "yes")) {
 	    echo '&nbsp;<button name="btn_dropdown" type="submit" >' . $menu_dropdown . '</button>';
 	}    
 	ECHO '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -234,6 +234,7 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a class="hreflink" href="./caller.php?file=' . DL3EL . '/aprs-is-msg.conf" id="aprs">aprs.conf</a> | ';
 	    }
 	    echo '<a class="hreflink" href="./caller.php?file=' . DL3EL_BASE . 'include/config.php" id="configphp">config.php</a> | ';
+	    echo '<a class="hreflink" href="./wifi.php" >Wifi</a> | ';
 	    if ((file_exists('/etc/default/shellinabox')) && ((defined('DL3EL_SSH')) && (strncmp(DL3EL_SSH, "yes", 3) === 0))) {
 		$getPortCommand = "grep -m 1 'SHELLINABOX_PORT=' /etc/default/shellinabox | awk -F '=' '/SHELLINABOX_PORT=/ {print $2}'";
 		$shellPort = exec($getPortCommand);    

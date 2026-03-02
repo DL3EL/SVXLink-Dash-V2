@@ -18,6 +18,7 @@
 <?php echo ("<title>" . $callsign . " Dashboard " . $dbversion . "</title>" ); ?>
 
 <?php include_once "include/browserdetect.php"; ?>
+<?php include_once "include/functions.php"; ?>
 
     <script type="text/javascript" src="scripts/jquery.min.js"></script>
     <script type="text/javascript" src="scripts/functions.js"></script>
@@ -99,12 +100,22 @@
 <?php 
 if (SHOWPTT=="TRUE") {
 // now including the volume buttons
-    include_once "ptt.html";
+    if ((defined('DL3EL_MIKE_TYPE')) && (DL3EL_MIKE_TYPE === "QX18")) {
+        include_once "ptt-qx18.html";
+    } else {
+        include_once "ptt.html";
+    }        
 }
 
 if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['auth'] === "AUTHORISED")) {
 /// neu audio
-    include_once "ptt.html";
+//    include_once "ptt.html";
+//    include_once "ptt-qx18.html";
+    if ((defined('DL3EL_MIKE_TYPE')) && (DL3EL_MIKE_TYPE === "QX18")) {
+        include_once "ptt-qx18.html";
+    } else {
+        include_once "ptt.html";
+    }        
     echo '<button class="button link" onclick="playAudioToggle(8001, this)">
     <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
     </button>';

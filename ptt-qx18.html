@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SvxLink Control - QX-18</title>
+    <script type="text/javascript">
+        // Pfad zur Status-Datei via PHP injiziert
+        const checkStatusUrl = "<?php echo 'dl3el/ptt-qx18/check_status.php'; ?>";
+        let isPTTActive = false;
+
+        function updatePTTUI() {
+            let xhr = new XMLHttpRequest();
+            // Cache-Busting mit Zeitstempel
+            xhr.open("GET", checkStatusUrl + "?t=" + new Date().getTime(), true);
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    let status = xhr.responseText.trim();
+                    let button = document.getElementById('myButton');
+                    
+                    if (status === "ON") {
+                        button.textContent = "Mic ON";
+                        button.style.backgroundColor = "red";
+                        isPTTActive = true;
+                    } else {
+                        button.textContent = "Mic OFF";
+                        button.style.backgroundColor = "green";
+                        isPTTActive = false;
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // Manuelles Klicken auf den Button (für Mouse-User)
+        function togglePTTManually() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "executePTT.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            // Wenn PTT an ist -> ausschalten (second), sonst einschalten (first)
+            let cmd = isPTTActive ? "command=second" : "command=first";
+            xhr.send(cmd);
+        }
+
+        setInterval(updatePTTUI, 1000);
+    </script>
+</head>
+<body>
+
+<?php
+// --- Lautsprecher Logik (Original übernommen) ---
+if (defined('DL3EL_SC_STRING')) {
+    $sc_exec = 'aplay -l | grep "' . DL3EL_SC_STRING . '"';
+    $sc = substr(shell_exec($sc_exec), 5, 1);
+} else {
+    $sc = 0;
+}
+
+function ls_change($value, $sc) {
+    exec("sudo amixer -c $sc set Speaker $value");
+    exec("sudo amixer -c $sc set Lineout $value");
+}
+
+if (isset($_POST['buttonA'])) { ls_change("5%-", $sc); }
+if (isset($_POST['buttonB'])) { ls_change("5%+", $sc); }
+if (isset($_POST['button_off'])) { ls_change("mute", $sc); }
+if (isset($_POST['button_on'])) { ls_change("unmute", $sc); }
+
+// Status abfragen für Lautsprecher
+$status = exec("amixer -c $sc get Speaker | grep % | awk '{print $7}'");
+if (!strlen($status)) { $status = exec("amixer -c $sc get Lineout | grep % | awk '{print $7}'"); }
+
+echo '<div style="display: flex; align-items: center; gap: 20px; padding: 10px;">';
+
+// 1. PTT BUTTON (Kompakt an der Seite)
+echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:green; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;"><b>PTT OFF</b></button>';
+
+// 2. LAUTSPRECHER STEUERUNG
+echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
+
+if ($status == "[on]") {
+    $volume = exec("amixer -c $sc get Speaker | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'");
+    if (!strlen($volume)) { $volume = exec("amixer -c $sc get Lineout | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'"); }
+
+    echo '<button name="button_off" type="submit" style="margin-right:10px; width:50px; border-radius:8px; background-color:#7a4a4a; border:none; height:30px;"><img src="images/speaker_off.png" height="15"></button>';
+    echo '<button name="buttonA" type="submit" style="width:30px; border-radius:8px; background-color:darkred; color:white; border:none; height:30px; font-weight:bold;">-</button>';
+    echo '<span style="margin: 0 10px; font-size:16px; font-family:sans-serif;">' . $volume . '</span>';
+    echo '<button name="buttonB" type="submit" style="width:30px; border-radius:8px; background-color:seagreen; color:white; border:none; height:30px; font-weight:bold;">+</button>';
+} else {
+    echo '<button name="button_on" type="submit" style="width:50px; border-radius:8px; background-color:#4a7a7a; border:none; height:30px;"><img src="images/speaker.png" height="15"></button>';
+    echo '<span style="margin-left:15px; font-family:sans-serif; color:grey;">Muted</span>';
+}
+
+echo '</form>';
+echo '</div>';
+
+function get_ptt_service_status() {
+    // Prüft, ob der systemd-Dienst läuft
+    $status = shell_exec("systemctl is-active ptt.service");
+    $is_running = (trim($status) == "active");
+    
+    // Prüft, ob das Mikrofon-Gerät im System vorhanden ist
+    $device_exists = false;
+    if (file_exists('/dev/input/')) {
+        $devices = shell_exec("cat /proc/bus/input/devices | grep UACDemoV1.0");
+        $device_exists = !empty($devices);
+    }
+
+    return [
+        'running' => $is_running,
+        'device' => $device_exists,
+        'label' => $is_running ? "Aktiv" : "Inaktiv",
+        'color' => $is_running ? "seagreen" : "darkred"
+    ];
+}
+
+?>
+
+</body>
+</html>
