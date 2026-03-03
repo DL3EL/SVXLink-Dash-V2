@@ -119,7 +119,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://stream.fm-funknetz.de" >Voice FMN | </a> ';
 	}    
 // FM-Funknetz WebChat
-	if ((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "yes")) {
+//	if ((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "no")) {
+	    // do not display Chat in Menu
+	} else {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://chat.fm-funknetz.de/index.php?call=' . $callsign . '">FMN WebChat | </a> ';
 	}    
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
