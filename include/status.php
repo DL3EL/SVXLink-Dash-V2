@@ -227,14 +227,18 @@ if ($reflectorlogic1 != "") {
    echo "</table>\n";
 
    $tgtmp = trim(getSVXTGTMP($reflectorlogic1));
+echo '<form method="post">';
    echo "<table colspan=2 style=\"margin-top:4px;margin-bottom:13px;\">\n";
    $tgdefault = $svxconfig[$reflectorlogic1]['DEFAULT_TG'];
+   $tgdefault_link = "<button type=submit id=jumptoA name=jmptoA class=active_id value=\"$tgdefault\">$tgdefault</button>";
+
    $tgmon = explode(",",$svxconfig[$reflectorlogic1]['MONITOR_TGS']);
-   echo "<tr><th width=50%>TG Default</th><td style=\"background:#ffffed;color:green;font-weight: bold;\">".$tgdefault."</td></tr>\n";
+   echo "<tr><th width=50%>TG Default</th><td style=\"background:#ffffed;color:green;font-weight: bold;\">".$tgdefault_link."</td></tr>\n";
    echo "<tr><th width=50%>TG Monitor</th><td style=\"background:#ffffed;color:#b44010;font-weight: bold;\">";
    echo "<div style=\"white-space:normal;\">";
    foreach ($tgmon as $key) {
-      echo $key." ";
+      echo "<button type=submit id=jumptoA name=jmptoA class=active_id value=\"$key\">$key </button>";
+//      echo $key." ";
    }
    echo "<span style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgtmp."</span>";
    echo "</div></td></tr>\n";
@@ -266,6 +270,7 @@ if ($reflectorlogic1 != "") {
    }
    echo "<tr><th width=50%>TG Active</th><td style=\"background: #ffffed;color:#0065ff;font-weight: bold;\">".$tgselect."</td></tr>\n";
    echo "</table>";
+echo '</form>';
 
 }
 if ((defined ('debug')) && (debug > 0)) echo "R1:$reflectorlogic1 R2:$reflectorlogic2<br>";
@@ -441,6 +446,7 @@ if ($reflectorlogic2 != "") {
 
    echo "<table style=\"margin-top:4px;margin-bottom:13px;\"><tr><th colspan=2 >Editing</th></tr><tr>";
    echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#ff0000;font-weight: bold;\">";
+   if (!isset($_SESSION['auth'])) $_SESSION['auth'] = "UNAUTHORISED";
    if ($_SESSION['auth'] === "UNAUTHORISED") {
       if ((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) {
          echo "always logged in";
