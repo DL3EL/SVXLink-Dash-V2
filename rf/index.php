@@ -84,6 +84,8 @@ if (defined('DL3EL_RADIO')) {
 
 <?php 
 $RfConfFile = DL3EL . '/sa818/sa818.json';
+# look for mismatch, RF-Guru sometimes loose config, trying to heal
+    $mismatch = 0;
 if (fopen($RfConfFile,'r')) {
     $filedata = file_get_contents($RfConfFile);
     $RfData = json_decode($filedata,true);
@@ -111,6 +113,9 @@ if (fopen($RfConfFile,'r')) {
       echo "saved port not valid: $radioport<br>";
       $RfData['port'] = "";
     } else {  
+// save json Data
+    $RfDataF = $RfData;
+//    echo "<br>1 different freq, " . $RfDataF['freq'] . "rfdata-freq:" . $RfData['freq'] . "ctcssF:" . $RfDataF['rxctcss'] . " ctcss:" . $RfData['rxctcss'] . "<br>";
 // check if saved data match radio data
       $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL . " p=" . $radioport;
       if ((defined ('debug')) && (debug > 10)) echo "ShariCall: $command<br>";
@@ -129,7 +134,8 @@ if (fopen($RfConfFile,'r')) {
       if ($tx !== "") {
 	$RfData['txfreq'] = $tx;
 	if ($tx !== $RfData['freq']) {
-	    echo "different freq, save the corret one<br>";
+	    echo "different freq, save the corret one<br>shari tx: $tx, json-freq:" . $RfData['freq'] . "<br>";
+	    $mismatch = 1;
 	}	
       }    
       if ($rx !== "") {
@@ -138,24 +144,28 @@ if (fopen($RfConfFile,'r')) {
       if (($rxctcss !== "")  && ($rxctcss !== "None")) {
 	if ($rxctcss !== $RfData['rxctcss']) {
 	    echo "different rxctcss, Shari: $rxctcss, sa818.json: " . $RfData['rxctcss'] . ", save the correct one<br>";
+	    $mismatch = 1;
 	}	
 	$RfData['rxctcss'] = $rxctcss;
       }    
       if (($txctcss !== "")  && ($txctcss !== "None")) {
 	if ($txctcss !== $RfData['txctcss']) {
 	    echo "different txctcss, Shari: $txctcss, sa818.json: " . $RfData['txctcss'] . ", save the correct one<br>";
+	    $mismatch = 1;
 	}	
 	$RfData['txctcss'] = $txctcss;
       }    
       if ($squelch !== "") {
 	if ($squelch !== $RfData['squelch']) {
 	    echo "different squelch, Shari: $squelch, sa818.json: " . $RfData['squelch'] . ", save the correct one<br>";
+	    $mismatch = 1;
 	}	
 	$RfData['squelch'] = $squelch;
       }    
       if ($bandwidth !== "") {
 	if ($bandwidth !== $RfData['bw']) {
 	    echo "different bandwidth, Shari: $bandwidth, sa818.json: " . $RfData['bw'] . ", save the correct one<br>";
+	    $mismatch = 1;
 	}	
 	$RfData['bw'] = $bandwidth;
       }    
@@ -458,13 +468,25 @@ if (isset($_POST['btnVol']))
 
 
 //load json
+      if ((DL3EL_RADIO == "RFGuru") && $mismatch) {
+//      if ((DL3EL_RADIO == "Shari") && $mismatch) {
+  echo "RF-Guru hat abweichende Konfiguration, letzte bekannte Konfig laden?<br>";
+    echo "<br>3 json/rf data:  " . $RfDataF['freq'] . "rfdata-freq:" . $RfData['freq'] . "rxctcssF:" . $RfDataF['rxctcss'] . " rxctcss:" . $RfData['rxctcss'] . "<br>";
+$rxfreq = $RfDataF['rxfreq'];$txfreq = $RfDataF['txfreq'];$ctcss=$RfDataF['ctcss'];$rxctcss=$RfDataF['rxctcss'];$txctcss=$RfDataF['txctcss'];$tail=$RfDataF['tail'];$squelch=$RfDataF['squelch'];
+$fEmph = $RfDataF['fEmph'];$fLow=$RfDataF['fLow'];$fHigh=$RfDataF['fHigh'];
+$volume = $RfDataF['volume'];
+$tail = $RfDataF['tail'];
+$bw = $RfDataF['bw'];
+if ((defined ('debug')) && (debug > 0)) echo "current data1 (json) TX:$txfreq, RX:$rxfreq, $ctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
+} else {
 
-$rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
+$rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$rxctcss=$RfData['rxctcss'];$txctcss=$RfData['txctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
 $fEmph = $RfData['fEmph'];$fLow=$RfData['fLow'];$fHigh=$RfData['fHigh'];
 $volume = $RfData['volume'];
 $tail = $RfData['tail'];
 $bw = $RfData['bw'];
-
+if ((defined ('debug')) && (debug > 0)) echo "current data1 (radio) TX:$txfreq, RX:$rxfreq, $ctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
+}
 ?>
 
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
@@ -510,6 +532,10 @@ $bw = $RfData['bw'];
       $pn = 0;
       $port = $device[0];
       echo '<form method="post" action="">';
+      if ((DL3EL_RADIO == "RFGuru") && $mismatch) {
+//      if ((DL3EL_RADIO == "Shari") && $mismatch) {
+	echo "RF-Guru hat abweichende Konfiguration, letzte bekannte Konfig laden?<br>";
+      }
       echo '<select id="port" name="port" required>';
       foreach ($device as $portnr) {
 	  $portLine = "<option value=" . $pn . ">" . $portnr . "</option><br>\n";
