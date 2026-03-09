@@ -86,13 +86,18 @@ if (defined('DL3EL_RADIO')) {
 $RfConfFile = DL3EL . '/sa818/sa818.json';
 # look for mismatch, RF-Guru sometimes loose config, trying to heal
     $mismatch = 0;
+    $command = "ls -lisa " . DL3EL . '/sa818/sa818.json';
+    exec($command, $output, $retval);
+    if ((defined ('debug')) && (debug > 0)) echo "Rights: <br>";
+    if ((defined ('debug')) && (debug > 0)) print_r($output);
 if (fopen($RfConfFile,'r')) {
     $filedata = file_get_contents($RfConfFile);
+    addsvxlog($filedata);
     $RfData = json_decode($filedata,true);
 
-    if ((defined ('debug')) && (debug > 10)) echo "Data from File: ";
-    if ((defined ('debug')) && (debug > 10)) print_r($RfData);
-    if ((defined ('debug')) && (debug > 10)) echo "<br>";
+    if ((defined ('debug')) && (debug > 0)) echo "Data from File: <br>";
+    if ((defined ('debug')) && (debug > 0)) print_r($RfData);
+    if ((defined ('debug')) && (debug > 0)) echo "<br>";
     list($txctcss, $rxctcss) = explode(",", $RfData['ctcss']);
     $RfData['txctcss'] = $txctcss;
     $RfData['rxctcss'] = $rxctcss;
@@ -105,7 +110,7 @@ if (fopen($RfConfFile,'r')) {
 // SA818 works only in simplex mode, RX has to be equal to TX	
     $RfData['rxfreq'] = $RfData['txfreq'];
 
-    if ((defined ('debug')) && (debug > 0)) echo "sa818.jason:<br>";
+    if ((defined ('debug')) && (debug > 0)) echo "sa818.json:<br>";
     if ((defined ('debug')) && (debug > 0)) print_r($RfData);
     $radioport = $RfData['port'];
     if (substr($radioport,0,8) !== "/dev/tty") {
@@ -118,7 +123,7 @@ if (fopen($RfConfFile,'r')) {
 //    echo "<br>1 different freq, " . $RfDataF['freq'] . "rfdata-freq:" . $RfData['freq'] . "ctcssF:" . $RfDataF['rxctcss'] . " ctcss:" . $RfData['rxctcss'] . "<br>";
 // check if saved data match radio data
       $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl r=1 d=" . DL3EL . " p=" . $radioport;
-      if ((defined ('debug')) && (debug > 10)) echo "ShariCall: $command<br>";
+      if ((defined ('debug')) && (debug > 0)) echo "ShariCall: $command<br>";
       exec($command, $output, $retval);
       $tx = "";
       $rx = "";
@@ -395,11 +400,12 @@ if (isset($_POST['btnRadio']))
 	}  
 
 	if (!$retval) {
-        $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
-	if ((defined ('debug')) && (debug > 10)) echo $command;
+	  $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
+	  if ((defined ('debug')) && (debug > 10)) echo $command;
 	  exec($command,$screen,$retval);
 	  $RfData['port']=$port;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
 	  $jsonRfData = json_encode($RfData);
+	  addsvxlog($jsonRfData);
 	  file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
 	  //archive the current config
 	  exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
