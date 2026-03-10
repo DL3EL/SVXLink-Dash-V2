@@ -1,6 +1,6 @@
 
 
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <form method="post"  style="display: inline;" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
     <?php
         $file = SVXCONFPATH.SVXCONFIG;
         $RefModeFile = DL3EL . "/ref_mode";
@@ -46,6 +46,16 @@
             echo '<button name="btn_REF4" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
             echo '&nbsp;&nbsp;&nbsp;';
         }    
+        if (file_exists(DL3EL.'/Reflector5.conf')) {
+            if (defined ('DL3EL_REF5_BUTTON') && (DL3EL_REF5_BUTTON !== ""))  {
+                $buttontext = DL3EL_REF5_BUTTON;
+                $color = ($refmode === DL3EL_REF5_BUTTON)? "green" : "blue";
+            } else {
+                $buttontext = "ref5";
+            }    
+            echo '<button name="btn_REF5" type="submit" style = "border-radius:8px; color:white;border-color:transparent; background-color:' . $color . '; height:30px; width:100px; font-size:12px;"><b>' . $buttontext . '</b></button>';
+            echo '&nbsp;&nbsp;&nbsp;';
+        }    
     ?>
     </form> 
 
@@ -75,6 +85,12 @@
         upd_svx_config($file,"dl3el/Reflector4.conf");
         if (defined ('DL3EL_REF4_BUTTON') && (DL3EL_REF4_BUTTON !== ""))  {
             file_put_contents($RefModeFile, DL3EL_REF4_BUTTON);
+        }    
+    }
+    if (isset($_POST['btn_REF5'])) {
+        upd_svx_config($file,"dl3el/Reflector5.conf");
+        if (defined ('DL3EL_REF5_BUTTON') && (DL3EL_REF5_BUTTON !== ""))  {
+            file_put_contents($RefModeFile, DL3EL_REF5_BUTTON);
         }    
     }
 

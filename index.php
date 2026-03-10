@@ -97,12 +97,13 @@ if ((file_exists('/usr/bin/dvs')) && (defined('DL3EL'))) {
 if ((defined ('debug')) && (debug > 0)) echo "DVS Support: $dmr_support";
 $refchg = DL3EL.'Reflector1.conf';
 if ((defined ('debug')) && (debug > 0)) echo "Auth:" . $_SESSION['auth'] . "<br>";
+/*
 if ($_SESSION['auth'] === "AUTHORISED") {
     if (file_exists(DL3EL.'/Reflector1.conf')) {
         include_once "ref_change.php";
     }
 }   
-
+*/
 ?>
 
 <?php
