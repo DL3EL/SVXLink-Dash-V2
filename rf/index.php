@@ -356,6 +356,11 @@ if (isset($_POST['btnRadio']))
 	$tail = (isset($_POST['tail']))? $_POST['tail'] : "";
 	$bw = (isset($_POST['bw']))? $_POST['bw'] : "";
 	$ctcss = $txctcss;
+	$freq = $rxfreq;
+	$tail_cmd = "";
+	$ctcss_type = "";
+	$retval = radio_ctcss_check($ctcss, $ctcss_type, $rxctcss, $txctcss,$tail_cmd,$tail);
+/*
 	$ctcss_type = "invalid";
 	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")) {
 	  $ctcss_type = "dcs";
@@ -403,6 +408,7 @@ if (isset($_POST['btnRadio']))
 	  }
 	}  
 
+*/
 	if (!$retval) {
 	  $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
 	  if ((defined ('debug')) && (debug > 10)) echo $command;
@@ -476,27 +482,50 @@ if (isset($_POST['btnVol']))
 	echo "new volume saved to device on $port, please reload page<br>";  
 }
 
+if (isset($_POST['btnSaveAll'])) {
+    $retval = null;
+    $screen = null;
+    $rxfreq = $RfDataF['rxfreq'];$txfreq = $RfDataF['txfreq'];$ctcss=$RfDataF['ctcss'];$rxctcss=$RfDataF['rxctcss'];$txctcss=$RfDataF['txctcss'];$tail=$RfDataF['tail'];$squelch=$RfDataF['squelch'];
+    $fEmph = $RfDataF['fEmph'];$fLow=$RfDataF['fLow'];$fHigh=$RfDataF['fHigh'];
+    $volume = $RfDataF['volume'];
+    $tail = $RfDataF['tail'];
+    $bw = $RfDataF['bw'];
 
-//load json
-      if ((DL3EL_RADIO == "RFGuru") && $mismatch) {
-//      if ((DL3EL_RADIO == "Shari") && $mismatch) {
-  echo "RF-Guru hat abweichende Konfiguration, letzte bekannte Konfig laden?<br>";
-    echo "<br>3 json/rf data:  " . $RfDataF['freq'] . "rfdata-freq:" . $RfData['freq'] . "rxctcssF:" . $RfDataF['rxctcss'] . " rxctcss:" . $RfData['rxctcss'] . "<br>";
-$rxfreq = $RfDataF['rxfreq'];$txfreq = $RfDataF['txfreq'];$ctcss=$RfDataF['ctcss'];$rxctcss=$RfDataF['rxctcss'];$txctcss=$RfDataF['txctcss'];$tail=$RfDataF['tail'];$squelch=$RfDataF['squelch'];
-$fEmph = $RfDataF['fEmph'];$fLow=$RfDataF['fLow'];$fHigh=$RfDataF['fHigh'];
-$volume = $RfDataF['volume'];
-$tail = $RfDataF['tail'];
-$bw = $RfDataF['bw'];
-if ((defined ('debug')) && (debug > 0)) echo "current data1 (json) TX:$txfreq, RX:$rxfreq, $ctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
-} else {
-
-$rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$rxctcss=$RfData['rxctcss'];$txctcss=$RfData['txctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
-$fEmph = $RfData['fEmph'];$fLow=$RfData['fLow'];$fHigh=$RfData['fHigh'];
-$volume = $RfData['volume'];
-$tail = $RfData['tail'];
-$bw = $RfData['bw'];
-if ((defined ('debug')) && (debug > 0)) echo "current data1 (radio) TX:$txfreq, RX:$rxfreq, $ctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
+    $freq = $rxfreq;
+    $tail_cmd = "";
+    $ctcss_type = "";
+    $retval = radio_ctcss_check($ctcss, $ctcss_type, $rxctcss, $txctcss,$tail_cmd,$tail);
+    $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
+    exec($command,$screen,$retval);
+    $command = "python3 sa818.py --port \"" .$port. "\" volume  --level \"" .$volume. "\" 2>&1";
+    exec($command,$screen,$retval);
+    $command = "python3 sa818.py --port \"" .$port. "\" filters  --emphasis \"" .$fEmph. "\" --lowpass \"" .$fLow. "\" --highpass \"" .$fHigh. "\" 2>&1";
+    exec($command,$screen,$retval);
 }
+//load json
+//$mismatch = 1;
+//  if ((DL3EL_RADIO == "Shari") && $mismatch) {
+  if ((DL3EL_RADIO == "RFGuru") && $mismatch) {
+    echo "RF-Guru hat abweichende Konfiguration, letzte bekannte Konfig laden?:<br>";
+    $rxfreq = $RfDataF['rxfreq'];$txfreq = $RfDataF['txfreq'];$ctcss=$RfDataF['ctcss'];$rxctcss=$RfDataF['rxctcss'];$txctcss=$RfDataF['txctcss'];$tail=$RfDataF['tail'];$squelch=$RfDataF['squelch'];
+    $fEmph = $RfDataF['fEmph'];$fLow=$RfDataF['fLow'];$fHigh=$RfDataF['fHigh'];
+    $volume = $RfDataF['volume'];
+    $tail = $RfDataF['tail'];
+    $bw = $RfDataF['bw'];
+    echo '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '"> ';
+    echo "<tr><td>";
+    echo "<button name=\"btnSaveAll\" type=\"submit\" class=\"red\" style = \"height:30px; width:400px; font-size:12px;\">gespeicherte Konfiguration zum RF-Guru schicken</button><br><br>";
+    echo "</td></tr>";
+    echo "</form> ";
+    if ((defined ('debug')) && (debug > 0)) echo "current data1 (json) TX:$txfreq, RX:$rxfreq, $ctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
+  } else {
+    $rxfreq = $RfData['rxfreq'];$txfreq = $RfData['txfreq'];$ctcss=$RfData['ctcss'];$rxctcss=$RfData['rxctcss'];$txctcss=$RfData['txctcss'];$tail=$RfData['tail'];$squelch=$RfData['squelch'];
+    $fEmph = $RfData['fEmph'];$fLow=$RfData['fLow'];$fHigh=$RfData['fHigh'];
+    $volume = $RfData['volume'];
+    $tail = $RfData['tail'];
+    $bw = $RfData['bw'];
+    if ((defined ('debug')) && (debug > 0)) echo "current data1 (radio) TX:$txfreq, RX:$rxfreq, $ctcss, SQ: $squelch, $rxctcss, BW: $bandwidth <br>";
+  }
 ?>
 
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
@@ -542,10 +571,6 @@ if ((defined ('debug')) && (debug > 0)) echo "current data1 (radio) TX:$txfreq, 
       $pn = 0;
       $port = $device[0];
       echo '<form method="post" action="">';
-      if ((DL3EL_RADIO == "RFGuru") && $mismatch) {
-//      if ((DL3EL_RADIO == "Shari") && $mismatch) {
-	echo "RF-Guru hat abweichende Konfiguration, letzte bekannte Konfig laden?<br>";
-      }
       echo '<select id="port" name="port" required>';
       foreach ($device as $portnr) {
 	  $portLine = "<option value=" . $pn . ">" . $portnr . "</option><br>\n";
@@ -710,5 +735,56 @@ function device_detection($radioport) {
       $screen[0] = "no Radio found";
     }  
     return($screen);
+}
+function radio_ctcss_check(&$ctcss,&$ctcss_type,&$rxctcss,&$txctcss,&$tail_cmd,&$tail) {
+echo "Funk CT: $ctcss, Tail: $tail_cmd [$tail] [RC $rxctcss / TC: $txctcss] <br>";
+	$ctcss = $txctcss;
+	$ctcss_type = "invalid";
+	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")) {
+	  $ctcss_type = "dcs";
+	  $tail_cmd = "";
+	} else {    
+	  if ((substr($txctcss,-2,1) === ".") || ($txctcss = "None")) {
+	    $ctcss_type = "ctcss";
+	    $tail_cmd = "--tail \"" . $tail . "\"";
+	  } else {  
+	    $ctcss_type = "invalid";
+	    $txctcss = "?" . $txctcss . "?";
+	    $retval = 1;
+	  }  
+	}
+	if (!$retval) {
+	  if ((substr($rxctcss,-1) === "N") || (substr($rxctcss,-1) === "I")) {
+	    if ($ctcss_type !== "dcs") {
+	      $ctcss_type = "invalid";
+	      $txctcss = "?" . $txctcss . "?";
+	      $rxctcss = "?" . $rxctcss . "?";
+	      $retval = 1;
+	    } else {  
+	      $ctcss_type = "dcs";
+	      $tail_cmd = "";
+	    }
+	  } else {    
+	    if ((substr($rxctcss,-2,1) === ".") || ($rxctcss = "None")) {
+	      if ($ctcss_type !== "ctcss") {
+		$ctcss_type = "invalid";
+		$txctcss = "?" . $txctcss . "?";
+		$rxctcss = "?" . $rxctcss . "?";
+		$retval = 1;
+	      } else {
+		$ctcss_type = "ctcss";
+		$tail_cmd = "--tail \"" . $tail . "\"";
+	      }
+	    } else {  
+	      $ctcss_type = "invalid";
+	      $rxctcss = "?" . $rxctcss . "?";
+	      $retval = 1;
+	    }  
+	  }
+	  if ($rxctcss !== "") {
+	    $ctcss = $txctcss . "," . $rxctcss;
+	  }
+	}  
+    return ($retval);
 }
 ?>
