@@ -353,7 +353,10 @@ if (isset($_POST['btnCleanUp']))
         //$content = trim(shell_exec('cat versioncheck'));
         $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
 
-        if ((defined ('debug')) && (debug > 0)) $content = ".g";
+        if ((defined ('debug')) && (debug > 0)) {
+            echo "<br><b>Debug ist eingeschaltet, kein Update möglich<br>Folgende Fehlermeldungen ignorieren und debug ausschalten<br></b>";
+            $content = ".g";
+        }    
         if ($content === ".g")  {
             $git_file  = "https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion";
             echo "<br><br><br>Github Versionprüfung konnte nicht ausgeführt werden. Die Datei <br><a href='$git_file' target='git'>$git_file</a> <br>konnte nicht gelesen werden<br";
