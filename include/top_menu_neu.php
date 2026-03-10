@@ -21,33 +21,46 @@ $menu_now = "classic";
 $knowledge = "Normal";
 $knowledgeFile = DL3EL . "/knowledge";
 
-
+// bei fehlender Definition TOP/BOTTOM Menü in config.php verhindert Darstellungsfehler
+if (!defined('MENUBUTTON')) {define("MENUBUTTON", "no button");} 
 
 $datei = "dl3el/menu";
 $menu_now = file_get_contents($datei);
 if ($menu_now == "dropdown") {
 
 	// Option kein Open Ham Clock Menüeintrag bei Display def. in config.php
-	if (DL3EL_OPENHAMCLOCK == "no") {
+//	if (DL3EL_OPENHAMCLOCK == "no") {
+  if (defined('DL3EL_OPENHAMCLOCK') && (DL3EL_OPENHAMCLOCK == "no")) {
 		$ohc = false;
 	} else {
 		$ohc = true;
 	}
 
 	// Option kein Expert Edit Menü def. in config.php
-	if (DL3EL_EXPERT == "no") {
-		file_put_contents($knowledgeFile, $knowledge);
-	}
+
+  if (defined('DL3EL_EXPERT') && (DL3EL_EXPERT == "no")) {
+//	if (DL3EL_EXPERT == "no") {
+		file_put_contents($knowledgeFile, "Normal");
+	} 
 
 	// Option Relais Dashboard ohne erweiterten Menü (nur Dashboard und DX)
 	$public_relais = false;
 
 	// Option Develop zusätzlicher Eintrag (Netzwerk Editor)
-	if (DL3EL_VERSION == "develop") {
+  if (defined('DL3EL_VERSION') && (DL3EL_VERSION == "develop")) {
+//	if (DL3EL_VERSION == "develop") {
 		$develop = true;
 	} else {
 		$develop = false;
 	}
+
+	// Option APRS	
+  if (defined('DL3EL_APRS_MSG') && (DL3EL_APRS_MSG == "yes")) {
+		$aprs = true;
+	} else {
+		$aprs = false;
+	}
+
 
 	// Option Anzeige Reflector Menü wenn Reflectoren wenn in config.php konfiguriert
 	if ((!defined("DL3EL_REF1_BUTTON")) && (!defined("DL3EL_REF2_BUTTON")) && (!defined("DL3EL_REF3_BUTTON")) && (!defined("DL3EL_REF4_BUTTON"))) {
@@ -64,14 +77,16 @@ if ($menu_now == "dropdown") {
 	}
 
 	// Option DX Cluster Menüeintrag wenn in config.php definiert
-	if (DL3EL_DXCLUSTER == "yes") {
+  if (defined('DL3EL_DXCLUSTER') && (DL3EL_DXCLUSTER == "yes")) {
+//	if (DL3EL_DXCLUSTER == "yes") {
 		$cluster = true;
 	} else {
 		$cluster = false;
 	}
 
 	// Open Ham Clock Menüeintrag DISPLAY wenn in config.php definiert
-	if (DL3EL_OPENHAMCLOCK == "yes") {
+  if (defined('DL3EL_OPENHAMCLOCK') && (DL3EL_OPENHAMCLOCK == "yes")) {
+//	if (DL3EL_OPENHAMCLOCK == "yes") {
 		$clock = true;
 	} else {
 		$clock = false;
@@ -122,26 +137,30 @@ if ($menu_now == "dropdown") {
 	if (isset($_POST['display'])) {
 		$val = $_POST['display'];
 
-		// URLs als Array definieren
-		$urls = [
-			1 => './index.php', //Dashboard wenn in DISPLAY Menü definiert
-			2 => './caller.php?id=include/tg',
-			3 => file_exists("/usr/local/bin/mqtt-simple")
-				? './caller.php?id=monitor&refresh=15'
-				: './caller.php?id=monitor0',
-			4 => './caller.php?id=echolink_dl3el0',
-			5 => './caller.php?id=relais0',
-			6 => './caller.php?id=include/svxdxc&refresh=15',
-			7 => './caller.php?id=aprs',
-			8 => './caller_extern.php?id=https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150',
-			9 => './caller_extern.php?id=https://stream.fm-funknetz.de',
-			10 => './caller_extern.php?id=https://qsolink.websdrbordeaux.fr/dashboard.html',
-			11 => 'https://openhamclock.com/',
-//			12 => './caller_extern.php?id=https://dashboard.fm-funknetz.de/chat_jd10/index.php?id=' . $callsign . '',
-			12 => './caller_extern.php?id=https://chat.fm-funknetz.de/index.php?call=' . $callsign,
-			//13 => './caller.php?id=neue_seite1',
-			//14 => './caller_extern.php?id=neue_seite2'  // bis20 !!//
-		];
+		$menu = [
+			1 => ['url' => './index.php'],
+			2 => ['url' => './caller.php?id=include/tg'],
+			3 => ['url' => file_exists("/usr/local/bin/mqtt-simple")
+            ? './caller.php?id=monitor&refresh=15'
+            : './caller.php?id=monitor0'
+			],
+			4 => ['url' => './caller.php?id=echolink_dl3el0'],
+			5 => ['url' => './caller.php?id=relais0'],
+			6 => ['url' => './caller.php?id=include/svxdxc&refresh=15'],
+			7 => ['url' => './caller.php?id=aprs'],
+			8 => ['url' => './caller_extern.php?id=https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150'],
+			9 => ['url' => './caller_extern.php?id=https://stream.fm-funknetz.de'],
+			10 => ['url' => './caller_extern.php?id=https://qsolink.websdrbordeaux.fr/dashboard.html'],
+			11 => ['url' => 'https://openhamclock.com/', 'condition' => $clock ],
+			12 => ['url' => './caller_extern.php?id=https://chat.fm-funknetz.de/index.php?call=' . $callsign ]
+			];
+		$urls = [];
+
+		foreach ($menu as $id => $entry) {
+			if (!isset($entry['condition']) || $entry['condition']) {
+				$urls[$id] = $entry['url'];
+			}
+		}
 
 		// Prüfen, ob ein Eintrag existiert
 		if (isset($urls[$val])) {
@@ -311,38 +330,25 @@ if ($menu_now == "dropdown") {
 		echo '<form method="post" action="" style="display:inline;">';
 
 		// Menü Display Inline /////////////////////////////
-		if ($ohc == false) {
-			$options = [
-				['value' => '', 'label' => 'DISPLAY', 'hidden' => true, 'disabled' => true, 'selected' => true],
-				//['value' => '1', 'label' => 'Dashboard'],
-				['value' => '2', 'label' => 'Talk Groups'],
-				['value' => '3', 'label' => 'Monitor Calls'],
-				['value' => '4', 'label' => 'Echolink'],
-				['value' => '5', 'label' => 'FM Relais'],
-				['value' => '6', 'label' => 'DX Cluster', 'condition' => $cluster === true],
-				['value' => '7', 'label' => 'APRS Monitor'],
-				['value' => '8', 'label' => 'OWR', 'condition' => $owrx === true],
-				['value' => '9', 'label' => 'Voice FMN'],
-				['value' => '10', 'label' => 'QSO Cockpit'],
-				//['value' => '11', 'label' => 'OHC'],
-				['value' => '12', 'label' => 'Web Chat'],
-			];
+		$options = [
+			['value' => '', 'label' => 'DISPLAY', 'hidden' => true, 'disabled' => true, 'selected' => true],
+			['value' => '2', 'label' => 'Talk Groups'],
+			['value' => '3', 'label' => 'Monitor Calls'],
+			['value' => '4', 'label' => 'Echolink'],
+			['value' => '5', 'label' => 'FM Relais'],
+			['value' => '6', 'label' => 'DX Cluster', 'condition' => $cluster === true],
+			['value' => '7', 'label' => 'APRS Monitor'],
+			['value' => '8', 'label' => 'OWR', 'condition' => $owrx === true],
+			['value' => '9', 'label' => 'Voice FMN'],
+		];
+
+		if ($ohc) {
+			$options[] = ['value' => '12', 'label' => 'FMN WebChat'];
+			$options[] = ['value' => '10', 'label' => 'QSO Cockpit'];
+			$options[] = ['value' => '11', 'label' => 'OHC'];
 		} else {
-			$options = [
-				['value' => '', 'label' => 'DISPLAY', 'hidden' => true, 'disabled' => true, 'selected' => true],
-				//['value' => '1', 'label' => 'Dashboard'],
-				['value' => '2', 'label' => 'Talk Groups'],
-				['value' => '3', 'label' => 'Monitor Calls'],
-				['value' => '4', 'label' => 'Echolink'],
-				['value' => '5', 'label' => 'FM Relais'],
-				['value' => '6', 'label' => 'DX Cluster', 'condition' => $cluster === true],
-				['value' => '7', 'label' => 'APRS Monitor'],
-				['value' => '8', 'label' => 'OWR', 'condition' => $owrx === true],
-				['value' => '9', 'label' => 'Voice FMN'],
-				['value' => '12', 'label' => 'FMN WebChat'],
-				['value' => '10', 'label' => 'QSO Cockpit'],
-				['value' => '11', 'label' => 'OHC'],
-			];
+			$options[] = ['value' => '10', 'label' => 'QSO Cockpit'];
+			$options[] = ['value' => '12', 'label' => 'Web Chat'];
 		}
 
 		echo '<select style="font-size:16px;" name="display" onchange="this.form.submit()">';
@@ -363,7 +369,7 @@ if ($menu_now == "dropdown") {
 			$tabConst = "DL3EL_EXTERN{$i}_TAB";
 			$mainConst = "DL3EL_EXTERN{$i}";
 			$nameConst = "DL3EL_EXTERN{$i}_NAME";
-			$value = 20 + $i; // value 21-24
+			$value = 21 + $i; // value 21-24
 
 			// Überspringen wenn TAB = "new"
 			if (defined($tabConst) && constant($tabConst) === "new") {
@@ -533,11 +539,12 @@ if ($menu_now == "dropdown") {
 		}
 
 		// Normal / Expert Button
-		if (DL3EL_EXPERT == "yes") {
+//		if (DL3EL_EXPERT == "yes") {
+	if (defined('DL3EL_EXPERT') && (DL3EL_EXPERT == "yes")) {	
 			echo '<button style="color:' . $kn_exp_col . ';font-size:16px;" name="btn_expert" type="submit" >' . $kn_exp . '</button>';
 			echo '<button style="color:' . $kn_nor_col . ';font-size:16px;" name="btn_normal" type="submit" >' . $kn_nor . '</button>';
-		}
-
+		} 
+	
 		// Auth Button
 		if ($show_auth) {
 			echo '<a href="./authorise.php" style="color:crimson;margin-left:10px;font-size:18px;">Authorise</a>';
