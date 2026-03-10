@@ -5,8 +5,11 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once "config.php";         
 include_once "tools.php";        
 include_once "functions.php";    
+if ($fmnetwork === "uk.wide.svxlink.uk") {
+include_once "tgdb_uk.php";    
+} else {
 include_once "tgdb.php";    
-
+}
 if (isset($_POST['btnUpdateTgs']))
     {
 

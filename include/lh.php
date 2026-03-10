@@ -78,7 +78,12 @@ echo '<th width=100px>Callsign</th>';
 	$dmrtgsel = $cron_log . " >" . $cron_File;
 	shell_exec("echo $dmrtgsel");
       }
+//include_once "tgdb.php";    
+if ($fmnetwork === "uk.wide.svxlink.uk") {
+include_once "tgdb_uk.php";    
+} else {
 include_once "tgdb.php";    
+}
 ?>
       <th width=100px>TG #</th>
 <!-- <th width=30px> A </th>  -->

@@ -98,7 +98,27 @@
 ?>
 <!-- PTT button -->
 <?php 
-if (SHOWPTT=="TRUE") {
+//if (SHOWPTT=="TRUE") {
+if ((defined('SHOWPTT')) && (SHOWPTT=="TRUE")) {
+    if ((defined('DL3EL_MIKE_TYPE')) && (DL3EL_MIKE_TYPE === "QX18")) {
+        $command = "pgrep -f 'ptt_listener.py'";
+        exec($command, $output, $returnCode);
+        $procs = count($output);
+        if ($procs <2) {
+            $cmd = "sudo -u svxlink python " . DL3EL . "/ptt-qx18/ptt_listener.py >/dev/null &";
+            if ((defined ('debug')) && (debug > 0)) echo "Starting QX18 ";
+            exec($cmd, $output, $retval);
+            $logtext =  "QX18 Listener gestartet (" . $cmd . ")\n";
+            addsvxlog($logtext);
+        }    
+        include_once "ptt-qx18.html";
+    } else {
+        include_once "ptt.html";
+    }        
+//        include_once "ptt-qx18.html";
+//        include_once "ptt.html";
+}
+/*
 // now including the volume buttons
     if ((defined('DL3EL_MIKE_TYPE')) && (DL3EL_MIKE_TYPE === "QX18")) {
         include_once "ptt-qx18.html";
@@ -106,12 +126,13 @@ if (SHOWPTT=="TRUE") {
         include_once "ptt.html";
     }        
 }
-
+*/
 if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['auth'] === "AUTHORISED")) {
 /// neu audio
 //    include_once "ptt.html";
 //    include_once "ptt-qx18.html";
     if ((defined('DL3EL_MIKE_TYPE')) && (DL3EL_MIKE_TYPE === "QX18")) {
+//        include_once "ptt.html";
         include_once "ptt-qx18.html";
     } else {
         include_once "ptt.html";
@@ -120,6 +141,9 @@ if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['aut
     <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
     </button>';
 }
+    if (file_exists(DL3EL.'/Reflector1.conf')) {
+        include_once "ref_change.php";
+    }
    
 ///
 ?>
