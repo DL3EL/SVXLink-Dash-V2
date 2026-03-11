@@ -292,6 +292,29 @@ if (session_status() === PHP_SESSION_NONE) {
 	} else {
 	    echo '<a class="hreflink" href="./caller.php?file=log" id="log">SVX Log</a> ';
 	}
+////// extern neu
+	for ($i = 1; $i < 5; $i++) {
+	    $link = "DL3EL_EXTERN{$i}";
+	    $name = "DL3EL_EXTERN{$i}_NAME";
+	    $tab = "DL3EL_EXTERN{$i}_TAB";
+	    if (defined($link)) {
+		$linkurl = constant($link);
+		if (defined($name))  {
+		    $linktext = constant($name);
+		} else {
+		    $linktext = $linkurl;
+		}    
+		if ((defined ('debug')) && (debug > 0)) echo "($i) L:$linkurl LN:$linktext<br>";
+		if ((defined($tab)) && (constant($tab) === "new")) {
+		    echo '| <a class="hreflink" href="' . $linkurl . '" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
+		} else{
+		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . $linkurl . '" >' . $linktext . '</a> ';
+		}    
+	    }
+	}
+
+///// extern neu
+/*
 	if (defined('DL3EL_EXTERN1'))  {
 	    if (defined('DL3EL_EXTERN1_NAME'))  {
 		$linktext = DL3EL_EXTERN1_NAME;
@@ -344,19 +367,14 @@ if (session_status() === PHP_SESSION_NONE) {
 		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN4 . '" >' . $linktext . '</a> ';
 		}    
 	}    
-	if (file_exists(DL3EL.'/Reflector1.conf')) {
-//	    echo '<span style = "padding-right: 5px; text-align: right;" | <b>Full</b> Edit</span>: ';
-	    echo ' | <b>Full</b> Edit: ';
-	    echo '<a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector1.conf" id="reflector1">Reflector1.conf</a> ';
-	}
-	if (file_exists(DL3EL.'/Reflector2.conf')) {
-	    echo '| <a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector2.conf" id="reflector1">Reflector2.conf</a> ';
-	}
-	if (file_exists(DL3EL.'/Reflector3.conf')) {
-	    echo '| <a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector3.conf" id="reflector1">Reflector3.conf</a> ';
-	}
-	if (file_exists(DL3EL.'/Reflector4.conf')) {
-	    echo '| <a class="hreflink" href="./caller.php?file=' . DL3EL . '/Reflector4.conf" id="reflector1">Reflector4.conf</a> ';
+*/
+	$refnr = 1;
+	while ($refnr < 6) {
+	    $ref_conf = DL3EL.'/Reflector' . $refnr . '.conf';
+	    if (file_exists($ref_conf)) {
+		echo '| <a class="hreflink" href="./caller.php?file=' . $ref_conf . '" id="reflector1">Reflector' . $refnr . '.conf</a> ';
+	    }
+	    ++$refnr;
 	}
         if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
             if (file_exists('./statistic.php')) {

@@ -21,14 +21,14 @@ function getSVXLog() {
 //	if (file_exists(LOGPATH."/".SVXLOGPREFIX."-".gmdate("Y-m-d").".log")) {
 	if (file_exists(SVXLOGPATH.SVXLOGPREFIX)) {
 		$logPath = SVXLOGPATH.SVXLOGPREFIX;
-		$logLines1 = explode("\n", `tail -10000 $logPath | egrep -a -h "Talker start on|Talker stop on" `);
+		$logLines1 = explode("\n", `tail -10000 $logPath | egrep -a -h "Talker start on|Talker stop on|Processing macro comman" `);
 	}
 	$logLines1 = array_slice($logLines1, -250);
   $reverselogLines1 = array_reverse($logLines1);
 	if (sizeof($logLines1) < 250) {
 		if (file_exists(SVXLOGPATH.SVXLOGPREFIX.".1")) {
 			$logPath = SVXLOGPATH.SVXLOGPREFIX.".1";
-			$logLines2 = explode("\n", `tail -10000 $logPath | egrep -a -h "Talker start on|Talker stop on" `);
+			$logLines2 = explode("\n", `tail -10000 $logPath | egrep -a -h "Talker start on|Talker stop on|Processing macro comman" `);
 		}
 	}
 	$logLines2 = array_slice($logLines2, -250);
@@ -322,6 +322,118 @@ function getSVXTGTMP($reflector) {
         return $tgselect;
 }
 
+/////////////////// Process DTMF
+
+function getSVXCommand() {
+        $logPath = SVXLOGPATH.SVXLOGPREFIX;
+        $file = SVXCONFPATH.SVXCONFIG;
+
+// accepting SimplexLogic: Processing macro command: D12...
+        $logLine = `tail -10 $logPath | egrep -a -h "Processing macro command" | grep "D" | tail -1`;
+//echo "-> $logLine<br>";
+        $dtmf_command=substr($logLine,strpos($logLine,"D")+2,1);
+        $dtmf_file = DL3EL . "/dtmf.cmd";
+        $newcmd = 0;
+        if (file_exists($dtmf_file)) {
+            $lastcmd = file_get_contents($dtmf_file);
+            if ($lastcmd !== $dtmf_command) {
+                $newcmd = 1;
+            }    
+        } else {    
+            file_put_contents($dtmf_file, $dtmf_command);
+            $newcmd = 1;
+        }
+        if ($newcmd) {    
+          $RefModeFile = DL3EL . "/ref_mode";
+          addsvxlog("CHG: dl3el/Reflector" . $dtmf_command . ".conf");
+          upd_svx_config($file,"dl3el/Reflector" . $dtmf_command . ".conf");
+          $ref_nummer = $dtmf_command;
+          $konstanten_name = "DL3EL_REF" . $ref_nummer . "_BUTTON";
+          if (defined($konstanten_name)) {
+            // Hier wird der Wert der Konstante indirekt geholt
+            $button_wert = constant($konstanten_name);
+            echo "Der Wert von $konstanten_name ist: " . $button_wert;
+            file_put_contents($RefModeFile, $button_wert);
+          }
+        } else {
+          $dtmf_command = "-";
+        }     
+        return $dtmf_command;
+    }
+
+
+
+function svx_restart() {
+    $command = "sudo systemctl restart svxlink 2>&1";
+    exec($command,$screen,$retval);
+    echo "restarting svxlink ...";
+    sleep(1);
+    if ($retval === 0) {
+        echo "svxlink sucessfull restartet";
+      } else {
+        echo "svxlink restart failure, check log";
+      }
+}
+
+function upd_svx_config($file,$file_new) {
+    $backup_filename = $file . "." . date("YmdHis");
+    exec('sudo cp -p ' . $file . ' ' . $backup_filename);
+
+    $svxconfig = custom_parse_ini_file($file);
+    $svxconfig_chg = custom_parse_ini_file($file_new);
+
+    foreach ($svxconfig_chg as $section_chg => $entries) {
+        if ((defined ('debug')) && (debug > 1)) echo "[$section_chg]<br>";
+        foreach ($entries as $key => $data) {
+            if ((defined ('debug')) && (debug > 2)) echo "$svxconfig_chg: $key = " . $svxconfig_chg[$section_chg][$key]['value'] . "(" . $svxconfig_chg[$section_chg][$key]['active'] .")<br>";
+        }
+    }
+    $content = "";
+    $nn=0; 
+// gültig:
+//DNS_DOMAIN = fm-funknetz.de
+//#HOSTS = 44.148.237.5:5308
+//CALLSIGN = DL3EL
+//AUTH_KEY = "Connect-FM-FunkNetz25"
+//DEFAULT_TG = 262649
+//MONITOR_TGS = 262649+++
+    
+    if ((defined ('debug')) && (debug > 1)) echo "<br>";
+    foreach ($svxconfig as $section => $entries) {
+        $content = $content . "[$section]\n";
+        foreach ($entries as $key => $data) {
+            if ($section === $section_chg) {
+                if ((defined ('debug')) && (debug > 1)) echo "CONF0: $section/$key, V:" . $svxconfig[$section][$key]['value'] . " A(" . $svxconfig[$section][$key]['active'] . ")<br>";
+                if ($svxconfig[$section][$key]['active']) {
+                    if ((isset($svxconfig_chg[$section][$key]['value'])) && (strlen($svxconfig_chg[$section][$key]['value']) > 0)) {
+                        if (!$svxconfig_chg[$section][$key]['active']) {
+                            $svxconfig[$section][$key]['active'] = FALSE;
+                        } else {
+                            $svxconfig[$section][$key]['value'] = $svxconfig_chg[$section][$key]['value'];
+                        }    
+                    }
+                } else {    
+                    if ((isset($svxconfig_chg[$section][$key]['value'])) && ($svxconfig_chg[$section][$key]['active'])) {
+                        $svxconfig[$section][$key]['value'] = $svxconfig_chg[$section][$key]['value'];
+                        $svxconfig[$section][$key]['active'] = TRUE;
+                    }
+                }        
+                if ((defined ('debug')) && (debug > 1)) echo "CONF1: $section/$key, V:" . $svxconfig[$section][$key]['value'] . " A(" . $svxconfig[$section][$key]['active'] . ")<br>";
+            }
+            if (!$svxconfig[$section][$key]['active']) {
+                $content = $content . "#";
+            }  
+            $content = $content . "$key = " . $svxconfig[$section][$key]['value'] . "\n";
+        ++$nn;
+        }  
+        $content = $content . "\n";
+    }  
+
+    file_put_contents($file, $content);
+    svx_restart();
+}
+
+///////////////////
 function initModuleArray() {
     $modules = Array();
     foreach (SVXMODULES as $enabled) {
@@ -912,7 +1024,7 @@ function display_config($config) {
             $group = 'svxlink';
 //          $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " 2>&1";
             $command = "sudo chown $owner:$group ; " . escapeshellarg($update_script) . " >" . $logfile . " &";
-            if ((defined ('debug')) && (debug > 0)) echo " starting: $cmd<br>"; 
+            if ((defined ('debug')) && (debug > 0)) echo " starting: $command<br>"; 
             exec($command, $output, $return_var);
             $jetzt = date("Y-m-d H:i:s");
             $logtext = "$jetzt Downloaded new $updFile (D:$delta, T:$timer)\n";

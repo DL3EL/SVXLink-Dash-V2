@@ -477,6 +477,8 @@ if ($reflectorlogic2 != "") {
 //         }   
       }
    }      
+   $dtmf = getSVXCommand();
+   echo "<br>Testing DTMF: $dtmf<br>";
    echo "</div></td></tr>";
    echo "</table>\n";
 } else {
