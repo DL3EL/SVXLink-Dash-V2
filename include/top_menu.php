@@ -372,7 +372,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	while ($refnr < 6) {
 	    $ref_conf = DL3EL.'/Reflector' . $refnr . '.conf';
 	    if (file_exists($ref_conf)) {
-		echo '| <a class="hreflink" href="./caller.php?file=' . $ref_conf . '" id="reflector1">Reflector' . $refnr . '.conf</a> ';
+		if ($refnr === 1) {
+		    echo '&nbsp;<a style = "padding-right: 5px; text-align: right; color: #000000;" <a style = "color: black;"> <b>Full</b> Edit:</a> ';
+		} else {
+		    echo '|';
+		}   
+		echo ' <a class="hreflink" href="./caller.php?file=' . $ref_conf . '" id="reflector1">Reflector' . $refnr . '.conf</a> ';
 	    }
 	    ++$refnr;
 	}
