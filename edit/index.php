@@ -123,7 +123,7 @@ if ($log) {
   $content = file_get_contents($file);
   if (str_contains($file,'include/config.php')) {
     if (str_contains($content,'config.inc.php')) {
-      echo "... file ok";  
+    if ((defined ('debug')) && (debug > 0)) echo "... file ok";  
     } else {
       echo "repair $file";
       $pos1 = stripos($content, '?>');
@@ -138,7 +138,7 @@ if ($log) {
 }  
 // Display in textarea & edit
 echo '<form method="post">';
-echo '<textarea name="content" rows="35" cols="120">' . htmlspecialchars($content) . '</textarea><br>';
+echo '<textarea name="content" rows="50" cols="120">' . htmlspecialchars($content) . '</textarea><br>';
 
 $aprs_conf = 0;
 if (!$log) {
@@ -182,6 +182,18 @@ if (!$log) {
     $content = str_replace("\r\n","\n",$_POST['content']); 
     file_put_contents($file, $content);
 
+    if (str_contains($file,'include/config.php')) {
+      // Prüft die Syntax der Datei, ohne sie auszuführen
+      $output = shell_exec("php -l " . escapeshellarg($file));
+
+      if (strpos($output, 'No syntax errors detected') !== false) {
+        include($config_file);
+      } else {
+        echo "<b>Syntaxfehler</b> in config.ph gefunden! Lade die letze Konfiguration!<br>";
+        exec('sudo cp -p ' . $backup_filename . ' ' . $file);
+        addsvx("Syntaxfehler in config.php, restoring old Version");
+      }  
+    }
     echo "<script type='text/javascript'> reloadPage(); </script>";
     if (isset($_POST['save_reload'])) {
   // Reload on submit//
