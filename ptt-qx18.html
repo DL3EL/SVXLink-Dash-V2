@@ -22,7 +22,7 @@
                         isPTTActive = true;
                     } else {
                         button.textContent = "Mic OFF";
-                        button.style.backgroundColor = "green";
+                        button.style.backgroundColor = "silver";
                         isPTTActive = false;
                     }
                 }
@@ -68,10 +68,11 @@ if (isset($_POST['button_on'])) { ls_change("unmute", $sc); }
 $status = exec("amixer -c $sc get Speaker | grep % | awk '{print $7}'");
 if (!strlen($status)) { $status = exec("amixer -c $sc get Lineout | grep % | awk '{print $7}'"); }
 
-echo '<div style="display: flex; align-items: center; gap: 20px; padding: 10px;">';
+//echo '<div style="display: flex; align-items: center; gap: 20px; padding: 10px;">';
 
 // 1. PTT BUTTON (Kompakt an der Seite)
-echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:green; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;"><b>PTT OFF</b></button>';
+//echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
+echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
 
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
@@ -90,7 +91,7 @@ if ($status == "[on]") {
 }
 
 echo '</form>';
-echo '</div>';
+//echo '</div>';
 
 function get_ptt_service_status() {
     // Prüft, ob der systemd-Dienst läuft

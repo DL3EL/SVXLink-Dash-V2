@@ -80,7 +80,89 @@ function get_current_amixer_values() {
     if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
     return $current_values;
 }
+function get_current_amixer_values_tx($sc) {
+//    $sc = $sc_tx;
+    if ((defined ('debug')) && (debug > 0)) echo "Karte gefunden: [$sc]<br>";
+    $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
+    $mic_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=4");
+    $capture_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=8");
+    $autogain_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=9");
+    $current_values = [
+        'headphone' => parse_amixer_value($headphone_output),
+        'mic' => parse_amixer_value($mic_output),
+        'capture' => parse_amixer_value($capture_output),
+        'autogain' => parse_amixer_value($autogain_output)
+    ];
 
+    if ($autogain_output) {
+        foreach ($autogain_output as $line) {
+            if (strpos($line, ": values=") !== false) {
+                $current_values['autogain'] = trim(str_replace(": values=", "", $line));
+                break;
+            }
+        }
+       if ((defined ('debug')) && (debug > 0)) echo "Ende autogain values: " . $current_values['autogain'] . "<br>";
+    }
+    if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
+    return $current_values;
+}
+function get_current_amixer_values_rx($sc) {
+//    $sc = $sc_rx;
+    if ((defined ('debug')) && (debug > 0)) echo "Karte gefunden: $sc<br>";
+    $mic_output_rx = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
+    $current_values_rx = [
+        'mic' => parse_amixer_value($mic_output_rx)
+    ];
+
+    if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
+    return $current_values_rx;
+}
+/// SC & MIke Info from svxlink.conf & system, skip var from config.php
+            $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
+            if (fopen($svxConfigFile,'r')) {
+                $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
+                $sc_port_rxname = $svxconfig['SimplexLogic']['RX']; 
+                $sc_port_rx = $svxconfig[$sc_port_rxname]['AUDIO_DEV']; 
+                $sc_port_txname = $svxconfig['SimplexLogic']['TX']; 
+// hier noch auf Multi Tx erweitern
+                $sc_port_tx = $svxconfig["Tx1"]['AUDIO_DEV']; 
+                $card_start = strpos($sc_port_tx, 'CARD=')+5;
+                if ($card_start !== false) {
+                    $card_end = strpos($sc_port_tx, ',DEV');
+                    $card_string = substr($sc_port_tx, $card_start, $card_end - $card_start);
+                    $sc_tx_cmp = $card_string . " \[";
+                    $sc = 'aplay -l | grep "' . $sc_tx_cmp . '"';
+                    $sc_tx = substr(shell_exec($sc),5,1);
+                    if ((defined ('debug')) && (debug > 0)) echo "2bTX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc)<br>";
+                    if ((defined ('debug')) && (debug > 0)) echo "<br>getting Soundcard configuration: <b>[" . $sc_port_tx . "]</b>";
+                }
+                $card_start = strpos($sc_port_rx, 'CARD=')+5;
+                if ($card_start !== false) {
+                    $card_end = strpos($sc_port_rx, ',DEV');
+                    $card_string = substr($sc_port_rx, $card_start, $card_end - $card_start);
+                    $sc_rx_name = $card_string;
+                    $sc_rx_cmp = $card_string . " \[";
+                    $sc = 'aplay -l | grep "' . $sc_rx_cmp . '"';
+                    $sc_rx = substr(shell_exec($sc),5,1);
+                    if ((defined ('debug')) && (debug > 0)) echo "2cRX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc)<br>";
+                    if ((defined ('debug')) && (debug > 0)) echo "<br>getting Mike configuration: <b>[" . $sc_port_rx . "]</b><br>";
+                }
+                $spkrismike = "";
+                if ($sc_port_rx === $sc_port_tx) {
+                    $spkrismike = "/Mikrofon";
+                }    
+                if ((defined ('debug')) && (debug > 0)) echo " [$sc_port_linux]<br>";
+                if ($sc_port_rx !== $sc_port_tx) {
+                    $sc_mike_linux = 'aplay -l | grep "' . $sc_rx_cmp . '"';
+                    $sc_mike_linux = shell_exec($sc_mike_linux);
+                    if ((defined ('debug')) && (debug > 0)) echo " [$sc_port_linux]<br>";
+                }    
+                if ((defined ('debug')) && (debug > 0)) echo "<br><br><b>" . $sc_port_linux . " (Linux)<br>";
+            }    
+    
+if ((defined ('debug')) && (debug > 0)) echo "RX (Mikrofon): $sc_rx_cmp [Index: $sc_rx sc_rx]<br>";
+if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Index: $sc_tx sc_tx]<br>";
+///
 // Maximum permitted values based on numid
 $max_values = [
     'headphone' => 151, // numid=6
@@ -89,16 +171,15 @@ $max_values = [
 ];
 
 // Get current values from amixer
-    $current_values = get_current_amixer_values();
+    $current_values = get_current_amixer_values_tx($sc_tx);
+    $current_values_rx = get_current_amixer_values_rx($sc_rx);
     $current_autogain = $current_values['autogain'];
-    if (defined('DL3EL_SC_STRING')) {
-        $sc_port_cmp = DL3EL_SC_STRING;
-    } else{    
-        $sc_port_cmp = "Audio Device";
-    }
-    $sc = 'aplay -l | grep "' . $sc_port_cmp . '"';
-    $sc = substr(shell_exec($sc),5,1);
-    //$current_autogain = 'Off';
+if ((defined ('debug')) && (debug > 0)) {
+    print_r($current_values);
+    echo "<br>";
+    print_r($current_values_rx);
+    echo "<br>";
+}    
 ?>
 
 <!DOCTYPE html>
@@ -119,43 +200,47 @@ $max_values = [
     <center>
     <h1 id="svxlink" style="color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Configurator</h1>
     <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">AMixer settings</h3>
+        <?php 
+        ?>
     <!-- HTML Form to adjust ALSA settings -->
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
-        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Headphone - TX Levels</h3>
+        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Lautsprecher - TX Level</h3>
             <label for="headphone">Set for 65 (0-100):</label>
             <input type="number" id="headphone" name="headphone" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['headphone'], $max_values['headphone'])); ?>" required>
             <br>
-        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Microphone - Not Used</h3>
-            <label for="mic">(0-100): Set to 0</label>
-            <input type="number" id="mic" name="mic" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['mic'], $max_values['mic'])); ?>" required>
-            <br>
-        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Capture - RX Levels</h3>
-            <label for="capture">(0-100) Set for 25:</label>
-            <input type="number" id="capture" name="capture" min="0" max="200" value="<?php echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); ?>" required>
-            <br>
-        <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>
-            <label for="autogain">Set to OFF for optimum control</label>
-            <select id="autogain" name="autogain" required>
-            <option value="0" <?php  if ($current_autogain === '0' || $current_autogain === 'off')  echo 'selected'; ?>>Off</option>
-            <option value="1" <?php  if ($current_autogain === '1' || $current_autogain === 'on')  echo 'selected'; ?>>On</option>
+        <?php 
+        if ($sc_tx !== $sc_rx) {
+            echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">ext. Mikrofon - ' . $sc_rx_name . '</h3>';
+            echo '<label for="mic">(0-500): Set to 0</label>';
+            echo '<input type="number" id="mic" name="mic" min="0" max="500" value="';
+            echo htmlspecialchars(calculate_percentage($current_values_rx['mic'], $max_values['mic']));
+            echo '" required>';
+            echo '<br>';
+        } else {    
+            echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Capture - RX Levels</h3>';
+            echo '<label for="capture">(0-100) Set for 25:</label>';
+            echo '<input type="number" id="capture" name="capture" min="0" max="200" value="';
+            echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); 
+            echo '" required>';
+            echo '<br>';
+            echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>';
+            echo '<label for="autogain">Set to OFF for optimum control</label>';
+            echo '<select id="autogain" name="autogain" required>';
+            echo '<option value="0"'; 
+            if ($current_autogain === '0' || $current_autogain === 'off')  echo 'selected';
+            echo '>Off</option>';
+            echo '<option value="1"';
+            if ($current_autogain === '1' || $current_autogain === 'on')  echo 'selected';
+            echo '>On</option>';
+        }
+        ?>
         </select>
 
         <?php 
-            $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
-            if (fopen($svxConfigFile,'r')) {
-                $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
-                $sc_port_name = $svxconfig['SimplexLogic']['RX']; 
-                $sc_port_raw = $svxconfig[$sc_port_name]['AUDIO_DEV']; 
-                if (defined('DL3EL_SC_STRING')) {
-                    $sc_port_cmp = DL3EL_SC_STRING;
-                } else{    
-                    $sc_port_cmp = "Audio Device";
+                echo "<br><br>Lautsprecher$spkrismike Konfiguration: <b>$sc_port_tx</b>, SC-Index:$sc_tx<br>";
+                if ($sc_port_rx !== $sc_port_tx) {
+                    echo "ext. Mikrofon Konfiguration: <b>$sc_port_rx</b>, SC-Index:$sc_rx<br>";
                 }
-                $sc_port_linux = 'aplay -l | grep "' . $sc_port_cmp . '"';
-                $sc_port_linux = shell_exec($sc_port_linux);
-                echo "<br>Soundcard configuration: <b>" . $sc_port_raw . "</b> (svxlink.conf" . ")<br>";
-                echo "<b>" . $sc_port_linux . " (Linux)<br>";
-            }    
         ?>
         <br>
         <button type="submit">Apply Settings</button>
@@ -190,25 +275,31 @@ $max_values = [
             $headphone_percentage = intval($_POST['headphone']);
             $headphone_value = ($headphone_percentage / 100) * $max_values['headphone'];
             echo "Card: $sc $headphone_value<br>";
-            exec("sudo amixer -c" . $sc . " cset numid=6 " . escapeshellarg($headphone_value));
+            exec("sudo amixer -c" . $sc_tx . " cset numid=6 " . escapeshellarg($headphone_value));
         }
 
         if (isset($_POST['mic'])) {
             $mic_percentage = intval($_POST['mic']);
             $mic_value = ($mic_percentage / 100) * $max_values['mic'];
-            exec("sudo amixer -c" . $sc . " cset numid=4 " . escapeshellarg($mic_value));
+            if ($sc_tx === $sc_rx) {
+                $sc = $sc_tx;
+                exec("sudo amixer -c" . $sc . " cset numid=4 " . escapeshellarg($mic_value));
+            } else {
+                $sc = $sc_rx;
+                exec("sudo amixer -c" . $sc . " cset numid=6 " . escapeshellarg($mic_value));
+            }                    
         }
 
         if (isset($_POST['capture'])) {
             $capture_percentage = intval($_POST['capture']);
             $capture_value = ($capture_percentage / 100) * $max_values['capture'];
-            exec("sudo amixer -c" . $sc . " cset numid=8 " . escapeshellarg($capture_value));
+            exec("sudo amixer -c" . $sc_tx . " cset numid=8 " . escapeshellarg($capture_value));
         }
         if ((defined ('debug')) && (debug > 0)) echo "vor autogain values: $autogain<br>";
         if (isset($_POST['autogain'])) {
             $autogain = $_POST['autogain'] === '1' ? '1' : '0';
             if ((defined ('debug')) && (debug > 0)) echo "Ende autogain values: $autogain<br>";
-            exec("sudo amixer -c" . $sc . " cset numid=9 " . escapeshellarg($autogain));
+            exec("sudo amixer -c" . $sc_tx. " cset numid=9 " . escapeshellarg($autogain));
         }
         if (isset($_POST['btnsavshari']))
             {
