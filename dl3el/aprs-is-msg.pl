@@ -137,6 +137,12 @@ my $exit_script = 0;
 #/var/www/html/FM-Funknetz/dl3el/aprs-is-msg.pl c=DL3EL-HS db=v5.30g by DL3EL(s)(a) ri=(432.9500MHz, T71.9)
 # DL3EL APRS-IS Message Receiver [v1.71] Start: 15:11:31 am 18.02.2026 (v5.30g by DL3EL(s)(a))
 
+#if ($verbose eq "9") {
+#my $aprs_lat = "5109.25N"; 
+#my $aprs_lon = "01839.46E";
+#	process_nodesinfo($aprs_lat,$aprs_lon); 
+#	exit;
+#}	
  	my $msgdatei = $dir  . "aprs-is.msg";
  	my $aprs_rxdatei = $dir  . "aprs-is.txt";
  	my $aprs_txdatei = $dir  . "aprs-tx.msg";
@@ -231,13 +237,18 @@ MainLoop:
 
 
 		if (($old_aprs_lat ne $aprs_lat) || ($old_aprs_lon ne $aprs_lon)) {
+			$write2file = sprintf "[$log_time] calling keepalive $old_aprs_lat != $aprs_lat\n";
+			print_file($logdatei,$write2file) if ($verbose >= 0);
 			send_keepalive($aprs_login);
+			process_nodesinfo($aprs_lat,$aprs_lon);
 			$last_beacon = time();
 			$old_aprs_lat = $aprs_lat; 
 			$old_aprs_lon = $aprs_lon; 
 		}
 
 		if (time() - $last_beacon >= $interval) {
+			$write2file = sprintf "[$log_time] calling keepalive time\n";
+			print_file($logdatei,$write2file) if ($verbose >= 0);
 			send_keepalive($aprs_login);
 			$last_beacon = time();
 		}
@@ -1254,4 +1265,67 @@ sub write_file {
 	printf FILE $data2write;
 	close FILE;
 
+}
+
+sub	process_nodesinfo {
+
+# --- Konfiguration ---
+my $dir         = '/etc/svxlink/';
+my $file_name   = 'node_info.json'; # Standardname im FM-Funknetz
+my $full_path   = $dir . $file_name;
+my $backup_path = $full_path . '.bak';
+
+# Übergabeparameter (APRS Format)
+my $alat = $_[0]; 
+my $alon = $_[1];
+my $json_text = "";
+my $old_json_text = "";
+my $new_json_text = "";
+# --- Hauptprogramm ---
+
+# 1. Sicherheitskopie erstellen
+# copy($full_path, $backup_path) or die "Backup fehlgeschlagen: $!";
+
+# 2. Koordinaten umrechnen
+convert_latlon($alat, $alon);
+
+# 3. Datei einlesen
+if (open(my $fh, '<', $full_path)) {
+	$json_text = do { local $/; <$fh> };
+	close($fh);
+} else {
+	$write2file = sprintf "[$log_time] Konnte Datei %s nicht lesen\n",$full_path;
+	return (-1);
+}	 
+# 3a. alte Werte sichern
+$new_json_text = $old_json_text;
+
+# 4. Werte gezielt ersetzen (robust gegen Leerzeichen/Tabs)
+# \s* matcht beliebig viele Leerzeichen, Tabs oder Umbrüche um den Doppelpunkt
+$json_text =~ s/(\"LAT\"\s*:\s*\")([^\"]*)(\")/$1$aprs_lat$3/g;
+$json_text =~ s/(\"LONG\"\s*:\s*\")([^\"]*)(\")/$1$aprs_lon$3/g;
+
+# 5. Datei überschreiben, aber nur bei einer Änderung
+if ($old_json_text ne $new_json_text) {
+	if (open(my $out, '>', $full_path)) {
+		print $out $json_text;
+		close($out);
+		$write2file = sprintf "[$log_time] Update erfolgreich: LAT=$aprs_lat, LONG=$aprs_lon\n";
+	} else {	
+		$write2file = sprintf "[$log_time] Konnte Datei %s nicht beschreiben\n",$full_path;
+	}
+	print_file($logdatei,$write2file);
+}	
+
+}
+# --- Funktion ---
+sub convert_latlon {
+    for my $coord (@_) {
+        if ($coord =~ /^(\d{2,3})(\d{2}\.\d+)([NSEW])$/) {
+            my ($deg, $min, $hem) = ($1, $2, $3);
+            my $dec = $deg + ($min / 60);
+            $dec *= -1 if $hem eq 'S' or $hem eq 'W';
+            $coord = sprintf("%.4f", $dec);
+        }
+    }
 }
