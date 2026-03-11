@@ -61,7 +61,12 @@ $anzahl = count($all_calls);
 // --- 3. AUSGABE ---
 $name = isset($tgdb_array[$active_tg]) ? $tgdb_array[$active_tg] : '---';
 //   $tgselect = trim(getSVXTGSelect($reflectorlogic1));
-    $reflectorlogic1 = 'ReflectorLogic';
+// erweitern auf dynamsiche Namen (auf für DB0HTV-BR)
+
+    if (isset($_GET['ref']) && !empty($_GET['ref'])) {
+        $reflectorlogic1 = $_GET['ref']; 
+    }   
+    if ((defined ('debug')) && (debug > 0)) echo " benutze Reflectorlogic: [$reflectorlogic1] <br>";
     $tgselect = trim(getSVXTGSelect($reflectorlogic1));
 
 echo '<table style="width: 100%; max-width: 650px; margin: 0 auto; border-collapse: collapse; border: none;">';
