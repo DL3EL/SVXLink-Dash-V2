@@ -94,6 +94,7 @@ sub create_el_table {
 my $elcall;
 my $call;
 my $node;
+my $location;
 my @array;
 my $cl_found = 0;
 my $dlcall;
@@ -105,33 +106,50 @@ my $srch_pref = $_[0];
 	@array = split (/<\/tr>/, $el_content);
 
 	foreach $entry (@array) {
-		$elcall = ($entry =~ /<td>([\w\*]+)(-R|-L|<\/td>)/i)? $1 : "undef";
-		if ($elcall ne "undef") {
-            $ssid = $2;
-			$elcall = $elcall . $2 if (substr($2,0,1) eq "-");
-			$node = ($entry =~ /(<.*>)([0-9]+)<\/td>/i)? $2 : $entry;
-            $call = $elcall . $cl_found;
-			if ($srch_pref eq "DL") {
-                $dlcall = ($elcall =~ /(D[A-R][0-9])/i)? $1 : "undef";
-            } else {
-                if (substr($elcall,0,length($srch_pref)) eq $srch_pref) {
-                    $dlcall = "ok";
-                    printf "Search Pref: %s %s ",$srch_pref,$elcall if ($verbose >=1);
-                } else {
-                    $dlcall = "undef";
-                }    
-            }    
-			if ($dlcall ne "undef") {
-                printf "Call: %s, Node: %s [$elcall/$1/$ssid]\n",$call,$node;
+	    $elcall = ($entry =~ /<td>([\w\*]+)(-R|-L|<\/td>)/i)? $1 : "undef";
+	    if ($elcall ne "undef") {
+	    # SSID anhängen, falls vorhanden (-R oder -L)
+		$ssid = $2;
+		$elcall = $elcall . $2 if (substr($2,0,1) eq "-");
+		# Extrahiere Location (2. Spalte)
+		# Wir suchen den Inhalt nach dem ersten schließenden </td> der Call-Spalte
+		$location = ($entry =~ /<\/td><td>(.*?)<\/td>/i)? $1 : "";		# 2. Fall: Wildcard-Suche (beginnt mit ?)
+		# Extrahiere Node-Nummer (letzte Tabellenzelle)
+		$node = ($entry =~ /(<.*>)([0-9]+)<\/td>/i)? $2 : $entry;
+		
+		$dlcall = "undef"; # Initialisierung
+		# 1. Fall: Spezialsuche für DL (Deutschland)
+		if ($srch_pref eq "DL") {
+		    $dlcall = ($elcall =~ /(D[A-R][0-9])/i)? $1 : "undef";
+		}		
+		
+		elsif (substr($srch_pref, 0, 1) eq "?") {
+		    my $search_term = lc(substr($srch_pref, 1)); # Suche Case-Insensitive (kleingeschrieben)
+                    # Suche sowohl im Call als auch in der Location
+		    if (index(lc($elcall), $search_term) != -1 || index(lc($location), $search_term) != -1) {
+			$dlcall = "ok";
+		    }
+		} 
+		else {
+		# 3. Fall: Normale Prefix-Suche
+		    if (substr($elcall, 0, length($srch_pref)) eq $srch_pref) {
+		    $dlcall = "ok";
+		    }
+		}
+		if ($dlcall ne "undef") {
+#		$call = $elcall . $cl_found;
+		    $call = $elcall;
+		    printf "Call: %s, Node: %s [$elcall/$1/$ssid]\n",$call,$node;
 				$CurrentLoginsTab{$call}{'CALL'} = $call;
 				$CurrentLoginsTab{$call}{'ELCALL'} = $elcall;
 				$CurrentLoginsTab{$call}{'ELCALLCMP'} = substr($elcall,0,length($elcall)-1);
 				$CurrentLoginsTab{$call}{'ELNODE'} = $node;
+				$CurrentLoginsTab{$call}{'ELLOC'} = $location;
 				++$cl_found;
-			}
-		} else {
-            print "." if ($verbose >= 4);
-        }    
+		}
+	    } else {
+		print "." if ($verbose >= 4);
+	    }    
 	}
 	print "Prefix $srch_pref, $cl_found gefunden";
 }
@@ -140,6 +158,11 @@ my $nn = 0;
 my $cl = 0;
 my $pref = "";
 my $pref_old = "";
+my $btn_text = "";
+my $line_len = 0; 
+my $max_len = 150;
+my $line = "";
+
     printf "<tr height=25px><th>(Script Run: $log_time) Echolink (Netz Update %s)</th></tr><tr><td>",$_[0];
     printf LOG "<tr height=25px><th>(Script Run: $log_time) Echolink (Netz Update %s)</th></tr><tr><td>",$_[0];
     print "<tr><td><form method=\"post\">";
@@ -152,14 +175,26 @@ my $pref_old = "";
              $nn = 0;
          }
          $pref_old = $pref;
-         printf "<button type=submit id=jmptoE name=jmptoE class=active_id value=%s>%s:%s</button>",$CurrentLoginsTab{$call}{'ELNODE'},$CurrentLoginsTab{$call}{'ELCALL'},$CurrentLoginsTab{$call}{'ELNODE'};
+	if ($srch_pref eq "DL") {
+	    printf "<button type=submit id=jmptoE name=jmptoE class=active_id value=%s>%s:%s</button>",$CurrentLoginsTab{$call}{'ELNODE'},$CurrentLoginsTab{$call}{'ELCALL'},$CurrentLoginsTab{$call}{'ELNODE'};
+	    ++$nn;
+	    if ($srch_pref eq "DL") {
+		if ($nn > 6) {
+		    print "<br>";
+		    print LOG "\n";
+		    $nn = 0;
+		}    
+	    }    
+	} else {  
+	    $btn_text = sprintf "<button type=submit id=jmptoE name=jmptoE class=active_id value=%s>%s:%s(%s)</button>&nbsp;&nbsp;",$CurrentLoginsTab{$call}{'ELNODE'},$CurrentLoginsTab{$call}{'ELCALL'},$CurrentLoginsTab{$call}{'ELNODE'},$CurrentLoginsTab{$call}{'ELLOC'};
+	    print $btn_text;
+	    $line .= $btn_text;
+	    if (length($line) > $max_len) {
+		print "<br>";
+		$line = "";
+	    }    
+	}    
          printf LOG "($cl/$nn) %s/%s, ",$CurrentLoginsTab{$call}{'ELCALL'},$CurrentLoginsTab{$call}{'ELNODE'};
-         ++$nn;
-         if ($nn > 6) {
-             print "<br>";
-             print LOG "\n";
-             $nn = 0;
-         }    
     }    
     print "</form></td></tr>";
  }

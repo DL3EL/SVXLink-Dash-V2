@@ -82,12 +82,17 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}    
 //	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
-        if (file_exists("/usr/local/bin/mqtt-simple")) {
-//	    echo '<a href="./caller.php?id=monitor0&refresh=' . DL3EL_MONREFRESH . '" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
-	    echo '<a class="hreflink" href="./caller.php?id=monitor&refresh=15" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	if ($fmnetwork === "uk.wide.svxlink.uk") {
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://ukwide.svxlink.net">UK Monitor | </a> ';
 	} else {
-	    echo '<a class="hreflink" href="./caller.php?id=monitor0" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	    if (file_exists("/usr/local/bin/mqtt-simple")) {
+//	    echo '<a href="./caller.php?id=monitor0&refresh=' . DL3EL_MONREFRESH . '" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+		echo '<a class="hreflink" href="./caller.php?id=monitor&refresh=15" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	    } else {
+		echo '<a class="hreflink" href="./caller.php?id=monitor0" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
+	    }
 	}    
+	
 //	echo '<a href="./monitor.php" style = "color: crimson;" id="log" target="_top">MonitorCalls0 | </a> ';
 //	echo '<a href="./echolink_dl3el.php" style = "color: #0000ff;" target="_top">Echolink0</a> | ';
 	echo '<a class="hreflink" href="./caller.php?id=echolink_dl3el0" >Echolink</a> | ';
