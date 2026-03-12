@@ -325,36 +325,37 @@ function getSVXTGTMP($reflector) {
 /////////////////// Process DTMF
 
 function getSVXCommand() {
-        $logPath = SVXLOGPATH.SVXLOGPREFIX;
-        $file = SVXCONFPATH.SVXCONFIG;
+  $logPath = SVXLOGPATH.SVXLOGPREFIX;
+  $file = SVXCONFPATH.SVXCONFIG;
 
 // accepting SimplexLogic: Processing macro command: D22...
-    $logLine = `tail -10 $logPath | egrep -a -h "Processing macro command" | grep "D2" | tail -1`;
-    $logLine = trim($logLine);
-    $dtmf_command = "";
-    if (strlen($logLine)) {  
-      $ll = strlen($logLine);
-      addlog ("L","to process ($ll) [$logLine]");
-      $dtmf_command=substr($logLine,strpos($logLine,"D")+2,1);
-      $dtmf_file = DL3EL . "/dtmf.cmd";
-      if ($dtmf_command !== ".") {
-        addsvxlog("received command:[$dtmf_command]\n");
-        $newcmd = 0;
-        if (file_exists($dtmf_file)) {
-            $lastcmd = file_get_contents($dtmf_file);
-            if ($lastcmd !== $dtmf_command) {
-                $newcmd = 1;
-            }    
-        } else {    
-            file_put_contents($dtmf_file, $dtmf_command);
-            $newcmd = 1;
-        }
-        if ($newcmd) {    
-          $RefModeFile = DL3EL . "/ref_mode";
-          if ((!defined ('debug')) || ((defined ('debug')) && (!debug))) {
+  $logLine = `tail -10 $logPath | egrep -a -h "Processing macro command" | grep "D2" | tail -1`;
+  $logLine = trim($logLine);
+  $dtmf_command = "";
+  if (strlen($logLine)) {  
+    $ll = strlen($logLine);
+    addlog ("L","to process ($ll) [$logLine]");
+    $dtmf_command=substr($logLine,strpos($logLine,"D")+2,1);
+    $dtmf_file = DL3EL . "/dtmf.cmd";
+    if ($dtmf_command !== ".") {
+      addsvxlog("received command:[$dtmf_command]\n");
+      $newcmd = 0;
+      if (file_exists($dtmf_file)) {
+          $lastcmd = file_get_contents($dtmf_file);
+          if ($lastcmd !== $dtmf_command) {
+              $newcmd = 1;
+          }    
+      } else {    
+          file_put_contents($dtmf_file, $dtmf_command);
+          $newcmd = 1;
+      }
+      if ($newcmd) {    
+        $RefModeFile = DL3EL . "/ref_mode";
+        if ((!defined ('debug')) || ((defined ('debug')) && (!debug))) {
 // there will be no profile change, if debug is on
-            addsvxlog("CHG: dl3el/Reflector" . $dtmf_command . ".conf\n");
-            upd_svx_config($file,"dl3el/Reflector" . $dtmf_command . ".conf");
+          addsvxlog("CHG: dl3el/Reflector" . $dtmf_command . ".conf\n");
+//          upd_svx_config($file,"dl3el/Reflector" . $dtmf_command . ".conf");
+          if (upd_svx_config($file,"dl3el/Reflector" . $dtmf_command . ".conf")) {
             $ref_nummer = $dtmf_command;
             $konstanten_name = "DL3EL_REF" . $ref_nummer . "_BUTTON";
             if (defined($konstanten_name)) {
@@ -363,18 +364,17 @@ function getSVXCommand() {
               echo "<br>neues Profil: " . $button_wert;
               file_put_contents($RefModeFile, $button_wert);
             }
-          } else {
-            addsvxlog("Debug State 1: [$debug]\n");
-          } 
+          }
         } else {
-          $dtmf_command = "-";
-        }     
-      } else {
-        if ((defined ('debug')) && (debug)) addsvxlog("no valid command received:[$dtmf_command]\n");
+            addsvxlog("Debug State 1: [$debug]\n");
+        }
       }
+    } else {
+      if ((defined ('debug')) && (debug)) addsvxlog("no valid command received:[$dtmf_command]\n");
     }
-    return $dtmf_command;
   }
+  return $dtmf_command;
+}
 
 function svx_restart() {
     $command = "sudo systemctl restart svxlink 2>&1";
@@ -389,6 +389,9 @@ function svx_restart() {
 }
 
 function upd_svx_config($file,$file_new) {
+    if (!file_exists($file_new)) {
+      return(0);
+    }  
     $backup_filename = $file . "." . date("YmdHis");
     exec('sudo cp -p ' . $file . ' ' . $backup_filename);
 
@@ -444,6 +447,7 @@ function upd_svx_config($file,$file_new) {
 
     file_put_contents($file, $content);
     svx_restart();
+    return(1);
 }
 
 ///////////////////
