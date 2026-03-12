@@ -391,7 +391,7 @@ sub parse_aprs {
 			print_file($logdatei,$write2file);
 			$write2file = sprintf "[$message_time] FM-Funknetz: Message to %s from %s: [%s]\n",$destcall,$srccall,$payload;
 			$payload = ($payload =~ /(.*)\{/i)? $1 : $payload;
-			$write2file = sprintf "%s^%s^%s^^%s^\n",$srccall,$mtype,$payload,aprs_time();
+			$write2file = sprintf "%s^%s^%s^^%s^%s^\n",$srccall,$mtype,$payload,aprs_time(),aprs_date();
 			print_file($msgdatei,$write2file);
 			system('touch', $msgdatei . ".neu");
 		}
@@ -832,6 +832,10 @@ sub act_time {
 sub aprs_time {
 		$tm = localtime(time);
 		return (sprintf("%02d:%02d:%02d",,$tm->hour, $tm->min, $tm->sec));
+}
+sub aprs_date {
+		$tm = localtime(time);
+		return (sprintf("%02d.%02d.%02d",$tm->mday, $tm->mon,$tm->year));
 }
 sub read_config {
 	$log_time = act_time();

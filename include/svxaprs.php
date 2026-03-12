@@ -54,7 +54,7 @@ include_once "settings.php";
 //	echo '<table style=" border-collapse: collapse; background-color: #f1f1f1; ...">';
 	echo '<thead>';
 	echo '<tr style = "border:none;background-color:#f1f1f1;">';
-	echo "<th><b>From</b></th><th><b>Type</b></th><th><b>Messages (" . date("H:i:s") .")</b></th><th><b>Zeit</b></th></tr>";
+	echo "<th><b>From</b></th><th><b>Type</b></th><th><b>Messages (" . date("H:i:s") .")</b></th><th><b>Datum</b></th><th><b>Zeit</b></th></tr>";
 	echo '</thead>';
 
 	$nn = 0;
@@ -79,8 +79,14 @@ include_once "settings.php";
 	    } 
 	    $llm = strlen($aprs_msg[$nn]);
 	    if ($llm) {
-//		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>". $line[4] . "</td><td>" .  $line[3] . "</td></tr>";
-		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>". $line[4] . "</td></tr>";
+//		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>". $line[4] . "</td></tr>";
+		echo "<tr><td>" . $line[0] . "</td><td>" . $line[1] . "</td><td>" . $msg . "</td><td>";
+		if (isset($line[5])) {
+		    echo $line[5] . "&nbsp;</td><td>" . $line[4];
+		} else {    
+		   echo "</td><td>" . $line[4];
+		}
+		echo "</td></tr>";
 	    }
 	    ++$nn;
     }
