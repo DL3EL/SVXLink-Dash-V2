@@ -81,12 +81,11 @@ function get_current_amixer_values() {
     return $current_values;
 }
 function get_current_amixer_values_tx($sc) {
-//    $sc = $sc_tx;
     if ((defined ('debug')) && (debug > 0)) echo "Karte gefunden: [$sc]<br>";
     $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
     $mic_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=4");
     $capture_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=8");
-    $autogain_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=9");
+    $autogain_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=9 2>/dev/null");
     $current_values = [
         'headphone' => parse_amixer_value($headphone_output),
         'mic' => parse_amixer_value($mic_output),
@@ -133,7 +132,7 @@ function get_current_amixer_values_rx($sc) {
                     $sc_tx_cmp = $card_string . " \[";
                     $sc = 'aplay -l | grep "' . $sc_tx_cmp . '"';
                     $sc_tx = substr(shell_exec($sc),5,1);
-                    if ((defined ('debug')) && (debug > 0)) echo "2bTX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc)<br>";
+                    if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc)<br>";
                     if ((defined ('debug')) && (debug > 0)) echo "<br>getting Soundcard configuration: <b>[" . $sc_port_tx . "]</b>";
                 }
                 $card_start = strpos($sc_port_rx, 'CARD=')+5;
@@ -144,20 +143,20 @@ function get_current_amixer_values_rx($sc) {
                     $sc_rx_cmp = $card_string . " \[";
                     $sc = 'aplay -l | grep "' . $sc_rx_cmp . '"';
                     $sc_rx = substr(shell_exec($sc),5,1);
-                    if ((defined ('debug')) && (debug > 0)) echo "2cRX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc)<br>";
+                    if ((defined ('debug')) && (debug > 0)) echo "RX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc)<br>";
                     if ((defined ('debug')) && (debug > 0)) echo "<br>getting Mike configuration: <b>[" . $sc_port_rx . "]</b><br>";
                 }
                 $spkrismike = "";
                 if ($sc_port_rx === $sc_port_tx) {
                     $spkrismike = "/Mikrofon";
                 }    
-                if ((defined ('debug')) && (debug > 0)) echo " [$sc_port_linux]<br>";
+                if ((defined ('debug')) && (debug > 0)) echo " [$sc_port_rx]<br>";
                 if ($sc_port_rx !== $sc_port_tx) {
                     $sc_mike_linux = 'aplay -l | grep "' . $sc_rx_cmp . '"';
                     $sc_mike_linux = shell_exec($sc_mike_linux);
-                    if ((defined ('debug')) && (debug > 0)) echo " [$sc_port_linux]<br>";
+                    if ((defined ('debug')) && (debug > 0)) echo " [$sc_mike_linux]<br>";
                 }    
-                if ((defined ('debug')) && (debug > 0)) echo "<br><br><b>" . $sc_port_linux . " (Linux)<br>";
+                if ((defined ('debug')) && (debug > 0)) echo "<br><br><b>" . $sc_mike_linux . " (Linux)<br>";
             }    
     
 if ((defined ('debug')) && (debug > 0)) echo "RX (Mikrofon): $sc_rx_cmp [Index: $sc_rx sc_rx]<br>";
@@ -171,7 +170,7 @@ $max_values = [
 ];
 
 // Get current values from amixer
-    $current_values = get_current_amixer_values_tx($sc_tx);
+    $current_values = get_current_amixer_values_tx($sc_tx,$sc_rx);
     $current_values_rx = get_current_amixer_values_rx($sc_rx);
     $current_autogain = $current_values['autogain'];
 if ((defined ('debug')) && (debug > 0)) {

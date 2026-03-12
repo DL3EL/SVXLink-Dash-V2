@@ -328,11 +328,17 @@ function getSVXCommand() {
         $logPath = SVXLOGPATH.SVXLOGPREFIX;
         $file = SVXCONFPATH.SVXCONFIG;
 
-// accepting SimplexLogic: Processing macro command: D12...
-        $logLine = `tail -10 $logPath | egrep -a -h "Processing macro command" | grep "D" | tail -1`;
-//echo "-> $logLine<br>";
-        $dtmf_command=substr($logLine,strpos($logLine,"D")+2,1);
-        $dtmf_file = DL3EL . "/dtmf.cmd";
+// accepting SimplexLogic: Processing macro command: D22...
+    $logLine = `tail -10 $logPath | egrep -a -h "Processing macro command" | grep "D2" | tail -1`;
+    $logLine = trim($logLine);
+    $dtmf_command = "";
+    if (strlen($logLine)) {  
+      $ll = strlen($logLine);
+      addlog ("L","to process ($ll) [$logLine]");
+      $dtmf_command=substr($logLine,strpos($logLine,"D")+2,1);
+      $dtmf_file = DL3EL . "/dtmf.cmd";
+      if ($dtmf_command !== ".") {
+        addsvxlog("received command:[$dtmf_command]\n");
         $newcmd = 0;
         if (file_exists($dtmf_file)) {
             $lastcmd = file_get_contents($dtmf_file);
@@ -345,23 +351,30 @@ function getSVXCommand() {
         }
         if ($newcmd) {    
           $RefModeFile = DL3EL . "/ref_mode";
-          addsvxlog("CHG: dl3el/Reflector" . $dtmf_command . ".conf");
-          upd_svx_config($file,"dl3el/Reflector" . $dtmf_command . ".conf");
-          $ref_nummer = $dtmf_command;
-          $konstanten_name = "DL3EL_REF" . $ref_nummer . "_BUTTON";
-          if (defined($konstanten_name)) {
-            // Hier wird der Wert der Konstante indirekt geholt
-            $button_wert = constant($konstanten_name);
-            echo "Der Wert von $konstanten_name ist: " . $button_wert;
-            file_put_contents($RefModeFile, $button_wert);
-          }
+          if ((!defined ('debug')) || ((defined ('debug')) && (!debug))) {
+// there will be no profile change, if debug is on
+            addsvxlog("CHG: dl3el/Reflector" . $dtmf_command . ".conf\n");
+            upd_svx_config($file,"dl3el/Reflector" . $dtmf_command . ".conf");
+            $ref_nummer = $dtmf_command;
+            $konstanten_name = "DL3EL_REF" . $ref_nummer . "_BUTTON";
+            if (defined($konstanten_name)) {
+              // Hier wird der Wert der Konstante indirekt geholt
+              $button_wert = constant($konstanten_name);
+              echo "<br>neues Profil: " . $button_wert;
+              file_put_contents($RefModeFile, $button_wert);
+            }
+          } else {
+            addsvxlog("Debug State 1: [$debug]\n");
+          } 
         } else {
           $dtmf_command = "-";
         }     
-        return $dtmf_command;
+      } else {
+        if ((defined ('debug')) && (debug)) addsvxlog("no valid command received:[$dtmf_command]\n");
+      }
     }
-
-
+    return $dtmf_command;
+  }
 
 function svx_restart() {
     $command = "sudo systemctl restart svxlink 2>&1";

@@ -479,7 +479,9 @@ if ($reflectorlogic2 != "") {
    }      
    if ((defined ('DL3EL_SW_PROFIL_DTMF')) && (DL3EL_SW_PROFIL_DTMF === "yes")) {
       $dtmf = getSVXCommand();
-      echo "<br>Testing DTMF: $dtmf<br>";
+      if (strlen($dtmf)) {
+         echo "<br>processing DTMF: [$dtmf]<br>";
+      }   
    }   
    echo "</div></td></tr>";
    echo "</table>\n";

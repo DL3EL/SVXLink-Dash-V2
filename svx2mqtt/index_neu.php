@@ -191,7 +191,9 @@ foreach ($array as $call_key => $data) {
 krsort($array_time);
 
 // --- BILDSCHIRMAUSGABE ---
-echo '<a class="hreflink" href="https://dashboard.fm-funknetz.de/" style="font-weight:bold; font-size:15px;" target="fmn">FM-Funknetz Live Activity</a>';
+date_default_timezone_set('Europe/Berlin');
+$update_time = date("H:i:s");
+echo '<a class="hreflink" href="https://dashboard.fm-funknetz.de/" style="font-weight:bold; font-size:15px;" target="fmn">FM-Funknetz Live Activity</a>&nbsp;&nbsp;' . $update_time;
 echo '<form method="post">';
 echo '<table style="width: 500px; text-align: left; margin-top: 5px; margin-bottom:0px; border:0; border-collapse:collapse; background-color:#f1f1f1;">';
 echo '<thead><tr style="height:24px;">';

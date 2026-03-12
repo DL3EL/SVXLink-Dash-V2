@@ -274,26 +274,28 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 //	echo '<a class="hreflink" href="./editor.php?id=power" style = "color: green;">Power</a></p>';
 	echo '<a class="hreflink" href="./caller.php?id=power/index" >Power</a></p>';
-	echo '<a style = "padding-right: 5px; text-align: right; " <a style = "color: black;"><b>Display:</b></a> ';
 //	echo '<a href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html style = "color: #0000ff;">Hilfe</a> | ';
 	if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
-//	    echo '<a href="./aprs.php" style = "color: black;">APRS Monitor</a> | ';
-//	    echo '<a href="./caller.php?id=aprs" >APRS Monitor</a> | ';
-	    echo '<a class="hreflink" href="./caller.php?id=aprs0" >APRS Monitor</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?id=aprs0" >APRS Monitor</a> ';
+	    echo '<a style = "padding-right: 5px; text-align: right; " <a style = "color: black;"> <b>Display Logs:</b></a> ';
 	    echo '<a class="hreflink" href="./caller.php?file=loga" id="log">APRS Log</a> | ';
 //	    echo '<a href="./caller.php?file=msg" style = "color: black;" id="msg">APRS MSG</a> ';
 	    if (file_exists(DL3EL.'/aprs-is-mqtt.msg')) {
 		echo '<a class="hreflink" class="hreflink" href="./caller.php?file=logb" id="log">APRS MQTT | </a> ';
 	    }
-	}
+	} else {
+	    echo '<a style = "padding-right: 5px; text-align: right; " <a style = "color: black;"> <b>Display Log:</b></a> ';
+	}    
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 	    echo '<a class="hreflink" href="./caller.php?file=log" id="log">L-Log</a> | ';
 	    echo '<a class="hreflink" href="./caller.php?file=ref" id="log">R-Log</a> ';
 	} else {
 	    echo '<a class="hreflink" href="./caller.php?file=log" id="log">SVX Log</a> ';
 	}
-////// extern neu
-	for ($i = 1; $i < 5; $i++) {
+////// externe Links
+	echo '<a style = "padding-right: 5px; text-align: right; " <a style = "color: black;">&nbsp; <b>External:</b></a> ';
+	$max_links = 4;
+	for ($i = 1; $i < $max_links+1; $i++) {
 	    $link = "DL3EL_EXTERN{$i}";
 	    $name = "DL3EL_EXTERN{$i}_NAME";
 	    $tab = "DL3EL_EXTERN{$i}_TAB";
@@ -306,68 +308,16 @@ if (session_status() === PHP_SESSION_NONE) {
 		}    
 		if ((defined ('debug')) && (debug > 0)) echo "($i) L:$linkurl LN:$linktext<br>";
 		if ((defined($tab)) && (constant($tab) === "new")) {
-		    echo '| <a class="hreflink" href="' . $linkurl . '" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
+		    echo '<a class="hreflink" href="' . $linkurl . '" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
 		} else{
-		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . $linkurl . '" >' . $linktext . '</a> ';
+		    echo '<a class="hreflink" href="./caller_extern.php?id=' . $linkurl . '" >' . $linktext . '</a> ';
+		}    
+		if ($i < $max_links) {
+		    echo "|";
 		}    
 	    }
 	}
-
-///// extern neu
-/*
-	if (defined('DL3EL_EXTERN1'))  {
-	    if (defined('DL3EL_EXTERN1_NAME'))  {
-		$linktext = DL3EL_EXTERN1_NAME;
-	    } else {
-		$linktext = DL3EL_EXTERN1;
-	    }
-//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN1 . ' style = "color: black;">' . $linktext . '</a> ';
-	    if ((defined('DL3EL_EXTERN1_TAB')) && (DL3EL_EXTERN1_TAB === "new")) {
-		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN1 . '" target="extern1" rel="noopener noreferrer">' . $linktext . '</a> ';
-		} else{
-		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN1 . '" >' . $linktext . '</a> ';
-		}    
-	}    
-	if (defined('DL3EL_EXTERN2'))  {
-	    if (defined('DL3EL_EXTERN2_NAME'))  {
-		$linktext = DL3EL_EXTERN2_NAME;
-	    } else {
-		$linktext = DL3EL_EXTERN2;
-	    }
-//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN2 . ' style = "color: black;">' . $linktext . '</a> ';
-	    if ((defined('DL3EL_EXTERN2_TAB')) && (DL3EL_EXTERN2_TAB === "new")) {
-		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN2 . '" target="extern2" rel="noopener noreferrer">' . $linktext . '</a> ';
-		} else{
-		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN2 . '" >' . $linktext . '</a> ';
-		}    
-	}    
-	if (defined('DL3EL_EXTERN3'))  {
-	    if (defined('DL3EL_EXTERN3_NAME'))  {
-		$linktext = DL3EL_EXTERN3_NAME;
-	    } else {
-		$linktext = DL3EL_EXTERN3;
-	    }
-//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN3 . ' style = "color: #000000;">' . $linktext . '</a> ';
-	    if ((defined('DL3EL_EXTERN3_TAB')) && (DL3EL_EXTERN3_TAB === "new")) {
-		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN3 . '" target="extern3" rel="noopener noreferrer">' . $linktext . '</a> ';
-		} else{
-		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN3 . '" >' . $linktext . '</a> ';
-		}    
-	}    
-	if (defined('DL3EL_EXTERN4'))  {
-	    if (defined('DL3EL_EXTERN4_NAME'))  {
-		$linktext = DL3EL_EXTERN4_NAME;
-	    } else {
-		$linktext = DL3EL_EXTERN4;
-	    }
-//	    echo '| <a href="./caller_extern.php?id=' . DL3EL_EXTERN4 . ' style = "color: black;">' . $linktext . '</a> ';
-	    if ((defined('DL3EL_EXTERN4_TAB')) && (DL3EL_EXTERN4_TAB === "new")) {
-		    echo '| <a class="hreflink" href="' . DL3EL_EXTERN4 . '" target="extern4" rel="noopener noreferrer">' . $linktext . '</a> ';
-		} else{
-		    echo '| <a class="hreflink" href="./caller_extern.php?id=' . DL3EL_EXTERN4 . '" >' . $linktext . '</a> ';
-		}    
-	}    
-*/
+///// Profile / reflektoren
 	$refnr = 1;
 	while ($refnr < 6) {
 	    $ref_conf = DL3EL.'/Reflector' . $refnr . '.conf';
@@ -403,32 +353,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
     echo '</form>';
 
-//include_once('parse_svxconf.php');
 
-
-/*if (fopen($svxConfigFile,'r'))
-{
-
-  $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
-  $logics = explode(",",$svxconfig['GLOBAL']['LOGICS']);
-  foreach ($logics as $key) {
-	if ($key == "SimplexLogic") $isSimplex = true;
-	if ($key == "RepeaterLogic") $isRepeater = true; 
-  };
-  $logics = explode(",",$svxconfig['GLOBAL']['LOGICS']);
-  if ($isSimplex) $modules = explode(",",str_replace('Module','',$svxconfig['SimplexLogic']['MODULES']));
-  if ($isRepeater) $modules = explode(",",str_replace('Module','',$svxconfig['RepeaterLogic']['MODULES']));
-  foreach ($modules as $key){
-	if ($key == "EchoLink") $isEchoLink = true;
- }
- */
- //if ($isEchoLink==true) {echo ' <a href="/echolink.php" style = "color: #0000ff;">EchoLink</a> |';};
-//$globalRf = $svxconfig['GLOBAL']['RF_MODULE'];
-
-/*if ($globalRf <> "No")
-{
-	echo'	<a href="/rf.php" style = "color: #0000ff;"> Rf</a> |';
-}
-}*/
 ?>
 
