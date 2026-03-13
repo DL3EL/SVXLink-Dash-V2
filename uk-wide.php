@@ -10,19 +10,17 @@ if ($_SESSION['auth'] !== 'AUTHORISED') {
 if (!isset($svx_include)) {
     include_once "include/settings.php";
 }
+include_once "include/settings.php";
 
 /**
  * Funktion um die UK-TG-Datenbank isoliert zu laden
- * Das verhindert Probleme beim ersten Include vs. AJAX-Reload
  */
 function loadUkTgDatabase() {
     $file = "include/tgdb_uk.php";
     if (!file_exists($file)) return [];
     
-    // Wir nutzen eine anonyme Funktion, um einen sauberen Scope zu haben
     return (function($file) {
-        include $file; // Datei laden
-        // Wir suchen die Variable, die das Array enthält (meist $tgdb)
+        include $file;
         $vars = get_defined_vars();
         foreach ($vars as $k => $v) {
             if ($k !== 'file' && is_array($v)) return $v;
@@ -31,10 +29,8 @@ function loadUkTgDatabase() {
     })($file);
 }
 
-// UK-TGs laden
 $uk_tgs = loadUkTgDatabase();
-
-$cacheFile = __DIR__ . "/uk_cache.json";
+$cacheFile = __DIR__ . "/dl3el/uk_cache.json";
 $currentTime = time();
 $dateStr = date("H:i:s");
 $refLog = isset($reflectorlogic1) ? $reflectorlogic1 : "ReflectorLogic";
@@ -60,7 +56,6 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         $isTalking = isset($info['isTalker']) && $info['isTalker'] === true;
         $tg = (isset($info['monitoredTGs']) && !empty($info['monitoredTGs'])) ? $info['monitoredTGs'][0] : "---";
         
-        // Namensauflösung
         $tgName = "";
         if (isset($uk_tgs[$tg])) {
             $tgName = $uk_tgs[$tg];
@@ -130,15 +125,15 @@ if (!empty($cache)) {
 .ukw-table span { font-size: 14px; }
 </style>
 
-<div class="ukw-table-container">
+<div class="ukw-table-container" id="ukw-wrapper">
     <div style="font-weight:bold; margin-bottom:5px; font-family: Arial, sans-serif;">
-        <a class="ukw-link" href="https://ukwide.svxlink.net/status.php" target="ukw">UK-Wide Status</a> 
+        <a class="ukw-link" href="https://ukwide.svxlink.net/status.php" target="_blank">UK-Wide Status</a> 
         <span id="ukw-clock" style="font-weight:normal; font-size:13px; margin-left:10px; color: #555;">
             <?php echo $dateStr; ?>
         </span>
     </div>
     
-    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <form id="ukw-tg-form" method="post" action="index.php">
         <input type="hidden" name="ref" value="<?php echo $refLog; ?>">
         <table class="ukw-table">
             <thead>
@@ -157,6 +152,7 @@ if (!empty($cache)) {
 
 <script>
 (function() {
+    // 1. Timer für Uhrzeit und Dauer
     if (window.ukwInterval) clearInterval(window.ukwInterval);
     window.ukwInterval = setInterval(function() {
         const now = new Date();
@@ -164,10 +160,4 @@ if (!empty($cache)) {
         if (clock) clock.innerText = now.toLocaleTimeString('de-DE');
         const nowTs = Math.floor(now.getTime() / 1000);
         document.querySelectorAll('.ukw-talking').forEach(function(row) {
-            const start = parseInt(row.getAttribute('data-start'));
-            const durationCell = row.querySelector('.ukw-duration');
-            if (durationCell) durationCell.innerText = (nowTs - start) + 's';
-        });
-    }, 1000);
-})();
-</script>
+            const start = parseInt(row.
