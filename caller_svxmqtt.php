@@ -1,41 +1,50 @@
 <?php
-// DL3EL_LIVEDB === "right" LiveDB rechts
-// DL3EL_LIVEDB === "top" LiveDB über Menu oben
-// DL3EL_LIVEDB undiefined: LiveDB rechts
+if ($_SESSION['auth'] !== "AUTHORISED") {
+    return;
+}
 
-	if ($_SESSION['auth'] !== "AUTHORISED") {
-	    if ((defined ('debug')) && (debug > 0)) echo "not authorized<br>";
-	    return;
+// Erkennung: Wird das Script via AJAX (jQuery .load) aufgerufen?
+$isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+
+// --- NUR FÜR DEN NEUEN UK-ZWEIG ---
+if ($fmnetwork === "uk.wide.svxlink.uk") {
+    
+    // Beim ersten Laden (include) müssen wir die Tabellenzelle öffnen
+    if (!$isAjax) {
+        echo '<td valign="top" style="border:none; width:600px;">';
+        echo '<div id="svxmqtt" style="margin-bottom:30px;">' . "\n";
     }
+
+    // Das eigentliche Script einbinden
+    $svx_include = 1;
+    include "uk-wide.php";
+
+    // Beim ersten Laden den JS-Reload-Code ausgeben
+    if (!$isAjax) {
+        $rate = 2000;
+        $call_script = "uk-wide.php";
+        echo '<script type="text/javascript">' . "\n";
+        echo 'function reloadCurrPage(){' . "\n";
+        echo '  $("#svxmqtt").load("' . $call_script . '", function(){ setTimeout(reloadCurrPage, ' . $rate . ') });' . "\n";
+        echo '}' . "\n";
+        echo 'setTimeout(reloadCurrPage, ' . $rate . ');' . "\n";
+        echo '$(window).trigger(\'resize\');' . "\n";
+        echo '</script>' . "\n";
+        echo '</div>'; // div schließen
+        echo '</td>';  // td schließen
+    }
+
+} else {
+    // --- RESTLICHER CODE (FM-FUNKNETZ) BLEIBT UNVERÄNDERT ---
+    // (Hier folgt dein originaler Code für das Standard-Netz)
     if ((!defined('DL3EL_LIVEDB')) || ((defined('DL3EL_LIVEDB')) && ((DL3EL_LIVEDB === "right") || (DL3EL_LIVEDB === "yes")))) {
-    // Live DB
         echo '<td valign="top" style = "border:none;">';
-//		echo '<object style="outline:none; width:500px; height:850px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
-//		echo '<object style="outline:none; width:500px; height:850px; justify-content: left;" data=svx2mqtt/index_neu.php></object>';
-// neu, mqtt
-        if (file_exists($mqtt_data)) {
-            $delta = time() - filemtime($mqtt_data);
-            if ($delta < 15) {
-// something received, heartbeat every 11s, dl3el mqtt ok
-                $mqtt = 1;
-            } else {
-// nothing received within 14s, dl3el mqtt not ok
-                $mqtt = 0;
-            }
-        } else {
-                $mqtt = 0;
-        }    
-// test ob mqtt installiert: /usr/local/bin/mqtt-simple
-        if (file_exists("/usr/local/bin/mqtt-simple")) {
-            $mqtt = 1;
-        }    
-        if (defined('DL3EL_MQTT')) {
-            if (DL3EL_MQTT === "no") {
-                $mqtt = 0;
-            } else {
-                $mqtt = 1;
-            }    
-        }
+        
+        $mqtt_data = DL3EL_BASE . "svx2mqtt/mqtt.data";
+        $mqtt = file_exists("/usr/local/bin/mqtt-simple") ? 1 : 0;
+        if (file_exists($mqtt_data) && (time() - filemtime($mqtt_data) < 15)) $mqtt = 1;
+        if (defined('DL3EL_MQTT')) $mqtt = (DL3EL_MQTT === "no") ? 0 : 1;
+
         if ($mqtt) {
             echo '<div id="svxmqtt" style = "margin-bottom:30px;">'."\n";
             $svx_include = 1;
@@ -53,9 +62,7 @@
         } else {
             echo '<object style="outline:none; width:500px; height:850px; justify-content: left;" data=svx2mqtt/index_duo.php></object>';
         }
-
-//        echo '<center><small>Live Daten vom FM-Funknetz.de basierend auf dem MQTT Livedashboard von DJ1JAY<br>(integriert von Frank, DL4EM)</small></center>';
         echo '</td>';
     }   
-   
+}
 ?>
