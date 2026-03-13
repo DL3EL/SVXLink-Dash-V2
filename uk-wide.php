@@ -6,18 +6,45 @@ if ($_SESSION['auth'] !== 'AUTHORISED') {
     return;
 }
 
-// Pfad zur Zwischendatei
-$cacheFile = __DIR__ . "/dl3el/uk_cache.json";
+// 1. Abhängigkeiten laden
+if (!isset($svx_include)) {
+    include_once "include/settings.php";
+}
+
+/**
+ * Funktion um die UK-TG-Datenbank isoliert zu laden
+ * Das verhindert Probleme beim ersten Include vs. AJAX-Reload
+ */
+function loadUkTgDatabase() {
+    $file = "include/tgdb_uk.php";
+    if (!file_exists($file)) return [];
+    
+    // Wir nutzen eine anonyme Funktion, um einen sauberen Scope zu haben
+    return (function($file) {
+        include $file; // Datei laden
+        // Wir suchen die Variable, die das Array enthält (meist $tgdb)
+        $vars = get_defined_vars();
+        foreach ($vars as $k => $v) {
+            if ($k !== 'file' && is_array($v)) return $v;
+        }
+        return [];
+    })($file);
+}
+
+// UK-TGs laden
+$uk_tgs = loadUkTgDatabase();
+
+$cacheFile = __DIR__ . "/uk_cache.json";
 $currentTime = time();
 $dateStr = date("H:i:s");
+$refLog = isset($reflectorlogic1) ? $reflectorlogic1 : "ReflectorLogic";
 
-// 1. Daten vom Web laden (UK-Wide JSON)
+// 2. Daten vom Web laden
 $url = "https://ukwide.svxlink.net/status.php?json";
 $jsonRaw = @file_get_contents($url);
 $webData = json_decode($jsonRaw, true);
 $webNodes = isset($webData['nodes']) ? $webData['nodes'] : [];
 
-// 2. Cache laden
 $cache = file_exists($cacheFile) ? json_decode(file_get_contents($cacheFile), true) : [];
 
 $active_rows = "";
@@ -32,23 +59,34 @@ if (is_array($webNodes) && count($webNodes) > 0) {
 
         $isTalking = isset($info['isTalker']) && $info['isTalker'] === true;
         $tg = (isset($info['monitoredTGs']) && !empty($info['monitoredTGs'])) ? $info['monitoredTGs'][0] : "---";
+        
+        // Namensauflösung
+        $tgName = "";
+        if (isset($uk_tgs[$tg])) {
+            $tgName = $uk_tgs[$tg];
+        } elseif (isset($uk_tgs[(int)$tg])) {
+            $tgName = $uk_tgs[(int)$tg];
+        }
+        
+        $displayTG = ($tgName !== "") ? "<span>$tg</span><br><small>" . htmlspecialchars($tgName) . "</small>" : "<span>$tg</span>";
         $safeName = htmlspecialchars($nodeName);
 
         if ($isTalking) {
-            if (!isset($cache[$nodeName]['start_ts']) || $cache[$nodeName]['talking'] === false) {
+            if (!isset($cache[$nodeName]['start_ts']) || (isset($cache[$nodeName]['talking']) && $cache[$nodeName]['talking'] === false)) {
                 $cache[$nodeName]['start_ts'] = $currentTime;
                 $cache[$nodeName]['start_str'] = $dateStr;
             }
             $cache[$nodeName]['last_end'] = $dateStr; 
             $cache[$nodeName]['talking'] = true;
             $cache[$nodeName]['tg'] = $tg;
+            $cache[$nodeName]['tgName'] = $tgName;
 
             $duration = $currentTime - $cache[$nodeName]['start_ts'];
-            $active_rows .= "<tr style='height:28px; border-bottom: 1px solid #ddd; background-color: rgba(40, 167, 69, 0.2);' class='ukw-talking' data-start='".$cache[$nodeName]['start_ts']."'>"
-                          . "<td style='width:35%;'>&nbsp;&nbsp;<b>$safeName</b></td>"
-                          . "<td style='width:20%;'><button class='ukw-btn-active' style='$svxmqtt_color_active'>$tg</button></td>"
+            $active_rows .= "<tr style='height:40px; border-bottom: 1px solid #ddd; background-color: rgba(40, 167, 69, 0.2);' class='ukw-talking' data-start='".$cache[$nodeName]['start_ts']."'>"
+                          . "<td style='width:25%;'>&nbsp;&nbsp;<b>$safeName</b></td>"
+                          . "<td style='width:35%; padding:4px;'><button type='submit' name='jmptoA' value='$tg' class='ukw-btn-active' style='$svxmqtt_color_active;'>$displayTG</button></td>"
                           . "<td style='width:20%; text-align:center;'>".$cache[$nodeName]['start_str']."</td>"
-                          . "<td style='width:25%; font-weight:bold; color:green;' class='ukw-duration'>".$duration."s</td>"
+                          . "<td style='width:20%; font-weight:bold; color:green;' class='ukw-duration'>".$duration."s</td>"
                           . "</tr>";
         } else {
             if (isset($cache[$nodeName])) {
@@ -56,11 +94,10 @@ if (is_array($webNodes) && count($webNodes) > 0) {
             }
         }
     }
-    // Cache nur speichern, wenn wir auch valide Daten vom Web bekommen haben
     file_put_contents($cacheFile, json_encode($cache));
 }
 
-// 4. Inaktive Liste aus Cache bauen
+// 4. Inaktive Liste aus Cache
 if (!empty($cache)) {
     uasort($cache, function($a, $b) {
         return strcmp($b['last_end'] ?? '', $a['last_end'] ?? '');
@@ -69,11 +106,15 @@ if (!empty($cache)) {
     foreach ($cache as $nodeName => $cData) {
         if (isset($cData['talking']) && $cData['talking'] === false) {
             $safeName = htmlspecialchars($nodeName);
-            $history_rows .= "<tr style='height:28px; border-bottom: 1px solid #ddd;'>"
-                           . "<td style='width:35%;'>&nbsp;&nbsp;<b>$safeName</b></td>"
-                           . "<td style='width:20%;'><button class='ukw-btn-active' style='$svxmqtt_color_passive'>".($cData['tg'] ?? '---')."</button></td>"
+            $tgVal = ($cData['tg'] ?? '---');
+            $tgName = ($cData['tgName'] ?? '');
+            $displayTG = ($tgName !== "") ? "<span>$tgVal</span><br><small>" . htmlspecialchars($tgName) . "</small>" : "<span>$tgVal</span>";
+
+            $history_rows .= "<tr style='height:40px; border-bottom: 1px solid #ddd;'>"
+                           . "<td style='width:25%;'>&nbsp;&nbsp;<b>$safeName</b></td>"
+                           . "<td style='width:35%; padding:4px;'><button type='submit' name='jmptoA' value='$tgVal' class='ukw-btn-active' style='$svxmqtt_color_passive;'>$displayTG</button></td>"
                            . "<td style='width:20%; text-align:center; color:#666;'>".($cData['last_end'] ?? '--:--')."</td>"
-                           . "<td style='width:25%;'></td>"
+                           . "<td style='width:20%;'></td>"
                            . "</tr>";
         }
     }
@@ -83,8 +124,10 @@ if (!empty($cache)) {
 <style>
 .ukw-table-container a.ukw-link:link, .ukw-table-container a.ukw-link:visited { color: black; text-decoration: underline; }
 .ukw-table-container a.ukw-link:hover { color: #009900; }
-.ukw-btn-active { border: none; border-radius: 8px; width: 85px; color: white; font-weight: bold; font-size: 14px; height: 24px; cursor: pointer; }
+.ukw-btn-active { border: none; border-radius: 8px; width: 100%; max-width: 170px; color: white; font-weight: bold; font-size: 14px; cursor: pointer; height: auto; line-height: 1.1; padding: 5px 0; }
 .ukw-table { width: 600px; text-align: left; border-collapse: collapse; background-color: #f1f1f1; font-family: Arial, sans-serif; font-size: 14px; border: 1px solid #ccc; }
+.ukw-table small { font-size: 10px; font-weight: normal; opacity: 0.95; display: block; margin-top: 2px; line-height: 1; }
+.ukw-table span { font-size: 14px; }
 </style>
 
 <div class="ukw-table-container">
@@ -95,40 +138,30 @@ if (!empty($cache)) {
         </span>
     </div>
     
-    <table class="ukw-table">
-        <thead>
-            <tr style="height:30px; background-color: #e2e2e2; border-bottom: 2px solid #bbb;">
-                <th style="width:35%;">&nbsp;&nbsp;Node</th>
-                <th style="width:20%;">TG</th>
-                <th style="width:20%; text-align:center;">Start/Ende</th>
-                <th style="width:25%;">Dauer</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php echo $active_rows ?: "<tr><td colspan='4' style='text-align:center; padding:10px; color:#777; font-style:italic;'>Kein Funkbetrieb</td></tr>"; ?>
-            
-            <tr style="background-color:#ddd;">
-                <td colspan="4" style="padding:4px; font-size:11px; color:#444;">&nbsp;<b>Zuletzt aktiv (lokaler Cache)</b></td>
-            </tr>
-            
-            <?php echo $history_rows; ?>
-        </tbody>
-    </table>
+    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <input type="hidden" name="ref" value="<?php echo $refLog; ?>">
+        <table class="ukw-table">
+            <thead>
+                <tr style="height:30px; background-color: #e2e2e2; border-bottom: 2px solid #bbb;">
+                    <th style="width:25%;">&nbsp;&nbsp;Node</th><th style="width:35%;">TG / Name</th><th style="width:20%; text-align:center;">Start/Ende</th><th style="width:20%;">Dauer</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php echo $active_rows ?: "<tr><td colspan='4' style='text-align:center; padding:15px; color:#777;'>Kein Funkbetrieb</td></tr>"; ?>
+                <tr style="background-color:#ddd;"><td colspan="4" style="padding:4px; font-size:11px; color:#444;">&nbsp;<b>Zuletzt aktive Nodes</b></td></tr>
+                <?php echo $history_rows; ?>
+            </tbody>
+        </table>
+    </form>
 </div>
 
 <script>
-// Funktion für das Live-Update (Uhr und Sekunden)
 (function() {
     if (window.ukwInterval) clearInterval(window.ukwInterval);
-    
     window.ukwInterval = setInterval(function() {
         const now = new Date();
-        
-        // Uhrzeit-Anzeige oben
         const clock = document.getElementById('ukw-clock');
         if (clock) clock.innerText = now.toLocaleTimeString('de-DE');
-
-        // Sekunden-Counter für Aktive
         const nowTs = Math.floor(now.getTime() / 1000);
         document.querySelectorAll('.ukw-talking').forEach(function(row) {
             const start = parseInt(row.getAttribute('data-start'));
