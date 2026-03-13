@@ -1439,6 +1439,14 @@ echo "<br>Stat: $cmd";
       
       }  
     }  
+    function check_network($fmnetwork,$net) {
+      $len_net = strlen($net);
+      if (substr($fmnetwork,0,$len_net) === $net) {
+        return (1);
+      } else {
+        return (0);
+      }  
+    }
 
 
 ?>

@@ -82,7 +82,8 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}    
 //	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
-	if ($fmnetwork === "uk.wide.svxlink.uk") {
+//	if ($fmnetwork === "uk.wide.svxlink.uk") {
+	if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://ukwide.svxlink.net">UK Monitor | </a> ';
 	} else {
 	    if (file_exists("/usr/local/bin/mqtt-simple")) {
