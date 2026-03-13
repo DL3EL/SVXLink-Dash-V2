@@ -7,7 +7,9 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
 $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 
 // --- NUR FÜR DEN NEUEN UK-ZWEIG ---
-if ($fmnetwork === "uk.wide.svxlink.uk") {
+//if ($fmnetwork === "uk.wide.svxlink.uk") {
+if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
+
     
     // Beim ersten Laden (include) müssen wir die Tabellenzelle öffnen
     if (!$isAjax) {

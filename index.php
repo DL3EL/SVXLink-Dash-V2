@@ -140,6 +140,8 @@ if ($_SESSION['auth'] === "AUTHORISED") {
         echo 'setTimeout(reloadLastHeardDMR,3000);'."\n";
     }
 // --- NEU: Reload für die aktive TG Teilnehmer ---
+  $mqtt = 0;
+  if (!check_network($fmnetwork,"uk.wide.svxlink.uk")) {
     $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
     if ((strlen($mqtt_script)) || (file_exists("/usr/local/bin/mqtt-simple"))) {
       $mqtt = 1;
@@ -148,8 +150,10 @@ if ($_SESSION['auth'] === "AUTHORISED") {
       echo '}'."\n";
       echo 'setTimeout(reloadActiveTGCalls, 15000);'."\n";
     } else {
-      $mqtt = 0;
+//      $mqtt = 0;
     } 
+  }
+
 // ------------------------------------------------
     echo '$(window).trigger(\'resize\');'."\n";
 
@@ -163,11 +167,13 @@ if ($_SESSION['auth'] === "AUTHORISED") {
         echo '</div></center>'."\n";
     }    
 // --- NEU: Container für die Anzeige ---
+    if (!check_network($fmnetwork,"uk.wide.svxlink.uk")) {
       if ($mqtt) {
         echo '<center><div id="ActiveTGCalls" style = "margin-bottom:30px;">'."\n";
         include_once "active_tg_calls.php"; // Initiales Laden beim Seitenaufruf
         echo '</div></center>'."\n";
       }  
+     } 
 // --------------------------------------    echo "<br />\n";
     echo '</td>';
     // Live DB
