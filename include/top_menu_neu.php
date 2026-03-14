@@ -207,14 +207,14 @@ route("display", $displayRoutes);
 // SYSTEM ROUTING
 //////////////////////////////////////////////////////////////
 $systemRoutes = [
-    1 => './mobile/index.php',
+    4 => './mobile/index.php',
     3 => './config_backup.php',
-	2 => "./caller_extern.php?id=' . $cubeip . '",
-	5 => "./caller_extern.php?id=' . DL3EL_SVXCUBE . '",
+	2 => "./caller_extern.php?id=" . $cubeip,
+	5 => "./caller_extern.php?id=" . DL3EL_SVXCUBE,
 	6 => "/DVSwitch/index.php",
 	7 => "./caller.php?id=/",
 	8 => "./ssh.php",
-    4 => function () {
+    1 => function () {
         file_put_contents("dl3el/menu", "classic");
         header("Location: ./index.php");
     }
@@ -396,11 +396,11 @@ select.selectedIndex=0;
 //////////////////////////////////////////////////////////////
 echo '<select style="font-size:16px;" name="svxsystem" onchange="this.form.submit()">';
 echo '<option value="" hidden disabled selected>SYSTEM</option>';
-if ($mobil == true) echo '<option value="1">Mobile DB</option>';
-echo '<option value="4">Classic Menü</option>';
+echo '<option value="1">Classic Menü</option>';
 echo '<option value="3">Backup & Restore</option>';
 if ($cube01 == true) echo '<option value="2">SVX Cube</option>';
 if ($cube02 == true) echo '<option value="5">SVX Cube</option>';
+if ($mobil == true) echo '<option value="4">Mobile DB</option>';
 if ($dvs == true) echo '<option value="6">DVS</option>';
 if ($local_ref == true) echo '<option value="7">Reflector</option>';
 if ($shell_box == true) echo '<option value="8">SSH</option>';
