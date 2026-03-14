@@ -220,6 +220,7 @@ $systemRoutes = [
     }
 	
 ];
+if ((defined ('debug')) && (debug > 0)) echo "SVXCube: " . "./caller_extern.php?id=" . DL3EL_SVXCUBE;
 route("svxsystem", $systemRoutes);
 
 //////////////////////////////////////////////////////////////
