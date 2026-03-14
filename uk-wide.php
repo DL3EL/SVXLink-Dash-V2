@@ -127,7 +127,10 @@ if (!empty($cache)) {
 
 <div class="ukw-table-container" id="ukw-wrapper">
     <div style="font-weight:bold; margin-bottom:5px; font-family: Arial, sans-serif;">
+<!--
         <a class="ukw-link" href="https://ukwide.svxlink.net/status.php" target="_blank">UK-Wide Status</a> 
+-->        
+        UK-Wide Status
         <span id="ukw-clock" style="font-weight:normal; font-size:13px; margin-left:10px; color: #555;">
             <?php echo $dateStr; ?>
         </span>
@@ -160,4 +163,11 @@ if (!empty($cache)) {
         if (clock) clock.innerText = now.toLocaleTimeString('de-DE');
         const nowTs = Math.floor(now.getTime() / 1000);
         document.querySelectorAll('.ukw-talking').forEach(function(row) {
-            const start = parseInt(row.
+            const start = parseInt(row.getAttribute('data-start'));
+            const durationCell = row.querySelector('.ukw-duration');
+            if (durationCell) durationCell.innerText = (nowTs - start) + 's';
+        });
+    }, 1000);
+})();
+</script>
+
