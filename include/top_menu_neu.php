@@ -49,6 +49,7 @@ if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
     $cube01 = true;
 	} else {
 	    if (defined('DL3EL_SVXCUBE'))  {
+	    $cubeip = DL3EL_SVXCUBE;
 	$cube02 = true;
 	    }    
 	}
@@ -210,7 +211,7 @@ $systemRoutes = [
     4 => './mobile/index.php',
     3 => './config_backup.php',
 	2 => "./caller_extern.php?id=" . $cubeip,
-	5 => "./caller_extern.php?id=" . DL3EL_SVXCUBE,
+	5 => "./caller_extern.php?id=" . $cubeip,
 	6 => "/DVSwitch/index.php",
 	7 => "./caller.php?id=/",
 	8 => "./ssh.php",
