@@ -80,11 +80,16 @@ function get_current_amixer_values() {
     if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
     return $current_values;
 }
-function get_current_amixer_values_tx($sc) {
-    if ((defined ('debug')) && (debug > 0)) echo "Karte gefunden: [$sc]<br>";
-    $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
+function get_current_amixer_values_tx($sc,$svxRadio) {
+    if ((defined ('debug')) && (debug > 0)) echo "get_current_amixer_values_tx, für Karte: [$sc]<br>";
     $mic_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=4");
-    $capture_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=8");
+    if ($svxRadio === "Elenata") {
+        $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=10");
+        $capture_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=2");
+    } else {    
+        $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
+        $capture_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=8");
+    }    
     $autogain_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=9 2>/dev/null");
     $current_values = [
         'headphone' => parse_amixer_value($headphone_output),
@@ -100,22 +105,32 @@ function get_current_amixer_values_tx($sc) {
                 break;
             }
         }
-       if ((defined ('debug')) && (debug > 0)) echo "Ende autogain values: " . $current_values['autogain'] . "<br>";
+       if ((defined ('debug')) && (debug > 0)) echo "autogain values: " . $current_values['autogain'] . "<br>";
+    } else {
+       if ((defined ('debug')) && (debug > 0)) echo "no autogain values available<br>";
     }
-    if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
+    if ((defined ('debug')) && (debug > 0)) echo "<b>get_current_amixer_values_tx (Headphone, $sc): " . $current_values['headphone'] . "</b><br>";
     return $current_values;
 }
 function get_current_amixer_values_rx($sc) {
 //    $sc = $sc_rx;
-    if ((defined ('debug')) && (debug > 0)) echo "Karte gefunden: $sc<br>";
+    if ((defined ('debug')) && (debug > 0)) echo "get_current_amixer_values_rx, für Karte:  $sc<br>";
     $mic_output_rx = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
     $current_values_rx = [
         'mic' => parse_amixer_value($mic_output_rx)
     ];
 
-    if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
+//    if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
+    if ((defined ('debug')) && (debug > 0)) echo "<b>get_current_amixer_values_rx (Mike, $sc): " . $current_values_rx['mic'] . "</b><br>";
     return $current_values_rx;
 }
+
+// PHP Code starts here
+    $svxRadio = "x";
+    if (defined('DL3EL_RADIO')) {
+        $svxRadio = DL3EL_RADIO;
+    }
+
 /// SC & MIke Info from svxlink.conf & system, skip var from config.php
             $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
             if (fopen($svxConfigFile,'r')) {
@@ -132,8 +147,7 @@ function get_current_amixer_values_rx($sc) {
                     $sc_tx_cmp = $card_string . " \[";
                     $sc = 'aplay -l | grep "' . $sc_tx_cmp . '"';
                     $sc_tx = substr(shell_exec($sc),5,1);
-                    if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc)<br>";
-                    if ((defined ('debug')) && (debug > 0)) echo "<br>getting Soundcard configuration: <b>[" . $sc_port_tx . "]</b>";
+                    if ((defined ('debug')) && (debug > 1)) echo "TX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc) <br>SVXLink: [" . $sc_port_tx . "]<br>";
                 }
                 $card_start = strpos($sc_port_rx, 'CARD=')+5;
                 if ($card_start !== false) {
@@ -143,41 +157,81 @@ function get_current_amixer_values_rx($sc) {
                     $sc_rx_cmp = $card_string . " \[";
                     $sc = 'aplay -l | grep "' . $sc_rx_cmp . '"';
                     $sc_rx = substr(shell_exec($sc),5,1);
-                    if ((defined ('debug')) && (debug > 0)) echo "RX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc)<br>";
-                    if ((defined ('debug')) && (debug > 0)) echo "<br>getting Mike configuration: <b>[" . $sc_port_rx . "]</b><br>";
+                    if ((defined ('debug')) && (debug > 1)) echo "RX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc) <br>SVXLink: [" . $sc_port_rx . "]<br>";
                 }
                 $spkrismike = "";
                 if ($sc_port_rx === $sc_port_tx) {
                     $spkrismike = "/Mikrofon";
-                }    
-                if ((defined ('debug')) && (debug > 0)) echo " [$sc_port_rx]<br>";
-                if ($sc_port_rx !== $sc_port_tx) {
+                    if ((defined ('debug')) && (debug > 1)) echo "TX: [$sc_port_tx] == RX:[$sc_port_rx]<br>";
+                } else {   
+//                if ($sc_port_rx !== $sc_port_tx) {
+                    if ((defined ('debug')) && (debug > 1)) echo "TX: [$sc_port_tx] != RX:[$sc_port_rx]<br>";
                     $sc_mike_linux = 'aplay -l | grep "' . $sc_rx_cmp . '"';
                     $sc_mike_linux = shell_exec($sc_mike_linux);
-                    if ((defined ('debug')) && (debug > 0)) echo " [$sc_mike_linux]<br>";
+                    if ((defined ('debug')) && (debug > 1)) echo "Found extra Mike [$sc_mike_linux]<br>";
                 }    
-                if ((defined ('debug')) && (debug > 0)) echo "<br><br><b>" . $sc_mike_linux . " (Linux)<br>";
             }    
     
-if ((defined ('debug')) && (debug > 0)) echo "RX (Mikrofon): $sc_rx_cmp [Index: $sc_rx sc_rx]<br>";
-if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Index: $sc_tx sc_tx]<br>";
+if ((defined ('debug')) && (debug > 0)) echo "<b>Radio $svxRadio:<br>RX (Mikrofon): $sc_rx_cmp [Index: $sc_rx sc_rx]<br>";
+if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Index: $sc_tx sc_tx]</b><br>";
 ///
 // Maximum permitted values based on numid
-$max_values = [
-    'headphone' => 151, // numid=6
-    'mic' => 32, // numid=4
-    'capture' => 16 // numid=8
-];
-
+// Todo: erlaubte Werte ermitteln
+/*
+ show all numids: sudo amixer -c1 controls
+ show all numids: sudo amixer -c1 contents
+*/
+    if ($svxRadio === "Elenata") {
+/*
+        numid=10,iface=MIXER,name='Lineout Playback Volume'
+        ; type=INTEGER,access=rw---R--,values=2,min=0,max=31,step=0
+        : values=22,22
+        | dBscale-min=-15.50dB,step=0.50dB,mute=0
+        numid=2,iface=MIXER,name='Capture Volume'
+        ; type=INTEGER,access=rw------,values=2,min=0,max=15,step=0
+        : values=12,12
+ 
+*/      
+        $max_values = [
+            'headphone' => 31, // numid=10
+            'mic' => 32, // numid=4
+            'capture' => 15 // numid=2
+        ];
+    } else {
+        /*
+        numid=4,iface=MIXER,name='Mic Playback Volume'
+        ; type=INTEGER,access=rw---R--,values=1,min=0,max=31,step=0
+        : values=24
+        | dBminmax-min=-23.00dB,max=8.00dB
+        numid=6,iface=MIXER,name='Speaker Playback Volume'
+        ; type=INTEGER,access=rw---R--,values=2,min=0,max=37,step=0
+        : values=23,23
+        | dBminmax-min=-37.00dB,max=0.00dB
+        numid=8,iface=MIXER,name='Mic Capture Volume'
+        ; type=INTEGER,access=rw---R--,values=1,min=0,max=35,step=0
+        : values=12
+        | dBminmax-min=-12.00dB,max=23.00dB
+        */
+        $max_values = [
+        'headphone' => 151, // numid=6
+        'mic' => 37, // numid=4
+        'capture' => 35 // numid=8
+        ];
+    }
 // Get current values from amixer
-    $current_values = get_current_amixer_values_tx($sc_tx,$sc_rx);
-    $current_values_rx = get_current_amixer_values_rx($sc_rx);
+    $current_values = get_current_amixer_values_tx($sc_tx,$svxRadio);
+    if ($sc_tx !== $sc_rx) {
+        $current_values_rx = get_current_amixer_values_rx($sc_rx);
+    }    
     $current_autogain = $current_values['autogain'];
 if ((defined ('debug')) && (debug > 0)) {
+    echo "<b>Spkr: ";
     print_r($current_values);
-    echo "<br>";
-    print_r($current_values_rx);
-    echo "<br>";
+    if ($sc_tx !== $sc_rx) {
+        echo "<br>Mike: ";
+        print_r($current_values_rx);
+    }    
+    echo "</b><br>";
 }    
 ?>
 
@@ -244,22 +298,18 @@ if ((defined ('debug')) && (debug > 0)) {
         <br>
         <button type="submit">Apply Settings</button>
         <?php 
-            if (defined('DL3EL_RADIO') ) {
-                $svxRadio = DL3EL_RADIO;
 // Soundcard?
-//              if ($svxRadio == "SC (no Radio)") {
                 if (substr($svxRadio,0,3) === "SC ") {
                     echo '<br>';
                     echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save SoundCard Settings</button>';
                     echo '<br>';
                     echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore SoundCard Settings</button>';
                 }    
-                if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+                if (($svxRadio == "Shari") || ($svxRadio == "RFGuru") || ($svxRadio == "Elenata")) {
                     echo '<br>';
                     echo '<button name="btnsavshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Save ' . $svxRadio . ' Sound Settings</button>';
                     echo '<button name="btnrstshari" type="submit" class="green" style = "height:30px; width:400px; font-size:12px;">Restore ' . $svxRadio . ' Sound Settings</button>';
                 }    
-            }   
             echo '<br>';
             echo '<button id=jumptoAm name=jmptoAm type="submit" class="green" style = "height:30px; width:200px; font-size:12px;" value=\"9990\">Parrot 9990 (Modulations Test)</button>';
             echo '<button id=jumptoAm name=jmptoAm type="submit" class="green" style = "height:30px; width:200px; font-size:12px;" value=\"9998\">Parrot 9998 (Modulations Test)</button>';
@@ -274,7 +324,11 @@ if ((defined ('debug')) && (debug > 0)) {
             $headphone_percentage = intval($_POST['headphone']);
             $headphone_value = ($headphone_percentage / 100) * $max_values['headphone'];
             echo "Card: $sc $headphone_value<br>";
-            exec("sudo amixer -c" . $sc_tx . " cset numid=6 " . escapeshellarg($headphone_value));
+            if ($svxRadio === "Elenata") {
+                exec("sudo amixer -c" . $sc_tx . " cset numid=10 " . escapeshellarg($headphone_value));
+            } else {    
+                exec("sudo amixer -c" . $sc_tx . " cset numid=6 " . escapeshellarg($headphone_value));
+            }    
         }
 
         if (isset($_POST['mic'])) {
@@ -292,7 +346,12 @@ if ((defined ('debug')) && (debug > 0)) {
         if (isset($_POST['capture'])) {
             $capture_percentage = intval($_POST['capture']);
             $capture_value = ($capture_percentage / 100) * $max_values['capture'];
-            exec("sudo amixer -c" . $sc_tx . " cset numid=8 " . escapeshellarg($capture_value));
+//            exec("sudo amixer -c" . $sc_tx . " cset numid=8 " . escapeshellarg($capture_value));
+            if ($svxRadio === "Elenata") {
+                exec("sudo amixer -c" . $sc_tx . " cset numid=2 " . escapeshellarg($capture_value));
+            } else {    
+                exec("sudo amixer -c" . $sc_tx . " cset numid=8 " . escapeshellarg($capture_value));
+            }    
         }
         if ((defined ('debug')) && (debug > 0)) echo "vor autogain values: $autogain<br>";
         if (isset($_POST['autogain'])) {
