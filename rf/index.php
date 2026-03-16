@@ -70,14 +70,14 @@ textarea {
 <center>
 <?php 
 if (defined('DL3EL_RADIO')) {
-  if ((DL3EL_RADIO == "Shari") || (DL3EL_RADIO == "RFGuru")) {
+  if ((DL3EL_RADIO == "Shari") || (DL3EL_RADIO == "RFGuru") || (DL3EL_RADIO == "Elenata")) {
     $svxRadio = DL3EL_RADIO;
   } else {
-    echo "No supported Radio defined (valid: Shari/RFGuru)<br>";
+    echo "No supported Radio defined (valid: Shari/RFGuru/Elenata)<br>";
     $svxRadio = "";
   }  
 } else {
-   echo "No Radio defined (valid: Shari/RFGuru)<br>";
+   echo "No Radio defined (valid: Shari/RFGuru/Elenata)<br>";
    $svxRadio = "";
 }
 ?>
@@ -680,6 +680,7 @@ function device_detection($radioport) {
 	$screen = null;
 	$screen_small = null;
 	
+// Elenata: /dev/ttyS*
 // RFGuru: /dev/ttyS*
 // Shari: /dev/ttyUSB* 
 
