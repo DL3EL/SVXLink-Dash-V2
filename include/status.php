@@ -30,7 +30,7 @@ include_once "functions.php";
          $radioctcss = "";
          if (defined('DL3EL_RADIO')) {
             $svxRadio = DL3EL_RADIO;
-            if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+            if (($svxRadio == "Shari") || ($svxRadio == "RFGuru") || ($svxRadio == "Elenata")) {
                $RfConfFile = DL3EL . '/sa818/sa818.json';
                if (fopen($RfConfFile,'r')) {
                   $filedata = file_get_contents($RfConfFile);
@@ -409,7 +409,7 @@ if ($reflectorlogic2 != "") {
       echo "<td colspan=2 style=\"background:#ffffed;\"><div style=\"margin-top:4px;margin-bottom:4px;white-space:normal;color:#0a7d29;font-weight: bold;\">";
       if (defined('DL3EL_RADIO')) {
          $svxRadio = DL3EL_RADIO;
-         if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+         if (($svxRadio == "Shari") || ($svxRadio == "RFGuru") || ($svxRadio == "Elenata")) {
             $RfConfFile = DL3EL . '/sa818/sa818.json';
             if (fopen($RfConfFile,'r')) {
                $filedata = file_get_contents($RfConfFile);

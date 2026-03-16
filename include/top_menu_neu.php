@@ -113,6 +113,7 @@ $owrx =    defined('DL3EL_OPENWEBRX');
 $livedb =  defined('DL3EL_LIVEDB') && DL3EL_LIVEDB == "top";
 $shari =   defined('DL3EL_RADIO') && DL3EL_RADIO == "Shari";
 $guru =    defined('DL3EL_RADIO') && DL3EL_RADIO == "RFGuru";
+$elenata =    defined('DL3EL_RADIO') && DL3EL_RADIO == "Elenata";
 
 $livedb01 = false;
 $livedb02 = false;
@@ -241,7 +242,7 @@ $expertRoutes = [
 ];
 
 if (
-    in_array(DL3EL_RADIO, ["Shari", "RFGuru"]) ||
+    in_array(DL3EL_RADIO, ["Shari", "RFGuru", "Elenata"]) ||
     str_starts_with(DL3EL_RADIO, "SC ")
 ) {
     $expertRoutes[5] = './caller.php?id=amixer/index';
@@ -261,7 +262,7 @@ $normalRoutes = [
 ];
 
 if (
-    in_array(DL3EL_RADIO, ["Shari", "RFGuru"]) ||
+    in_array(DL3EL_RADIO, ["Shari", "RFGuru", "Elenata"]) ||
     str_starts_with(DL3EL_RADIO, "SC ")
 ) {
     $expertRoutes[4] = './caller.php?id=amixer/index';
@@ -421,6 +422,7 @@ if ($expert) {
     echo '<option value="5">AMixer</option>';
     if ($shari) echo '<option value="6">Shari Conf</option>';
     if ($guru)  echo '<option value="6">Guru Conf</option>';
+    if ($elenata)  echo '<option value="6">Elenata Conf</option>';
     echo '<option value="7">Node Info</option>';
     echo '<option value="8">config.php</option>';
     echo '<option value="9">Wifi</option>';
@@ -440,6 +442,7 @@ if ($normal) {
     echo '<option value="4">AMixer</option>';
     if ($shari) echo '<option value="5">Shari Conf</option>';
     if ($guru)  echo '<option value="5">Guru Conf</option>';
+    if ($elenata)  echo '<option value="5">Elenata Conf</option>';
     echo '<option value="6">Node Info</option>';
     echo '</select>';
 }

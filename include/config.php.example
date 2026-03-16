@@ -63,6 +63,7 @@ define("DL3EL_SSH", "no");
 define("DL3EL_SPEC_TG", 99);
 define("DL3EL_RADIO", "Shari");
 //define("DL3EL_RADIO", "RFGuru");
+//define("DL3EL_RADIO", "Elenata");
 // examples, will be shown in Status and in APRS Beacon
 //define("DL3EL_RADIO", "no Radio");
 //define("DL3EL_RADIO", "SC (no Radio)");

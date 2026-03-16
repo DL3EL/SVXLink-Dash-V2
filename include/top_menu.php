@@ -266,7 +266,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}	
 	if (defined('DL3EL_RADIO')) {
 	    $svxRadio = DL3EL_RADIO;
-	    if (($svxRadio == "Shari") || ($svxRadio == "RFGuru")) {
+	    if (($svxRadio == "Shari") || ($svxRadio == "RFGuru") || ($svxRadio == "Elenata")) {
 		echo '<a class="hreflink" href="./caller.php?id=amixer/index" id="amixer">AMixer</a> | ';
 //		echo '<a href="./editor.php?id=amixer" style = "color: black;" id="amixer">AMixer</a> | ';
 		echo '<a class="hreflink" href="./rf.php" id="radio">Radio</a> | ';
