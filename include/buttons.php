@@ -9,6 +9,26 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
 	}
 */
  $exec="";
+ $dtmf_pty = get_pty();
+ 
+for ($i = 1; $i <= 20; $i++) {
+    $buttonName = 'button' . $i;
+    $constantName = 'KEY' . $i;
+
+    if (array_key_exists($buttonName, $_POST)) {
+        // Wir nutzen constant(), um den Wert der KEY1, KEY2 etc. dynamisch abzugreifen
+        $keyValue = constant($constantName)[1];
+        
+        $exec = "echo '" . $keyValue . "' > " . $dtmf_pty;
+        exec($exec, $output);
+        
+        echo "<meta http-equiv='refresh' content='0'>";
+        
+        // Da nur ein Button gleichzeitig gedrückt wird, können wir hier abbrechen
+        break; 
+    }
+}
+/* 
  if(array_key_exists('button1', $_POST)) {
         $exec= "echo '" . KEY1[1] . "' > /tmp/dtmf_svx";
         exec($exec,$output);
@@ -111,6 +131,7 @@ if(array_key_exists('button11', $_POST)) {
             exec($exec,$output);
             echo "<meta http-equiv='refresh' content='0'>";
         }
+*/        
     if (strlen($exec)) {
         $logtext = "DTMF via Button: "  . $exec;
     } else {

@@ -1349,6 +1349,7 @@ echo "<br>Stat: $cmd";
 
     function getfmnetwork () {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
+// das hier noch variable gestalten, Reflectorlogic kann anders heissen
       $section = "ReflectorLogic";
       if (fopen($svxConfigFile,'r')) { 
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
@@ -1375,6 +1376,20 @@ echo "<br>Stat: $cmd";
       return $fmnetwork;
     }
 
+    function get_pty() {
+      $svxConfigFile = SVXCONFPATH . SVXCONFIG;
+// das hier noch variable gestalten, Reflectorlogic kann anders heissen
+//DTMF_CTRL_PTY = /tmp/dtmf_svx
+      $section = "SimplexLogic";
+      $dtmf_pty = "/tmp/dtmf_svx";
+      if (fopen($svxConfigFile,'r')) { 
+        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+        if (isset($svxconfig[$section]['DTMF_CTRL_PTY'])) {
+          $dtmf_pty = $svxconfig[$section]['DTMF_CTRL_PTY'];
+        }    
+    }
+    return $dtmf_pty;
+}
     function start_mqtt() {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
       $callsign = "N0Call";

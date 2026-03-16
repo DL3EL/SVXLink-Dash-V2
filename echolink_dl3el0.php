@@ -27,7 +27,9 @@
 
 <?php
 if (isset($_POST["jmptoE"])) {
-    $exec= "echo '2#" . $_POST['jmptoE'] . "#' > /tmp/dtmf_svx";
+//    $exec= "echo '2#" . $_POST['jmptoE'] . "#' > /tmp/dtmf_svx";
+    $dtmf_pty = get_pty();
+    $exec= "echo '2#" . $_POST['jmptoE'] . "#' > " . $dtmf_pty;
     exec($exec,$output);
 }
 ?>

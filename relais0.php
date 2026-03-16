@@ -73,7 +73,7 @@
             file_put_contents($FMLQueryFile, $fmlquery);
         }    
     }
-echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:0px;margin-left:10px;margin-right:10px;font-size:14px; border:none;">';
+//echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:0px;margin-left:10px;margin-right:10px;font-size:14px; border:none;">';
     echo '<table style = "margin-bottom:0px;border:0; border-collapse:collapse; cellspacing:0; cellpadding:0; background-color:#f1f1f1;"><tr style = "border:none;background-color:#f1f1f1;">';
     if (($handle = fopen($RelaisFile, "r")) !== FALSE) {
         while (($data = fgetcsv($handle, 1000, ";", "\"", "\\")) !== FALSE) {
@@ -125,12 +125,13 @@ echo '<fieldset style = " width:550px;background-color:#f1f1f1;margin-top:0px;ma
         <input type="hidden" name="form_submitted" value="1">
     </form>
 </table>
-</fieldset>
 
 <?php
 
 if (isset($_POST["jmptoE"])) {
-    $exec= "echo '2#" . $_POST['jmptoE'] . "#' > /tmp/dtmf_svx";
+ $dtmf_pty = get_pty();
+//    $exec= "echo '2#" . $_POST['jmptoE'] . "#' > /tmp/dtmf_svx";
+    $exec= "echo '2#" . $_POST['jmptoE'] . "#' > " . $dtmf_pty;
     exec($exec,$output);
 }
 
