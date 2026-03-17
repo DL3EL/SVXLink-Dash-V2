@@ -128,6 +128,7 @@ if ((defined('SHOWPTT')) && (SHOWPTT=="TRUE")) {
 }
 */
 if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['auth'] === "AUTHORISED")) {
+/*
 /// neu audio
 //    include_once "ptt.html";
 //    include_once "ptt-qx18.html";
@@ -137,10 +138,12 @@ if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['aut
     } else {
         include_once "ptt.html";
     }        
+*/
     echo '<button class="button link" onclick="playAudioToggle(8001, this)">
     <b><img src="images/speaker.png" alt="" style="vertical-align:middle">&nbsp;RX Monitor</b>
     </button>';
 }
+
     if (file_exists(DL3EL.'/Reflector1.conf')) {
         include_once "ref_change.php";
     }

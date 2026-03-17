@@ -130,7 +130,7 @@ echo '<span style="display: inline;">';
 // we need the mixer routine for voce traffic anyway
 // correction, the voice controls only make sense, when there is a local speaker attached. For remote sound, use the browser
 // as it is not possible to determin a locally connected speaker, we assume, that is the case, if PTT===TRUE
-if (SHOWPTT=="TRUE") {
+//if (SHOWPTT=="TRUE") {
     echo '<button id="myButton" onclick="executeCommand()" style = "margin-right:90px; width:150px; color:white; background-color:green; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>PTT off</b></button>';
 
 
@@ -163,7 +163,7 @@ if (SHOWPTT=="TRUE") {
         $color = "transparent";
         echo '<font style="margin-right:140px; width:30px;">' . $volume . '</font>';
     }
-}
+//}
 ?>
 </form>
 </span>
