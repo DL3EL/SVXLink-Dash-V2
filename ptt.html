@@ -87,7 +87,12 @@ function get_current_headphone_values() {
     } else {
         $sc = 0;
     }    
-    $headphone_value = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
+    if ((defined('DL3EL_RADIO')) && (DL3EL_RADIO ==="Elenata")) {
+        $numid = 10;
+    } else {
+        $numid = 10;
+    }
+    $headphone_value = execute_amixer("sudo amixer -c" . $sc . " cget numid=" . $numid);
     $headphone_output =  parse_amixer_value($headphone_value);
     return $headphone_output;
 }
@@ -102,12 +107,21 @@ function ls_change($value) {
     } else {
         $sc = 0;
     }    
-    $new_value = execute_amixer("sudo amixer -c" . $sc . " set Speaker " . $value);
-    if ((substr($new_value[0],0,14) === "amixer: Unable") || (!strlen($new_value[0]))) {
-        // zumindest bei DB0HTV ist das so
-        $new_value = execute_amixer("sudo amixer -c" . $sc . " set Lineout " . $value);
+//    
+    if ((defined('DL3EL_RADIO')) && (DL3EL_RADIO ==="Elenata")) {
+        $headphone_percentage = $value;
+        $headphone_value = ($headphone_percentage / 100) * $max_values['headphone'];
+        echo "Card: $sc $headphone_value<br>";
+        exec("sudo amixer -c" . $sc_tx . " cset numid=10 " . escapeshellarg($headphone_value));
+    } else {    
+//       exec("sudo amixer -c" . $sc_tx . " cset numid=6 " . escapeshellarg($headphone_value));
+        $new_value = execute_amixer("sudo amixer -c" . $sc . " set Speaker " . $value);
+        if ((substr($new_value[0],0,14) === "amixer: Unable") || (!strlen($new_value[0]))) {
+            // zumindest bei DB0HTV ist das so
+            $new_value = execute_amixer("sudo amixer -c" . $sc . " set Lineout " . $value);
+        }    
+        $new_value =  parse_amixer_value($new_value);
     }    
-    $new_value =  parse_amixer_value($new_value);
 }
 
 // Get current values from amixer
