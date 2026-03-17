@@ -87,12 +87,7 @@ function get_current_headphone_values() {
     } else {
         $sc = 0;
     }    
-    if ((defined('DL3EL_RADIO')) && (DL3EL_RADIO ==="Elenata")) {
-        $numid = 10;
-    } else {
-        $numid = 10;
-    }
-    $headphone_value = execute_amixer("sudo amixer -c" . $sc . " cget numid=" . $numid);
+    $headphone_value = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
     $headphone_output =  parse_amixer_value($headphone_value);
     return $headphone_output;
 }
@@ -107,21 +102,12 @@ function ls_change($value) {
     } else {
         $sc = 0;
     }    
-//    
-    if ((defined('DL3EL_RADIO')) && (DL3EL_RADIO ==="Elenata")) {
-        $headphone_percentage = $value;
-        $headphone_value = ($headphone_percentage / 100) * $max_values['headphone'];
-        echo "Card: $sc $headphone_value<br>";
-        exec("sudo amixer -c" . $sc_tx . " cset numid=10 " . escapeshellarg($headphone_value));
-    } else {    
-//       exec("sudo amixer -c" . $sc_tx . " cset numid=6 " . escapeshellarg($headphone_value));
-        $new_value = execute_amixer("sudo amixer -c" . $sc . " set Speaker " . $value);
-        if ((substr($new_value[0],0,14) === "amixer: Unable") || (!strlen($new_value[0]))) {
-            // zumindest bei DB0HTV ist das so
-            $new_value = execute_amixer("sudo amixer -c" . $sc . " set Lineout " . $value);
-        }    
-        $new_value =  parse_amixer_value($new_value);
+    $new_value = execute_amixer("sudo amixer -c" . $sc . " set Speaker " . $value);
+    if ((substr($new_value[0],0,14) === "amixer: Unable") || (!strlen($new_value[0]))) {
+        // zumindest bei DB0HTV ist das so
+        $new_value = execute_amixer("sudo amixer -c" . $sc . " set Lineout " . $value);
     }    
+    $new_value =  parse_amixer_value($new_value);
 }
 
 // Get current values from amixer
@@ -142,36 +128,41 @@ echo '<p></p>';
 echo '<span style="display: inline;">';
 // only if PTT is activated
 // we need the mixer routine for voce traffic anyway
+// correction, the voice controls only make sense, when there is a local speaker attached. For remote sound, use the browser
+// as it is not possible to determin a locally connected speaker, we assume, that is the case, if PTT===TRUE
 if (SHOWPTT=="TRUE") {
     echo '<button id="myButton" onclick="executeCommand()" style = "margin-right:90px; width:150px; color:white; background-color:green; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>PTT off</b></button>';
-}
-echo '<form action="" method="post" style="display: inline;" >';
 
-//read Speaker on/off from amixer
-$status = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $7}'");
-if ((substr($status,0,14) === "amixer: Unable") || (!strlen($status))) {
-// zumindest bei DB0HTV ist das so
-    $status = exec("amixer -c" . $sc . " get Lineout |grep % |awk '{print $7}'");
-}    
 
-if ($status == "[on]") {
-	$volume = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
-    if ((substr($volume,0,14) === "amixer: Unable") || (!strlen($volume))) {
-        $volume = exec("amixer -c" . $sc . " get Lineout |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
-    }
-	$color = "#7a4a4a";
-	echo '<button name="button_off" type="submit" style = "margin-right:15px; width:70px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:16px;"><img src=images/speaker_off.png></button>';
+    echo '<form action="" method="post" style="display: inline;" >';
+
+    //read Speaker on/off from amixer
+    $status = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $7}'");
+    if ((substr($status,0,14) === "amixer: Unable") || (!strlen($status))) {
+    // zumindest bei DB0HTV ist das so
+        $status = exec("amixer -c" . $sc . " get Lineout |grep % |awk '{print $7}'");
+    }    
+
+    if ($status == "[on]") {
+        $volume = exec("amixer -c" . $sc . " get Speaker |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
+// unable könnte auf einen ELenata Karte hindeuten
+        if ((substr($volume,0,14) === "amixer: Unable") || (!strlen($volume))) {
+            $volume = exec("amixer -c" . $sc . " get Lineout |grep % |awk '{print $5}'|sed 's/[^0-9\%]//g'");
+        }
+        $color = "#7a4a4a";
+        echo '<button name="button_off" type="submit" style = "margin-right:15px; width:70px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:16px;"><img src=images/speaker_off.png></button>';
         $color = "darkred";
-	echo '<button name="buttonA" type="submit" style = "margin-right:10px; width:30px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:18px;"><b>-</b></button>';
-	echo '<font style="margin-right:10px; width:30px; color:black; font-size:16px">' . $volume . '</font>';
-	$color = "seagreen";
-	echo '<button name="buttonB" type="submit" style = "margin-right:10px; width:30px; border-radius:8px;color:white; border-color:transparent; background-color:' . $color .';height:28px; font-size:18px;"><b>+</b></button>';
-} else {
-	$volume = "&ensp;<img src=images/speaker_off_b.png>&emsp;";
-	$color = "#4a7a7a";
-	echo '<button name="button_on" type="submit" style = "margin-right:55px; width:70px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:16px;"><img src=images/speaker.png></button>';
-    $color = "transparent";
-    echo '<font style="margin-right:140px; width:30px;">' . $volume . '</font>';
+        echo '<button name="buttonA" type="submit" style = "margin-right:10px; width:30px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:18px;"><b>-</b></button>';
+        echo '<font style="margin-right:10px; width:30px; color:black; font-size:16px">' . $volume . '</font>';
+        $color = "seagreen";
+        echo '<button name="buttonB" type="submit" style = "margin-right:10px; width:30px; border-radius:8px;color:white; border-color:transparent; background-color:' . $color .';height:28px; font-size:18px;"><b>+</b></button>';
+    } else {
+        $volume = "&ensp;<img src=images/speaker_off_b.png>&emsp;";
+        $color = "#4a7a7a";
+        echo '<button name="button_on" type="submit" style = "margin-right:55px; width:70px; border-radius:8px; color:white; border-color:transparent; background-color:' . $color .'; height:28px; font-size:16px;"><img src=images/speaker.png></button>';
+        $color = "transparent";
+        echo '<font style="margin-right:140px; width:30px;">' . $volume . '</font>';
+    }
 }
 ?>
 </form>
