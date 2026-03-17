@@ -154,10 +154,6 @@ if (session_status() === PHP_SESSION_NONE) {
     }   
 ?>
 <?php
-	if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
-//		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
-		echo '| <a class="hreflink" href="./network.php" >Network</a> ';
-	}	
 	if (file_exists(DL3EL_BASE . "/mobile/index.php")) {
 	    echo '| <a class="hreflink" href="./mobile/index.php" >mobile</a> ';
 	}    
@@ -243,6 +239,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	    echo '<a class="hreflink" href="./caller.php?file=' . DL3EL_BASE . 'include/config.php" id="configphp">config.php</a> | ';
 	    echo '<a class="hreflink" href="./wifi.php" >Wifi</a> | ';
+	    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
+//		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
+		echo '<a class="hreflink" href="./network.php" >Network</a> |  ';
+	    }	
 	    if ((file_exists('/etc/default/shellinabox')) && ((defined('DL3EL_SSH')) && (strncmp(DL3EL_SSH, "yes", 3) === 0))) {
 		$getPortCommand = "grep -m 1 'SHELLINABOX_PORT=' /etc/default/shellinabox | awk -F '=' '/SHELLINABOX_PORT=/ {print $2}'";
 		$shellPort = exec($getPortCommand);    
