@@ -183,4 +183,9 @@ sudo nmcli connection up "DL3ELHotspot"
 Check, erreichbar?
 Erfolg? Dann sudo shutdown -c zum Abbrechen des Neustarts.
 Fehler? 5 Minuten warten, der Pi "rettet" sich selbst durch den Reboot.
-
+================
+hilfreiche nmcli Befehle:
+sudo nmcli connection show
+nmcli -f NAME,UUID,AUTOCONNECT,AUTOCONNECT-PRIORITY connection show
+sudo nmcli connection down "Hotspot"
+sudo nmcli connection up "Hotspot"

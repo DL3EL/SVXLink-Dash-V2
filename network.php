@@ -23,8 +23,8 @@ include_once "include/page_top.php";
     echo '</div>'."\n";
     echo '</td>'."\n";
 
-    echo '<td valign="top"  style = "height:500px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
-    echo '<iframe src="./network"  style = "width:615px; height:490px"></iframe>';
+    echo '<td valign="top"  style = "height:600px; width=620px; text-align: center; border:none;  background-color:#f1f1f1;">';
+    echo '<iframe src="./network"  style = "width:615px; height:600px"></iframe>';
     echo '</td>';
 ?>
 </tr></table>

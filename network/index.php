@@ -2,6 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+    include_once "../include/settings.php";
+    include_once "../include/functions.php";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -61,13 +64,15 @@ textarea {
 
 </style>
 </head>
-<body style = "background-color: #e1e1e1;font: 11pt arial, sans-serif;">
+<body style = "background-color: #e1e1e1;font: 11pt arial, sans-serif; heigth=1500px;">
+<!--
 <script src="web-audio-peak-meter.js"></script>
 <center>
 <fieldset style = "border:#3083b8 2px groove;box-shadow:5px 5px 20px #999; background-color:#f1f1f1; width:555px;margin-top:15px;margin-left:0px;margin-right:5px;font-size:13px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
 <div style = "padding:0px;width:550px;background-image: linear-gradient(to bottom, #e9e9e9 50%, #bcbaba 100%);border-radius: 10px;-moz-border-radius:10px;-webkit-border-radius:10px;border: 1px solid LightGrey;margin-left:0px; margin-right:0px;margin-top:4px;margin-bottom:0px;line-height:1.6;white-space:normal;">
 <center>
 <h1 id="web-audio-peak-meters" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Network Configurator</h1>
+-->	
 
 
 <?php 
@@ -238,9 +243,11 @@ if (isset($_POST['btnDown']))
 
 ?>
 
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
-<DIV style = "height:150px">
 <table>
+<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
+<!--
+<DIV style = "height:150px">
+--->
 	<tr>
 	<th>Screen</th> 
 	</tr>
@@ -252,7 +259,9 @@ if (isset($_POST['btnDown']))
 </td>
 </tr>  
 </table> 
+<!--
 </DIV>
+--->
 
 <table>
         <tr>
@@ -310,10 +319,78 @@ foreach ($conns as $conn){
 
 </td>
 </tr>
-</table>
 
 </form>
+</table>
+<!-- </center>
+</div>
+</fieldset>
+</center> -->
+<?php
+if (isset($_POST['btnVPNCheck']))
+    {
+// sudo visudo
+//svxlink ALL=(ALL) NOPASSWD: /usr/bin/perl /var/www/html/FM-Funknetz/vpn-check.pl
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "VPN Check $ip \n";
+        addsvxlog($logtext);
+        $retval = null;
+        $screen = null;
+        $vpnCheck = DL3EL . "/vpn-check.pl";
+        $command = "sudo /usr/bin/perl " . $vpnCheck . " v=1 2>&1";
+        $command = "perl " . $vpnCheck . " v=1 2>&1";
+        $output = shell_exec($command);
+        $logtext = "VPN: " . $command . "<br>" . $output;
+//        $logtext = $logtext . print_r($screen, true);
+        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
+        
+}
+if (isset($_POST['btnVPNStart']))
+    {
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "VPN Check $ip \n";
+        addsvxlog($logtext);
+        $retval = null;
+        $screen = null;
+        $command = "sudo wg-quick up home 2>&1";
+        $output = shell_exec($command);
+        $logtext = "VPNStart: " . $command . "<br>[" . $output . "]";
+        addsvxlog($logtext);
 
+        
+}
+if (isset($_POST['btnVPNStop']))
+    {
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = "VPN Check $ip \n";
+        addsvxlog($logtext);
+        $retval = null;
+        $screen = null;
+        $command = "sudo wg-quick down home 2>&1";
+        $output = shell_exec($command);
+        $logtext = "VPNStop: " . $command . "<br>" . $output;
+        addsvxlog($logtext);
+
+}
+?> 
+<fieldset style = "border:#3083b8 2px groove;box-shadow:5px 5px 20px #999; background-color:#f1f1f1; width:555px;margin-top:15px;margin-left:0px;margin-right:5px;font-size:13px;border-top-left-radius: 10px; border-top-right-radius: 10px;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+<div>
+<table>
+<tr>
+<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
+
+<?php
+   $vpnCheck = DL3EL . "/vpn-check.pl";
+   if (file_exists($vpnCheck)) {
+      echo '<br><br><br>';
+      echo '<button name="btnVPNCheck" type="submit" class="orange" style = "height:30px; width:400px; font-size:12px;">Check VPN</button><br>';
+      echo '<button name="btnVPNStart" type="submit" class="orange" style = "height:30px; width:400px; font-size:12px;">Start VPN</button><br>';
+      echo '<button name="btnVPNStop" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Stop VPN</button><br>';
+   }       
+?>   
+</form>
+</tr></table>
+</div>
 <p style = "margin: 0 auto;"></p>
 <p style = "margin-bottom:-2px;"></p>
 

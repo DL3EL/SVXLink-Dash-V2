@@ -47,50 +47,6 @@ if (isset($_POST['btnPower']))
         exec($command,$screen,$retval);
 }
 
-if (isset($_POST['btnVPNCheck']))
-    {
-        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-        $logtext = "VPN Check $ip \n";
-        addsvxlog($logtext);
-        $retval = null;
-        $screen = null;
-        $vpnCheck = DL3EL . "/vpn-check.pl";
-        $command = "sudo " . $vpnCheck . " v=1";
-        exec($command,$screen,$retval);
-        $logtext = "VPN: " . $command . "<br>";
-        $logtext = $logtext . print_r($screen, true);
-        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
-        
-}
-if (isset($_POST['btnVPNStart']))
-    {
-        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-        $logtext = "VPN Check $ip \n";
-        addsvxlog($logtext);
-        $retval = null;
-        $screen = null;
-        $command = "sudo wg-quick up home";
-        exec($command,$screen,$retval);
-        $logtext = "VPN: " . $command . "<br>";
-        $logtext = $logtext . print_r($screen, true);
-        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
-        
-}
-if (isset($_POST['btnVPNStop']))
-    {
-        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-        $logtext = "VPN Check $ip \n";
-        addsvxlog($logtext);
-        $retval = null;
-        $screen = null;
-        $command = "sudo wg-quick down home";
-        exec($command,$screen,$retval);
-        $logtext = "VPN: " . $command . "<br>";
-        $logtext = $logtext . print_r($screen, true);
-        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
-        
-}
-
 //if (isset($_POST['btnLcd']))
 //    {
 //
@@ -335,8 +291,8 @@ if (isset($_POST['btnCleanUp']))
         $logtext = "System Cleanup enforced from $ip \n";
         addsvxlog($logtext);
         $cron_File = DL3EL . "/crontab.log";
-        $cron = start_cron($cron_File,$callsign,$fmnetwork,"F");
-        touch($cron_File);
+	    $cron = start_cron($cron_File,$callsign,$fmnetwork,"F");
+	    touch($cron_File);
 }
 
 } else {
@@ -447,16 +403,8 @@ if (isset($_POST['btnCleanUp']))
                 }
             }  
         }
-
   }
 
-   $vpnCheck = DL3EL . "/vpn-check.pl";
-   if (file_exists($vpnCheck)) {
-      echo '<br><br><br>';
-      echo '<button name="btnVPNCheck" type="submit" class="orange" style = "height:30px; width:400px; font-size:12px;">Check VPN</button><br>';
-      echo '<button name="btnVPNStart" type="submit" class="orange" style = "height:30px; width:400px; font-size:12px;">Start VPN</button><br>';
-      echo '<button name="btnVPNStop" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Stop VPN</button><br>';
-   }       
 ?>   
 </form>
 
