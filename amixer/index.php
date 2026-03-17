@@ -21,7 +21,7 @@ function execute_amixer($command) {
 function parse_amixer_value($output) {
     $nn = 0;
     foreach ($output as $line) {
-        if ((defined ('debug')) && (debug > 0)) echo "[$nn] parse_amixer, raw line [$line]<br>";
+        if ((defined ('debug')) && (debug > 1)) echo "[$nn] parse_amixer, raw line [$line]<br>";
 // for some reason on the shari, the output is ie 37,37, we need to delete the second value
         if (strpos($line, ": values=") !== false) {
             $value = trim(str_replace(": values=", "", $line));
@@ -29,7 +29,7 @@ function parse_amixer_value($output) {
             if ($poscomma > 0) {
                 $value = substr($value,0,strlen($value)-$poscomma-1);
             }
-            if ((defined ('debug')) && (debug > 0)) echo "[$nn] ende parse_amixer, values: $value [$line] (kommas was $poscomma)<br>------<br>";
+            if ((defined ('debug')) && (debug > 1)) echo "[$nn] ende parse_amixer, values: $value [$line] (kommas was $poscomma)<br>------<br>";
             return $value;
         }
         ++$nn;
@@ -45,7 +45,9 @@ function calculate_percentage($current_value, $max_value) {
     return round(($current_value / $max_value) * 100);
 }
 
+
 // Retrieve and parse current values using amixer cget
+/*
 function get_current_amixer_values() {
     if (defined('DL3EL_SC_STRING')) {
         $sc_port_cmp = DL3EL_SC_STRING;
@@ -80,8 +82,9 @@ function get_current_amixer_values() {
     if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
     return $current_values;
 }
+*/
 function get_current_amixer_values_tx($sc,$svxRadio) {
-    if ((defined ('debug')) && (debug > 0)) echo "get_current_amixer_values_tx, für Karte: [$sc]<br>";
+    if ((defined ('debug')) && (debug > 1)) echo "get_current_amixer_values_tx, für Karte: [$sc]<br>";
     $mic_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=4");
     if ($svxRadio === "Elenata") {
         $headphone_output = execute_amixer("sudo amixer -c" . $sc . " cget numid=10");
@@ -105,23 +108,23 @@ function get_current_amixer_values_tx($sc,$svxRadio) {
                 break;
             }
         }
-       if ((defined ('debug')) && (debug > 0)) echo "autogain values: " . $current_values['autogain'] . "<br>";
+       if ((defined ('debug')) && (debug > 1)) echo "autogain values: " . $current_values['autogain'] . "<br>";
     } else {
-       if ((defined ('debug')) && (debug > 0)) echo "no autogain values available<br>";
+       if ((defined ('debug')) && (debug > 1)) echo "no autogain values available<br>";
     }
-    if ((defined ('debug')) && (debug > 0)) echo "<b>get_current_amixer_values_tx (Headphone, $sc): " . $current_values['headphone'] . "</b><br>";
+    if ((defined ('debug')) && (debug > 1)) echo "<b>get_current_amixer_values_tx (Headphone, $sc): " . $current_values['headphone'] . "</b><br>";
     return $current_values;
 }
 function get_current_amixer_values_rx($sc) {
 //    $sc = $sc_rx;
-    if ((defined ('debug')) && (debug > 0)) echo "get_current_amixer_values_rx, für Karte:  $sc<br>";
+    if ((defined ('debug')) && (debug > 1)) echo "get_current_amixer_values_rx, für Karte:  $sc<br>";
     $mic_output_rx = execute_amixer("sudo amixer -c" . $sc . " cget numid=6");
     $current_values_rx = [
         'mic' => parse_amixer_value($mic_output_rx)
     ];
 
 //    if ((defined ('debug')) && (debug > 1)) echo "CV: " . $current_values['headphone'] . "<br>";
-    if ((defined ('debug')) && (debug > 0)) echo "<b>get_current_amixer_values_rx (Mike, $sc): " . $current_values_rx['mic'] . "</b><br>";
+    if ((defined ('debug')) && (debug > 1)) echo "<b>get_current_amixer_values_rx (Mike, $sc): " . $current_values_rx['mic'] . "</b><br>";
     return $current_values_rx;
 }
 
@@ -131,53 +134,55 @@ function get_current_amixer_values_rx($sc) {
     if (defined('DL3EL_RADIO')) {
         $svxRadio = DL3EL_RADIO;
     }
-    if (defined('DL3EL_RADIO')) {
-        $svxRadio = DL3EL_RADIO;
+    if (defined('DL3EL_SC_STRING')) {
+        $sc_port_cmp = DL3EL_SC_STRING;
     }
 
 /// SC & MIke Info from svxlink.conf & system, skip var from config.php
-            $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
-            if (fopen($svxConfigFile,'r')) {
-                $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
-                $sc_port_rxname = $svxconfig['SimplexLogic']['RX']; 
-                $sc_port_rx = $svxconfig[$sc_port_rxname]['AUDIO_DEV']; 
-                $sc_port_txname = $svxconfig['SimplexLogic']['TX']; 
+    $svxConfigFile = SVXCONFPATH."/".SVXCONFIG;
+    if (fopen($svxConfigFile,'r')) {
+        $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
+        $sc_port_rxname = $svxconfig['SimplexLogic']['RX']; 
+        $sc_port_rx = $svxconfig[$sc_port_rxname]['AUDIO_DEV']; 
+        $sc_port_txname = $svxconfig['SimplexLogic']['TX']; 
 // hier noch auf Multi Tx erweitern
-                $sc_port_tx = $svxconfig["Tx1"]['AUDIO_DEV']; 
-                $card_start = strpos($sc_port_tx, 'CARD=')+5;
-                if ($card_start !== false) {
-                    $card_end = strpos($sc_port_tx, ',DEV');
-                    $card_string = substr($sc_port_tx, $card_start, $card_end - $card_start);
-                    $sc_tx_cmp = $card_string . " \[";
-                    $sc = 'aplay -l | grep "' . $sc_tx_cmp . '"';
-                    $sc_tx = substr(shell_exec($sc),5,1);
-                    if ((defined ('debug')) && (debug > 1)) echo "TX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc) <br>SVXLink: [" . $sc_port_tx . "]<br>";
-                }
-                $card_start = strpos($sc_port_rx, 'CARD=')+5;
-                if ($card_start !== false) {
-                    $card_end = strpos($sc_port_rx, ',DEV');
-                    $card_string = substr($sc_port_rx, $card_start, $card_end - $card_start);
-                    $sc_rx_name = $card_string;
-                    $sc_rx_cmp = $card_string . " \[";
-                    $sc = 'aplay -l | grep "' . $sc_rx_cmp . '"';
-                    $sc_rx = substr(shell_exec($sc),5,1);
-                    if ((defined ('debug')) && (debug > 1)) echo "RX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc) <br>SVXLink: [" . $sc_port_rx . "]<br>";
-                }
-                $spkrismike = "";
-                if ($sc_port_rx === $sc_port_tx) {
-                    $spkrismike = "/Mikrofon";
-                    if ((defined ('debug')) && (debug > 1)) echo "TX: [$sc_port_tx] == RX:[$sc_port_rx]<br>";
-                } else {   
+        $sc_port_tx = $svxconfig["Tx1"]['AUDIO_DEV']; 
+        $card_start = strpos($sc_port_tx, 'CARD=')+5;
+        if ($card_start !== false) {
+            $card_end = strpos($sc_port_tx, ',DEV');
+            $card_string = substr($sc_port_tx, $card_start, $card_end - $card_start);
+            $sc_tx_cmp = $card_string . " \[";
+            $sc = 'aplay -l | grep "' . $sc_tx_cmp . '"';
+            $sc_tx = substr(shell_exec($sc),5,1);
+            if ((defined ('debug')) && (debug > 1)) echo "TX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc) <br>SVXLink: [" . $sc_port_tx . "]<br>";
+        }
+        $card_start = strpos($sc_port_rx, 'CARD=')+5;
+        if ($card_start !== false) {
+            $card_end = strpos($sc_port_rx, ',DEV');
+            $card_string = substr($sc_port_rx, $card_start, $card_end - $card_start);
+            $sc_rx_name = $card_string;
+            $sc_rx_cmp = $card_string . " \[";
+            $sc = 'aplay -l | grep "' . $sc_rx_cmp . '"';
+            $sc_rx = substr(shell_exec($sc),5,1);
+            if ((defined ('debug')) && (debug > 1)) echo "RX (Mikrofon): $sc_rx_cmp, Card:[$sc_rx] ($sc) <br>SVXLink: [" . $sc_port_rx . "]<br>";
+        }
+        $spkrismike = "";
+        if ($sc_port_rx === $sc_port_tx) {
+            $spkrismike = "/Mikrofon";
+            if ((defined ('debug')) && (debug > 1)) echo "TX: [$sc_port_tx] == RX:[$sc_port_rx]<br>";
+        } else {   
 //                if ($sc_port_rx !== $sc_port_tx) {
-                    if ((defined ('debug')) && (debug > 1)) echo "TX: [$sc_port_tx] != RX:[$sc_port_rx]<br>";
-                    $sc_mike_linux = 'aplay -l | grep "' . $sc_rx_cmp . '"';
-                    $sc_mike_linux = shell_exec($sc_mike_linux);
-                    if ((defined ('debug')) && (debug > 1)) echo "Found extra Mike [$sc_mike_linux]<br>";
-                }    
-            }    
-    
+            if ((defined ('debug')) && (debug > 1)) echo "TX: [$sc_port_tx] != RX:[$sc_port_rx]<br>";
+            $sc_mike_linux = 'aplay -l | grep "' . $sc_rx_cmp . '"';
+            $sc_mike_linux = shell_exec($sc_mike_linux);
+            $max_values_qx18 = 147;
+            if ((defined ('debug')) && (debug > 1)) echo "Found extra Mike [$sc_mike_linux]<br>";
+        }    
+    }    
+// $sc_rx_cmp Mikrofon     svxlink rx, Index: $sc_rx
+// $sc_tx_cmp LAutsprecher svxlink tx, Index: $sc_tx   
 if ((defined ('debug')) && (debug > 0)) echo "<b>Radio $svxRadio:<br>RX (Mikrofon): $sc_rx_cmp [Index: $sc_rx sc_rx]<br>";
-if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Index: $sc_tx sc_tx]</b><br>";
+if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Index: $sc_tx sc_tx] $sc_port_cmp: </b><br>";
 ///
 // Maximum permitted values based on numid
 // Todo: erlaubte Werte ermitteln
@@ -263,26 +268,27 @@ if ((defined ('debug')) && (debug > 0)) {
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" onsubmit="reloadPage()">
         <h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Lautsprecher - TX Level</h3>
             <label for="headphone">Set for 65 (0-100):</label>
-            <input type="number" id="headphone" name="headphone" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['headphone'], $max_values['headphone'])); ?>" required>
+            <input type="number" id="headphone" name="headphone" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['headphone'], $max_values['headphone'])); ?>" required>%
             <br>
         <?php 
         if ($sc_tx !== $sc_rx) {
             echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">ext. Mikrofon - ' . $sc_rx_name . '</h3>';
-            echo '<label for="mic">(0-500): Set to 0</label>';
-            echo '<input type="number" id="mic" name="mic" min="0" max="500" value="';
-            echo htmlspecialchars(calculate_percentage($current_values_rx['mic'], $max_values['mic']));
-            echo '" required>';
+            echo '<label for="mic">(0-100): Set to 50</label>';
+            echo '<input type="number" id="mic" name="mic" min="0" max="100" value="';
+//            echo htmlspecialchars(calculate_percentage($current_values_rx['mic'], $max_values['mic']));
+            echo htmlspecialchars(calculate_percentage($current_values_rx['mic'], $max_values_qx18));
+            echo '" required>%';
             echo '<br>';
         } else {    
             echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Audio Capture - RX Levels</h3>';
             echo '<label for="capture">(0-100) Set for 25:</label>';
             echo '<input type="number" id="capture" name="capture" min="0" max="200" value="';
             echo htmlspecialchars(calculate_percentage($current_values['capture'], $max_values['capture'])); 
-            echo '" required>';
+            echo '" required>%';
             echo '<br>';
             echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">Auto Gain</h3>';
             echo '<label for="autogain">Set to OFF for optimum control</label>';
-            echo '<select id="autogain" name="autogain" required>';
+            echo '<select id="autogain" name="autogain" required>%';
             echo '<option value="0"'; 
             if ($current_autogain === '0' || $current_autogain === 'off')  echo 'selected';
             echo '>Off</option>';
@@ -336,12 +342,14 @@ if ((defined ('debug')) && (debug > 0)) {
         }
 
         if (isset($_POST['mic'])) {
-            $mic_percentage = intval($_POST['mic']);
-            $mic_value = ($mic_percentage / 100) * $max_values['mic'];
             if ($sc_tx === $sc_rx) {
+                $mic_percentage = intval($_POST['mic']);
+                $mic_value = ($mic_percentage / 100) * $max_values['mic'];
                 $sc = $sc_tx;
                 exec("sudo amixer -c" . $sc . " cset numid=4 " . escapeshellarg($mic_value));
             } else {
+                $mic_percentage = intval($_POST['mic']);
+                $mic_value = ($mic_percentage / 100) * $max_values_qx18;
                 $sc = $sc_rx;
                 exec("sudo amixer -c" . $sc . " cset numid=6 " . escapeshellarg($mic_value));
             }                    
@@ -373,12 +381,24 @@ if ((defined ('debug')) && (debug > 0)) {
             $command = DL3EL . "/astore.sh  2>&1";
             exec($command,$screen,$retval);
 */
-            $command = DL3EL . "/astore.sh " . $sc_port_cmp . " 2>&1";
+//$sc_rx_cmp
+// $sc_rx_cmp Mikrofon     svxlink rx, Index: $sc_rx
+// $sc_tx_cmp LAutsprecher svxlink tx, Index: $sc_tx   
+
+            $command = DL3EL . "/astore.sh " . $sc_tx_cmp . " 2>&1";
             $output = shell_exec($command);
             if ((defined ('debug')) && (debug > 0)) { 
                 $logtext = "AudioSave: " . $command . "\n[" . $output . "]";
                 addsvxlog($logtext);
             }    
+            if ($sc_tx !== $sc_rx) {
+                $command = DL3EL . "/astore.sh " . $sc_rx_cmp . " 2>&1";
+                $output = shell_exec($command);
+                if ((defined ('debug')) && (debug > 0)) { 
+                    $logtext = "AudioSave: " . $command . "\n[" . $output . "]";
+                    addsvxlog($logtext);
+                }    
+            }
         }
         if (isset($_POST['btnrstshari']))
             {
@@ -390,12 +410,20 @@ if ((defined ('debug')) && (debug > 0)) {
             $command = DL3EL . "/arestore.sh  2>&1";
             exec($command,$screen,$retval);
 */
-            $command = DL3EL . "/arestore.sh " . $sc_port_cmp . " 2>&1";
+            $command = DL3EL . "/arestore.sh " . $sc_tx_cmp . " 2>&1";
             $output = shell_exec($command);
             if ((defined ('debug')) && (debug > 0)) { 
                 $logtext = "AudioSave: " . $command . "\n[" . $output . "]";
                 addsvxlog($logtext);
             }    
+            if ($sc_tx !== $sc_rx) {
+                $command = DL3EL . "/arestore.sh " . $sc_rx_cmp . " 2>&1";
+                $output = shell_exec($command);
+                if ((defined ('debug')) && (debug > 0)) { 
+                    $logtext = "AudioSave: " . $command . "\n[" . $output . "]";
+                    addsvxlog($logtext);
+                }    
+            }
         }
 
         // Refresh the page to show updated values
