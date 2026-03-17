@@ -126,7 +126,11 @@ function get_current_amixer_values_rx($sc) {
 }
 
 // PHP Code starts here
-    $svxRadio = "x";
+    $svxRadio = "";
+    $sc_port_cmp = "Audio Device";
+    if (defined('DL3EL_RADIO')) {
+        $svxRadio = DL3EL_RADIO;
+    }
     if (defined('DL3EL_RADIO')) {
         $svxRadio = DL3EL_RADIO;
     }
@@ -363,19 +367,35 @@ if ((defined ('debug')) && (debug > 0)) {
             {
 // wichttig: damit das funktioniert, muss mit visudo folgendes eingetragen werden
 // svxlink        ALL=(ALL) NOPASSWD: /usr/sbin/alsactl
+/*
             $retval = null;
             $screen = null;
             $command = DL3EL . "/astore.sh  2>&1";
             exec($command,$screen,$retval);
+*/
+            $command = DL3EL . "/astore.sh " . $sc_port_cmp . " 2>&1";
+            $output = shell_exec($command);
+            if ((defined ('debug')) && (debug > 0)) { 
+                $logtext = "AudioSave: " . $command . "\n[" . $output . "]";
+                addsvxlog($logtext);
+            }    
         }
         if (isset($_POST['btnrstshari']))
             {
 // wichttig: damit das funktioniert, muss mit visudo folgendes eingetragen werden
 // svxlink        ALL=(ALL) NOPASSWD: /usr/sbin/alsactl
+/*
             $retval = null;
             $screen = null;
             $command = DL3EL . "/arestore.sh  2>&1";
             exec($command,$screen,$retval);
+*/
+            $command = DL3EL . "/arestore.sh " . $sc_port_cmp . " 2>&1";
+            $output = shell_exec($command);
+            if ((defined ('debug')) && (debug > 0)) { 
+                $logtext = "AudioSave: " . $command . "\n[" . $output . "]";
+                addsvxlog($logtext);
+            }    
         }
 
         // Refresh the page to show updated values
