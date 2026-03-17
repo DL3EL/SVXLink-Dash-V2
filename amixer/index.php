@@ -128,6 +128,23 @@ function get_current_amixer_values_rx($sc) {
     return $current_values_rx;
 }
 
+/**
+ * Extrahiert min und max Werte aus der amixer Ausgabe
+ * @param string $input Die Roh-Ausgabe von shell_exec
+ * @return array|null Array mit ['min', 'max'] oder null bei Fehler
+ */
+function getAmixerRange($input) {
+    // Sucht nach 'min=' gefolgt von Zahlen und 'max=' gefolgt von Zahlen
+    // \d+ steht für eine oder mehrere Ziffern
+    if (preg_match('/min=(\d+),max=(\d+)/', $input, $matches)) {
+        return [
+            'min' => (int)$matches[1],
+            'max' => (int)$matches[2]
+        ];
+    }
+    return null;
+}
+
 // PHP Code starts here
     $svxRadio = "";
     $sc_port_cmp = "Audio Device";
@@ -180,7 +197,7 @@ function get_current_amixer_values_rx($sc) {
         }    
     }    
 // $sc_rx_cmp Mikrofon     svxlink rx, Index: $sc_rx
-// $sc_tx_cmp LAutsprecher svxlink tx, Index: $sc_tx   
+// $sc_tx_cmp Lautsprecher svxlink tx, Index: $sc_tx   
 if ((defined ('debug')) && (debug > 0)) echo "<b>Radio $svxRadio:<br>RX (Mikrofon): $sc_rx_cmp [Index: $sc_rx sc_rx]<br>";
 if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Index: $sc_tx sc_tx] $sc_port_cmp: </b><br>";
 ///
@@ -206,6 +223,20 @@ if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Ind
             'mic' => 32, // numid=4
             'capture' => 15 // numid=2
         ];
+if ((defined ('debug')) && (debug > 0)) {
+    echo "MaxValues alt:<br>";
+    print_r($max_values);
+    $output_lo = shell_exec("amixer -c" . $sc_tx ." cget numid=10");
+    $range_lo = getAmixerRange($output_hp);
+    $output_mi = shell_exec("amixer -c" . $sc_tx ." cget numid=2");
+    $range_mi = getAmixerRange($output_mi);
+    echo "<br>Gefundener Minimalwert HeadPhone 6: " . $range_hp['min'] . "<br>";
+    echo "Gefundener Maximalwert HeadPhone 6: " . $range_hp['max'] . "<br>";
+    echo "Gefundener Minimalwert Mike 4: " . $range_mi['min'] . "<br>";
+    echo "Gefundener Maximalwert Mike 4: " . $range_mi['max'] . "<br>";
+    echo "Gefundener Minimalwert Capture 8: " . $range_cp['min'] . "<br>";
+    echo "Gefundener Maximalwert Capture 8: " . $range_cp['max'] . "<br>";
+}
     } else {
         /*
         numid=4,iface=MIXER,name='Mic Playback Volume'
@@ -222,11 +253,29 @@ if ((defined ('debug')) && (debug > 0)) echo "TX (Lautsprecher): $sc_tx_cmp [Ind
         | dBminmax-min=-12.00dB,max=23.00dB
         */
         $max_values = [
-        'headphone' => 151, // numid=6
+//        'headphone' => 151, // numid=6
+        'headphone' => 45, // numid=6
         'mic' => 37, // numid=4
         'capture' => 35 // numid=8
         ];
-    }
+ if ((defined ('debug')) && (debug > 0)) {
+   echo "MaxValues alt:<br>";
+    print_r($max_values);
+    $output_hp = shell_exec("amixer -c" . $sc_tx ." cget numid=6");
+    $range_hp = getAmixerRange($output_hp);
+    $output_mi = shell_exec("amixer -c" . $sc_tx ." cget numid=4");
+    $range_mi = getAmixerRange($output_mi);
+    $output_cp = shell_exec("amixer -c" . $sc_tx ." cget numid=8");
+    $range_cp = getAmixerRange($output_cp);
+
+    echo "<br>Gefundener Minimalwert HeadPhone 6: " . $range_hp['min'] . "<br>";
+    echo "Gefundener Maximalwert HeadPhone 6: " . $range_hp['max'] . "<br>";
+    echo "Gefundener Minimalwert Mike 4: " . $range_mi['min'] . "<br>";
+    echo "Gefundener Maximalwert Mike 4: " . $range_mi['max'] . "<br>";
+    echo "Gefundener Minimalwert Capture 8: " . $range_cp['min'] . "<br>";
+    echo "Gefundener Maximalwert Capture 8: " . $range_cp['max'] . "<br>";
+}
+}
 // Get current values from amixer
     $current_values = get_current_amixer_values_tx($sc_tx,$svxRadio);
     if ($sc_tx !== $sc_rx) {
