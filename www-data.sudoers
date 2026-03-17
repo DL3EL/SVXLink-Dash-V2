@@ -10,6 +10,9 @@ svxlink ALL=NOPASSWD: /usr/sbin/shutdown
 svxlink ALL=NOPASSWD: /usr/bin/mv
 svxlink ALL=NOPASSWD: /usr/bin/nmcli
 svxlink ALL=NOPASSWD: /usr/bin/amixer
+svxlink ALL=NOPASSWD: /usr/sbin/alsactl
 svxlink ALL=NOPASSWD: /bin/echo * > /tmp/dtmf_svx
 svxlink ALL=NOPASSWD: /usr/bin/echo
+svxlink ALL=NOPASSWD: /usr/bin/wg-quick
+
 
