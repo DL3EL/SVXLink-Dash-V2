@@ -227,15 +227,13 @@ if ((defined ('debug')) && (debug > 0)) {
     echo "MaxValues alt:<br>";
     print_r($max_values);
     $output_lo = shell_exec("amixer -c" . $sc_tx ." cget numid=10");
-    $range_lo = getAmixerRange($output_hp);
+    $range_lo = getAmixerRange($output_lo);
     $output_mi = shell_exec("amixer -c" . $sc_tx ." cget numid=2");
     $range_mi = getAmixerRange($output_mi);
-    echo "<br>Gefundener Minimalwert HeadPhone 6: " . $range_hp['min'] . "<br>";
-    echo "Gefundener Maximalwert HeadPhone 6: " . $range_hp['max'] . "<br>";
-    echo "Gefundener Minimalwert Mike 4: " . $range_mi['min'] . "<br>";
-    echo "Gefundener Maximalwert Mike 4: " . $range_mi['max'] . "<br>";
-    echo "Gefundener Minimalwert Capture 8: " . $range_cp['min'] . "<br>";
-    echo "Gefundener Maximalwert Capture 8: " . $range_cp['max'] . "<br>";
+    echo "<br>Gefundener Minimalwert LineOut 10: " . $range_lo['min'] . "<br>";
+    echo "Gefundener Maximalwert LineOut 10: " . $range_lo['max'] . "<br>";
+    echo "Gefundener Minimalwert Mike 2: " . $range_mi['min'] . "<br>";
+    echo "Gefundener Maximalwert Mike 2: " . $range_mi['max'] . "<br>";
 }
     } else {
         /*
