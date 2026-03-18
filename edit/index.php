@@ -61,8 +61,13 @@ if ((defined ('debug')) && (debug > 0)) echo "Datei $file";
         $prog = "svxreflector";
         $command = "sudo systemctl restart svxreflector 2>&1";
       } else {
-        $prog = "svxlink";
-        $command = "sudo systemctl restart svxlink 2>&1";
+        if (defined('SVXNAME')) {
+                $svxlink = SVXNAME;
+        } else {        
+                $svxlink = "svxlink";
+        }
+        $prog = $svxlink;
+        $command = "sudo systemctl restart ".  $svxlink ." 2>&1";
       }    
       $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
       $logtext = $prog . " Restarted from $ip \n";
