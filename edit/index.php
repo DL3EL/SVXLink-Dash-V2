@@ -16,19 +16,19 @@ include_once "../include/config.php";
 <body style = "background-color: #e1e1e1;font: 11pt arial, sans-serif;">
 
 <center>
-<h1 id="conf-editor" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;"
+<h1 id="conf-editor" style = "color:#00aee8;font: 18pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">
 <?php
 
 // Get filename from query parameter
 $file = $_GET['file']; 
 $log = 0;
 $file_ex = $file .'.example';
-echo "Datei $file $file_ex";
+if ((defined ('debug')) && (debug > 0)) echo "Datei $file $file_ex";
 if ((!file_exists($file)) && (file_exists($file_ex))) {
     copy($file_ex,$file);
     sleep(3); 
 }
-echo "Datei $file";
+if ((defined ('debug')) && (debug > 0)) echo "Datei $file";
 //
   // Save / Reload on submit//
   if ((isset($_POST['save'])) || (isset($_POST['save_reload'])) || (isset($_POST['save_restart']))) {
@@ -176,7 +176,7 @@ if (($file == "log") || ($file == "loga") || ($file == "logb") || ($file == "ref
     }
   }  
 } else {
-    echo ">Expert-Editor " . $file . "</h1>";
+    echo "Expert-Editor " . $file . "</h1>";
 }
 
 echo '<script type="text/javascript">

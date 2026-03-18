@@ -36,7 +36,7 @@ include_once "include/page_top.php";
         }    
     }        
     if (($_SESSION['auth'] === 'AUTHORISED') || (isset($_GET['noauth']) && !empty($_GET['wid']))) {
-        addsvxlog("CE:[". $call_script ."]\n");
+        addsvxlog("CallerExtern:[". $call_script ."]\n");
         echo '<object style="outline:none; height: 850px;width:' . $extern_width .'px;justify-content: left;" data=' . $call_script . '></object>';
     } else {
         echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
