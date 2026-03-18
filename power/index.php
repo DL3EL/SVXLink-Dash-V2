@@ -70,7 +70,12 @@ if (isset($_POST['btnSvxlink']))
         //$sAconn = $_POST['sAconn'];
         //$password = $_POST['password'];
         //exec('sudo nmcli dev wifi rescan');
-        $command = "sudo systemctl restart svxlink 2>&1";
+        if (defined('SVXNAME')) {
+                $svxlink = SVXNAME;
+        } else {        
+                $svxlink = "svxlink";
+        }
+        $command = "sudo systemctl restart " . $svxlink . " 2>&1";
         exec($command,$screen,$retval);
 }
 
@@ -100,7 +105,12 @@ if (isset($_POST['btnSvxlinkoff']))
         //$sAconn = $_POST['sAconn'];
         //$password = $_POST['password'];
         //exec('sudo nmcli dev wifi rescan');
-        $command = "sudo systemctl stop svxlink 2>&1";
+        if (defined('SVXNAME')) {
+                $svxlink = SVXNAME;
+        } else {        
+                $svxlink = "svxlink";
+        }
+        $command = "sudo systemctl stop " . $svxlink . " 2>&1";
         exec($command,$screen,$retval);
 }
 
