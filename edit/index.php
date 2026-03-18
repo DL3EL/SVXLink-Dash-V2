@@ -159,12 +159,12 @@ if (($file == "log") || ($file == "loga") || ($file == "logb") || ($file == "ref
           $file = $file . ".1";
       }
     }
-    echo ">Log Display: " . $file . " (reverse order)</h1>";
+    echo "Log Display: " . $file . " (reverse order)</h1>";
   } else {
     if ($file == "msg") {
       $file = DL3EL . "/aprs-is.msg";
       $log = 1;
-      echo ">Message Display: " . $file . " (reverse order)</h1>";
+      echo "Message Display: " . $file . " (reverse order)</h1>";
       if (file_exists($file  . ".neu")) {
         unlink($file . ".neu");
       }
@@ -172,7 +172,7 @@ if (($file == "log") || ($file == "loga") || ($file == "logb") || ($file == "ref
     } else {  
       $file = DL3EL . "/readme.info";
       $log = 2;
-      echo ">Info Display: " . $file . " </h1>";
+      echo "Info Display: " . $file . " </h1>";
     }
   }  
 } else {
