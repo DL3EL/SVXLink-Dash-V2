@@ -55,12 +55,27 @@ if (defined('DL3EL_SC_STRING')) {
 }
 
 function ls_change($value, $sc) {
-    exec("sudo amixer -c $sc set Speaker $value");
-    exec("sudo amixer -c $sc set Lineout $value");
+//    exec("sudo amixer -c $sc set Speaker $value");
+//    exec("sudo amixer -c $sc set Lineout $value");
+
+    // Schritt 1: Aktuellen Wert auslesen
+    $card = $sc;
+    $numid = 6;
+    $step = $value;
+    $cmdGet = "amixer -c $card cget numid=$numid | grep ': values=' | cut -d= -f2 | cut -d, -f1";
+    $current = (int)shell_exec($cmdGet);
+
+    // Schritt 2: Neuen Wert berechnen (min 0, max 45)
+    $new = $current + $step;
+    if ($new > 45) $new = 45;
+    if ($new < 0) $new = 0;
+
+    // Schritt 3: Setzen
+    return shell_exec("sudo amixer -c $card cset numid=$numid $new");
 }
 
-if (isset($_POST['buttonA'])) { ls_change("5%-", $sc); }
-if (isset($_POST['buttonB'])) { ls_change("5%+", $sc); }
+if (isset($_POST['buttonA'])) { ls_change("-5", $sc); }
+if (isset($_POST['buttonB'])) { ls_change("5", $sc); }
 if (isset($_POST['button_off'])) { ls_change("mute", $sc); }
 if (isset($_POST['button_on'])) { ls_change("unmute", $sc); }
 

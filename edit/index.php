@@ -2,7 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+include_once "../include/functions.php";
 include_once "../include/config.php";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +29,88 @@ if ((!file_exists($file)) && (file_exists($file_ex))) {
     sleep(3); 
 }
 echo "Datei $file";
+//
+  // Save / Reload on submit//
+  if ((isset($_POST['save'])) || (isset($_POST['save_reload'])) || (isset($_POST['save_restart']))) {
 
+    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+    $logtext = $file . " changed by $ip \n";
+    addsvxlog($logtext);
+    // Backup file
+    $backup_filename = $file . "." . date("YmdHis");
+    exec('sudo cp -p ' . $file . ' ' . $backup_filename);
+    // eliminate \r (when editing in a windows browser
+    $content = str_replace("\r\n","\n",$_POST['content']); 
+    file_put_contents($file, $content);
+    if (str_contains($file,'include/config.php')) {
+      // Prüft die Syntax der Datei, ohne sie auszuführen
+      $output = shell_exec("php -l " . escapeshellarg($file));
+      if (strpos($output, 'No syntax errors detected') !== false) {
+        addsvxlog("config.php ok");
+//        include($file);
+      } else {
+        echo "<b>Syntaxfehler</b> in config.ph gefunden! Lade die letze Konfiguration!<br>";
+        exec('sudo cp -p ' . $backup_filename . ' ' . $file);
+        addsvxlog("Syntaxfehler in config.php, restoring old Version");
+        echo "<script type='text/javascript'> reloadPage(); </script>";
+      }  
+    }
+    if (isset($_POST['save_reload'])) {
+  // Reload on submit//
+      if ($file == "/etc/svxlink/svxreflector.conf") {
+        $prog = "svxreflector";
+        $command = "sudo systemctl restart svxreflector 2>&1";
+      } else {
+        $prog = "svxlink";
+        $command = "sudo systemctl restart svxlink 2>&1";
+      }    
+      $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
+      $logtext = $prog . " Restarted from $ip \n";
+      addsvxlog($logtext);
+      echo "restarting $prog ...";
+      sleep(1);
+      exec($command,$screen,$retval);
+      if ($retval === 0) {
+        echo "$prog sucessfull restartet";
+      } else {
+        echo "$prog restart failure, check log";
+      }
+    }
+    if (isset($_POST['save_restart'])) {
+      $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+      $aprs_exit = DL3EL . "/aprs.exit";
+      touch($aprs_exit);
+      $logtext =  "APRS Dienst durch " . $ip . " gestoppt, Restart automatisch durch Dashboard\n";
+      addsvxlog($logtext);
+     }  
+  }
+ 
+
+ else {
+/*
+  if ($log ===1) {
+      echo ' Nachricht an <input type="text" id="aprs" name="aprs_call" value="DL3EL" required>';
+      echo '&nbsp;&nbsp;';
+      echo '<input type="text" style = "width:300px" id="aprs" name="aprs_msg" value="Text" required>';
+      echo '&nbsp;&nbsp;';
+      echo '<input type="submit" name="senden" value="senden">';  
+      echo '</form>';
+      // Save / Reload on submit//
+      if ((isset($_POST['senden'])) || (isset($_POST['cancel']))) {
+        $aprs_call = $_POST['aprs_call'];
+        if ($aprs_call !== "Call") {
+          $aprs_msg = $_POST['aprs_msg'];
+          $aprs_tx = $aprs_call . "^" .  $aprs_msg;
+          $file = DL3EL . "/aprs-tx.msg";
+          file_put_contents($file, $aprs_tx);
+          $logtext =  "APRS Nachricht \"" . $aprs_msg . "\" an " . $aprs_call . " gesendet\n";
+          addsvxlog($logtext);
+        }  
+      }
+    }  
+*/
+}
+//
 if (((defined('DL3EL_NOAUTH')) && (DL3EL_NOAUTH === "yes")) || ($_SESSION['auth'] === 'AUTHORISED')) {
   // ok, go ahead, set to authorized :-)
   $_SESSION['auth'] = "AUTHORISED";
@@ -168,87 +251,6 @@ if (!$log) {
 // cancel button
   echo '<input type="submit" name="cancel" value="Cancel">';  
   echo '</form>';
-
-  // Save / Reload on submit//
-  if ((isset($_POST['save'])) || (isset($_POST['save_reload'])) || (isset($_POST['save_restart']))) {
-
-    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-    $logtext = $file . " changed by $ip \n";
-    addsvxlog($logtext);
-    // Backup file
-    $backup_filename = $file . "." . date("YmdHis");
-    exec('sudo cp -p ' . $file . ' ' . $backup_filename);
-    // eliminate \r (when editing in a windows browser
-    $content = str_replace("\r\n","\n",$_POST['content']); 
-    file_put_contents($file, $content);
-
-    if (str_contains($file,'include/config.php')) {
-      // Prüft die Syntax der Datei, ohne sie auszuführen
-      $output = shell_exec("php -l " . escapeshellarg($file));
-
-      if (strpos($output, 'No syntax errors detected') !== false) {
-        include($config_file);
-      } else {
-        echo "<b>Syntaxfehler</b> in config.ph gefunden! Lade die letze Konfiguration!<br>";
-        exec('sudo cp -p ' . $backup_filename . ' ' . $file);
-        addsvx("Syntaxfehler in config.php, restoring old Version");
-      }  
-    }
-    echo "<script type='text/javascript'> reloadPage(); </script>";
-    if (isset($_POST['save_reload'])) {
-  // Reload on submit//
-      if ($file == "/etc/svxlink/svxreflector.conf") {
-        $prog = "svxreflector";
-        $command = "sudo systemctl restart svxreflector 2>&1";
-      } else {
-        $prog = "svxlink";
-        $command = "sudo systemctl restart svxlink 2>&1";
-      }    
-      $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';
-      $logtext = $prog . " Restarted from $ip \n";
-      addsvxlog($logtext);
-      echo "restarting $prog ...";
-      sleep(1);
-      exec($command,$screen,$retval);
-      if ($retval === 0) {
-        echo "$prog sucessfull restartet";
-      } else {
-        echo "$prog restart failure, check log";
-      }
-    }
-    if (isset($_POST['save_restart'])) {
-      $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
-      $aprs_exit = DL3EL . "/aprs.exit";
-      touch($aprs_exit);
-      $logtext =  "APRS Dienst durch " . $ip . " gestoppt, Restart automatisch durch Dashboard\n";
-      addsvxlog($logtext);
-     }  
-  }
-} 
-
- else {
-/*
-  if ($log ===1) {
-      echo ' Nachricht an <input type="text" id="aprs" name="aprs_call" value="DL3EL" required>';
-      echo '&nbsp;&nbsp;';
-      echo '<input type="text" style = "width:300px" id="aprs" name="aprs_msg" value="Text" required>';
-      echo '&nbsp;&nbsp;';
-      echo '<input type="submit" name="senden" value="senden">';  
-      echo '</form>';
-      // Save / Reload on submit//
-      if ((isset($_POST['senden'])) || (isset($_POST['cancel']))) {
-        $aprs_call = $_POST['aprs_call'];
-        if ($aprs_call !== "Call") {
-          $aprs_msg = $_POST['aprs_msg'];
-          $aprs_tx = $aprs_call . "^" .  $aprs_msg;
-          $file = DL3EL . "/aprs-tx.msg";
-          file_put_contents($file, $aprs_tx);
-          $logtext =  "APRS Nachricht \"" . $aprs_msg . "\" an " . $aprs_call . " gesendet\n";
-          addsvxlog($logtext);
-        }  
-      }
-    }  
-*/
 }
 ?>
 </body>

@@ -153,13 +153,18 @@ ExecStartPre=/bin/sleep 2
 
 # Wir setzen NUR die Audio-Grundwerte
 ExecStartPre=/usr/bin/amixer -D hw:Audio sset 'Lineout' unmute
-ExecStartPre=/usr/bin/amixer -D hw:Audio sset 'Lineout' 100%
-ExecStartPre=/usr/bin/amixer -D hw:Audio sset 'PCM' 90%
+ExecStartPre=/usr/bin/amixer -D hw:Audio sset 'Capture Mux' LINE_IN
 # Wir lassen Capture-Einstellungen erst mal weg, um den TX-Weg zu testen
 
 sudo systemctl daemon-reload
 # Teste es direkt, indem du SvxLink neu startest:
 sudo systemctl restart svxlink
+=================================
+Hilfreiche amixer Befehler
+amixer controls
+amixer contents
+sudo amixer -c1 contents
+sudo amixer -c1 controls
 =================================
 beim Raspberry Zero ist es sinnvoll, dieses so zu konfigurieren, dass er einen eigenen Hotspot aufspannt, wenn er keine Netzwerkverbindung findet
 # Dazu wird ein eigener Hotspo konfiguriert
