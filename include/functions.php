@@ -1384,10 +1384,25 @@ echo "<br>Stat: $cmd";
       $dtmf_pty = "/tmp/dtmf_svx";
       if (fopen($svxConfigFile,'r')) { 
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
+// get logics
+        $check_logics = explode(",",$svxconfig['GLOBAL']['LOGICS']);
+   
+        foreach ($check_logics as $key) {
+          if ($key === "RepeaterLogic") {
+            $section = $key;
+            break;
+          }
+          if ($key === "SimplexLogic") {
+            $section = $key;
+            break;
+          }
+        }
+
         if (isset($svxconfig[$section]['DTMF_CTRL_PTY'])) {
           $dtmf_pty = $svxconfig[$section]['DTMF_CTRL_PTY'];
         }    
     }
+    if ((defined ('debug')) && (debug > 0)) echo "Logic $section found, DTMF_PTY:" . $dtmf_pty . "<br>";
     return $dtmf_pty;
 }
     function start_mqtt() {
