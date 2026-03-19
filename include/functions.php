@@ -377,15 +377,21 @@ function getSVXCommand() {
 }
 
 function svx_restart() {
-    $command = "sudo systemctl restart svxlink 2>&1";
+//    $command = "sudo systemctl restart svxlink 2>&1";
+    if (defined('SVXNAME')) {
+        $svxlink = SVXNAME;
+    } else {        
+        $svxlink = "svxlink";
+    }
+    $command = "sudo systemctl restart " . $svxlink . " 2>&1";
     exec($command,$screen,$retval);
     echo "restarting svxlink ...";
     sleep(1);
     if ($retval === 0) {
-        echo "svxlink sucessfull restartet";
-      } else {
-        echo "svxlink restart failure, check log";
-      }
+      echo "svxlink sucessfull restartet";
+    } else {
+      echo "svxlink restart failure, check log";
+    }
 }
 
 function upd_svx_config($file,$file_new) {
