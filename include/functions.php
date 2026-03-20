@@ -1176,7 +1176,8 @@ function display_config($config) {
         $dbversion = $dbversion . "(a)";
       }  
       $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
-      if ((strlen($mqtt_script)) || (file_exists("/usr/local/bin/mqtt-simple"))) {
+      if (strlen($mqtt_script) || file_exists("/usr/local/bin/mqtt-simple") || file_exists("/usr/bin/mqtt-simple")) {
+//      if ((strlen($mqtt_script)) || (file_exists("/usr/local/bin/mqtt-simple"))) {
         $dbversion = $dbversion . "(m)";
       }
       if (!strlen($fmnetwork)) {
@@ -1424,7 +1425,8 @@ echo "<br>Stat: $cmd";
         $callsign = isset($svxconfig[$section]['CALLSIGN']) ? $svxconfig[$section]['CALLSIGN'] : 'NOCALL';
       }  
       $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
-      if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+      if (strlen($mqtt_script) || file_exists("/usr/local/bin/mqtt-simple") || file_exists("/usr/bin/mqtt-simple")) {
+//      if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
         $debug = "";
         if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
         $mqttid = "c=" . $callsign . " ";
