@@ -355,7 +355,11 @@ sub parse_aprs {
 		print_file($logdatei,$write2file) if ($verbose >= 1);
 		if (($srcdest ne "APNFMN") && ($destcall ne substr($aprs_msg_call,0,$aprs_msg_call_length))) {
 		# not for us, but put into Log		
-			process_other($raw_data,$srccall);
+			if ($srcdest eq "APWEE5") {
+				process_rxwx($raw_data,$srccall);
+			} else {
+				process_other($raw_data,$srccall);
+			}	
 		} else {
 			$write2file = sprintf "[$message_time] Data ignored [%s], Datatyp is [%s]\n",$raw_data,$datatype if ($verbose >= 0);
 			print_file($logdatei,$write2file) if ($verbose >= 0);
@@ -580,6 +584,40 @@ sub send_ack {
 		print_file($logdatei,$write2file) if ($verbose >= 0);
 }
 
+sub process_rxwx {
+	my $raw_data = $_[0];
+	my $srccall = $_[1];
+	my $datatype = "";
+	my $call = "";
+	my $wx = "";
+# danach noch manuell filtern
+# APRS Data Type Identifiers
+# @ Position with timestamp (with APRS messaging)
+# DB0FDA>APRS,WIDE3-3,qAR,DB0EJ:!4952.05N/00838.28E#Relais Hochschule Darmstadt 438.587 MHz DOK F42
+# [21.03.2026 12:04:29] working on: [DC9VQ-13>APWEE5,TCPIP*,qAC,FIRST:@211100z5009.90N/00841.05E_.../...g...t053r000p000P000b10165h67.weewx-5.2.0-netatmo]
+# [21.03.2026 12:04:29] Datatyp is [@] [DC9VQ-13>APWEE5,TCPIP*,qAC,FIRST:@211100z5009.90N/00841.05E_.../...g...t053r000p000P000b10165h67.weewx-5.2.0-netatmo]
+# [21.03.2026 12:04:29]. DC9VQ-13>APWEE5,TCPIP*,qAC,FIRST:@211100z5009.90N/00841.05E_.../...g...t053r000p000P000b10165h67.weewx-5.2.0-netatmo
+# [21.03.2026 12:37:30] working on: [DL1AIE-13>APWEE5,TCPIP*,qAC,THIRD:@211135z5010.70N/00904.16E_093/007g009t054r000p000P000b10161h55.weewx-5.1.0-GW1000]
+# [21.03.2026 12:37:30] Datatyp is [@] [DL1AIE-13>APWEE5,TCPIP*,qAC,THIRD:@211135z5010.70N/00904.16E_093/007g009t054r000p000P000b10161h55.weewx-5.1.0-GW1000]
+# [21.03.2026 12:37:30]WX-Test DL1AIE-13>APWEE5,TCPIP*,qAC,THIRD:@211135z5010.70N/00904.16E_093/007g009t054r000p000P000b10161h55.weewx-5.1.0-GW1000
+# 21.03.2026 13:07:20]WX: @ [211205z5010.70N/00904.16E_078/004g004t054r000p000P000b10158h56.weewx-5.1.0-GW1000]
+# ToDo Timestamp berücksichtigen (/ and @)
+
+#	$analyze = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([!\/=@]+)([\d*.\d*]+[N|S]+)[\/|\\|0-9|a-j|A-Z]{1}([\d*.\d*]+[E|W]+).(.*)/i)? $4 : "undef";
+	$write2file = sprintf "[$message_time]WX-Test %s\n",$raw_data if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
+
+	$call = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*:([!\/=@]+)(.*)/i)? $1 : "undef";
+	if ($call eq "undef") {
+		$write2file = sprintf "[$message_time]WX Wrong. %s\n",$raw_data if ($verbose >= 0);
+	} else {
+		$wx = ($raw_data =~ /([\d]+)z([\d*.\d*]+[N|S]+)[\/|\\|0-9|a-j|A-Z]{1}([\d*.\d*]+[E|W]+)_(.*)/i)? $4 : "undef";
+		$write2file = sprintf "[$message_time]WX from %s [%s]\n",$call,$wx if ($verbose >= 0);
+#[21.03.2026 14:57:21]WX from DL1AIE-13 [028/003g006t054r000p000P000b10151h56.weewx-5.1.0-GW1000]
+	}
+	print_file($logdatei,$write2file) if ($verbose >= 0);
+
+}
 sub process_other {
 	my $raw_data = $_[0];
 	my $srccall = $_[1];
