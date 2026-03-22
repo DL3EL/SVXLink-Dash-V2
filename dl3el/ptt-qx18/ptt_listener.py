@@ -34,9 +34,11 @@ def run_listener():
                         
                         if new_val == "O":
                             os.write(fd, b"O\n")
+                            with open("/tmp/ptt_status.txt", "w") as f: f.write("ON")
                         else:
                             # Wir schreiben einfach Z und ein Newline
                             os.write(fd, b"Z\n")
+                            with open("/tmp/ptt_status.txt", "w") as f: f.write("OFF")
                         
                         os.close(fd)
                         print(f"PTT -> {new_val}")
