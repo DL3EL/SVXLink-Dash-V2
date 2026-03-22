@@ -1354,7 +1354,7 @@ echo "<br>Stat: $cmd";
       file_put_contents($db_File, $add2log,FILE_APPEND);
     }
 
-    function getfmnetwork () {
+    function getfmnetwork (&$nodeinfo = null) {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
 // das hier noch variable gestalten, Reflectorlogic kann anders heissen
       $section = "ReflectorLogic";
@@ -1376,6 +1376,13 @@ echo "<br>Stat: $cmd";
           } else {
             $fmnetwork = "parseErr";
           } 
+        }
+        if ($nodeinfo === null) {
+          // Logik, wenn kein Parameter übergeben wurde
+        } else {
+            if (isset($svxconfig[$section]['NODE_INFO_FILE'])) {
+              $nodeinfo = $svxconfig[$section]['NODE_INFO_FILE'];
+          }
         }
       } else {
           $fmnetwork = "confErr";

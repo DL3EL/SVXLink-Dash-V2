@@ -233,7 +233,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	    echo '<a class="hreflink" href="./caller.php?file=' . MODULEPATH . ECHOLINKCONFIG . '" id="echolink">EchoLink</a> | ';
 	    echo '<a class="hreflink" href="./caller.php?file=' . MODULEPATH . METARINFO . '" id="metarinfo">MetarInfo</a> | ';
-	    echo '<a class="hreflink" href="./caller.php?file=' . SVXCONFPATH . 'node_info.json" class="hreflink" id="nodeInfo">NodeInfo</a> | ';
+//echo " $nodeinfo ";
+//	    echo '<a class="hreflink" href="./caller.php?file=' . SVXCONFPATH . 'node_info.json" class="hreflink" id="nodeInfo">NodeInfo</a> | ';
+	    echo '<a class="hreflink" href="./caller.php?file=' . $nodeinfo. '" class="hreflink" id="nodeInfo">NodeInfo</a> | ';
 	    if ((defined('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
 		echo '<a class="hreflink" href="./caller.php?file=' . DL3EL . '/aprs-is-msg.conf" id="aprs">aprs.conf</a> | ';
 	    }

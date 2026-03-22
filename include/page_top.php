@@ -55,8 +55,9 @@
     <div class="text"style = "padding-right:230px">
 --->    
 <?php 
-    if (!strlen($fmnetwork)) {
-      $fmnetwork = getfmnetwork();
+    if ((!strlen($fmnetwork)) || (!strlen($nodeinfo))) {
+        $nodeinfo = "";
+        $fmnetwork = getfmnetwork($nodeinfo);
     }     
 ?>
 <center><p style = "margin-top:5px;margin-bottom:0px;">
