@@ -72,9 +72,15 @@ if (fopen($svxConfigFile,'r')) {
 	$fmnetwork_arry = explode(",", $fmnetwork_all);
 	$fmnetwork = $fmnetwork_arry[0];
     }
+    if (isset($svxconfig[$section]['NODE_INFO_FILE'])) {
+	$nodeinfo = $svxconfig[$section]['NODE_INFO_FILE'];
+    } else {
+	$nodeinfo = NODE_INFO_FILE;
+    }
 } else { 
      $callsign="NOCALL";
      $fmnetwork="not registered";
      $EL_node = "unknown";
 }
 define("FMNETWORK", $fmnetwork);
+?>

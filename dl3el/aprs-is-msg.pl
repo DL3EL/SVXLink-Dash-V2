@@ -6,6 +6,9 @@ use Time::Piece;
 #use File::stat;
 use IO::Socket::INET;
 use IO::Select;
+use Data::Dumper;
+use open qw(:std :utf8);
+use utf8; # Erlaubt Umlaute im Quellcode selbst
 ######
 # Todo
 # Filter prüfen, ob pos Packete empfangen werden können							done 15.11.2025
@@ -89,6 +92,7 @@ my $exit_script = 0;
 	$conf = $dir . "aprs-is-msg.conf";
 	printf "DL3EL APRS-IS Message Receiver [v$version] Start: %02d:%02d:%02d am %02d.%02d.%04d\n$0 @ARGV $dir $conf\n",$tm->hour, $tm->min, $tm->sec, $tm->mday, $tm->mon,$tm->year if ($verbose >= 1);
  	my $logdatei = $dir  . "aprs-is.log";
+ 	my $wxdatei = $dir  . "aprs-is.wx";
 
 	my $total = $#ARGV + 1;
 	my $counter = 1;
@@ -268,6 +272,8 @@ MainLoop:
 		exit 0;
 	} else {
 		print "Folgender Fehler ist aufgetreten: $@\n" if($@);
+		$write2file = sprintf "[$message_time] Folgender Fehler ist aufgetreten: $@\n" if($@);
+		print_file($logdatei,$write2file) if($@);
 		goto MainLoop;
 	}
 
@@ -285,6 +291,19 @@ sub parse_aprs {
 	my $destcall = "undef";
 	my $payload = "";
 	my $mtype = "";
+	my $message = "";
+	my $status = "";
+	my $rx_aprs_lat = "";
+	my $rx_aprs_lon = "";
+	my $comment = "";
+	my $dist = "";
+	my $pfeil = "";
+
+my 	$srccallp = "";
+my	$srcdestp = "";
+my	$datatypep = "";
+my	$destcallp = "";
+my $raw_datap = "";	
 
 	$message_time = act_time();
 	$write2file = sprintf "[$message_time] working on: [$raw_data]\n" if ($verbose >= 1);
@@ -302,13 +321,101 @@ sub parse_aprs {
 # offener Punkt: ? kann nicht ausgewertet werden. Entgegen aller Beschreibeungen klappt die Regex damit nicht.
 # offener Punkt: T für Telemetrie löst auch bei einem T als erstem Zeichen in der Nachricht aus
 #	if ($raw_data =~ /([\w-]+)>([\w-]+),.*:([:;!\/=@#$%*<>T]{1})/i) {
+#### new parser
+my $result = parse_aprs_line($raw_data);
+	my $decoded = ""; #sprintf "%s", Dumper($result);
+#	$write2file = sprintf "[$message_time] DMP: [%s]\n",$decoded if ($verbose >= 1);
+if ($result) {
+	$srccall = $result->{source};
+	$srcdest = $result->{destination};
+	$decoded = sprintf("%s -> %s ",$srccall,$srcdest); 
+	$datatype = $result->{type};
+    if ($result->{type} eq 'unknown') {
+		$decoded = "Typ: " . $result->{type} . " ";
+		$decoded .= trim_cr($raw_data);
+	}
+#	$decoded .= "Von: " . $result->{source} . " ";
+
+    # Spezifischer Zugriff je nach Typ
+    if ($result->{type} eq 'weather') {
+		$rx_aprs_lat = $result->{lat};
+		$rx_aprs_lon = $result->{lon};
+		if ($rx_aprs_lat ne "undef") {
+			my $lat_dec = aprs_to_decimal($rx_aprs_lat);
+			my $lon_dec = aprs_to_decimal($rx_aprs_lon);			
+			my $locator = convert2loc($lat_dec,$lon_dec);
+			$dist = calcdist($lat_dec,$lon_dec,$aprs_lat_dec,$aprs_lon_dec,"km");
+		}
+        if ($verbose >= 1) {
+			$decoded .= $result->{temp_c} . "c " if ($result->{temp_c} ne "undef");
+			$decoded .= $result->{press_hpa} . "hpa " if ($result->{press_hpa} ne "undef");
+			$decoded .= $result->{humid_pct} . "% " if ($result->{humid_pct} ne "undef");
+			$decoded .= $result->{wind_speed_ms} . "m/s " if ($result->{wind_speed_ms} ne "undef");
+			$decoded .= $result->{wind_dir} . "° " if ($result->{wind_dir} ne "N/A ");
+			$decoded .= "(Böen: " . $result->{wind_gust_ms} . "m/s) " if ($result->{wind_gust_ms} ne "undef");
+			$decoded .= "Regen 1h: " . $result->{rain_1h_mm} . "mm " if ($result->{rain_1h_mm} ne "undef");
+			$decoded .= "Regen 24h: " . $result->{rain_24h_mm} . "mm " if ($result->{rain_24h_mm} ne "undef");
+			$decoded .= "\nRAW: [" . ($result->{wx_raw} // "undef") . "] " if ($verbose >= 1);
+			$write2file = sprintf "[$message_time] %s(%s): [%s]\n",$result->{source},$dist,$decoded if ($verbose >= 1);
+			print_file($wxdatei,$write2file) if ($verbose >= 1);
+		} else {
+			$decoded = $result->{source} . "^" . $dist . "^";
+			$decoded .= "&#127777;" .$result->{temp_c} . "c^" if ($result->{temp_c} ne "undef");
+			$decoded .= "&#128200;" . $result->{press_hpa} . "hpa^" if ($result->{press_hpa} ne "undef");
+			$decoded .= "&#128167;" . $result->{humid_pct} . "%^" if ($result->{humid_pct} ne "undef");
+			$decoded .= "&#128168;" . $result->{wind_speed_ms} . "m/s^" if ($result->{wind_speed_ms} ne "undef");
+			if ($result->{wind_dir} ne "undef") {
+				$pfeil = sprintf "<span style='display:inline-block; transform:rotate(%sdeg);'>&uarr;</span>",$result->{wind_dir} ;
+				$decoded .= $pfeil . $result->{wind_dir} . "°^" ;
+			}	
+			$decoded .= $result->{wind_gust_ms} . "m/s^" if ($result->{wind_gust_ms} ne "undef");
+			$decoded .= "&#9748;" . $result->{rain_1h_mm} . "mm^" if ($result->{rain_1h_mm} ne "undef");
+			$decoded .= $result->{rain_24h_mm} . "mm^" if ($result->{rain_24h_mm} ne "undef");
+			if (length($decoded) > 60) {
+				$write2file = sprintf "[$message_time]^%s\n",$decoded if ($verbose >= 0);
+				print_file($wxdatei,$write2file) if ($verbose >= 0);
+			}	
+		}		
+    }
+    
+	$write2file = sprintf "[$message_time] %s: [%s]\n",$result->{source},$decoded if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
+	if ($datatype eq "message") {
+		$datatype = ":";
+		$destcall = $result->{addressee};
+		$message = $result->{message};
+		$decoded = sprintf("%s, MSG to:%s [%s]",$decoded,$destcall,$message); 
+	}	
+	if ($datatype eq "status") {
+		$status = $result->{status};
+		$decoded = sprintf("%s, Status [%s]",$decoded,$status); 
+	}	
+	if ($datatype eq "position") {
+		$rx_aprs_lat = $result->{lat};
+		$rx_aprs_lon = $result->{lon};
+		$comment =  $result->{comment};
+		$decoded = sprintf("%s, Position [%s %s %s]",$decoded,$rx_aprs_lat,$rx_aprs_lon,$comment); 
+	}	
+	$write2file = sprintf "[$message_time] [%s]\n",$decoded if ($verbose >= 0);
+	print_file($logdatei,$write2file) if ($verbose >= 1);
+
+	if ($verbose >= 1) {
+		$srccallp = $srccall;
+		$srcdestp = $srcdest;
+		$datatypep = $datatype;
+		$destcallp = $destcall;
+		$raw_datap = $result->{raw} if (defined $result->{raw});
+	}	
+} else {
+####
 	if ($raw_data =~ /([\w-]+)>([\w-]+),.*:([:;!\/=@#$%*<>]{1})/i) {
 		$srccall = $1;
 		$srcdest = $2;
 		$datatype = $3;
 	}	
+}
 
-	if ($datatype eq "undef") {
+	if (($datatype eq "undef") || ($datatype eq "unknown") ){
 # Todo: compressed beacon		
 		$write2file = sprintf "[$message_time] unknown data [%s]\n",$raw_data if ($verbose >= 0);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
@@ -316,15 +423,22 @@ sub parse_aprs {
 	}	
 	if ($datatype eq ":") {
 # datatype is message
-		$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)/i)? $4 : "undef";
-
+		if ($verbose >= 1) {
+			$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)/i)? $4 : "undef";
+		} else {
+# provisorisch, bis wir sicher sind, dass der neue Parser passt
+			$payload = $message;
+		}
 		if ($payload ne "undef") {
-			$srccall = $1;
-			$srcdest = $2;
-			$destcall = $3;
+			if ($verbose >= 1) {
+				$srccall = $1;
+				$srcdest = $2;
+				$destcall = $3;
 # Type Message found			
-#			$payload = ($raw_data =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)([\{]*)/i)? $4 : "undef";
-			$destcall = $3;
+				$write2file = sprintf "[$message_time] Parser Test 1 PO[%s/%s] PN[%s(%s):%s]SC[%s/%s]SD[%s/%s]\n",$payload,$raw_data,$destcall,$destcallp,$message,$srccall,$srccallp,$srcdest,$srcdestp if ($verbose >= 1);
+				print_file($logdatei,$write2file) if ($verbose >= 1);
+				$destcall = $3;
+			}	
 			my $msg_for_us = 0;
 			$mtype = "MSG";
 			if ($aprs_msg_call_wc) {
@@ -338,7 +452,9 @@ sub parse_aprs {
 				}
 			}
 			if ($msg_for_us) {
-				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$payload if ($verbose >= 0);
+				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$payload if ($verbose >= 1);
+				print_file($logdatei,$write2file) if ($verbose >= 1);
+				$write2file = sprintf "[$message_time] Message found from $srccall to $destcall [%s] \n",$message if ($verbose >= 0);
 				print_file($logdatei,$write2file) if ($verbose >= 0);
 			} else {
 				$write2file = sprintf "[$message_time] other message [%s]\n",$raw_data if ($verbose >= 1);
@@ -346,16 +462,21 @@ sub parse_aprs {
 				return 0;
 			}		
 		} else {
+			$write2file = sprintf "[$message_time] Parser Test 2 PO[%s] PN[%s(%s):%s]\n",$payload,$destcall,$destcallp,$message if ($verbose >= 1);
+			print_file($logdatei,$write2file) if ($verbose >= 1);
 			$write2file = sprintf "[$message_time] wrong payload for datatype [%s] [%s]\n",$datatype,$raw_data if ($verbose >= 1);
 			print_file($logdatei,$write2file) if ($verbose >= 1);
 			return 0;
 		}	
 	} else {
-		$write2file = sprintf "[$message_time] Datatyp is [%s] [%s]\n",$datatype,$raw_data if ($verbose >= 1);
+		$write2file = sprintf "[$message_time] Parser Test 3 DT[%s/%s] SD[%s/%s] DC[%s/%s]\nRAWO[%s]\nRAWN[%s]\n",$datatype,$datatypep,$srcdest,$srcdestp,$destcall,$destcallp,$raw_data,$raw_datap if ($verbose >= 0);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
+		$write2file = sprintf "[$message_time] Datatyp is [%s] [%s]\n",$datatypep,$raw_datap if ($verbose >= 1);
 		print_file($logdatei,$write2file) if ($verbose >= 1);
 		if (($srcdest ne "APNFMN") && ($destcall ne substr($aprs_msg_call,0,$aprs_msg_call_length))) {
 		# not for us, but put into Log		
 			if ($srcdest eq "APWEE5") {
+# prepare wx info for DB0HTV
 				process_rxwx($raw_data,$srccall);
 			} else {
 				process_other($raw_data,$srccall);
@@ -366,10 +487,11 @@ sub parse_aprs {
 		}	
 		return 0;
 	}	
+# bisher mit neuem PArser
 # check and process ack if necessary
 	$write2file = sprintf "[$message_time] calling check for ack R[%s], P[%s]\n",$raw_data,$payload if ($verbose >= 2);
 	print_file($logdatei,$write2file) if ($verbose >= 2);
-	$ack = process_ack($raw_data,$payload,$srccall,$srcdest,$destcall);
+	$ack = process_ack($raw_data,$message,$srccall,$srcdest,$destcall);
 
 # Process data
 	if ($ack ne ":ack") {
@@ -401,8 +523,146 @@ sub parse_aprs {
 		}
 	} else {
 		$write2file = sprintf "no action: [$raw_data]\n" if ($verbose >= 1);
-		print_file($logdatei,$write2file);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
 	}
+}
+
+sub parse_aprs_line {
+    my ($line) = @_;
+    chomp($line);
+
+    return unless $line =~ /^([^>]+)>([^,:]+),?([^:]*):(.*)$/;
+    
+    my $data = {
+        source      => $1,
+        destination => $2,
+        path        => $3,
+        payload     => $4,
+        lat         => "undef",
+        lon         => "undef",
+        type        => 'unknown:',
+        raw         => $line
+    };
+
+    my $p = $data->{payload};
+
+    # 1. Nachrichten (Message)
+    if ($p =~ /^:(.{9}):(.*)$/) {
+		my $payload = ($line =~ /([\w-]+)\>([\w-]+)\,.*::([\w-]+)[ :]+(.*)/i)? $4 : "undef";
+		$write2file = sprintf "MSG: [%s](%s)[%s]\n",$p,$line,$payload if ($verbose >= 0);
+		print_file($logdatei,$write2file) if ($verbose >= 1);
+        $data->{type}      = 'message';
+#        $data->{addressee} = $1;
+        $data->{addressee} = $3;
+#        $data->{addressee} =~ s/\s+$//;
+		$data->{addressee} = "undef" if (not defined $data->{addressee}); 
+#        $data->{message}   = $2;
+        $data->{message}   = $4;
+		$data->{message} = "undef" if (not defined $data->{message}); 
+    }
+    
+    # 2. Wetterdaten & Positionen (kombinierte Logik)
+    # Erkennt Wetter-Symbol '_' an verschiedenen Positionen (mit/ohne Zeitstempel) oder reinem WX-Format
+    elsif ($p =~ /_(\d{3})\/(\d{3})/ || $p =~ /[\!\=\@\/].{7,25}_/ || $p =~ /^\d{4}\.\d{2}[NS].\d{5}\.\d{2}[EW]_/) {
+        $data->{type} = 'weather';
+        $data->{wx_raw} = $p;
+
+        # Wetter-Variablen initialisieren
+        my ($wdir, $wspd);
+
+        # Wind-Daten (APRS-Spezial: ccc/sss oder direkt im Kommentar/Payload)
+        if ($p =~ /(\d{3})\/(\d{3})/) { # Format: 225/005 (Direction/Speed)
+            $wdir = $1;
+            $wspd = $2;
+        } elsif ($p =~ /c(\d{3})/) {    # Format: c225 (Direction)
+            $wdir = $1;
+        }
+        
+        $wspd = $1 if $p =~ /s(\d{3})/ && !defined $wspd; # Fallback auf s...
+
+        # Extraktion der Felder (Regex sucht im gesamten Payload)
+        $data->{temp_f}  = $1 if $p =~ /t(-?\d{3})/;
+        $data->{gust}    = $1 if $p =~ /g(\d{3})/;
+        $data->{humid}   = $1 if $p =~ /h(\d{2})/;
+        $data->{press}   = $1 if $p =~ /b(\d{5})/;
+        $data->{rain_1h} = $1 if $p =~ /r(\d{3})/;
+        $data->{rain_24} = $1 if $p =~ /p(\d{3})/;
+
+		undef $data->{rain_1h} 		if (defined $data->{rain_1h} && (($data->{rain_1h} eq "...") || ($data->{rain_1h} eq "000")));
+		undef $data->{rain_24} 		if (defined $data->{rain_24} && (($data->{rain_24} eq "...") || ($data->{rain_24} eq "000")));
+		undef $data->{press_hpa} 	if (defined $data->{press_hpa} && ($data->{press_hpa} eq "..."));
+		undef $data->{temp_f} 		if (defined $data->{temp_f} && ($data->{temp_f} eq "..."));
+		undef $data->{wspd} 		if (defined $data->{wspd} && ($data->{wspd} eq "..."));
+		undef $data->{wind_dir} 	if (defined $data->{wind_dir} && ($data->{wind_dir} eq "..."));
+		undef $data->{gust} 		if (defined $data->{gust} && ($data->{gust} eq "..."));
+
+        # Position innerhalb des Wetterpakets suchen (optional)
+        if ($p =~ /([\!\=\@\/])(?:(\d{6}[hz\/]))?(\d{4}\.\d{2}[NS])(.)(\d{5}\.\d{2}[EW])(.)/) {
+            $data->{lat}      = $3;
+            $data->{lon}      = $5;
+            $data->{position} = "$3 $5";
+        } else {
+            $data->{lat}      = "undef";
+            $data->{lon}      = "undef";
+            $data->{position} = "undef";
+        }
+
+        # Umrechnungen & N/A Absicherung
+        if (defined $data->{temp_f}) {
+            $data->{temp_c} = sprintf("%.1f", ($data->{temp_f} - 32) * 5/9);
+        } else { $data->{temp_c} = "undef"; }
+
+        if (defined $wspd && $wspd ne "...") {
+            $data->{wind_speed_ms} = sprintf("%.1f", $wspd * 0.44704);
+            $data->{wind_dir}      = (defined $wdir && $wdir ne "...") ? $wdir : "undef";
+        } else {
+            $data->{wind_speed_ms} = "undef"; 
+            $data->{wind_dir} = "undef";
+        }
+
+        $data->{wind_gust_ms} = (defined $data->{gust} && $data->{gust} ne "...") ? sprintf("%.1f", $data->{gust} * 0.44704) : "undef";
+
+        if (defined $data->{humid} && $data->{humid} =~ /^\d+$/) {
+            $data->{humid_pct} = ($data->{humid} eq "00") ? 100 : int($data->{humid});
+        } else { $data->{humid_pct} = "undef"; }
+
+        $data->{press_hpa} = (defined $data->{press} && $data->{press} ne "...") ? sprintf("%.1f", $data->{press} / 10) : "undef";
+        $data->{rain_1h_mm} = (defined $data->{rain_1h} && $data->{rain_1h} ne "...") ? sprintf("%.1f", $data->{rain_1h} * 0.254) : "undef";
+        $data->{rain_24h_mm} = (defined $data->{rain_24} && $data->{rain_24} ne "...") ? sprintf("%.1f", $data->{rain_24} * 0.254) : "undef";
+
+        # Kommentar: Alles nach dem letzten bekannten Wetter-Identifier
+        if ($p =~ /.*[thbrpPgh]\d{2,5}(.*)$/) {
+            my $cmt = $1; $cmt =~ s/^[\s\._,]+//;
+            $data->{comment} = $cmt || "undef";
+        } else { $data->{comment} = "undef"; }
+
+        # Felder auffüllen
+        foreach my $k (qw(temp_f humid press rain_1h rain_24 gust)) { $data->{$k} //= "undef"; }
+    }
+    
+    # 3. Reine Position (ohne Wetter)
+    elsif ($p =~ /^([\!\=\@\/])(?:(\d{6}[hz\/]))?(\d{4}\.\d{2}[NS])(.)(\d{5}\.\d{2}[EW])(.)(.*)$/) {
+        $data->{type}         = 'position';
+        $data->{identifier}   = $1;
+        $data->{timestamp}    = $2 // "undef";
+        $data->{lat}          = $3;
+        $data->{symbol_table} = $4;
+        $data->{lon}          = $5;
+        $data->{symbol_code}  = $6;
+        $data->{comment}      = $7 || "undef";
+
+        if ($data->{comment} =~ /\/A=(\d{6})/) {
+            $data->{altitude_ft} = $1;
+        }
+    }
+
+    # 4. Status-Berichte
+    elsif ($p =~ /^>/) {
+        $data->{type}   = 'status';
+        $data->{status} = substr($p, 1);
+    }
+
+    return $data;
 }
 
 sub process_ack {
