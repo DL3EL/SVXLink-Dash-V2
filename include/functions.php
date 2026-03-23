@@ -1151,7 +1151,14 @@ function display_config($config) {
           rename($db_File, $db_File . ".bak");
           touch($db_File);
       }
-// 3e. Clear UK-Cache
+// 3e. Clear APRS WX log
+      $db_File = DL3EL . "/aprs-is.wx";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
+// 3f. Clear UK-Cache
       $db_File = DL3EL . "/uk-cache.json";
       $db_File_size = filesize($db_File);
       if ($db_File_size > 100000) {

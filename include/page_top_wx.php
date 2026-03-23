@@ -1,5 +1,9 @@
 <?php
 $wx_file = DL3EL . '/aprs-is.wx';
+if (defined ('SVXNAME')) {
+    $wx_file = '/var/www/html/dl3el/aprs-is.wx';
+}    
+
 $best_station = null;
 $wx_stn_found = 0;
 if (file_exists($wx_file)) {
