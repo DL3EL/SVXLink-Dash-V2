@@ -346,7 +346,7 @@ if ($result) {
 			my $locator = convert2loc($lat_dec,$lon_dec);
 			$dist = calcdist($lat_dec,$lon_dec,$aprs_lat_dec,$aprs_lon_dec,"km");
 		}
-        if ($verbose >= 1) {
+        if ($verbose >= 2) {
 			$decoded .= $result->{temp_c} . "c " if ($result->{temp_c} ne "undef");
 			$decoded .= $result->{press_hpa} . "hpa " if ($result->{press_hpa} ne "undef");
 			$decoded .= $result->{humid_pct} . "% " if ($result->{humid_pct} ne "undef");
@@ -371,11 +371,11 @@ if ($result) {
 			$decoded .= $result->{wind_gust_ms} . "m/s^" if ($result->{wind_gust_ms} ne "undef");
 			$decoded .= "&#9748;" . $result->{rain_1h_mm} . "mm^" if ($result->{rain_1h_mm} ne "undef");
 			$decoded .= $result->{rain_24h_mm} . "mm^" if ($result->{rain_24h_mm} ne "undef");
-			if (length($decoded) > 50) {
+			if (length($decoded) > 40) {
 				$write2file = sprintf "[$message_time]^%s\n",$decoded if ($verbose >= 0);
 				print_file($wxdatei,$write2file) if ($verbose >= 0);
 			} else {
-				$write2file = sprintf "[$message_time]^[%s]:%s\n",$decoded,length($decoded) if ($verbose >= 0);
+				$write2file = sprintf "[$message_time]^%s^Length:%s^\n",$decoded,length($decoded) if ($verbose >= 0);
 				print_file($wxdatei,$write2file) if ($verbose >= 0);
 			}	
 		}		
