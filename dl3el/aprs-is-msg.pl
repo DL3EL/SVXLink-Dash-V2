@@ -371,7 +371,7 @@ if ($result) {
 			$decoded .= $result->{wind_gust_ms} . "m/s^" if ($result->{wind_gust_ms} ne "undef");
 			$decoded .= "&#9748;" . $result->{rain_1h_mm} . "mm^" if ($result->{rain_1h_mm} ne "undef");
 			$decoded .= $result->{rain_24h_mm} . "mm^" if ($result->{rain_24h_mm} ne "undef");
-			if (length($decoded) > 60) {
+			if (length($decoded) > 50) {
 				$write2file = sprintf "[$message_time]^%s\n",$decoded if ($verbose >= 0);
 				print_file($wxdatei,$write2file) if ($verbose >= 0);
 			}	
