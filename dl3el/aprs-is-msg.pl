@@ -374,6 +374,9 @@ if ($result) {
 			if (length($decoded) > 50) {
 				$write2file = sprintf "[$message_time]^%s\n",$decoded if ($verbose >= 0);
 				print_file($wxdatei,$write2file) if ($verbose >= 0);
+			} else {
+				$write2file = sprintf "[$message_time]^[%s]:%s\n",$decoded,length($decoded) if ($verbose >= 0);
+				print_file($wxdatei,$write2file) if ($verbose >= 0);
 			}	
 		}		
     }
