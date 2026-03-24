@@ -13,6 +13,7 @@
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="pragma" content="no-cache" />
+    <meta charset="UTF-8">
 <link rel="shortcut icon" href="images/favicon.ico" sizes="16x16 32x32" type="image/png">    
 
 <?php echo ("<title>" . $callsign . " Dashboard " . $dbversion . "</title>" ); ?>
