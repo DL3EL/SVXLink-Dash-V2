@@ -22,6 +22,7 @@ if (file_exists($wx_file)) {
                 $data = ['call' => $call, 'score' => 0, 'dist' => 9999, 'display' => ""];
                 $info = [];
 
+                $ztime = 0;
                 foreach ($parts as $p) {
                     $p = trim($p);
                     if (empty($p) || $p == "undef°") continue;
@@ -29,6 +30,8 @@ if (file_exists($wx_file)) {
                     // Score berechnen (Qualität) und Distanz extrahieren
                     if (strpos($p, 'km') !== false) {
                         $data['dist'] = (float)$p;
+                    } elseif (strpos($p, 'z') !== false) {
+                        $ztime = $p;
                     } else {
                         $data['score']++; // Jeder Wetter-Datenpunkt erhöht die Qualität
                         $info[] = $p;
@@ -36,6 +39,7 @@ if (file_exists($wx_file)) {
                 }
                 $data['display'] = implode(' | ', $info);
                 $data['time'] = $time;
+                $data['ztime'] = $ztime;
                 $stations[$call] = $data;
                 if ((defined ('DL3EL_WX_STN')) && (DL3EL_WX_STN === $call)) {
                     if ((defined ('debug')) && (debug > 0)) echo "WX_STN:" . DL3EL_WX_STN . " " . $call . "<br>";;
@@ -54,15 +58,24 @@ if (file_exists($wx_file)) {
             }
             return $b['score'] <=> $a['score'];
         });
-
         if (count($stations) > 0) {
             $best = $stations[0];
-            $wx_string = "<span style='color:#FFD700; font-weight:bold;'>WX ({$best['call']}):</span> {$best['display']} ({$best['dist']}km) " . $best['time'] . "h)";
-        }
+            $ztime = "";
+            if (isset($best['ztime']) && !empty($best['ztime'])) {
+                $ztime = ", " . $best['ztime'];
+            }    
+            $wx_string = "<span style='color:#FFD700; font-weight:bold;'>WX ({$best['call']}{$ztime}):</span> {$best['display']} ({$best['dist']}km, " . $best['time'] . "h)";
+        } else {
+          if ((defined ('debug')) && (debug > 0)) echo "no WX available";
+        }   
     } else {
         $best = $stations[$call];
-        $wx_string = "<span style='color:#FFD700; font-weight:bold;'>WX ({$best['call']}):</span> {$best['display']} ({$best['dist']}km, " . $best['time'] . "h)";
-    }        
+        $ztime = "";
+        if (isset($best['ztime']) && !empty($best['ztime'])) {
+            $ztime = ", " . $best['ztime'];
+        }    
+        $wx_string = "<span style='color:#FFD700; font-weight:bold;'>WX ({$best['call']}{$ztime}):</span> {$best['display']} ({$best['dist']}km, " . $best['time'] . "h)";
+    }
 } else {
     if ((defined ('debug')) && (debug > 0)) echo "no WX available";
 }    
