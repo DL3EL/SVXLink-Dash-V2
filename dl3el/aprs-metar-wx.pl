@@ -159,6 +159,7 @@ use POSIX qw(strftime);
 
 # --- KONFIGURATION ---
 my $pos_file    = '/var/www/html/dl3el/aprs-follow.pos';
+my $MetarFile = $dir  . "metar.csv";
 
 # 1. Position aus Datei lesen
 open(my $fh, '<', $pos_file) or die "Datei $pos_file nicht gefunden: $!";
@@ -170,47 +171,31 @@ chomp($raw_pos);
 my ($lat_aprs, $lon_aprs) = split(/\^/, $raw_pos);
 
 # Umwandlung für API (Dezimalgrad für die Suche)
-sub aprs_to_decimal {
-    my ($val, $dir) = @_;
-    my $deg = substr($val, 0, index($val, '.') - 2);
-    my $min = substr($val, index($val, '.') - 2);
-    my $dec = $deg + ($min / 60);
-    return ($dir =~ /[SW]/) ? $dec * -1 : $dec;
-}
 
 my $lat_dec = aprs_to_decimal(substr($lat_aprs, 0, 7), substr($lat_aprs, 7, 1));
 my $lon_dec = aprs_to_decimal(substr($lon_aprs, 0, 8), substr($lon_aprs, 8, 1));
 
 
-my $cmd = "http://relais.dl3el.de/cgi-bin/metar.pl?sel=latlondec&lat_dec=" . $lat_dec . "&lon_dec=" . $lon_dec . "&v=0";
-# 2. Nächstgelegenen Flughafen finden & METAR abrufen
-my $ua = LWP::UserAgent->new(timeout => 10);
+	my $cmd = "wget -O " . $MetarFile . " -q \"http://relais.dl3el.de/cgi-bin/metar.pl?sel=latlondec&lat_dec=" . $lat_dec . "&lon_dec=" . $lon_dec . "&v=0\"";
+	$cmd = `$cmd 2>&1`;
+	open($fh, '<', $MetarFile) or die "Datei $MetarFile nicht gefunden: $!";
+	my $raw_metar = <$fh>;
+	close($fh);
+	chomp($raw_metar);
 
-# Suche Station in der Nähe (Radius 50km)
-my $res = $ua->get($cmd);
-die "API Fehler" unless $res->is_success;
-my $content = "";
-$content = $res->decoded_content;
-#$content = "METAR EDDF 23017KT 9999 -SHRA SCT038 BKN046 FEW///TCU 09/04 Q1002 TEMPO 24020G30KT SHRA BKN020CB"; # nok
-#$content = "METAR EDDF 251150Z AUTO 22017KT 9999 SCT039 10/03 Q1002 TEMPO 24020G30KT SHRA BKN020CB"; # ok
-print "Original: [$content]\n";
-my $decoded = metar_to_aprs($content);
+# my $content = $raw_metar;
+print "Original: [$raw_metar]\n" if ($verbose >= 1);
+my $decoded = metar_to_aprs($raw_metar);
 my $icao = "EDDF";
 my $dist = 10;
-$message_time = act_time();
+	$message_time = act_time();
 
-			$write2file = sprintf "[$message_time]^%s\n",$decoded if ($verbose >= 0);
-			print_file($wxdatei,$write2file) if ($verbose >= 0);
-printf "APRS: %s %s\n",$decoded,$write2file;
-
-
-# Einfaches Parsen der Antwort (Regex statt schwerem JSON Modul für ein Standalone Script)
-#printf "Metar: %s\n",$content;
+	$write2file = sprintf "[$message_time]^%s\n",$decoded if ($verbose >= 0);
+	print_file($wxdatei,$write2file) if ($verbose >= 0);
+	printf "APRS: %s %s\n",$decoded,$write2file if ($verbose >= 1);
 
 
 sub metar_to_aprs {
-
-
 my ($raw_string) = @_;
 
     # 1. Splitten des Strings am '^'
@@ -276,16 +261,14 @@ my ($raw_string) = @_;
 
 ####
 # --- Funktion ---
-sub convert_latlon {
-    for my $coord (@_) {
-        if ($coord =~ /^(\d{2,3})(\d{2}\.\d+)([NSEW])$/) {
-            my ($deg, $min, $hem) = ($1, $2, $3);
-            my $dec = $deg + ($min / 60);
-            $dec *= -1 if $hem eq 'S' or $hem eq 'W';
-            $coord = sprintf("%.4f", $dec);
-        }
-    }
+sub aprs_to_decimal {
+    my ($val, $dir) = @_;
+    my $deg = substr($val, 0, index($val, '.') - 2);
+    my $min = substr($val, index($val, '.') - 2);
+    my $dec = $deg + ($min / 60);
+    return ($dir =~ /[SW]/) ? $dec * -1 : $dec;
 }
+
 
 sub print_file {
 	my $file = $_[0];
