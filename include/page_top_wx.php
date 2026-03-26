@@ -6,11 +6,23 @@ if (defined ('SVXNAME')) {
 
 $best_station = null;
 $wx_stn_found = 0;
+$now = time(); // Aktueller Zeitpunkt
+
 if (file_exists($wx_file)) {
     $lines = array_reverse(file($wx_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
     $stations = [];
 
     foreach ($lines as $line) {
+        // 1. Zeitstempel der Zeile extrahieren (Format: 25.03.2026 00:13:35)
+        // Wir nehmen den gesamten Inhalt der ersten Klammer [ ]
+        if (preg_match('/^\[(.*?)\]/', $line, $timeMatches)) {
+            $lineTime = strtotime($timeMatches[1]);
+        
+            // 2. Prüfen: Wenn die Zeile älter als 20 Min (1200 Sek) ist -> ignorieren
+            if ($now - $lineTime > 1200) {
+                continue; 
+            }
+        }
         // Extrahiere Call und den Rest
         if (preg_match('/\]\^(.*?)\^(.*)$/', $line, $matches)) {
             $call = $matches[1];
