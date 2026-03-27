@@ -44,6 +44,9 @@ if (file_exists($wx_file)) {
                         $data['dist'] = (float)$p;
                     } elseif (strpos($p, 'z') !== false) {
                         $ztime = $p;
+                    } elseif (strpos($p, 'span') !== false) {
+                        # do not count wind
+                        $info[] = $p;
                     } else {
                         $data['score']++; // Jeder Wetter-Datenpunkt erhöht die Qualität
                         $info[] = $p;
