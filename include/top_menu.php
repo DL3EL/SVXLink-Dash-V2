@@ -195,7 +195,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a class="hreflink" href="./authorise.php" > | Authorise</a>';
 	}
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
-	    echo '<a class="hreflink" href="/DVSwitch/index.php" > | DVS</a></p>';
+	    echo '<a class="hreflink" href="/DVSwitch/index.php" target="dvs"> | DVS</a></p>';
 	}
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 //	    echo '<a href="/" style = "color: #0000ff;">| Reflector</a></p>';
@@ -327,7 +327,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 ///// Profile / reflektoren
 	$refnr = 1;
-	while ($refnr < 6) {
+	while ($refnr < 7) {
 	    $ref_conf = DL3EL.'/Reflector' . $refnr . '.conf';
 	    if (file_exists($ref_conf)) {
 		if ($refnr === 1) {
