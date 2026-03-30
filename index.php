@@ -162,11 +162,6 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     include_once "include/lh.php";
     echo '</div></center>'."\n";
 
-    if ($dmr_support == "1") {
-        echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
-//        include_once "/var/www/html/DVSwitch/include/lh.php";
-        echo '</div></center>'."\n";
-    }    
 // --- NEU: Container für die Anzeige ---
     if (!check_network($fmnetwork,"uk.wide.svxlink.uk")) {
       if ($mqtt) {
