@@ -430,7 +430,7 @@ $dvsmode = OFF | DMR | YSF | DSTAR
                     echo '	<button name="btn_DSTAR_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR Discon</b></button>';
                     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                 }
-                echo "<br>Config:$file($radio) / mode:$mode / DVS Mode:$dvsmode";
+                echo "<br>Configfile:$file($radio) / mode:$mode / DVS Mode:$dvsmode";
                 echo '</form>';
     ?>
     </table>    
