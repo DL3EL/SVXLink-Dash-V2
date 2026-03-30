@@ -52,6 +52,7 @@ if (file_exists($wx_file)) {
                         $info[] = $p;
                     }
                 }
+                if ((defined ('debug')) && (debug > 0)) echo "WX found: $call [" . $content . "], Score:" . $data['score'] . " <br>";;
                 $data['display'] = implode(' | ', $info);
                 $data['time'] = $time;
                 $data['ztime'] = $ztime;
@@ -66,6 +67,7 @@ if (file_exists($wx_file)) {
         }
     }
     if (!$wx_stn_found) {
+/*alt
         // Sortierung: Erst nach höchstem Score (viele Daten), dann nach kleinster Distanz
         usort($stations, function($a, $b) {
             if ($b['score'] === $a['score']) {
@@ -73,9 +75,33 @@ if (file_exists($wx_file)) {
             }
             return $b['score'] <=> $a['score'];
         });
+*/
+        // Sortierung: Innerhalb von 10km nach Score, danach nur nach Entfernung
+usort($stations, function($a, $b) {
+    $radius = 10; // 10 km Grenze
+
+    // Fall 1: Beide Stationen sind innerhalb von 10km
+    // -> Hier gewinnt der höhere Score
+    if ($a['dist'] <= $radius && $b['dist'] <= $radius) {
+        if ($b['score'] === $a['score']) {
+            return $a['dist'] <=> $b['dist']; // Bei gleichem Score: Nähere gewinnt
+        }
+        return $b['score'] <=> $a['score'];
+    }
+
+    // Fall 2: Eine Station ist nah (<=10km), die andere weit weg (>10km)
+    // -> Die nähere Station gewinnt immer (unabhängig vom Score)
+    if ($a['dist'] <= $radius && $b['dist'] > $radius) return -1;
+    if ($a['dist'] > $radius && $b['dist'] <= $radius) return 1;
+
+    // Fall 3: Beide sind außerhalb von 10km
+    // -> Hier gewinnt die absolut kleinere Entfernung
+    return $a['dist'] <=> $b['dist'];
+});
         if (count($stations) > 0) {
             $best = $stations[0];
             $ztime = "";
+            if ((defined ('debug')) && (debug > 0)) echo "# WX found:" . count($stations) . ", selected:{$best['call']}, with Score:{$best['score']}<br>";
             if (isset($best['ztime']) && !empty($best['ztime'])) {
                 $ztime = ", " . $best['ztime'];
             }    
