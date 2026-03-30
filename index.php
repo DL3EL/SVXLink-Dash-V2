@@ -164,7 +164,7 @@ if ($_SESSION['auth'] === "AUTHORISED") {
 
     if ($dmr_support == "1") {
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
-        include_once "/var/www/html/DVSwitch/include/lh.php";
+//        include_once "/var/www/html/DVSwitch/include/lh.php";
         echo '</div></center>'."\n";
     }    
 // --- NEU: Container für die Anzeige ---
