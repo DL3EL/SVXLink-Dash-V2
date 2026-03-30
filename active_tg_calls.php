@@ -65,7 +65,9 @@ $name = isset($tgdb_array[$active_tg]) ? $tgdb_array[$active_tg] : '---';
 
     if (isset($_GET['ref']) && !empty($_GET['ref'])) {
         $reflectorlogic1 = $_GET['ref']; 
-    }   
+    } else {  
+       $reflectorlogic1 = "";
+    }    
     if ((defined ('debug')) && (debug > 0)) echo " benutze Reflectorlogic: [$reflectorlogic1] <br>";
     $tgselect = trim(getSVXTGSelect($reflectorlogic1));
 
