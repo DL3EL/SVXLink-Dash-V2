@@ -96,13 +96,13 @@ $dvsmode = OFF | DMR | YSF | DSTAR
         $kanal = "OV F49";
 
 // Hauptreflector ausschalten, DVS only
+sleep(1);
         $command = "echo '*9#' > /tmp/dtmf_svx";
         exec($command,$screen,$retval);
-//sleep(5);
 // F49-Reflector ausschalten, DVS only
-            $command = "echo '*8#' > /tmp/dtmf_svx";
-            exec($command,$screen,$retval);
-//sleep(5);
+sleep(1);
+        $command = "echo '*8#' > /tmp/dtmf_svx";
+        exec($command,$screen,$retval);
         $file = "dmr_only";
 //        $command = "sudo service svxlink restart 2>&1";
 //        exec($command,$screen,$retval);
