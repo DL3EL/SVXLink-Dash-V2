@@ -87,35 +87,31 @@ $dvsmode = OFF | DMR | YSF | DSTAR
 
     if (isset($_POST['btn_DVS_only']))
     {
-// dvs ist "7", einschalten
-        $command = "echo '*71#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
+        if (($mode == "FM_only")  && ($file === "dmr_fm")) {
+            $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
+            exec($command,$screen,$retval);
+        }
         $mode ="DVS_only";
         $color = "red";
         $colorb = "blue";
         $kanal = "OV F49";
-
-// Hauptreflector ausschalten, DVS only
-sleep(1);
-        $command = "echo '*9#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
-// F49-Reflector ausschalten, DVS only
-sleep(1);
-        $command = "echo '*8#' > /tmp/dtmf_svx";
+        $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
         exec($command,$screen,$retval);
         $file = "dmr_only";
-//        $command = "sudo service svxlink restart 2>&1";
-//        exec($command,$screen,$retval);
+        $command = "sudo service svxlink restart 2>&1";
+        exec($command,$screen,$retval);
         $dmrtg = $DMRdefTG;
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune " . $dmrtg . " 2>&1";
         exec($command,$screen,$retval);
-        $dmrstatus = "DVS_only >" . $DMRStatusFile;
-        shell_exec("echo $dmrstatus");
-        $dmrtgsel = $dmrtg . " >" . $DMRTGFile;
-        shell_exec("echo $dmrtgsel");
-        $dvsmode = "DMR >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "DMR";
+        if (defined('DL3EL')) {
+            $dmrstatus = "DVS_only >" . $DMRStatusFile;
+            shell_exec("echo $dmrstatus");
+            $dmrtgsel = $dmrtg . " >" . $DMRTGFile;
+            shell_exec("echo $dmrtgsel");
+            $dvsmode = "DMR >" . $DVSModeFile;
+            shell_exec("echo $dvsmode");
+            $dvsmode = "DMR";
+        }    
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DMR 2>&1";
         exec($command,$screen,$retval);
     }
@@ -159,19 +155,44 @@ sleep(1);
     }
     if (isset($_POST['btn_DVS_only_DISC']))
     {
-        $command = "echo '*7#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
-        $command = "echo '*91#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
+        if ($mode == "DMR_FM") {
+            $command = "echo '*7#' > /tmp/dtmf_svx";
+            exec($command,$screen,$retval);
+            $command = "echo '*91262649#' > /tmp/dtmf_svx";
+            exec($command,$screen,$retval);
+            if ($file !== "dmr_fm") {
+                $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_fm /etc/svxlink/svxlink.conf 2>&1";
+                exec($command,$screen,$retval);
+                $file = "dmr_fm";
+                $command = "sudo service svxlink restart 2>&1";
+                exec($command,$screen,$retval);
+            }
+        } else {
+            if ($dvsmode == "DMR") {
+                $command = "/opt/MMDVM_Bridge/dvswitch.sh tune 4000 2>&1";
+                exec($command,$screen,$retval);
+            }    
+            if ($file === "dmr_only") {
+                $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_only 2>&1";
+                exec($command,$screen,$retval);
+                $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_fm /etc/svxlink/svxlink.conf 2>&1";
+                exec($command,$screen,$retval);
+                $command = "sudo service svxlink restart 2>&1";
+                exec($command,$screen,$retval);
+                $file = "dmr_fm";
+            }
+        }
         $mode ="FM_only";
         $color = "blue";
         $colorb = "blue";
         $kanal = "disconnect";
-        $dmrstatus = "FM_only >" . $DMRStatusFile;
-        shell_exec("echo $dmrstatus");
-        $dvsmode = "OFF >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "OFF";
+        if (defined('DL3EL')) {
+            $dmrstatus = "FM_only >" . $DMRStatusFile;
+            shell_exec("echo $dmrstatus");
+            $dvsmode = "OFF >" . $DVSModeFile;
+            shell_exec("echo $dvsmode");
+            $dvsmode = "OFF";
+        }    
         if ($dmr_support == "1") {
             $dmrtg = "off";
         } else {
@@ -182,31 +203,30 @@ sleep(1);
 // YSF
     if (isset($_POST['btn_YSF_only']))
     {
-//
-// dvs ist "7", einschalten
-        $command = "echo '*71#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
-// Hauptreflector ausschalten, DVS only
-        $command = "echo '*9#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
-//sleep(5);
-// F49-Reflector ausschalten, DVS only
-            $command = "echo '*8#' > /tmp/dtmf_svx";
+        if (($mode == "FM_only") && ($file === "dmr_fm")) {
+            $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
             exec($command,$screen,$retval);
-//
+        }
         $mode ="DVS_only";
         $color = "red";
         $colorb = "blue";
+        $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
+        exec($command,$screen,$retval);
+        $file = "dmr_only";
+        $command = "sudo service svxlink restart 2>&1";
+        exec($command,$screen,$retval);
         $dvsmode ="YSF";
         $kanal = " ";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode YSF 2>&1";
         exec($command,$screen,$retval);
 
-        $dvsmode = "YSF >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "YSF";
-        $dmrstatus = "DVS_only >" . $DMRStatusFile;
-        shell_exec("echo $dmrstatus");
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+           $dmrstatus = "DVS_only >" . $DMRStatusFile;
+           shell_exec("echo $dmrstatus");
+        }    
     }
 
     if (isset($_POST['btn_YSF']))
@@ -231,9 +251,11 @@ sleep(1);
         $kanal = "disconnect";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune disconnect 2>&1";
         exec($command,$screen,$retval);
-        $dvsmode = "YSF >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "YSF";
+        if (defined('DL3EL')) {
+           $dvsmode = "YSF >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "YSF";
+        }    
     }
 
     if (isset($_POST['btn_YSF_HES']))
@@ -266,30 +288,30 @@ sleep(1);
 // DSTAR
     if (isset($_POST['btn_DSTAR_only']))
     {
-// dvs ist "7", einschalten
-        $command = "echo '*71#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
-// Hauptreflector ausschalten, DVS only
-        $command = "echo '*9#' > /tmp/dtmf_svx";
-        exec($command,$screen,$retval);
-//sleep(5);
-// F49-Reflector ausschalten, DVS only
-            $command = "echo '*8#' > /tmp/dtmf_svx";
+        if (($mode == "FM_only") && ($file === "dmr_fm")) {
+            $command = "sudo cp -p /etc/svxlink/svxlink.conf /etc/svxlink/svxlink.conf.dmr_fm 2>&1";
             exec($command,$screen,$retval);
+        }
         $mode ="DVS_only";
         $color = "red";
         $colorb = "blue";
+        $command = "sudo cp -p /etc/svxlink/svxlink.conf.dmr_only /etc/svxlink/svxlink.conf 2>&1";
+        exec($command,$screen,$retval);
         $file = "dmr_only";
+        $command = "sudo service svxlink restart 2>&1";
+        exec($command,$screen,$retval);
         $dvsmode ="DSTAR";
         $kanal = " ";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DSTAR 2>&1";
         exec($command,$screen,$retval);
 
-        $dvsmode = "DSTAR >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "DSTAR";
-        $dmrstatus = "DVS_only >" . $DMRStatusFile;
-        shell_exec("echo $dmrstatus");
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+           $dmrstatus = "DVS_only >" . $DMRStatusFile;
+           shell_exec("echo $dmrstatus");
+        }    
     }
 
     if (isset($_POST['btn_DSTAR']))
@@ -298,9 +320,11 @@ sleep(1);
         $kanal = " ";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DSTAR 2>&1";
         exec($command,$screen,$retval);
-        $dvsmode = "DSTAR >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "DSTAR";
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+        }    
     }
 
 
@@ -310,9 +334,11 @@ sleep(1);
         $kanal = "disconnect";
         $command = "/opt/MMDVM_Bridge/dvswitch.sh tune disconnect 2>&1";
         exec($command,$screen,$retval);
-        $dvsmode = "DSTAR >" . $DVSModeFile;
-        shell_exec("echo $dvsmode");
-        $dvsmode = "DSTAR";
+        if (defined('DL3EL')) {
+           $dvsmode = "DSTAR >" . $DVSModeFile;
+           shell_exec("echo $dvsmode");
+           $dvsmode = "DSTAR";
+        }    
 //        echo '<pre>D* 1KL'; print_r($screen); echo '</pre>';
     }
 
