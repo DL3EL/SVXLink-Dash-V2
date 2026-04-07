@@ -1368,6 +1368,8 @@ echo "<br>Stat: $cmd";
         $logics_all = $svxconfig[$section]['LOGICS'];
         $logics_arry = explode(",", $logics_all);
         $section = $logics_arry[1];
+//echo "Section: [$section]<br>";
+addsvxlog("1Section: [" . $section . "]<br>");
       } else {    
 // das hier noch variable gestalten, Reflectorlogic kann anders heissen
         $section = "ReflectorLogic";
@@ -1384,6 +1386,7 @@ echo "<br>Stat: $cmd";
         } else {
           $fmnetwork = "";
         }    
+addsvxlog("2Section: [" . $section . "]<br>");
         if (!strlen($fmnetwork)) {
           if (isset($svxconfig[$section]['DNS_DOMAIN'])) {
             $fmnetwork = $svxconfig[$section]['DNS_DOMAIN'];
