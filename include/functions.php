@@ -1363,7 +1363,7 @@ echo "<br>Stat: $cmd";
 
     function getfmnetwork (&$nodeinfo = null) {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
-      $section = "Global";
+      $section = "GLOBAL";
       if (isset($svxconfig[$section]['LOGICS'])) {
         $logics_all = $svxconfig[$section]['LOGICS'];
         $logics_arry = explode(",", $logics_all);
