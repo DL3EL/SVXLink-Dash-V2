@@ -1363,22 +1363,16 @@ echo "<br>Stat: $cmd";
 
     function getfmnetwork (&$nodeinfo = null) {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
-      $section = "GLOBAL";
-      if (isset($svxconfig[$section]['LOGICS'])) {
-        $logics_all = $svxconfig[$section]['LOGICS'];
-        $logics_arry = explode(",", $logics_all);
-        $section = $logics_arry[1];
-//echo "Section: [$section]<br>";
-addsvxlog("1Section: [" . $section . "]<br>");
-      } else {    
-// das hier noch variable gestalten, Reflectorlogic kann anders heissen
-        $section = "ReflectorLogic";
-      }  
       if (fopen($svxConfigFile,'r')) { 
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
-//        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $svxconfig[$section]['DNS_DOMAIN'];
-//        $svxconfig = custom_parse_ini_file($svxConfigFile);
-//        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS']['value'] : $svxconfig[$section]['DNS_DOMAIN']['value'];
+        $section = "GLOBAL";
+        if (isset($svxconfig[$section]['LOGICS'])) {
+          $logics_all = $svxconfig[$section]['LOGICS'];
+          $logics_arry = explode(",", $logics_all);
+          $section = $logics_arry[1];
+        } else {    
+          $section = "ReflectorLogic";
+        }  
         if (isset($svxconfig[$section]['HOSTS'])) {
           $fmnetwork_all = $svxconfig[$section]['HOSTS'];
           $fmnetwork_arry = explode(",", $fmnetwork_all);
@@ -1386,7 +1380,6 @@ addsvxlog("1Section: [" . $section . "]<br>");
         } else {
           $fmnetwork = "";
         }    
-addsvxlog("2Section: [" . $section . "]<br>");
         if (!strlen($fmnetwork)) {
           if (isset($svxconfig[$section]['DNS_DOMAIN'])) {
             $fmnetwork = $svxconfig[$section]['DNS_DOMAIN'];
