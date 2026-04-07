@@ -1363,8 +1363,15 @@ echo "<br>Stat: $cmd";
 
     function getfmnetwork (&$nodeinfo = null) {
       $svxConfigFile = SVXCONFPATH . SVXCONFIG;
+      $section = "Global";
+      if (isset($svxconfig[$section]['LOGICS'])) {
+        $logics_all = $svxconfig[$section]['LOGICS'];
+        $logics_arry = explode(",", $logics_all);
+        $section = $logics_arry[1];
+      } else {    
 // das hier noch variable gestalten, Reflectorlogic kann anders heissen
-      $section = "ReflectorLogic";
+        $section = "ReflectorLogic";
+      }  
       if (fopen($svxConfigFile,'r')) { 
         $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
 //        $fmnetwork_all = isset($svxconfig[$section]['HOSTS']) ? $svxconfig[$section]['HOSTS'] : $svxconfig[$section]['DNS_DOMAIN'];
