@@ -1541,7 +1541,7 @@ echo "<br>Stat: $cmd";
         $delta = time() - filemtime($cron_File);
         $target = filemtime($cron_File) + $timer;
         date_default_timezone_set('Europe/Berlin');
-        echo "Nächster \"Cleanup\"-Lauf: " . date ("d.m.y H:i:s ", $target) . "<br>";;
+        echo "<br>Nächster \"Cleanup\"-Lauf: " . date ("d.m.y H:i:s ", $target) . "<br>";;
 
         if ((defined ('debug')) && (debug > 0)) echo "$cron_File was last modified: " . date ("F d Y H:i:s ", filemtime($cron_File)) . "(Delta: $delta) <br>x";
       
