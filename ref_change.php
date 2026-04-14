@@ -2,12 +2,14 @@
 
     <form method="post"  style="display: inline;" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
     <?php
+        $globber = DL3EL . "/Reflector*.conf";
+        $nr_of_profiles = count_files($globber);
         $file = SVXCONFPATH.SVXCONFIG;
         $RefModeFile = DL3EL . "/ref_mode";
         $refmode = file_get_contents($RefModeFile);
         $color = "blue";
 
-        for ($i = 1; $i <= 6; $i++) {
+        for ($i = 1; $i <= $nr_of_profiles; $i++) {
             $ref_conf = DL3EL.'/Reflector' . $i . '.conf';
             if (file_exists($ref_conf)) {
                 $konstanten_name = "DL3EL_REF" . $i . "_BUTTON";
@@ -28,9 +30,13 @@
 
 <?php
 
+    $globber = DL3EL . "/Reflector*.conf";
+    $nr_of_profiles = count_files($globber);
+    if ((defined ('debug')) && (debug > 0)) echo "Profile gefunden: $nr_of_profiles <br>";
+    
     $RefModeFile = DL3EL . "/ref_mode";
-// Wir prüfen alle Reflektoren von 1 bis 10
-    for ($i = 1; $i <= 6; $i++) {
+// Wir prüfen alle Reflektoren von 1 bis $nr_of_profiles
+    for ($i = 1; $i <= $nr_of_profiles; $i++) {
         $btn_name = "btn_REF" . $i;
     
         if (isset($_POST[$btn_name])) {

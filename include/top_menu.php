@@ -83,9 +83,13 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 //	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
 //	if ($fmnetwork === "uk.wide.svxlink.uk") {
-	if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://ukwide.svxlink.net">UK Monitor | </a> ';
-	} else {
+	if ((defined ('debug')) && (debug > 0)) echo "UK: $uknetwork NA: $nanetwork <br>";
+
+	if (check_network($fmnetwork,$uknetwork)) {
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $uknetwork_state . '">UK Monitor | </a> ';
+	} elseif (check_network($fmnetwork,$nanetwork)) {
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $nanetwork_state . '">US Monitor | </a> ';
+	} else {    
 	    if (file_exists("/usr/local/bin/mqtt-simple")) {
 //	    echo '<a href="./caller.php?id=monitor0&refresh=' . DL3EL_MONREFRESH . '" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 		echo '<a class="hreflink" href="./caller.php?id=monitor&refresh=15" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
@@ -326,8 +330,10 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	}
 ///// Profile / reflektoren
+        $globber = DL3EL . "/Reflector*.conf";
+        $nr_of_profiles = count_files($globber) +1;
 	$refnr = 1;
-	while ($refnr < 7) {
+	while ($refnr < $nr_of_profiles) {
 	    $ref_conf = DL3EL.'/Reflector' . $refnr . '.conf';
 	    if (file_exists($ref_conf)) {
 		if ($refnr === 1) {

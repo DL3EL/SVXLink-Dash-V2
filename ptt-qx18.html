@@ -87,7 +87,18 @@ if (!strlen($status)) { $status = exec("amixer -c $sc get Lineout | grep % | awk
 
 // 1. PTT BUTTON (Kompakt an der Seite)
 //echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
-echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
+//
+  $rxtx_state = "/tmp/svxlink_last_state.txt";
+  if (file_exists($rxtx_state)) { 
+      $content = file_get_contents($rxtx_state);
+      if (strpos($content, "OPEN")) {
+        echo '<button id="myButton" style="width:120px; color:white; background-color:red; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic ON</button>';
+      } else {  
+        echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
+      }    
+    }
+//
+//echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
 
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';

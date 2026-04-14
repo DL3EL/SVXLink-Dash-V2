@@ -460,7 +460,9 @@ if (defined ('SVXMQTT_COLOR_passive')) {
         <?php
         // Definition Button TG Wechsel
         if (isset($_POST["dtmfsvx"])) {
-            $exec = "echo '*91" . $_POST['dtmfsvx'] . "#' > /tmp/dtmf_svx";	//FM Funknetz TG Link Ausführung
+//            $exec = "echo '*91" . $_POST['dtmfsvx'] . "#' > /tmp/dtmf_svx";	//FM Funknetz TG Link Ausführung
+            $dtmf_pty = get_pty();
+            $exec = "echo '*91" . $_POST['dtmfsvx'] . "#' > " . $dtmf_pty;	//FM Funknetz TG Link Ausführung
             exec($exec, $output);
             echo "<meta http-equiv='refresh' content='0'>";
         }

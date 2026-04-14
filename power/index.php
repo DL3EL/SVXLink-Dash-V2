@@ -257,7 +257,7 @@ if (isset($_POST['btnDashUpdate']))
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 3\n");
                 if (!strlen($fmnetwork)) {
-                    $fmnetwork = getfmnetwork();
+                        $fmnetwork = getfmnetwork();
                 }     
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
                 $useragent = str_replace(";",",",$useragent); 
@@ -405,13 +405,13 @@ if (isset($_POST['btnCleanUp']))
                     } else {
                         echo "<br>Github Version:$gitversion entspricht der installierten Version:$version, kein Update notwendig<br>";
                         echo "<br><br>";
-                        handle_cleanup();
-                        echo "<br>Der Cleanup Lauf läuft automatisch alle 24 Stunden.<br>Es ist normalerweise nicht notwendig, einen Cleanup Lauf manuell anzustarten.<br>";
-                        echo "Sollte es im System Unregelmäffigkeiten geben und ein adhoc Cleanup Lauf wird empfohlen, kann dieser hier gestartet werden.<br>";
-                        echo '<button name="btnCleanUp" type="submit" class="bleu" style = "height:30px; width:400px; font-size:12px;">jetzt CleanUp starten</button>';
                     }    
                 }
             }  
+            handle_cleanup();
+            echo "<br>Der Cleanup Lauf läuft automatisch alle 24 Stunden.<br>Es ist normalerweise nicht notwendig, einen Cleanup Lauf manuell anzustarten.<br>";
+            echo "Sollte es im System Unregelmäffigkeiten geben und ein adhoc Cleanup Lauf wird empfohlen, kann dieser hier gestartet werden.<br>";
+            echo '<button name="btnCleanUp" type="submit" class="bleu" style = "height:30px; width:400px; font-size:12px;">jetzt CleanUp starten</button>';
         }
   }
 

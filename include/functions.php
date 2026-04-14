@@ -567,6 +567,19 @@ function getLastHeard($logLines) {
 //14.06.2021 16:57:33: Tx1: Turning the transmitter OFF
 
 function getTXInfo() {
+
+	$rxtx_state = "/tmp/svxlink_last_state.txt";
+  if (file_exists($rxtx_state)) { 
+      $content = file_get_contents($rxtx_state);
+      if (strpos($content, "ON")) { 
+          return "<tr><td style=\"background:#ff6600;color:white;\"><div style=\"margin-top:2px;margin-bottom:2px;font-weight:bold;\">TX</div></td></tr>\n";       
+      }    
+      if (strpos($content, "OPEN")) {
+          return "<tr><td style=\"background:#4aa361;color:black;\"><div style=\"margin-top:2px;margin-bottom:2px;font-weight:bold;\">RX</div></td></tr>\n";
+      } 
+      return  "<td style=\"background:#c3e5cc;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#464646;font-weight:bold;\">Listening</div></td></tr>\n"; 
+  }
+
 	$logPath = SVXLOGPATH.SVXLOGPREFIX;
 	if (file_exists(SVXLOGPATH.SVXLOGPREFIX)) { 
                 $txstat =`tail -10000 $logPath | egrep -a -h "Turning the transmitter|squelch is|squelch for" | tail -1`; 
@@ -1102,14 +1115,28 @@ function display_config($config) {
       $test = 0;
       $globber = DL3EL . "/aprs-is-msg.conf.20*";
       delete_old_copies($globber,$max_kept,$cron_File,$test);
-      $globber = DL3EL . "/Reflector1.conf.20*";
+      $globber = DL3EL . "/Reflector*.conf.20*";
       delete_old_copies($globber,$max_kept,$cron_File,$test);
+/*
       $globber = DL3EL . "/Reflector2.conf.20*";
       delete_old_copies($globber,$max_kept,$cron_File,$test);
       $globber = DL3EL . "/Reflector3.conf.20*";
       delete_old_copies($globber,$max_kept,$cron_File,$test);
       $globber = DL3EL . "/Reflector4.conf.20*";
       delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector5.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector6.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector7.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector8.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector9.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+      $globber = DL3EL . "/Reflector10.conf.20*";
+      delete_old_copies($globber,$max_kept,$cron_File,$test);
+*/
 // 3a. Clear LogFile
       $db_File = DL3EL . "/db.log";
       $db_File_size = filesize($db_File);
@@ -1159,7 +1186,14 @@ function display_config($config) {
           touch($db_File);
       }
 // 3f. Clear UK-Cache
-      $db_File = DL3EL . "/uk-cache.json";
+      $db_File = DL3EL . "/uk_cache.json";
+      $db_File_size = filesize($db_File);
+      if ($db_File_size > 100000) {
+          rename($db_File, $db_File . ".bak");
+          touch($db_File);
+      }
+// 3f. Clear QSO-Cache
+      $db_File = DL3EL . "/qsos_cache.json";
       $db_File_size = filesize($db_File);
       if ($db_File_size > 100000) {
           rename($db_File, $db_File . ".bak");
@@ -1334,6 +1368,18 @@ echo "<br>Stat: $cmd";
       file_put_contents($tgdb_File, $content);
       include_once DL3EL_BASE . "include/tg_ext.php";
     }
+
+    function count_files($globber) {
+//      $globber = DL3EL . "/Reflector*.conf";
+//     count_files($globber);
+    $numberoffiles = 0;
+    $file_array = glob($globber);
+    foreach ($file_array as $filename) {
+      if ((defined ('debug')) && (debug > 2)) echo "F:$filename<br>";
+      ++$numberoffiles;
+    }
+    return ($numberoffiles);
+}    
 
     function addlog ($logfile,$logtext) {
       if (((defined ('debug')) && (debug > 0)) || ($logfile === "F")) {

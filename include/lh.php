@@ -2,10 +2,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include_once "config.php";         
-include_once "tools.php";        
-include_once "functions.php";    
-
+//include_once "config.php";         
+//include_once "tools.php";        
+//include_once "functions.php";    
+include_once "settings.php";    
 
 echo '<span style = "font-size:25px"> </span>';
 echo '<span style = "font-weight:bold; font-size:15px;">SVXReflector Activity</span>';
@@ -79,7 +79,8 @@ echo '<th width=100px>Callsign</th>';
 	shell_exec("echo $dmrtgsel");
       }
 //include_once "tgdb.php";    
-if ($fmnetwork === "uk.wide.svxlink.uk") {
+//if ($fmnetwork === "uk.wide.svxlink.uk") {
+if (($fmnetwork === $uknetwork) || ($fmnetwork === $nanetwork)) {
 include_once "tgdb_uk.php";    
 } else {
 include_once "tgdb.php";    
@@ -126,11 +127,15 @@ for ($i = 0;  ($i <= 35); $i++) { //Last 35 calls
 	  $call = substr($listElem[1],0,$ssid);
 	}
 
-	if ((defined ('DL3EL_LH_DETAIL') && (DL3EL_LH_DETAIL === "FMN"))) {
-	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$listElem[1]."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
-	} else {
+	if (($fmnetwork === $uknetwork) || ($fmnetwork === $nanetwork) || (!defined ('DL3EL_LH_DETAIL'))) {
 	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
-	}
+	} else {  
+	  if ((defined ('DL3EL_LH_DETAIL') && (DL3EL_LH_DETAIL === "FMN"))) {
+	    echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$listElem[1]."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
+	  } else {
+	    echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;</td>";
+	  }
+	}  
       }
 //////////////////// NEU //////////////Add Name ///////////////////////////////////////////////////////////////////////////////////////
       if ($use_names) {

@@ -30,20 +30,13 @@ function loadUkTgDatabase() {
 }
 
 $uk_tgs = loadUkTgDatabase();
-$cacheFile = __DIR__ . "/dl3el/uk_cache.json";
+$cacheFile = __DIR__ . "/dl3el/qsos_cache.json"; // Separater Cache für QSOS
 $currentTime = time();
 $dateStr = date("H:i:s");
 $refLog = isset($reflectorlogic1) ? $reflectorlogic1 : "ReflectorLogic";
 
-// 2. Daten vom Web laden
-if ((defined ('debug')) && (debug > 0)) echo "UK: $uknetwork NA: $nanetwork <br>";
-if (check_network($fmnetwork,$uknetwork)) {
-    $url = "https://" . $uknetwork_state . "/status.php?json";
-} 
-if (check_network($fmnetwork,$nanetwork)) {
-    $url = "https://" . $nanetwork_state . "/status.php?json";
-}
-//$url = "https://ukwide.svxlink.net/status.php?json";
+// 2. Daten vom Web laden (QSOS Status)
+$url = "https://svxlink.qsos.uk/status";
 $jsonRaw = @file_get_contents($url);
 $webData = json_decode($jsonRaw, true);
 $webNodes = isset($webData['nodes']) ? $webData['nodes'] : [];
@@ -61,8 +54,8 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         if (isset($info['hidden']) && $info['hidden'] === true) continue;
 
         $isTalking = isset($info['isTalker']) && $info['isTalker'] === true;
-//        $tg = (isset($info['monitoredTGs']) && !empty($info['monitoredTGs'])) ? $info['monitoredTGs'][0] : "---";
-        $tg = (isset($info['tg']) && !empty($info['tg'])) ? $info['tg'] : "---";
+        // In QSOS JSON ist 'tg' oft 0 wenn inaktiv, daher prüfen wir monitoredTGs als Fallback
+        $tg = ($info['tg'] != 0) ? $info['tg'] : ((isset($info['monitoredTGs'][0])) ? $info['monitoredTGs'][0] : "---");
         
         $tgName = "";
         if (isset($uk_tgs[$tg])) {
@@ -73,18 +66,20 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         
         $displayTG = ($tgName !== "") ? "<span>$tg</span><br><small>" . htmlspecialchars($tgName) . "</small>" : "<span>$tg</span>";
         $safeName = htmlspecialchars($nodeName);
+
         if ($isTalking) {
-            if (!isset($cache[$nodeName]['start_ts']) || (isset($cache[$nodeName]['talking']) && $cache[$nodeName]['talking'] === false)) {
-                $cache[$nodeName]['start_ts'] = $currentTime;
-                $cache[$nodeName]['start_str'] = $dateStr;
-            }
+            // Startzeitpunkt aus dem JSON konvertieren oder aktuelles System nutzen
+            $startTime = isset($info['talkingStartedAt']) ? strtotime($info['talkingStartedAt']) : $currentTime;
+            
+            $cache[$nodeName]['start_ts'] = $startTime;
+            $cache[$nodeName]['start_str'] = date("H:i:s", $startTime);
             $cache[$nodeName]['last_end'] = $dateStr; 
             $cache[$nodeName]['talking'] = true;
             $cache[$nodeName]['tg'] = $tg;
             $cache[$nodeName]['tgName'] = $tgName;
 
-            $duration = $currentTime - $cache[$nodeName]['start_ts'];
-            $active_rows .= "<tr style='height:40px; border-bottom: 1px solid #ddd; background-color: rgba(40, 167, 69, 0.2);' class='ukw-talking' data-start='".$cache[$nodeName]['start_ts']."'>"
+            $duration = $currentTime - $startTime;
+            $active_rows .= "<tr style='height:40px; border-bottom: 1px solid #ddd; background-color: rgba(40, 167, 69, 0.2);' class='ukw-talking' data-start='".$startTime."'>"
                           . "<td style='width:25%;'>&nbsp;&nbsp;<b>$safeName</b></td>"
                           . "<td style='width:35%; padding:4px;'><button type='submit' name='jmptoA' value='$tg' class='ukw-btn-active' style='$svxmqtt_color_active;'>$displayTG</button></td>"
                           . "<td style='width:20%; text-align:center;'>".$cache[$nodeName]['start_str']."</td>"
@@ -134,10 +129,7 @@ if (!empty($cache)) {
 
 <div class="ukw-table-container" id="ukw-wrapper">
     <div style="font-weight:bold; margin-bottom:5px; font-family: Arial, sans-serif;">
-<!--
-        <a class="ukw-link" href="https://ukwide.svxlink.net/status.php" target="_blank">UK-Wide Status</a> 
--->        
-        World-Wide Status
+        QSOS.UK Status
         <span id="ukw-clock" style="font-weight:normal; font-size:13px; margin-left:10px; color: #555;">
             <?php echo $dateStr; ?>
         </span>
@@ -152,7 +144,7 @@ if (!empty($cache)) {
                 </tr>
             </thead>
             <tbody>
-                <?php echo $active_rows ?: "<tr><td colspan='4' style='text-align:center; padding:15px; color:#777;'>Kein Funkbetrieb</td></tr>"; ?>
+                <?php echo $active_rows ?: "<tr><td colspan='4' style='text-align:center; padding:15px; color:#777;'>Kein Funkbetrieb (QSOS)</td></tr>"; ?>
                 <tr style="background-color:#ddd;"><td colspan="4" style="padding:4px; font-size:11px; color:#444;">&nbsp;<b>Zuletzt aktive Nodes</b></td></tr>
                 <?php echo $history_rows; ?>
             </tbody>
@@ -162,7 +154,6 @@ if (!empty($cache)) {
 
 <script>
 (function() {
-    // 1. Timer für Uhrzeit und Dauer
     if (window.ukwInterval) clearInterval(window.ukwInterval);
     window.ukwInterval = setInterval(function() {
         const now = new Date();
@@ -172,9 +163,11 @@ if (!empty($cache)) {
         document.querySelectorAll('.ukw-talking').forEach(function(row) {
             const start = parseInt(row.getAttribute('data-start'));
             const durationCell = row.querySelector('.ukw-duration');
-            if (durationCell) durationCell.innerText = (nowTs - start) + 's';
+            if (durationCell) {
+                const diff = nowTs - start;
+                durationCell.innerText = (diff > 0 ? diff : 0) + 's';
+            }
         });
     }, 1000);
 })();
 </script>
-

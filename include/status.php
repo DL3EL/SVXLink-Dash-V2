@@ -95,6 +95,19 @@ if (isProcessRunning('svxlink')) {
    if (fopen($svxConfigFile,'r')) {
       $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
    }
+// status_pty
+   $status_pty = isset($svxconfig['SimplexLogic']['STATE_PTY']) ? $svxconfig['SimplexLogic']['STATE_PTY'] : "";
+   if ($status_pty !== "n/a") {
+      $status_script = shell_exec("pgrep status_pty.pl");
+      if (!strlen($status_script)) {
+         $cmd = DL3EL . "/status_pty.pl >/dev/null &";
+         echo "Starting Status_PTY ";
+         exec($cmd, $output, $retval);
+         $logtext =  "Status PTY Dienst gestartet " . $cmd . "\n";
+         addsvxlog($logtext);
+      }
+   }
+//
    $callsign = isset($svxconfig['ReflectorLogic']['CALLSIGN']) ? $svxconfig['ReflectorLogic']['CALLSIGN'] : 'NoCall';     
    $check_logics = explode(",",$svxconfig['GLOBAL']['LOGICS']);
    

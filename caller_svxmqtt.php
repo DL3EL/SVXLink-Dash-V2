@@ -8,7 +8,8 @@ $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTT
 
 // --- NUR FÜR DEN NEUEN UK-ZWEIG ---
 //if ($fmnetwork === "uk.wide.svxlink.uk") {
-if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
+//if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
+if ((check_network($fmnetwork,"uk.wide.svxlink.uk")) || (check_network($fmnetwork,"north.america.svxlink.net"))) {
 
     
     // Beim ersten Laden (include) müssen wir die Tabellenzelle öffnen
@@ -17,14 +18,20 @@ if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
         echo '<div id="svxmqtt" style="margin-bottom:30px;">' . "\n";
     }
 
+	if ($fmnetwork === $uknetwork) {
+        $call_script = "global_lh.php";
+    } else {
+        $call_script = "uk-wide.php";
+    }    
     // Das eigentliche Script einbinden
     $svx_include = 1;
-    include "uk-wide.php";
+//    include "uk-wide.php";
+    include $call_script;
 
     // Beim ersten Laden den JS-Reload-Code ausgeben
     if (!$isAjax) {
         $rate = 2000;
-        $call_script = "uk-wide.php";
+//        $call_script = "uk-wide.php";
         echo '<script type="text/javascript">' . "\n";
         echo 'function reloadCurrPage(){' . "\n";
         echo '  $("#svxmqtt").load("' . $call_script . '", function(){ setTimeout(reloadCurrPage, ' . $rate . ') });' . "\n";
