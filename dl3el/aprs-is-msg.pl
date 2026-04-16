@@ -1506,6 +1506,7 @@ sub connect_aprs {
 		sleep 2;
 	}	
 	if ($rr == 6) {
+		$data = "no data" if (not defined $data);
 		$write2file = sprintf "[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data\n";
 		print_file($logdatei,$write2file);
 		$write2file = sprintf "Error^^[$log_time]  ($rr)[$aprs_login,$aprs_passwd] Login unsuccessfull $data^^\n";
