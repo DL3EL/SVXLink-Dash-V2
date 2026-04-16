@@ -7,9 +7,9 @@ if ($_SESSION['auth'] !== 'AUTHORISED') {
 }
 
 // 1. Abhängigkeiten laden
-if (!isset($svx_include)) {
-    include_once "include/settings.php";
-}
+//if (!isset($svx_include)) {
+//    include_once "include/settings.php";
+//}
 include_once "include/settings.php";
 
 /**
@@ -31,12 +31,14 @@ function loadUkTgDatabase() {
 
 $uk_tgs = loadUkTgDatabase();
 $cacheFile = __DIR__ . "/dl3el/qsos_cache.json"; // Separater Cache für QSOS
+date_default_timezone_set('Europe/Berlin');
 $currentTime = time();
 $dateStr = date("H:i:s");
 $refLog = isset($reflectorlogic1) ? $reflectorlogic1 : "ReflectorLogic";
 
 // 2. Daten vom Web laden (QSOS Status)
-$url = "https://svxlink.qsos.uk/status";
+//$url = "https://svxlink.qsos.uk/status";
+$url = $uknetwork_lh;
 $jsonRaw = @file_get_contents($url);
 $webData = json_decode($jsonRaw, true);
 $webNodes = isset($webData['nodes']) ? $webData['nodes'] : [];
@@ -56,6 +58,7 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         $isTalking = isset($info['isTalker']) && $info['isTalker'] === true;
         // In QSOS JSON ist 'tg' oft 0 wenn inaktiv, daher prüfen wir monitoredTGs als Fallback
         $tg = ($info['tg'] != 0) ? $info['tg'] : ((isset($info['monitoredTGs'][0])) ? $info['monitoredTGs'][0] : "---");
+        if ((defined ('debug')) && (debug > 0)) echo "Node:$nodeName isTalker:$isTalking tg:$tg <br>";
         
         $tgName = "";
         if (isset($uk_tgs[$tg])) {
@@ -72,7 +75,7 @@ if (is_array($webNodes) && count($webNodes) > 0) {
             $startTime = isset($info['talkingStartedAt']) ? strtotime($info['talkingStartedAt']) : $currentTime;
             
             $cache[$nodeName]['start_ts'] = $startTime;
-            $cache[$nodeName]['start_str'] = date("H:i:s", $startTime);
+            $cache[$nodeName]['start_str'] = date("d.m.y H:i:s", $startTime);
             $cache[$nodeName]['last_end'] = $dateStr; 
             $cache[$nodeName]['talking'] = true;
             $cache[$nodeName]['tg'] = $tg;
@@ -91,6 +94,8 @@ if (is_array($webNodes) && count($webNodes) > 0) {
             }
         }
     }
+    if ((defined ('debug')) && (debug > 0)) echo "writing cachefile:$cacheFile<br>";
+    if ((defined ('debug')) && (debug > 0)) echo "writing:" .  json_encode($cache) . "<br>";
     file_put_contents($cacheFile, json_encode($cache));
 }
 

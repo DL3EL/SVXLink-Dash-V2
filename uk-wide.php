@@ -37,13 +37,13 @@ $refLog = isset($reflectorlogic1) ? $reflectorlogic1 : "ReflectorLogic";
 
 // 2. Daten vom Web laden
 if ((defined ('debug')) && (debug > 0)) echo "UK: $uknetwork NA: $nanetwork <br>";
-if (check_network($fmnetwork,$uknetwork)) {
-    $url = "https://" . $uknetwork_state . "/status.php?json";
-} 
+//if (check_network($fmnetwork,$uknetwork)) {
+//    $url = "https://" . $uknetwork_state . "/status.php?json";
+//} 
 if (check_network($fmnetwork,$nanetwork)) {
     $url = "https://" . $nanetwork_state . "/status.php?json";
 }
-//$url = "https://ukwide.svxlink.net/status.php?json";
+//$url = "https://north.america.svxlink.net/status.php?json";
 $jsonRaw = @file_get_contents($url);
 $webData = json_decode($jsonRaw, true);
 $webNodes = isset($webData['nodes']) ? $webData['nodes'] : [];

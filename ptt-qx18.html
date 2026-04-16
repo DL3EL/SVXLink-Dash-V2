@@ -5,6 +5,7 @@
     <script type="text/javascript">
         // Pfad zur Status-Datei via PHP injiziert
         const checkStatusUrl = "<?php echo 'dl3el/ptt-qx18/check_status.php'; ?>";
+
         let isPTTActive = false;
 
         function updatePTTUI() {
@@ -66,7 +67,11 @@ function ls_change($value, $sc) {
     $current = (int)shell_exec($cmdGet);
 
     // Schritt 2: Neuen Wert berechnen (min 0, max 45)
-    $new = $current + $step;
+    if ($value === "mute") {
+        $new = -1;
+    } else {    
+        $new = $current + $step;
+    }    
     if ($new > 45) $new = 45;
     if ($new < 0) $new = 0;
 
@@ -77,33 +82,27 @@ function ls_change($value, $sc) {
 if (isset($_POST['buttonA'])) { ls_change("-5", $sc); }
 if (isset($_POST['buttonB'])) { ls_change("5", $sc); }
 if (isset($_POST['button_off'])) { ls_change("mute", $sc); }
-if (isset($_POST['button_on'])) { ls_change("unmute", $sc); }
+if (isset($_POST['button_on'])) { ls_change("25", $sc); }
 
 // Status abfragen für Lautsprecher
 $status = exec("amixer -c $sc get Speaker | grep % | awk '{print $7}'");
+$volume = exec("amixer -c $sc cget numid=6 | grep ': values=' | cut -d= -f2 | cut -d, -f1");
 if (!strlen($status)) { $status = exec("amixer -c $sc get Lineout | grep % | awk '{print $7}'"); }
 
 //echo '<div style="display: flex; align-items: center; gap: 20px; padding: 10px;">';
 
 // 1. PTT BUTTON (Kompakt an der Seite)
-//echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
-//
-  $rxtx_state = "/tmp/svxlink_last_state.txt";
-  if (file_exists($rxtx_state)) { 
-      $content = file_get_contents($rxtx_state);
-      if (strpos($content, "OPEN")) {
-        echo '<button id="myButton" style="width:120px; color:white; background-color:red; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic ON</button>';
-      } else {  
-        echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
-      }    
-    }
-//
+// hier Platzhalter, Änderung erfolgt über das Javascript weiter oben. Besondern gut get es, wenn in der Simplexlogik
+//STATE_PTY = /tmp/state_smp
+// eingefügt wird.
+echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
 //echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
 
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
 
-if ($status == "[on]") {
+//if (($status === "[on]") || ($volume)) {
+if ($volume) {
     $volume = exec("amixer -c $sc get Speaker | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'");
     if (!strlen($volume)) { $volume = exec("amixer -c $sc get Lineout | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'"); }
 
@@ -119,25 +118,6 @@ if ($status == "[on]") {
 echo '</form>';
 //echo '</div>';
 
-function get_ptt_service_status() {
-    // Prüft, ob der systemd-Dienst läuft
-    $status = shell_exec("systemctl is-active ptt.service");
-    $is_running = (trim($status) == "active");
-    
-    // Prüft, ob das Mikrofon-Gerät im System vorhanden ist
-    $device_exists = false;
-    if (file_exists('/dev/input/')) {
-        $devices = shell_exec("cat /proc/bus/input/devices | grep UACDemoV1.0");
-        $device_exists = !empty($devices);
-    }
-
-    return [
-        'running' => $is_running,
-        'device' => $device_exists,
-        'label' => $is_running ? "Aktiv" : "Inaktiv",
-        'color' => $is_running ? "seagreen" : "darkred"
-    ];
-}
 
 ?>
 

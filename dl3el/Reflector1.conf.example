@@ -3,6 +3,8 @@
 DNS_DOMAIN = reflector-network.de
 # IP-Adresse:Port (braucht man normalerweise nicht)
 #HOSTS = IP-Adresse:Port 
+# bei Netzen in UK, US und VK gibt es ein anderes Format der node_info.json, das zu verwendende muss hier eingestellt werden<br>
+NODE_INFO_FILE = /etc/svxlink/node_info.json
 # Call: das eigene Rufzeichen, welches für das Netz oben freigeschaltet ist
 CALLSIGN = Call
 # "das Passwort" welchen vom Netzbetreiber übermittelt wurde

@@ -1,8 +1,9 @@
 [ReflectorLogic]
 DNS_DOMAIN = hier gehört das Netz hin
-#HOSTS = IPp-Adresse
+#HOSTS = IP-Adresse:Port
+NODE_INFO_FILE = /etc/svxlink/node_info_uk.json
 CALLSIGN = das Call
-AUTH_KEY = "das PAsswort"
+AUTH_KEY = "das Passwort"
 DEFAULT_TG = DefTG
 MONITOR_TGS = MOnTGs
 

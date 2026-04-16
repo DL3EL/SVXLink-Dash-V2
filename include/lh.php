@@ -91,6 +91,7 @@ include_once "tgdb.php";
       <th>TG Name</th>
     </tr>
 <?php
+date_default_timezone_set('Europe/Berlin');
 $i = 0;
 for ($i = 0;  ($i <= 35); $i++) { //Last 35 calls
   if (isset($lastHeard[$i])) {
@@ -108,6 +109,11 @@ for ($i = 0;  ($i <= 35); $i++) { //Last 35 calls
         //$local_time = date("%e F Y", strtotime('2010-01-08'))
       echo"<tr height=24px style=\"font-size:12.5px;>\">";
       echo"<td align=\"center\"> $local_time </td>";
+$duration = time() - strtotime($local_time);
+//echo "Timestamp: $listElem[0] Localtime " . $local_time . "($duration) <br>";		  
+      if ($duration > 300) {
+	$listElem[3] = "OFF";
+      }
       if ($listElem[3] == "OFF" ) {$bgcolor="";}
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
