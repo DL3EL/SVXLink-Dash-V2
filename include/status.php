@@ -96,7 +96,7 @@ if (isProcessRunning('svxlink')) {
       $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW); 
    }
 // status_pty
-   $status_pty = isset($svxconfig['SimplexLogic']['STATE_PTY']) ? $svxconfig['SimplexLogic']['STATE_PTY'] : "";
+   $status_pty = isset($svxconfig['SimplexLogic']['STATE_PTY']) ? $svxconfig['SimplexLogic']['STATE_PTY'] : "n/a";
    if ($status_pty !== "n/a") {
       $status_script = shell_exec("pgrep status_pty.pl");
       if (!strlen($status_script)) {
