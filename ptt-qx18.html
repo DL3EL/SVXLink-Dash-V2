@@ -7,6 +7,31 @@
         const checkStatusUrl = "<?php echo 'dl3el/ptt-qx18/check_status.php'; ?>";
 
         let isPTTActive = false;
+        let interval;
+
+        function startTimer(duration, button) {
+            let timer = duration, minutes, seconds;
+            interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                button.textContent = "PTT on (" + minutes + ":" + seconds + ")";
+                button.style.fontWeight = "bold";
+                button.style.backgroundColor = "red";
+                button.style.color = "white";
+                if (--timer < 0) {
+                    clearInterval(interval); 
+                    button.textContent = "PTT Time!";
+                    button.style.fontWeight = "bold";
+                    button.style.backgroundColor = "yellow";
+                    button.style.color = "black";
+                    //alert("Zeit abgelaufen!");
+                }
+            }, 1000);
+        }
 
         function updatePTTUI() {
             let xhr = new XMLHttpRequest();
@@ -18,10 +43,14 @@
                     let button = document.getElementById('myButton');
                     
                     if (status === "ON") {
-                        button.textContent = "Mic ON";
-                        button.style.backgroundColor = "red";
+                        if (!isPTTActive) {
+                            button.textContent = "Mic ON";
+                            button.style.backgroundColor = "red";
+                            startTimer(180, button); // 10 Sekunden Timer
+                        }    
                         isPTTActive = true;
                     } else {
+                        clearInterval(interval);
                         button.textContent = "Mic OFF";
                         button.style.backgroundColor = "silver";
                         isPTTActive = false;
@@ -29,16 +58,11 @@
                 }
             };
             xhr.send();
-        }
-
-        // Manuelles Klicken auf den Button (für Mouse-User)
-        function togglePTTManually() {
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", "executePTT.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            // Wenn PTT an ist -> ausschalten (second), sonst einschalten (first)
-            let cmd = isPTTActive ? "command=second" : "command=first";
-            xhr.send(cmd);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                //alert(xhr.responseText);
+                }
+            };
         }
 
         setInterval(updatePTTUI, 1000);
@@ -95,8 +119,8 @@ if (!strlen($status)) { $status = exec("amixer -c $sc get Lineout | grep % | awk
 // hier Platzhalter, Änderung erfolgt über das Javascript weiter oben. Besondern gut get es, wenn in der Simplexlogik
 //STATE_PTY = /tmp/state_smp
 // eingefügt wird.
-echo '<button id="myButton" onclick="togglePTTManually()" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
-//echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px; cursor:pointer;">Mic OFF</button>';
+
+echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px;">Mic OFF</button>';
 
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
@@ -106,13 +130,13 @@ if ($volume) {
     $volume = exec("amixer -c $sc get Speaker | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'");
     if (!strlen($volume)) { $volume = exec("amixer -c $sc get Lineout | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'"); }
 
-    echo '<button name="button_off" type="submit" style="margin-right:10px; width:50px; border-radius:8px; background-color:#7a4a4a; border:none; height:30px;"><img src="images/speaker_off.png" height="15"></button>';
-    echo '<button name="buttonA" type="submit" style="width:30px; border-radius:8px; background-color:darkred; color:white; border:none; height:30px; font-weight:bold;">-</button>';
+    echo '<button name="button_off" type="submit" style="margin-right:10px; width:50px; border-radius:8px; background-color:#7a4a4a; border:none; height:30px; cursor:pointer;"><img src="images/speaker_off.png" height="15"></button>';
+    echo '<button name="buttonA" type="submit" style="width:30px; border-radius:8px; background-color:darkred; color:white; border:none; height:30px; font-weight:bold; cursor:pointer;">-</button>';
     echo '<span style="margin: 0 10px; font-size:16px; font-family:sans-serif;">' . $volume . '</span>';
-    echo '<button name="buttonB" type="submit" style="width:30px; border-radius:8px; background-color:seagreen; color:white; border:none; height:30px; font-weight:bold;">+</button>';
+    echo '<button name="buttonB" type="submit" style="width:30px; border-radius:8px; background-color:seagreen; color:white; border:none; height:30px; font-weight:bold; cursor:pointer;">+</button>';
 } else {
-    echo '<button name="button_on" type="submit" style="width:50px; border-radius:8px; background-color:#4a7a7a; border:none; height:30px;"><img src="images/speaker.png" height="15"></button>';
-    echo '<span style="margin-left:15px; font-family:sans-serif; color:grey;">Muted</span>';
+    echo '<button name="button_on" type="submit" style="width:50px; border-radius:8px; background-color:#4a7a7a; border:none; height:30px;"><img src="images/speaker.png" height="15" cursor:pointer;></button>';
+    echo '<span style="margin-left:15px; font-family:sans-serif; color:grey; cursor:pointer;">Muted</span>';
 }
 
 echo '</form>';
