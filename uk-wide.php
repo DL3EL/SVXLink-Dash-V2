@@ -31,6 +31,7 @@ function loadUkTgDatabase() {
 
 $uk_tgs = loadUkTgDatabase();
 $cacheFile = __DIR__ . "/dl3el/uk_cache.json";
+date_default_timezone_set('Europe/Berlin');
 $currentTime = time();
 $dateStr = date("H:i:s");
 $refLog = isset($reflectorlogic1) ? $reflectorlogic1 : "ReflectorLogic";
@@ -76,7 +77,8 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         if ($isTalking) {
             if (!isset($cache[$nodeName]['start_ts']) || (isset($cache[$nodeName]['talking']) && $cache[$nodeName]['talking'] === false)) {
                 $cache[$nodeName]['start_ts'] = $currentTime;
-                $cache[$nodeName]['start_str'] = $dateStr;
+//                $cache[$nodeName]['start_str'] = $dateStr;
+                $cache[$nodeName]['start_str'] = date("d.m.y H:i:s", $startTime);
             }
             $cache[$nodeName]['last_end'] = $dateStr; 
             $cache[$nodeName]['talking'] = true;
@@ -93,6 +95,7 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         } else {
             if (isset($cache[$nodeName])) {
                 $cache[$nodeName]['talking'] = false;
+                $cache[$nodeName]['end_str'] = date("d.m.y H:i:s", time());
             }
         }
     }
