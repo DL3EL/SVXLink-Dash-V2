@@ -91,6 +91,7 @@ if (is_array($webNodes) && count($webNodes) > 0) {
         } else {
             if (isset($cache[$nodeName])) {
                 $cache[$nodeName]['talking'] = false;
+                $cache[$nodeName]['end_str'] = date("d.m.y H:i:s", time());
             }
         }
     }
@@ -115,7 +116,8 @@ if (!empty($cache)) {
             $history_rows .= "<tr style='height:40px; border-bottom: 1px solid #ddd;'>"
                            . "<td style='width:25%;'>&nbsp;&nbsp;<b>$safeName</b></td>"
                            . "<td style='width:35%; padding:4px;'><button type='submit' name='jmptoA' value='$tgVal' class='ukw-btn-active' style='$svxmqtt_color_passive;'>$displayTG</button></td>"
-                           . "<td style='width:20%; text-align:center; color:#666;'>".($cData['last_end'] ?? '--:--')."</td>"
+//                           . "<td style='width:20%; text-align:center; color:#666;'>".($cData['last_end'] ?? '--:--')."</td>"
+                           . "<td style='width:20%; text-align:center; color:#666;'>".($cData['end_str'] ?? '--:--')."</td>"
                            . "<td style='width:20%;'></td>"
                            . "</tr>";
         }
