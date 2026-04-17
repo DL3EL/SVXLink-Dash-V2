@@ -71,21 +71,63 @@
 <body>
 
 <?php
-// --- Lautsprecher Logik (Original übernommen) ---
+//
+// ==========================
+// CONFIG QX18 DATEN
+// ==========================
+$output_card = shell_exec('cat /proc/asound/cards 2>&1');
+//if (preg_match('/^\s*(\d+)\s+\[UACDemoV10\s*\]/m', $output_card, $matches)) {
+if (defined('DL3EL_MIKE_ID')) {
+    $deviceName = DL3EL_MIKE_ID;
+    $pattern = '/^\s*(\d+)\s+\[' . preg_quote($deviceName, '/') . '\s*\]/m';
+    if (preg_match($pattern, $output_card, $matches)) {
+        $CARD = $matches[1];
+        if ((defined ('debug')) && (debug > 0)) echo $CARD . " gefunden.<br>";
+    } else {
+        echo "UACDemoV10 QX18 Mikrofon nicht gefunden.<br>";
+        return -1;
+    }
+} else {
+    return -1;
+}    
+
+$output = [];
+exec("amixer -c $CARD controls", $output);
+
+$NUMID_SPEAKER = null;
+$NUMID_MIC = null;
+
+foreach ($output as $line) {
+    if (preg_match("/numid=(\d+).*name='PCM Playback Volume'/", $line, $matches)) {
+        $NUMID_SPEAKER = $matches[1];
+    }
+    
+    if (preg_match("/numid=(\d+).*name='Mic Capture Volume'/", $line, $matches)) {
+        $NUMID_MIC = $matches[1];
+    }
+}
+
+    if ((defined ('debug')) && (debug > 0)) echo "Ports für $CARD Speaker:$NUMID_SPEAKER  Mike:$NUMID_MIC<br>";
+//
+// --- Lautsprecher Logik (Original übernommen), wenn DL3EL_SC_STRING nicht definiert ist, wird der Lautsüprecher vom Mike genommen ---
 if (defined('DL3EL_SC_STRING')) {
     $sc_exec = 'aplay -l | grep "' . DL3EL_SC_STRING . '"';
     $sc = substr(shell_exec($sc_exec), 5, 1);
+// noch flexibilisieren;
+    $numid = 6;
 } else {
-    $sc = 0;
+    $sc = $CARD;
+    $numid = $NUMID_SPEAKER;
 }
+    if ((defined ('debug')) && (debug > 0)) echo "(old logic) Ports für SC: $sc<br>";
 
-function ls_change($value, $sc) {
+function ls_change($value, $sc, $numid) {
 //    exec("sudo amixer -c $sc set Speaker $value");
 //    exec("sudo amixer -c $sc set Lineout $value");
 
     // Schritt 1: Aktuellen Wert auslesen
     $card = $sc;
-    $numid = 6;
+//    $numid = 6;
     $step = $value;
     $cmdGet = "amixer -c $card cget numid=$numid | grep ': values=' | cut -d= -f2 | cut -d, -f1";
     $current = (int)shell_exec($cmdGet);
@@ -103,10 +145,10 @@ function ls_change($value, $sc) {
     return shell_exec("sudo amixer -c $card cset numid=$numid $new");
 }
 
-if (isset($_POST['buttonA'])) { ls_change("-5", $sc); }
-if (isset($_POST['buttonB'])) { ls_change("5", $sc); }
-if (isset($_POST['button_off'])) { ls_change("mute", $sc); }
-if (isset($_POST['button_on'])) { ls_change("25", $sc); }
+if (isset($_POST['buttonA'])) { ls_change("-5", $sc,$numid); }
+if (isset($_POST['buttonB'])) { ls_change("5", $sc,$numid); }
+if (isset($_POST['button_off'])) { ls_change("mute", $sc,$numid); }
+if (isset($_POST['button_on'])) { ls_change("25", $sc,$numid); }
 
 // Status abfragen für Lautsprecher
 $status = exec("amixer -c $sc get Speaker | grep % | awk '{print $7}'");

@@ -1,17 +1,27 @@
+import sys
 import evdev
 from evdev import ecodes
 import time
 import os
 
 # --- KONFIGURATION ---
+# sudo pkill -f ptt_listener.py
 DEVICE_NAME = "Jieli Technology UACDemoV1.0 Keyboard"
+DEFAULT_DEVICE_PART = "UACDemoV1.0 K"
+DEVICE_PART = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_DEVICE_PART
 SQL_FILE = "/tmp/sql"
 PTT_KEY = ecodes.KEY_F2
 
 def run_listener():
     try:
         devices = [evdev.InputDevice(p) for p in evdev.list_devices()]
-        device = next(d for d in devices if d.name == DEVICE_NAME)
+#        print(f"Gefundene Geräte: {len(devices)}", flush=True)
+        
+#        for d in devices:
+#            print(f"Gerät im System: {d.name}", flush=True)
+#        device = next(d for d in devices if d.name == DEVICE_NAME)
+        device = next((d for d in devices if DEVICE_PART in d.name), None)
+
         
         device.grab()
         print(f"Verbunden: {device.name}")

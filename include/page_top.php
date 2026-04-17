@@ -110,7 +110,12 @@ if ((defined('SHOWPTT')) && (SHOWPTT=="TRUE")) {
         exec($command, $output, $returnCode);
         $procs = count($output);
         if ($procs <2) {
-            $cmd = "sudo -u svxlink python " . DL3EL . "/ptt-qx18/ptt_listener.py >/dev/null &";
+            if (defined('DL3EL_MIKE_NAME')) {
+                $device_part = DL3EL_MIKE_NAME;
+            } else{    
+                $device_part = "UACDemoV1.0 K";
+            }    
+            $cmd = "sudo -u svxlink python " . DL3EL . "/ptt-qx18/ptt_listener.py " . escapeshellarg($device_part) . ">/dev/null 2>&1 &";
             if ((defined ('debug')) && (debug > 0)) echo "Starting QX18 ";
             exec($cmd, $output, $retval);
             $logtext =  "QX18 Listener gestartet (" . $cmd . ")\n";
