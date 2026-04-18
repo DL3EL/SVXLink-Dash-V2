@@ -71,6 +71,98 @@
 <body>
 
 <?php
+// ==========================
+// HELPER: EXECUTE COMMAND
+// ==========================
+function run($cmd)
+{
+    exec($cmd . " 2>&1", $out, $code);
+    return ["output" => $out, "code" => $code];
+}
+// ==========================
+// GET CURRENT VALUE
+// ==========================
+function get_volume($scLM, $numid)
+{
+    $cmdGet = "amixer -c $scLM cget numid=$numid | grep ': values=' | cut -d= -f2 | cut -d, -f1";
+    $current = (int)shell_exec($cmdGet);
+    return $current;
+// von Frank
+    $res = run("amixer -c$scLM cget numid=$numid");
+    foreach ($res["output"] as $line) {
+        echo "GV: $line<br>";
+        if (strpos($line, ": values=") !== false) {
+            preg_match('/values=(\d+)/', $line, $m);
+            return isset($m[1]) ? (int)$m[1] : 0;
+        }
+    }
+    return 0;
+
+}
+
+// ==========================
+// GET RANGE (min/max)
+// ==========================
+function get_range($scLM, $numid)
+{
+    $res = run("amixer -c$scLM cget numid=$numid");
+    foreach ($res["output"] as $line) {
+        if (strpos($line, "min=") !== false) {
+            preg_match('/min=(\d+),max=(\d+)/', $line, $m);
+            return [
+                "min" => (int)$m[1],
+                "max" => (int)$m[2]
+            ];
+        }
+    }
+    return ["min" => 0, "max" => 100];
+}
+
+// ==========================
+// SET VOLUME
+// ==========================
+function set_volume($scLM, $numid, $value)
+{
+    run("amixer -c$scLM cset numid=$numid $value");
+}
+
+// ==========================
+// CHANGE VOLUME (+/-)
+// ==========================
+function change_volume($scLM, $numid, $direction, $step)
+{
+    $current = get_volume($scLM, $numid);
+    $range = get_range($scLM, $numid);
+    $delta = ($range["max"] - $range["min"]) * ($step / 100);
+    if ($direction === "+") {
+        $new = $current + $delta;
+    } else {
+        $new = $current - $delta;
+    }
+    $new = max($range["min"], min($range["max"], (int)$new));
+    set_volume($scLM, $numid, $new);
+}
+
+// ==========================
+// MUTE / UNMUTE (TOGGLE)
+// ==========================
+function mute_toggle($scLM, $numid)
+{
+    $file = "/tmp/vol_" . $numid;
+    if (file_exists($file)) {
+        // UNMUTE
+        $old = (int)file_get_contents($file);
+        set_volume($scLM, $numid, $old);
+        unlink($file);
+    } else {
+        // MUTE
+        $current = get_volume($scLM, $numid);
+        file_put_contents($file, $current);
+        $range = get_range($scLM, $numid);
+        set_volume($scLM, $numid, $range["min"]);
+    }
+}
+
 //
 // ==========================
 // CONFIG QX18 DATEN
@@ -119,62 +211,23 @@ if (defined('DL3EL_SC_STRING')) {
     $sc = $CARD;
     $numid = $NUMID_SPEAKER;
 }
-    if ((defined ('debug')) && (debug > 0)) echo "(old logic) Ports für SC: $sc<br>";
 
-function ls_change($value, $sc, $numid) {
-//    exec("sudo amixer -c $sc set Speaker $value");
-//    exec("sudo amixer -c $sc set Lineout $value");
+if (isset($_POST['buttonA'])) { change_volume($sc,$numid,"-",5); }
+if (isset($_POST['buttonB'])) { change_volume($sc,$numid,"+",5); }
+if (isset($_POST['button_off'])) { mute_toggle($sc,$numid); }
+if (isset($_POST['button_on'])) { mute_toggle($sc,$numid); }
 
-    // Schritt 1: Aktuellen Wert auslesen
-    $card = $sc;
-//    $numid = 6;
-    $step = $value;
-    $cmdGet = "amixer -c $card cget numid=$numid | grep ': values=' | cut -d= -f2 | cut -d, -f1";
-    $current = (int)shell_exec($cmdGet);
-
-    // Schritt 2: Neuen Wert berechnen (min 0, max 45)
-    if ($value === "mute") {
-        $new = -1;
-    } else {    
-        $new = $current + $step;
-    }    
-    if ($new > 45) $new = 45;
-    if ($new < 0) $new = 0;
-
-    // Schritt 3: Setzen
-    return shell_exec("sudo amixer -c $card cset numid=$numid $new");
-}
-
-if (isset($_POST['buttonA'])) { ls_change("-5", $sc,$numid); }
-if (isset($_POST['buttonB'])) { ls_change("5", $sc,$numid); }
-if (isset($_POST['button_off'])) { ls_change("mute", $sc,$numid); }
-if (isset($_POST['button_on'])) { ls_change("25", $sc,$numid); }
-
-// Status abfragen für Lautsprecher
-$status = exec("amixer -c $sc get Speaker | grep % | awk '{print $7}'");
-$volume = exec("amixer -c $sc cget numid=6 | grep ': values=' | cut -d= -f2 | cut -d, -f1");
-if (!strlen($status)) { $status = exec("amixer -c $sc get Lineout | grep % | awk '{print $7}'"); }
-
-//echo '<div style="display: flex; align-items: center; gap: 20px; padding: 10px;">';
-
-// 1. PTT BUTTON (Kompakt an der Seite)
-// hier Platzhalter, Änderung erfolgt über das Javascript weiter oben. Besondern gut get es, wenn in der Simplexlogik
-//STATE_PTY = /tmp/state_smp
-// eingefügt wird.
 
 echo '<button id="myButton" style="width:120px; color:white; background-color:silver; border:none; border-radius:8px; height:40px; font-size:14px;">Mic OFF</button>';
 
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
 
-//if (($status === "[on]") || ($volume)) {
+$volume = get_volume($sc, $numid);
 if ($volume) {
-    $volume = exec("amixer -c $sc get Speaker | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'");
-    if (!strlen($volume)) { $volume = exec("amixer -c $sc get Lineout | grep % | awk '{print $5}' | sed 's/[^0-9\%]//g'"); }
-
     echo '<button name="button_off" type="submit" style="margin-right:10px; width:50px; border-radius:8px; background-color:#7a4a4a; border:none; height:30px; cursor:pointer;"><img src="images/speaker_off.png" height="15"></button>';
     echo '<button name="buttonA" type="submit" style="width:30px; border-radius:8px; background-color:darkred; color:white; border:none; height:30px; font-weight:bold; cursor:pointer;">-</button>';
-    echo '<span style="margin: 0 10px; font-size:16px; font-family:sans-serif;">' . $volume . '</span>';
+    echo '<span style="margin: 0 10px; font-size:16px; font-family:sans-serif;">' . $volume . '%</span>';
     echo '<button name="buttonB" type="submit" style="width:30px; border-radius:8px; background-color:seagreen; color:white; border:none; height:30px; font-weight:bold; cursor:pointer;">+</button>';
 } else {
     echo '<button name="button_on" type="submit" style="width:50px; border-radius:8px; background-color:#4a7a7a; border:none; height:30px;"><img src="images/speaker.png" height="15" cursor:pointer;></button>';
@@ -182,7 +235,6 @@ if ($volume) {
 }
 
 echo '</form>';
-//echo '</div>';
 
 
 ?>
