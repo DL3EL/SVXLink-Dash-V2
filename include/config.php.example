@@ -115,6 +115,14 @@ define("DL3EL_EXTERN1_TAB", "new");
 define("DL3EL_SC_CHANGE", "no");
 // this string has to match the name of the card in the linux system
 define("DL3EL_SC_STRING", "Audio Device");
+// needed for an external Mike ie. QX-18
+define("DL3EL_SC_Card_ID", "Device");
+define("DL3EL_SC_SPEAKER_STRING", "Speaker Playback Volume");
+define("DL3EL_MIKE_SPEAKER_STRING", "PCM Playback Volume");
+define("DL3EL_MIKE_MIKE_STRING", "Mic Capture Volume");
+define("DL3EL_MIKE_ID", "UACDemoV10");
+define("DL3EL_MIKE_TYPE","QX18");
+define("DL3EL_MIKE_NAME","UACDemoV1.0 K");
 // show only one IP in system-window, if there are lots of
 //define("DL3EL_SHOW_ONLY_ONE_IP", "yes");
 //define("DL3EL_SHOW_ONLY_ONE_IP", "no");

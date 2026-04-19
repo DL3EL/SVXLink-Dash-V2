@@ -169,48 +169,64 @@ function mute_toggle($scLM, $numid)
 // ==========================
 $output_card = shell_exec('cat /proc/asound/cards 2>&1');
 //if (preg_match('/^\s*(\d+)\s+\[UACDemoV10\s*\]/m', $output_card, $matches)) {
+// get variables from config or default values
 if (defined('DL3EL_MIKE_ID')) {
     $deviceName = DL3EL_MIKE_ID;
+} else {
+    $deviceName = "UACDemoV10";
+}
+
+if (defined('DL3EL_SC_SPEAKER_STRING')) {
+    $spkr_vol = DL3EL_SC_SPEAKER_STRING;
+} else {
+    $spkr_vol = "Speaker Playback Volume";
+}    
+
+if (defined('DL3EL_MIKE_SPEAKER_STRING')) {
+    $mike_spkr_vol = DL3EL_MIKE_SPEAKER_STRING;
+} else {
+    $mike_spkr_vol = "PCM Playback Volume";
+}    
+
+if (defined('DL3EL_MIKE_MIKE_STRING')) {
+    $mike_mike_vol = DL3EL_MIKE_MIKE_STRING;
+} else {
+    $mike_mike_vol = "Mic Capture Volume";
+}    
+
+
     $pattern = '/^\s*(\d+)\s+\[' . preg_quote($deviceName, '/') . '\s*\]/m';
     if (preg_match($pattern, $output_card, $matches)) {
-        $CARD = $matches[1];
-        if ((defined ('debug')) && (debug > 0)) echo $CARD . " gefunden.<br>";
+        $extMike = $matches[1];
+        if ((defined ('debug')) && (debug > 0)) echo $extMike . " gefunden.<br>";
     } else {
         echo "UACDemoV10 QX18 Mikrofon nicht gefunden.<br>";
         return -1;
     }
-} else {
-    return -1;
-}    
 
-$output = [];
-exec("amixer -c $CARD controls", $output);
 
 $NUMID_SPEAKER = null;
 $NUMID_MIC = null;
-
-foreach ($output as $line) {
-    if (preg_match("/numid=(\d+).*name='PCM Playback Volume'/", $line, $matches)) {
-        $NUMID_SPEAKER = $matches[1];
-    }
-    
-    if (preg_match("/numid=(\d+).*name='Mic Capture Volume'/", $line, $matches)) {
-        $NUMID_MIC = $matches[1];
-    }
-}
-
-    if ((defined ('debug')) && (debug > 0)) echo "Ports für $CARD Speaker:$NUMID_SPEAKER  Mike:$NUMID_MIC<br>";
+    $cmdGet = "amixer -c $extMike controls | grep '" . $mike_spkr_vol . "' | cut -d= -f2 | cut -d, -f1";
+    $NUMID_SPEAKER = (int)shell_exec($cmdGet);
+    $cmdGet = "amixer -c $extMike controls | grep '" . $mike_mike_vol . "' | cut -d= -f2 | cut -d, -f1";
+    $NUMID_MIC = (int)shell_exec($cmdGet);
+    if ((defined ('debug')) && (debug > 0)) echo "Ports für $extMike Speaker:$NUMID_SPEAKER  Mike:$NUMID_MIC<br>";
 //
 // --- Lautsprecher Logik (Original übernommen), wenn DL3EL_SC_STRING nicht definiert ist, wird der Lautsüprecher vom Mike genommen ---
 if (defined('DL3EL_SC_STRING')) {
     $sc_exec = 'aplay -l | grep "' . DL3EL_SC_STRING . '"';
     $sc = substr(shell_exec($sc_exec), 5, 1);
-// noch flexibilisieren;
-    $numid = 6;
+//    $cmdGet = "amixer -c $sc controls | grep '" . . "Speaker Playback Volume' | cut -d= -f2 | cut -d, -f1";
+    $cmdGet = "amixer -c $sc controls | grep '" . $spkr_vol . "' | cut -d= -f2 | cut -d, -f1";
+    $numid = (int)shell_exec($cmdGet);
 } else {
-    $sc = $CARD;
+    $sc = $extMike;
     $numid = $NUMID_SPEAKER;
 }
+// ab hier: $sc = Lautsprecher, $extMike = Mikrofon
+
+
 
 if (isset($_POST['buttonA'])) { change_volume($sc,$numid,"-",5); }
 if (isset($_POST['buttonB'])) { change_volume($sc,$numid,"+",5); }
@@ -222,7 +238,7 @@ echo '<button id="myButton" style="width:120px; color:white; background-color:si
 
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
-
+echo "&nbsp;";
 $volume = get_volume($sc, $numid);
 if ($volume) {
     echo '<button name="button_off" type="submit" style="margin-right:10px; width:50px; border-radius:8px; background-color:#7a4a4a; border:none; height:30px; cursor:pointer;"><img src="images/speaker_off.png" height="15"></button>';
@@ -235,7 +251,6 @@ if ($volume) {
 }
 
 echo '</form>';
-
 
 ?>
 
