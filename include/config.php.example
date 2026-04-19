@@ -117,12 +117,12 @@ define("DL3EL_SC_CHANGE", "no");
 define("DL3EL_SC_STRING", "Audio Device");
 // needed for an external Mike ie. QX-18
 define("DL3EL_SC_Card_ID", "Device");
-define("DL3EL_SC_SPEAKER_STRING", "Speaker Playback Volume");
-define("DL3EL_MIKE_SPEAKER_STRING", "PCM Playback Volume");
-define("DL3EL_MIKE_MIKE_STRING", "Mic Capture Volume");
-define("DL3EL_MIKE_ID", "UACDemoV10");
-define("DL3EL_MIKE_TYPE","QX18");
-define("DL3EL_MIKE_NAME","UACDemoV1.0 K");
+//define("DL3EL_SC_SPEAKER_STRING", "Speaker Playback Volume");
+//define("DL3EL_MIKE_SPEAKER_STRING", "PCM Playback Volume");
+//define("DL3EL_MIKE_MIKE_STRING", "Mic Capture Volume");
+//define("DL3EL_MIKE_ID", "UACDemoV10");
+//define("DL3EL_MIKE_TYPE","QX18");
+//define("DL3EL_MIKE_NAME","UACDemoV1.0 K");
 // show only one IP in system-window, if there are lots of
 //define("DL3EL_SHOW_ONLY_ONE_IP", "yes");
 //define("DL3EL_SHOW_ONLY_ONE_IP", "no");
@@ -148,6 +148,8 @@ define("DL3EL_LH_DETAIL", "FMN");
 define("DL3EL_WEBCHAT", "yes");
 // QSO-Link Dashboard is shown
 define("DL3EL_QSOLINK", "no");
+define("DL3EL_UK_NET", "no");
+define("DL3EL_US_NET", "no");
 // the rest of the more static variables and constants
 include_once DL3EL_BASE ."include/config.inc.php";
 ?>

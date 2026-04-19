@@ -81,8 +81,6 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a class="hreflink" href="./svx2mqtt.php">LIVE DB</a> | ';
 	    }
 	}    
-//	if ((defined('DL3EL_MONREFRESH')) && (DL3EL_MONREFRESH > "4")) {
-//	if ($fmnetwork === "uk.wide.svxlink.uk") {
 	if ((defined ('debug')) && (debug > 0)) echo "UK: $uknetwork NA: $nanetwork <br>";
 
 	if (check_network($fmnetwork,$uknetwork)) {
@@ -91,7 +89,6 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $nanetwork_state . '">US Monitor | </a> ';
 	} else {    
 	    if (file_exists("/usr/local/bin/mqtt-simple")) {
-//	    echo '<a href="./caller.php?id=monitor0&refresh=' . DL3EL_MONREFRESH . '" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 		echo '<a class="hreflink" href="./caller.php?id=monitor&refresh=15" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
 	    } else {
 		echo '<a class="hreflink" href="./caller.php?id=monitor0" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
@@ -147,6 +144,12 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 	if ((defined('DL3EL_QSOLINK')) && (DL3EL_QSOLINK === "yes")) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://qsolink.websdrbordeaux.fr/dashboard.html">QSOLinkDB | </a> ';
+	}
+	if ((defined('DL3EL_UK_NET')) && (DL3EL_UK_NET === "yes")) {
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://ukwide.svxlink.net/">UK Net | </a> ';
+	}
+	if ((defined('DL3EL_US_NET')) && (DL3EL_US_NET === "yes")) {
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://north.america.svxlink.net/">US Net | </a> ';
 	}
 	echo '<a class="hreflink" href="./config_backup.php" >Backup/Restore</a> ';
     } else {

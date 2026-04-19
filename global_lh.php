@@ -16,7 +16,7 @@ include_once "include/settings.php";
  * Funktion um die UK-TG-Datenbank isoliert zu laden
  */
 function loadUkTgDatabase() {
-    $file = "include/tgdb_uk.php";
+    $file = "include/tgdb.php";
     if (!file_exists($file)) return [];
     
     return (function($file) {
