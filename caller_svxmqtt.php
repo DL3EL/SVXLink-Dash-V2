@@ -9,6 +9,7 @@ $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTT
 // --- NUR FÜR DEN NEUEN UK-ZWEIG ---
 //if ($fmnetwork === "uk.wide.svxlink.uk") {
 //if (check_network($fmnetwork,"uk.wide.svxlink.uk")) {
+    if ((defined ('debug')) && (debug > 0)) echo "check Netz: $fmnetwork, UK:$uknetwork<br>";
 if ((check_network($fmnetwork,"uk.wide.svxlink.uk")) || (check_network($fmnetwork,"north.america.svxlink.net"))) {
 
     
@@ -18,6 +19,7 @@ if ((check_network($fmnetwork,"uk.wide.svxlink.uk")) || (check_network($fmnetwor
         echo '<div id="svxmqtt" style="margin-bottom:30px;">' . "\n";
     }
 
+    if ((defined ('debug')) && (debug > 0)) echo "akt Netz: $fmnetwork, UK:$uknetwork<br>";
 	if ($fmnetwork === $uknetwork) {
         $call_script = "global_lh.php";
     } else {

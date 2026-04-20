@@ -95,8 +95,8 @@ if (is_array($webNodes) && count($webNodes) > 0) {
             }
         }
     }
-    if ((defined ('debug')) && (debug > 0)) echo "writing cachefile:$cacheFile<br>";
-    if ((defined ('debug')) && (debug > 0)) echo "writing:" .  json_encode($cache) . "<br>";
+    if ((defined ('debug')) && (debug > 1)) echo "writing cachefile:$cacheFile<br>";
+    if ((defined ('debug')) && (debug > 1)) echo "writing:" .  json_encode($cache) . "<br>";
     file_put_contents($cacheFile, json_encode($cache));
 }
 
