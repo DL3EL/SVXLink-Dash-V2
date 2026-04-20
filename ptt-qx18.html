@@ -109,12 +109,14 @@ function get_range($scLM, $numid)
     foreach ($res["output"] as $line) {
         if (strpos($line, "min=") !== false) {
             preg_match('/min=(\d+),max=(\d+)/', $line, $m);
+            if ((defined ('debug')) && (debug > 0)) echo "getrange loop: ($m[1]/$m[2])<br>";
             return [
                 "min" => (int)$m[1],
                 "max" => (int)$m[2]
             ];
         }
     }
+    if ((defined ('debug')) && (debug > 0)) echo "getrange Ende (0/100)<br>";
     return ["min" => 0, "max" => 100];
 }
 
@@ -123,6 +125,7 @@ function get_range($scLM, $numid)
 // ==========================
 function set_volume($scLM, $numid, $value)
 {
+    if ((defined ('debug')) && (debug > 0)) echo "set_volume [$scLM, $numid, $value]<br>";
     run("amixer -c$scLM cset numid=$numid $value");
 }
 
@@ -239,13 +242,32 @@ echo '<button id="myButton" style="width:120px; color:white; background-color:si
 // 2. LAUTSPRECHER STEUERUNG
 echo '<form action="" method="post" style="display: inline-flex; align-items: center;">';
 echo "&nbsp;";
+//
+// ==========================
+// GET VALUES FOR DISPLAY
+// ==========================
 $volume = get_volume($sc, $numid);
+$sp_range = get_range($sc, $numid);
+
+// Prozent berechnen
+function to_percent($val, $range) {
+    return round(($val - $range["min"]) / ($range["max"] - $range["min"]) * 100);
+}
+
+$vol_percent = to_percent($volume, $sp_range);
+
+//
+if ((defined ('debug')) && (debug > 0)) echo "in Form, SC:$sc Numid:$numid Vol:$volume<br>";
 if ($volume) {
     echo '<button name="button_off" type="submit" style="margin-right:10px; width:50px; border-radius:8px; background-color:#7a4a4a; border:none; height:30px; cursor:pointer;"><img src="images/speaker_off.png" height="15"></button>';
     echo '<button name="buttonA" type="submit" style="width:30px; border-radius:8px; background-color:darkred; color:white; border:none; height:30px; font-weight:bold; cursor:pointer;">-</button>';
-    echo '<span style="margin: 0 10px; font-size:16px; font-family:sans-serif;">' . $volume . '%</span>';
+    echo '<span style="margin: 0 10px; font-size:16px; font-family:sans-serif;">' . $vol_percent . '%</span>';
     echo '<button name="buttonB" type="submit" style="width:30px; border-radius:8px; background-color:seagreen; color:white; border:none; height:30px; font-weight:bold; cursor:pointer;">+</button>';
 } else {
+    $file = "/tmp/vol_" . $numid;
+    if (!file_exists($file)) {
+        file_put_contents($file, "5");
+    }    
     echo '<button name="button_on" type="submit" style="width:50px; border-radius:8px; background-color:#4a7a7a; border:none; height:30px;"><img src="images/speaker.png" height="15" cursor:pointer;></button>';
     echo '<span style="margin-left:15px; font-family:sans-serif; color:grey; cursor:pointer;">Muted</span>';
 }
