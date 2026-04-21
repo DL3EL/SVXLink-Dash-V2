@@ -328,6 +328,14 @@ $dvsmode = OFF | DMR | YSF | DSTAR
                     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     echo '	<button name="btn_DSTAR_DISC" type="submit" style = "border-radius:8px; color:white; border-color:transparent; background-color:green; height:30px; width:100px; font-size:12px;"><b>DSTAR Discon</b></button>';
                     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                    echo '</form>';
+                    echo '<form method="post" action="">';
+
+                    echo '<label for="dmrtg">D-Star Room (eg DCS001KL)</label>';
+                    echo '<input type="text" id="dmrtg" name="dmrtg" value="">';
+                    echo '<button type="submit">ausw&auml;hlen</button>';
+                    echo '<input type="hidden" name="form_submitted" value="1">';
+                    echo '</form>';
                 }
             }
                 echo "<br>Configfile:$file($radio) / mode:$mode / DVS Mode:$dvsmode";
