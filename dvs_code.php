@@ -128,6 +128,10 @@ $dvsmode = OFF | DMR | YSF | DSTAR
 
 
     if (isset($_POST['btn_DVS_aus'])) {
+        if ($dvsmode !== "DMR") {
+            $command = "/opt/MMDVM_Bridge/dvswitch.sh mode DMR 2>&1";
+            exec($command,$screen,$retval);
+        }    
         $command = "echo '*7#' > /tmp/dtmf_svx";
         exec($command,$screen,$retval);
         $command = "echo '*910#' > /tmp/dtmf_svx";
