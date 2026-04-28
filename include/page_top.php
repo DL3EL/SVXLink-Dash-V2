@@ -143,9 +143,11 @@ if ((file_exists('/etc/systemd/system/svxlink-node.service')) && ($_SESSION['aut
     </button>';
 }
 
+if ($_SESSION['auth'] === "AUTHORISED") {
     if (file_exists(DL3EL.'/Reflector1.conf')) {
         include_once "ref_change.php";
     }
+}   
    
 ///
 ?>
