@@ -1262,7 +1262,18 @@ function display_config($config) {
           rename($db_File, $db_File . ".bak");
           touch($db_File);
       }
-
+//
+// 8. update DMRIds.dat
+	$DMRIDFile = DL3EL . "/DMRIds.dat";
+	$DMRIDFile_save = DL3EL . "/DMRIds.dat.save";
+	$update_script = DL3EL .'/DMRID_update.sh ';
+	$update_script = DL3EL . "/DMRID_update.sh";
+	$logfile =  DL3EL .'/DMRID_update.log';
+	$jetzt = date("Y-m-d H:i:s");
+	// für Tests
+	// sudo touch -m -t 202508101421 DMRIds.dat
+	$upd = update_file($DMRIDFile, $update_script, $logfile, 0);
+//
 // Ende
     date_default_timezone_set('Europe/Berlin');
     $jetzt = date("Y-m-d H:i:s");
