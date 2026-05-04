@@ -1272,7 +1272,7 @@ function display_config($config) {
 	$jetzt = date("Y-m-d H:i:s");
 	// für Tests
 	// sudo touch -m -t 202508101421 DMRIds.dat
-	$upd = update_file($DMRIDFile, $update_script, $logfile, 0);
+	$upd = update_file($DMRIDFile, $update_script, $logfile, 30);
 //
 // Ende
     date_default_timezone_set('Europe/Berlin');
