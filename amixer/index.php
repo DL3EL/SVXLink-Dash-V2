@@ -162,21 +162,43 @@ function getAmixerRange($input) {
         $sc_port_rxname = $svxconfig['SimplexLogic']['RX']; 
         $sc_port_rx = $svxconfig[$sc_port_rxname]['AUDIO_DEV']; 
         $sc_port_txname = $svxconfig['SimplexLogic']['TX']; 
+// ELenata Image von DG7AA:
+// AUDIO_DEV = alsa:fe_pi_capture
 // hier noch auf Multi Tx erweitern
         $sc_port_tx = $svxconfig["Tx1"]['AUDIO_DEV']; 
-        $card_start = strpos($sc_port_tx, 'CARD=')+5;
+        if ($sc_port_tx === "alsa:svx_tx_out") {
+            $dg7aa_image = 1;
+            $card_start = 0;
+        } else {    
+            $dg7aa_image = 0;
+            $card_start = strpos($sc_port_tx, 'CARD=')+5;
+        }    
         if ($card_start !== false) {
-            $card_end = strpos($sc_port_tx, ',DEV');
-            $card_string = substr($sc_port_tx, $card_start, $card_end - $card_start);
+            if ($dg7aa_image) {
+                $card_string = $sc_port_cmp;
+            } else {
+                $card_end = strpos($sc_port_tx, ',DEV');
+                $card_string = substr($sc_port_tx, $card_start, $card_end - $card_start);
+            }    
             $sc_tx_cmp = $card_string . " \[";
             $sc = 'aplay -l | grep "' . $sc_tx_cmp . '"';
             $sc_tx = substr(shell_exec($sc),5,1);
             if ((defined ('debug')) && (debug > 1)) echo "TX (Lautsprecher): $sc_tx_cmp, Card:[$sc_tx] ($sc) <br>SVXLink: [" . $sc_port_tx . "]<br>";
         }
-        $card_start = strpos($sc_port_rx, 'CARD=')+5;
+        if ($sc_port_rx === "alsa:fe_pi_capture") {
+            $dg7aa_image = 1;
+            $card_start = 0;
+        } else {    
+            $dg7aa_image = 0;
+            $card_start = strpos($sc_port_rx, 'CARD=')+5;
+        }    
         if ($card_start !== false) {
-            $card_end = strpos($sc_port_rx, ',DEV');
-            $card_string = substr($sc_port_rx, $card_start, $card_end - $card_start);
+            if ($dg7aa_image) {
+                $card_string = $sc_port_cmp;
+            } else {
+                $card_end = strpos($sc_port_rx, ',DEV');
+                $card_string = substr($sc_port_rx, $card_start, $card_end - $card_start);
+            }    
             $sc_rx_name = $card_string;
             $sc_rx_cmp = $card_string . " \[";
             $sc = 'aplay -l | grep "' . $sc_rx_cmp . '"';
@@ -342,7 +364,7 @@ if ((defined ('debug')) && (debug > 0)) {
             <input type="number" id="headphone" name="headphone" min="0" max="100" value="<?php echo htmlspecialchars(calculate_percentage($current_values['headphone'], $max_values['headphone'])); ?>" required>%
             <br>
         <?php 
-        if ($sc_tx !== $sc_rx) {
+        if (($sc_tx !== $sc_rx) && (!$dg7aa_image)) {
             echo '<h3 style="color:#00aee8;font: 12pt arial, sans-serif;font-weight:bold; text-shadow: 0.25px 0.25px gray;">ext. Mikrofon - ' . $sc_rx_name . '</h3>';
             echo '<label for="mic">(0-100): Set to 50</label>';
             echo '<input type="number" id="mic" name="mic" min="0" max="100" value="';
