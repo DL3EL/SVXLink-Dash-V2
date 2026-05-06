@@ -524,8 +524,10 @@ if ((defined ('debug')) && (debug > 0)) {
         reloadPage();
         </script>";    
 
+        $dtmf_pty = get_pty();
         if (isset($_POST["jmptoAm"])) {
-            $exec= "echo '*91" . $_POST['jmptoAm'] . "#' > /tmp/dtmf_svx";
+#            $exec= "echo '*91" . $_POST['jmptoAm'] . "#' > /tmp/dtmf_svx";
+            $exec= "echo '*91" . $_POST['jmptoAm'] . "#' > " . $dtmf_pty;
             exec($exec,$output);
             echo "<meta http-equiv='refresh' content='0'>";
             $logtext = "DTMF via Dashboard: "  . $_POST['jmptoAm'];
