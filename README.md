@@ -1,14 +1,10 @@
 # SVXLink-Dashboard-V2.5 Enhancements by DL3EL
-<---
-<h1>SVXLink Node dashboard repository inspired by a pi-star dashboard</h1>
-<h2>Originally constructed by SP2ONG and SP0DZ, but suffered from out of date code in PHP and Javascript.</h2>
---->
 Updated the code from Chris (G4NAB) slightly and added some enhancements
 <b>all requirements listed below in the original readme are still valid and need to be executed.</b> The only difference is, if you use a different directory than /var/www/html, you have to your your selected name instead.<br><br>
-<b>Base Image</b>
-- DC9VQ Image: only update from within the dashboard is necessary, dashboard is included in the the image
-- DG7AA Image: install image as described in own documentation, after that start here as described below. When finished, check "Hilfe", Topic 6 for special adjustments
-- own image: you know what t do :-)
+<b>Base Image</b><br>
+- DC9VQ Image: only update from within the dashboard is necessary, dashboard is included in the the image<br>
+- DG7AA Image: install image as described in own documentation, after that start here as described below. When finished, check "Hilfe", Topic 6 for special adjustments<br>
+- own image: you know what t do :-)<br><br>
 
 <b>Changes</b>
 <p>The major change is that the dashboard now runs in every directory below /var/www/html. So you can have two dashboards parallel, for test reasons or whatever.  </p>
