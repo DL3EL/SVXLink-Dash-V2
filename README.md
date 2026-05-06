@@ -1,8 +1,15 @@
 # SVXLink-Dashboard-V2.5 Enhancements by DL3EL
+<---
 <h1>SVXLink Node dashboard repository inspired by a pi-star dashboard</h1>
 <h2>Originally constructed by SP2ONG and SP0DZ, but suffered from out of date code in PHP and Javascript.</h2>
-Updated the code from Chris slightly and added some enhancements
+--->
+Updated the code from Chris (G4NAB) slightly and added some enhancements
 <b>all requirements listed below in the original readme are still valid and need to be executed.</b> The only difference is, if you use a different directory than /var/www/html, you have to your your selected name instead.<br><br>
+<b>Base Image</b>
+- DC9VQ Image: only update from within the dashboard is necessary, dashboard is included in the the image
+- DG7AA Image: install image as described in own documentation, after that start here as described below. When finished, check "Hilfe", Topic 6 for special adjustments
+- own image: you know what t do :-)
+
 <b>Changes</b>
 <p>The major change is that the dashboard now runs in every directory below /var/www/html. So you can have two dashboards parallel, for test reasons or whatever.  </p>
 <p>So in /var/www/ run the following command line. </p>
@@ -11,7 +18,7 @@ Updated the code from Chris slightly and added some enhancements
 <p>You can choose any other name than "SVXLink-Dash-V2.5"</p>
 <p>Some minor changes clearing double definitions and eliminating path names in the code when definitions are available. So the only file, that has to be changed for an individual configuration should be ./include/config.php.<br>
 To make it more  obvious, the button definition has moved from ./include/config.inc.php to ./include/config.php. This repository does not include both files, but ./include/config.inc.php.example and ./include/config.php.example. So old changes will not be overridden. As a disadvantage the .example files should be checked for any new or changed definitions. When the dashboard runs and does not find ./include/config.inc.php.example or ./include/config.php.example, the files will be created with the contents from the .example files (which is basically a factory reset for the dashboard).</p><br>
-Because of this, the script "upgrade.sh", mentioned below, will not work on the first run, because config.php et al. are not present. Therefore, it is necessary to open the dasboard via browser direct after the git clone command. In this run, the files will be created. Next, run the upgrade script as root where the rest is done.<br>
+Because of this, the script "upgrade.sh", mentioned below, will not work on the first run, because config.php et al. are not present. Therefore, it is necessary to open the dasboard via browser direct after the git clone command. In this run, the files will be created. Next, run the upgrade script as root where the rest is done.<br><br>
 <b>Enhancements</b><br>
 <p>The topic <b>Echolink</b> asks for a call or a part of if and, after hitting "Query" it shows all active Echolink stations, matching the query. A click on the station starts Echolink and tries to connect the station. Same happen, if "Echotest" is clicked</p>
 <p>The topic <b>FM Relais</b> requires a Repeater or APRS Call or alternatively a QTH locator to show all active repeaters from FM-Funknetz and/or with an active Echolink connection. Clicking the TG / Nodenumber tries to connect the Echolink Node or activates the FM-Funknetz TG locally.</p>
