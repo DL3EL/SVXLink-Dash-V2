@@ -247,7 +247,9 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a class="hreflink" href="./caller.php?file=' . DL3EL . '/aprs-is-msg.conf" id="aprs">aprs.conf</a> | ';
 	    }
 	    echo '<a class="hreflink" href="./caller.php?file=' . DL3EL_BASE . 'include/config.php" id="configphp">config.php</a> | ';
-	    echo '<a class="hreflink" href="./wifi.php" >Wifi</a> | ';
+	    if (!file_exists('/var/www/html/dbversion.php')) {
+		echo '<a class="hreflink" href="./wifi.php" >Wifi</a> | ';
+	    }
 	    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
 //		echo '<a href="./audio.php" style = "color: #0000ff;"> Audio </a> | ';
 		echo '<a class="hreflink" href="./network.php" >Network</a> |  ';
@@ -348,11 +350,9 @@ if (session_status() === PHP_SESSION_NONE) {
 	    }
 	    ++$refnr;
 	}
-        if ((defined('DL3EL_GIT_UPDATE')) && (DL3EL_GIT_UPDATE === "nocheck") && (defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) { 
-            if (file_exists('./statistic.php')) {
-		echo '| <a class="hreflink" href="./statistic.php" id="log">Statistic</a> ';
-            }
-        }
+        if (file_exists('./statistic.php')) {
+	    echo '| <a class="hreflink" href="./statistic.php" id="log">Statistic</a> ';
+	}
 	$tgdb_File = DL3EL_BASE . "include/tgdb.php";
 	if (filesize($tgdb_File)  <= 1000) {
 	    echo '| <a class="hreflink" href="./include/tgdb_upd.php" id="upd">Update TGDB</a> ';
