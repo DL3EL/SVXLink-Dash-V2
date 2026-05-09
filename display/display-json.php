@@ -7,7 +7,7 @@ define('DISPLAY_API_VERSION', '1.0.1');
 define('DTMF_FIFO', '/tmp/dtmf_svx');
 
 if ((defined ('debug')) && (debug > 0)) echo "Ich bin gerade hier: " . getcwd() . "\n";
-define ("debug", "0");
+//define ("debug", "0");
 
 if (is_readable("../include/config.php")) {
 	include_once "../include/config.php";
@@ -169,6 +169,19 @@ function selected_tg($lines) {
 }
 
 function last_heard($lines, $limit = 12) {
+//
+	$use_names = 0;
+	if (DL3EL_DB) {
+		$DMRIDFile = DL3EL . "/DMRIds.dat";
+		if ((defined ('debug')) && (debug > 0)) echo  "ID: $DMRIDFile\n";
+		$dmrIDline = file_get_contents($DMRIDFile);
+		if (strlen($dmrIDline) > 1000000) {
+		$use_names = 1;
+		include_once "../include/tgdb.php";    
+		}  
+	}	
+    if ((defined ('debug')) && (debug > 0)) echo "use names: $use_names\n";
+//
     $heard = array();
     $seen = array();
     for ($i = count($lines) - 1; $i >= 0 && count($heard) < $limit; $i--) {
@@ -179,6 +192,60 @@ function last_heard($lines, $limit = 12) {
         $tg = trim($m[3]);
         $call = trim($m[4]);
         if ($call === '' || strlen($call) > 24) continue;
+//
+		$station = $call;
+		if ($use_names) {
+			if ((defined ('debug')) && (debug > 0)) echo "($i) search Name: $call ";
+			//Aufbereitung LastCall zur Suche in DMRIds.dat (entfernt Bindestrich)
+			$string = $call;
+			$position = strpos($string, "-");		// Stelle des "-" zurück
+			if ($position !== false) {			// Prüft, ob das Zeichen gefunden wurde
+				$call = substr($string, 0, $position);	//schneidet ab "-" ab
+			}
+			// Suche Name zum Call in DMRIds.da
+			if ((defined ('debug')) && (debug > 0)) echo "search Name: $call ";
+			$arr2 = $call;
+			if (isset($call_array[$call])) {
+				if ((defined ('debug')) && (debug > 0)) echo "$call already found: $call_array[$call] \n";
+				$name = $call_array[$call];
+			} else {	 
+				if ((defined ('debug')) && (debug > 0)) echo "search Name: $call ";
+				if ((substr($call,0,3) === "DB0") || (substr($call,0,3) === "DM0") || (substr($call,0,3) === "DO0")) {
+					if ((defined ('debug')) && (debug > 0)) echo "Call is Repeater, no names \n";
+					$name = "";
+				} else {	
+					$pos = strpos($dmrIDline, $arr2." ");
+					if ($pos != false) {
+						$name = substr($dmrIDline, ($pos + strlen($arr2." ")));
+						$name = ltrim($name, " ");
+						$x = strpos($name, "\n");
+						$y = strpos($name, " ");
+						$name = rtrim($name, " ");
+						if ($x < $y) {
+							$name = substr($name, 0, $x);
+						} else {
+							$name = substr($name, 0, $y);
+						}
+						if ((defined ('debug')) && (debug > 0)) echo "Name: $name \n";
+						$call_array[$call] = $name;
+					}	
+				}	
+			}	
+		} else {
+			$name = "";
+		}
+	
+//
+// TG
+		if (DL3EL_DB) {
+			$tgnumber = $tg;
+			$tgname = ltrim(isset($tgdb_array[$tgnumber])? $tgdb_array[$tgnumber] : '');
+			if ( $tgnumber>=400 and $tgnumber<= 499){ $tgname ="AUTO QSY";}
+		} else {
+			$tgname = "";
+		}	
+
+//
         $key = $call . '#' . $tg;
         if (isset($seen[$key])) continue;
         $seen[$key] = true;
@@ -188,11 +255,12 @@ function last_heard($lines, $limit = 12) {
             'mode' => 'SVXLink',
             'source_mode' => 'SVXLink',
             'callsign' => $call,
-            'station' => $call,
+            'station' => $station,
+            'name' => $name,
             'target' => 'TG ' . $tg,
             'talkgroup' => $tg,
             'target_name' => '',
-            'talkgroup_name' => '',
+            'talkgroup_name' => $tgname,
             'src' => 'SVXRef',
             'source_system' => 'SVXRef',
             'tx' => $event === 'start' ? 'ON' : 'OFF'
