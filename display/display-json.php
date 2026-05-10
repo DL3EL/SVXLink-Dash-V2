@@ -155,7 +155,7 @@ function svxlink_log_candidates($path) {
     return array();
 }
 
-function tail_lines($file, $count = 1200) {
+function tail_lines($file, $count = 12000) {
     $out = array();
     foreach (svxlink_log_candidates($file) as $candidate) {
         $cmd = 'tail -n ' . intval($count) . ' ' . escapeshellarg($candidate) . ' 2>/dev/null';
@@ -398,7 +398,7 @@ function tg_list_for_reflector($conf, $reflector, $activeTg, $temporaryTg) {
     return array_values($out);
 }
 
-function build_reflectors($conf, $lines, $reflectors) {
+function build_reflectors($conf, $lines, $reflectors, $fmnetwork) {
     $out = array();
     foreach ($reflectors as $reflector) {
         $defaultTg = conf_value($conf, $reflector, 'DEFAULT_TG', '');
@@ -474,12 +474,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conf = read_conf();
-$lines = tail_lines(svx_log_path(), 1200);
+$lines = tail_lines(svx_log_path(), 12000);
 $logicNames = configured_logics($conf);
 $baseLogic = base_logic($conf, $logicNames);
 $reflectorSections = reflector_sections($conf, $logicNames);
 $primaryReflector = count($reflectorSections) ? $reflectorSections[0] : '';
-$reflectors = build_reflectors($conf, $lines, $reflectorSections);
+$reflectors = build_reflectors($conf, $lines, $reflectorSections, $fmnetwork);
 $primary = count($reflectors) ? $reflectors[0] : array('tg' => array('default' => '', 'active' => '', 'temporary_monitor' => '', 'monitor' => array(), 'list' => array()));
 
 $response = array(
@@ -488,7 +488,7 @@ $response = array(
     'api_version' => DISPLAY_API_VERSION,
     'backend' => 'SVXLink',
     'dashboard' => array(
-        'root' => __DIR__,
+        'root' => $dashboardRoot,
         'config_file' => svx_conf_path(),
         'log_file' => svx_log_path(),
         'dtmf_fifo' => dtmf_fifo_path()
