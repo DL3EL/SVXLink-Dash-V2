@@ -84,7 +84,12 @@ echo '<div style = "width:180px;"><span style = "font-weight: bold;font-size:14p
 //echo '<fieldset style = "width:170px;background-color:#e8e8e8e8;margin-right:3px;font-size:12px;border-radius:10px;">';
 
 
-if (isProcessRunning('svxlink')) {
+if (defined('SVXNAME')) {
+   $svxprocess = SVXNAME;
+} else {
+   $svxprocess = 'svxlink';
+}      
+if (isProcessRunning($svxprocess)) {
    echo "<table style=\"margin-top:4px;margin-bottom:13px;\">\n";
    echo "<tr><th><span style=\"font-size:12px;\">Active Logics</span></th></tr>\n";
    if ((defined('SVXCONFIG')) && (defined('SVXCONFPATH'))) {
@@ -499,7 +504,7 @@ if ($reflectorlogic2 != "") {
    echo "</div></td></tr>";
    echo "</table>\n";
 } else {
-   echo "<span style=\"color:red;font-size:13.5px;font-weight: bold;\">SvxLink is not <br>running</span>";
+   echo "<span style=\"color:red;font-size:13.5px;font-weight: bold;\">SvxLink ($svxprocess) is not <br>running</span>";
 }
 ?>
 </fieldset>
