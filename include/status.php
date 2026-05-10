@@ -83,7 +83,7 @@ include_once "functions.php";
 echo '<div style = "width:180px;"><span style = "font-weight: bold;font-size:14px;">SVXLink Info</span></div>';
 //echo '<fieldset style = "width:170px;background-color:#e8e8e8e8;margin-right:3px;font-size:12px;border-radius:10px;">';
 
-
+// hier noch genauer prüfen, wenn zwei Tasks laufen (DB0HTV)
 if (defined('SVXNAME')) {
    $svxprocess = 'svxlink';
 } else {
