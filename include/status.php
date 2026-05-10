@@ -85,7 +85,7 @@ echo '<div style = "width:180px;"><span style = "font-weight: bold;font-size:14p
 
 
 if (defined('SVXNAME')) {
-   $svxprocess = SVXNAME;
+   $svxprocess = 'svxlink';
 } else {
    $svxprocess = 'svxlink';
 }      
