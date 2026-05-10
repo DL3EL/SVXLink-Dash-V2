@@ -346,12 +346,13 @@ if (session_status() === PHP_SESSION_NONE) {
 		} else {
 		    echo '|';
 		}   
-		echo ' <a class="hreflink" href="./caller.php?file=' . $ref_conf . '" id="reflector1">Reflector' . $refnr . '.conf</a> ';
+		echo ' <a class="hreflink" href="./caller.php?file=' . $ref_conf . '" id="reflector1">Ref' . $refnr . '.conf</a> ';
 	    }
 	    ++$refnr;
 	}
         if (file_exists('./statistic.php')) {
-	    echo '| <a class="hreflink" href="./statistic.php" id="log">Statistic</a> ';
+//	    echo '| <a class="hreflink" href="./statistic.php" id="log">Statistic</a> ';
+	    echo '| <a class="hreflink" href="./caller_extern.php?id=./statistic/index.php" >Stat</a> ';
 	}
 	$tgdb_File = DL3EL_BASE . "include/tgdb.php";
 	if (filesize($tgdb_File)  <= 1000) {
