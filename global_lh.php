@@ -89,10 +89,18 @@ if (is_array($webNodes) && count($webNodes) > 0) {
                           . "<td style='width:20%; font-weight:bold; color:green;' class='ukw-duration'>".$duration."s</td>"
                           . "</tr>";
         } else {
+// Nur aktualisieren, wenn der Node im Cache ist UND vorher auf 'talking' stan
+            if (isset($cache[$nodeName]) && $cache[$nodeName]['talking'] === true) {
+                $cache[$nodeName]['talking'] = false;
+                $cache[$nodeName]['last_end'] = date("H:i:s"); // Für die Sortierung
+                $cache[$nodeName]['end_str'] = date("d.m.y H:i:s"); // Für die Anzeige
+            }
+/*
             if (isset($cache[$nodeName])) {
                 $cache[$nodeName]['talking'] = false;
                 $cache[$nodeName]['end_str'] = date("d.m.y H:i:s", time());
             }
+*/
         }
     }
     if ((defined ('debug')) && (debug > 1)) echo "writing cachefile:$cacheFile<br>";
