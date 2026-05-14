@@ -325,6 +325,7 @@ function getSVXTGTMP($reflector) {
 /////////////////// Process DTMF
 
 function getLastDTMF() {
+// currently not used
         $logPath = SVXLOGPATH.SVXLOGPREFIX;
         $logLine = `tail -1000 $logPath | egrep -a -h "DTMF command received:"`;
         if (strpos($logLine,"received:")) {
