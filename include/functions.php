@@ -324,6 +324,16 @@ function getSVXTGTMP($reflector) {
 
 /////////////////// Process DTMF
 
+function getLastDTMF() {
+        $logPath = SVXLOGPATH.SVXLOGPREFIX;
+        $logLine = `tail -1000 $logPath | egrep -a -h "DTMF command received:"`;
+        if (strpos($logLine,"received:")) {
+          $dtmf=substr($logLine,strpos($logLine,"received:")+10,12);
+         }
+         else {$dtmf=""; }
+        return $dtmf;
+}
+
 function getSVXCommand() {
   $logPath = SVXLOGPATH.SVXLOGPREFIX;
   $file = SVXCONFPATH.SVXCONFIG;
