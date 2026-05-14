@@ -20,7 +20,8 @@ if ((check_network($fmnetwork,"uk.wide.svxlink.uk")) || (check_network($fmnetwor
     }
 
     if ((defined ('debug')) && (debug > 0)) echo "akt Netz: $fmnetwork, UK:$uknetwork<br>";
-	if ($fmnetwork === $uknetwork) {
+    if (check_network($fmnetwork,$uknetwork)) {
+//	if ($fmnetwork === $uknetwork) {
         $call_script = "global_lh.php";
     } else {
         $call_script = "uk-wide.php";

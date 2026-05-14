@@ -7,9 +7,9 @@ if ($_SESSION['auth'] !== 'AUTHORISED') {
 }
 
 // 1. Abhängigkeiten laden
-if (!isset($svx_include)) {
-    include_once "include/settings.php";
-}
+//if (!isset($svx_include)) {
+//    include_once "include/settings.php";
+//}
 include_once "include/settings.php";
 
 /**
@@ -41,10 +41,14 @@ if ((defined ('debug')) && (debug > 0)) echo "UK: $uknetwork NA: $nanetwork <br>
 //if (check_network($fmnetwork,$uknetwork)) {
 //    $url = "https://" . $uknetwork_state . "/status.php?json";
 //} 
+/*
 if (check_network($fmnetwork,$nanetwork)) {
     $url = "https://" . $nanetwork_state . "/status.php?json";
+} else {
+    $url = "NIL";
 }
-//$url = "https://north.america.svxlink.net/status.php?json";
+*/
+$url = $nanetwork_lh;
 $jsonRaw = @file_get_contents($url);
 $webData = json_decode($jsonRaw, true);
 $webNodes = isset($webData['nodes']) ? $webData['nodes'] : [];
