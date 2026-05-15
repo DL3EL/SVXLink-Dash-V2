@@ -133,15 +133,17 @@ if (session_status() === PHP_SESSION_NONE) {
 	}    
 	//<!--<a href="./dtmf.php" style = "color: #0000ff;">Dtmf</a> | -->
 	//<!--<a href="./audio.php" style = "color: #0000ff;">Audio </a> | -->
+/*
 	if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
             $cubeip = str_replace(' ', '<br />', exec('hostname -I | awk \'{print $1}\''));
 	    $cubeip = "http://" . $cubeip . ":8081";
 	    echo '<a class="hreflink" href="./caller_extern.php?id=' . $cubeip . '" >SVXCube | </a> ';
 	} else {
+*/
 	    if (defined('DL3EL_SVXCUBE'))  {
 		echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_SVXCUBE . '" >SVXCube | </a> ';
 	    }    
-	}    
+//	}    
 	if ((defined('DL3EL_QSOLINK')) && (DL3EL_QSOLINK === "yes")) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://qsolink.websdrbordeaux.fr/dashboard.html">QSOLinkDB | </a> ';
 	}
