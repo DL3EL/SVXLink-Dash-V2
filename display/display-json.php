@@ -2,16 +2,14 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 error_reporting(0);
-
 define('DISPLAY_API_VERSION', '1.1.0');
 // DL3EL
 error_reporting(-1);
 //define ("debug", "1");
 if ((defined ('debug')) && (debug > 0)) echo "Ich bin gerade hier: " . getcwd() . "\n";
-
 if (is_readable("../include/config.php")) {
 	include_once "../include/config.php";
-	//include_once "../include/functions.php";
+	include_once "../include/functions.php";
 	define('SVXLINK_CONF', SVXCONFPATH . SVXCONFIG);
 	define('SVXLINK_LOG', SVXLOGPATH . SVXLOGPREFIX);
 	$fmnetwork = get_network();
@@ -31,7 +29,6 @@ if (is_readable("../include/config.php")) {
 }
 if ((defined ('debug')) && (debug > 0)) echo "SVXLINK_CONF: " . SVXLINK_CONF . "\n";
 if ((defined ('debug')) && (debug > 0)) echo "SVXLINK_LOG: " . SVXLINK_LOG . "\n";
-
 function get_network() {
     $svxConfigFile = SVXCONFPATH . SVXCONFIG;
     $svxconfig = parse_ini_file($svxConfigFile,true,INI_SCANNER_RAW);
@@ -473,7 +470,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     send_json(array('ok' => false, 'error' => 'Unknown action'), 400);
 }
 
+function check_aprs() {
+   if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+      $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
+      if (!strlen($aprs_script)) {
+         $debug = "";
+         if ((defined ('debug')) && (debug > 0)) $debug = "v=" . debug . " ";
+         $dbversionFile = DL3EL . "/dbversion";
+         $dbversion = file_get_contents($dbversionFile);
+         if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+            $dbversion = $dbversion . "(s)(a)";
+         }  
+         if (file_exists("/usr/local/bin/mqtt-simple")) {
+            $dbversion = $dbversion . "(m)";
+         } else {
+            $dbversion = $dbversion . "(m)";
+         }
+         $dbversion = " db=\"" . $dbversion . "\"";
+         /* Radio */
+         $radioinfo = "";
+         $radioqrg = "";
+         $radioctcss = "";
+         if (defined('DL3EL_RADIO')) {
+            $svxRadio = DL3EL_RADIO;
+            if (($svxRadio == "Shari") || ($svxRadio == "RFGuru") || ($svxRadio == "Elenata")) {
+               $RfConfFile = DL3EL . '/sa818/sa818.json';
+               if (fopen($RfConfFile,'r')) {
+                  $filedata = file_get_contents($RfConfFile);
+                  $RfData = json_decode($filedata,true);
+//                  $radioqrg = " qrg=\"" . $RfData['rxfreq'] . "\"";
+//                  $radioctcss = " rct=\"" . $RfData['rxctcss'] . "\"";
+                  $radioinfo = " ri=\"(" . $RfData['rxfreq'] . "MHz, T" . $RfData['rxctcss'] . ")\"";
+               } 
+            } else {
+               $radioinfo = " ri=\"(" . $svxRadio . ")\"";
+            }   
+         }
+//         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioqrg . $radioctcss . " >/dev/null &";
+         $cmd = DL3EL . "/aprs-is-msg.pl " . $debug . "c=" . $callsign . $dbversion . $radioinfo . " >/dev/null &";
+         echo "Starting APRS " . $debug;
+         exec($cmd, $output, $retval);
+         $logtext =  "APRS Dienst gestartet " . $cmd . " /" . $debug . "\n";
+         addsvxlog($logtext);
+      } else {
+         if ((defined ('debug')) && (debug > 0)) echo "APRS: [" . $aprs_script . "]<br>";
+      }   
+    }
+}
+    
+function check_mqtt() {
+   $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+   if ((!strlen($mqtt_script)) && (file_exists("/usr/local/bin/mqtt-simple"))) {
+      if ((!defined('DL3EL_MQTT')) || ((defined('DL3EL_MQTT')) && (DL3EL_MQTT !== "no"))) {
+         start_mqtt();
+      }   
+   }
+
+}
+
+function check_cron($fmnetwork) {
+    $cron_File = DL3EL . "/crontab.log";
+    if (file_exists($cron_File)) {
+		if ((defined ('DL3EL_CRON_TIMER')) && (DL3EL_CRON_TIMER > 0)) {
+			$timer = DL3EL_CRON_TIMER;
+		} else {
+		$timer = 86400;
+		}
+		$delta = time() - filemtime($cron_File);
+		$target = filemtime($cron_File) + $timer;
+		if ($delta > $timer) {
+			$cron = start_cron($cron_File,$callsign,$fmnetwork,"L");
+			touch($cron_File);
+		}  
+     }
+}	
 $conf = read_conf();
+if (DL3EL_DB) {
+	check_aprs();
+	check_mqtt();
+	check_cron($fmnetwork);
+}	
 $lines = tail_lines(svx_log_path(), 12000);
 $logicNames = configured_logics($conf);
 $baseLogic = base_logic($conf, $logicNames);
@@ -521,3 +597,4 @@ $response = array(
 );
 
 send_json($response);
+?>

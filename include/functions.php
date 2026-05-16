@@ -69,9 +69,6 @@ function getLogContent() {
     return $logContent !== '' ? nl2br($logContent) : "Log file not found.";
 }
 
-
-
-
 function getSVXStatusLog() {
 	// Open Logfile and copy loglines into LogLines-Array()
 	$logLines = array();
@@ -1611,7 +1608,4 @@ file_put_contents(DL3EL_BASE . "include/tgdb.php",$content);
         return (0);
       }  
     }
-
-
 ?>
-    
