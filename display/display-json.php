@@ -317,7 +317,8 @@ function short_local_time($time) {
     return $time;
 }
 
-function parse_talker_line($line) {
+// function parse_talker_line($line) {
+function parse_talker_line($line, $use_names = 0, &$dmrIDline = "", &$call_cache = array()) {
     if (!preg_match('/^(.+?):\s*([A-Za-z][A-Za-z0-9_+\-]*):\s*Talker\s+(start|stop)\s+on\s+TG\s*#?\s*([0-9]+)\s*:\s*(.+)$/i', $line, $m)) {
         return null;
     }
@@ -328,6 +329,54 @@ function parse_talker_line($line) {
     $call = trim($m[5]);
     $call = preg_replace('/\s+/', ' ', $call);
     if ($call === '' || strlen($call) > 32) return null;
+
+    // --- NAMENSERMITTLUNG ---
+    $station = $call;
+    $name = "";
+    if ($use_names && !empty($dmrIDline)) {
+        // Aufbereitung LastCall: Bindestrich (z.B. -S oder -L) entfernen
+        $clean_call = $call;
+        $position = strpos($clean_call, "-");
+        if ($position !== false) {
+            $clean_call = substr($clean_call, 0, $position);
+        }
+
+        // 1. Blick in den schnellen Cache (Arbeitsspeicher-Array)
+        if (isset($call_cache[$clean_call])) {
+            $name = $call_cache[$clean_call];
+        } else {
+            // Repeater ausschließen (DB0, DM0, DO0)
+            $prefix = substr($clean_call, 0, 3);
+            if ($prefix === "DB0" || $prefix === "DM0" || $prefix === "DO0") {
+                $name = "";
+            } else {
+                // 2. Suche im übergebenen String (Kein Festplattenzugriff!)
+                $pos = strpos($dmrIDline, $clean_call . " ");
+                if ($pos !== false) {
+                    $name = substr($dmrIDline, ($pos + strlen($clean_call . " ")));
+                    $name = ltrim($name, " ");
+                    $x = strpos($name, "\n");
+                    $y = strpos($name, " ");
+                    $name = rtrim($name, " ");
+                    
+                    if ($x !== false && $y !== false) {
+                        $name = ($x < $y) ? substr($name, 0, $x) : substr($name, 0, $y);
+                    } elseif ($x !== false) {
+                        $name = substr($name, 0, $x);
+                    } elseif ($y !== false) {
+                        $name = substr($name, 0, $y);
+                    }
+                    
+                    $name = trim($name);
+                    // Ergebnis für die nächste Zeile im Array cachen
+                    $call_cache[$clean_call] = $name;
+                }
+            }
+        }
+    }
+    // --- ENDE NAMENSERMITTLUNG ---
+
+
 
     $tx = 'OFF';
     if ($event === 'start') {
@@ -342,6 +391,7 @@ function parse_talker_line($line) {
         'source_mode' => 'SVXLink',
         'callsign' => $call,
         'station' => $call,
+        'fname' => $name, // Das Array wird hier um den Namen ergänzt
         'target' => 'TG ' . $tg,
         'talkgroup' => $tg,
         'target_name' => tg_name($tg),
@@ -355,10 +405,32 @@ function parse_talker_line($line) {
 
 function last_heard($lines, $limit = 12) {
     $limit = max(1, min(100, intval($limit)));
+
+    // --- EINMALIGES EINLESEN AM ANFANG VON last_heard ---
+    $use_names = 0;
+    $dmrIDline = "";
+    $call_cache = array(); // Cache-Array zur Vermeidung doppelter String-Suchen
+
+    if (defined('DL3EL_DB') && DL3EL_DB) {
+        $DMRIDFile = DL3EL . "/DMRIds.dat";
+        if (defined('debug') && debug > 0) echo "ID: $DMRIDFile\n";
+        
+        if (file_exists($DMRIDFile)) {
+            $dmrIDline = file_get_contents($DMRIDFile);
+            if (strlen($dmrIDline) > 1000000) {
+                $use_names = 1;
+                include_once "../include/tgdb.php";    
+            }  
+        }  
+    }   
+    if (defined('debug') && debug > 0) echo "use names: $use_names\n";
+    // ----------------------------------------------------
+
     $heard = array();
     $seen = array();
     for ($i = count($lines) - 1; $i >= 0 && count($heard) < $limit; $i--) {
-        $item = parse_talker_line($lines[$i]);
+        $item = parse_talker_line($lines[$i], $use_names, $dmrIDline, $call_cache);
+        //$item = parse_talker_line($lines[$i]);
         if (!$item) continue;
         $key = $item['callsign'] . '#' . $item['talkgroup'];
         if (isset($seen[$key])) continue;
@@ -544,11 +616,71 @@ function check_cron($fmnetwork) {
 		}  
      }
 }	
+
+function check_pos(&$lat,&$lon) {
+   if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+      $aprspos = DL3EL . "/aprs-follow.pos";
+      if (file_exists($aprspos)) {
+         $delta = time() - filemtime($aprspos);
+//         if ($delta > 60) {
+            $filepos = file_get_contents($aprspos);
+            $position = explode("^",$filepos);
+            $lat = $position[0];
+            $lon = $position[1];
+            $lat = convertNmeaToDecimal($position[0]);
+            $lon = convertNmeaToDecimal($position[1]);
+
+//         }   
+      }
+   }      
+}
+
+function convertNmeaToDecimal($coordinateStr) {
+    // Leerzeichen entfernen und alles in Großbuchstaben umwandeln
+    $coordinateStr = strtoupper(trim($coordinateStr));
+    if (empty($coordinateStr)) return 0.0;
+
+    // Die Himmelsrichtung ist das letzte Zeichen
+    $direction = substr($coordinateStr, -1);
+    
+    // Den reinen Zahlenwert ohne den Buchstaben heraustrennen
+    $numericPart = substr($coordinateStr, 0, -1);
+
+    // Bestimmen, ob es sich um Längengrad (E/W -> 3 Stellen Grad) 
+    // oder Breitengrad (N/S -> 2 Stellen Grad) handelt
+    if ($direction === 'E' || $direction === 'W') {
+        $degLen = 3; // gggmm.dd
+    } elseif ($direction === 'N' || $direction === 'S') {
+        $degLen = 2; // ggmm.dd
+    } else {
+        // Falls kein gültiger Buchstabe gefunden wurde
+        return 0.0; 
+    }
+
+    // Grad und Minuten trennen
+    $degrees = (int)substr($numericPart, 0, $degLen);
+    $minutes = (float)substr($numericPart, $degLen);
+
+    // In Dezimalgrad umrechnen
+    $decimal = $degrees + ($minutes / 60.0);
+
+    // Bei Süden (S) oder Westen (W) das Vorzeichen umkehren (negativ machen)
+    if ($direction === 'S' || $direction === 'W') {
+        $decimal = -$decimal;
+    }
+
+    // Auf 6 Nachkommastellen runden
+    return round($decimal, 6);
+}
+
 $conf = read_conf();
 if (DL3EL_DB) {
 	check_aprs();
 	check_mqtt();
 	check_cron($fmnetwork);
+    $lat = "";
+    $lon = "";
+    check_pos($lat,$lon);
 }	
 $lines = tail_lines(svx_log_path(), 12000);
 $logicNames = configured_logics($conf);
@@ -578,6 +710,8 @@ $response = array(
         'logic' => $baseLogic
     ),
     'radio_status' => radio_status($lines),
+    'hs_lat' => (string)$lat,
+    'hs_lon' => (string)$lon,
     'reflector_status' => $primaryReflector !== '' ? reflector_status($lines, $primaryReflector, $fmnetwork) : 'No status',
     'reflector_host' => $primaryReflector !== '' ? host_from_conf($conf, $primaryReflector, $fmnetwork) : '',
     'reflectors' => $reflectors,
