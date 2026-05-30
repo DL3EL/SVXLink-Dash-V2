@@ -45,6 +45,7 @@ echo '<div id="content_area">';
                     $call_script = $_GET['id'] . ".php";
                     
                     if (($call_script === "amixer/index.php") || ($call_script === "power/index.php")) {
+                        $svx_include = 0;
                         echo '<object style="outline:none; width:600px; height:900px;" data="' . $call_script . '"></object>';
                     } else {    
                         // Falls das inkludierte File selbst Tabellen hat, 

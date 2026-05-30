@@ -141,7 +141,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	} else {
 */
 	    if (defined('DL3EL_SVXCUBE'))  {
-		echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_SVXCUBE . '" >SVXCube | </a> ';
+		echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_SVXCUBE . '" >ext. Displays | </a> ';
 	    }    
 //	}    
 	if ((defined('DL3EL_QSOLINK')) && (DL3EL_QSOLINK === "yes")) {
