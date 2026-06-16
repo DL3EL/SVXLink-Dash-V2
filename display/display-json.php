@@ -439,9 +439,11 @@ function last_heard($lines, $limit = 12) {
             if (is_array($cached_data)) {
                 if (defined('debug') && debug > 0) echo "Cache-Hit: Keine Änderung. Ausgabe aus Datei geladen.\n";
                 //echo "Using chache data\n";
-                $req = "Using cache data ";
-                $log_file = __DIR__ . "/display.log";
-                file_put_contents($log_file,$req,FILE_APPEND);
+				if (DL3EL_DB) {
+					$req = "Using cache data ";
+					$log_file = __DIR__ . "/display.log";
+					file_put_contents($log_file,$req,FILE_APPEND);
+				}	
                 return $cached_data; // Funktion bricht hier sofort ab und spart 100% CPU-Last!
             }
         }
@@ -450,9 +452,11 @@ function last_heard($lines, $limit = 12) {
     // --- 3. CACHE-MISS: NEUE ROHDATEN FÜR NÄCHSTE PRÜFUNG SPEICHERN ---
     //echo "writing new cache: $raw_cache_file\n";
     file_put_contents($raw_cache_file, $current_raw_content);
-    $req = "Writing new cache ";
-    $log_file = __DIR__ . "/display.log";
-    file_put_contents($log_file,$req,FILE_APPEND);
+	if (DL3EL_DB) {
+		$req = "Writing new cache ";
+		$log_file = __DIR__ . "/display.log";
+		file_put_contents($log_file,$req,FILE_APPEND);
+	}	
 
     // --- AB HIER FOLGT IHRE ORIGINALE EINLESE-STRUKTUR (UNVERÄNDERT) ---
     $use_names = 0;
@@ -796,9 +800,11 @@ $response = array(
     )
 );
 
-$currentTime_R = microtime(true) - $currentTime;
-$req = " Ticks: " . round($currentTime_R, 4) ."\n ";
-file_put_contents($log_file, $req,FILE_APPEND);
+if (DL3EL_DB) {
+	$currentTime_R = microtime(true) - $currentTime;
+	$req = " Ticks: " . round($currentTime_R, 4) ."\n ";
+	file_put_contents($log_file, $req,FILE_APPEND);
+}	
 send_json($response);
 
 
