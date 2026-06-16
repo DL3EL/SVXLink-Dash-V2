@@ -133,7 +133,10 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     echo '}'."\n";
     echo 'setTimeout(reloadLastHeard,3000);'."\n";
 
-    if ($dmr_support == "1") {
+    $DMRStatusFile = DL3EL . "/dmr_status";
+    $dmrstatus = trim(shell_exec('cat ' . $DMRStatusFile));
+    if (($dmr_support == "1") && ($dmrstatus !== "FM_only")){
+//    if ($dmr_support == "1") {
         echo 'function reloadLastHeardDMR(){'."\n";
         echo '  $("#LastHeardDMR").load("/DVSwitch/include/lh.php",function(){ setTimeout(reloadLastHeardDMR,3000) });'."\n";
         echo '}'."\n";
@@ -162,7 +165,9 @@ if ($_SESSION['auth'] === "AUTHORISED") {
     include_once "include/lh.php";
     echo '</div></center>'."\n";
 
-    if ($dmr_support == "1") {
+    $DMRStatusFile = DL3EL . "/dmr_status";
+    $dmrstatus = trim(shell_exec('cat ' . $DMRStatusFile));
+    if (($dmr_support == "1") && ($dmrstatus !== "FM_only")){
         echo '<center><div id="LastHeardDMR" style = "margin-bottom:30px;">'."\n";
         echo '</div></center>'."\n";
     }    
