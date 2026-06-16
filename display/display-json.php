@@ -6,6 +6,7 @@ define('DISPLAY_API_VERSION', '1.1.0');
 // DL3EL
 error_reporting(-1);
 //define ("debug", "1");
+$currentTime = microtime(true);
 if ((defined ('debug')) && (debug > 0)) echo "Ich bin gerade hier: " . getcwd() . "\n";
 if (is_readable("../include/config.php")) {
 	include_once "../include/config.php";
@@ -389,7 +390,7 @@ function parse_talker_line($line, $use_names = 0, &$dmrIDline = "", &$call_cache
         'time_local' => short_local_time($time),
         'mode' => 'SVXLink',
         'source_mode' => 'SVXLink',
-        'callsign' => $call,
+        'callsign' => $clean_call,
         'station' => $call,
         'fname' => $name, // Das Array wird hier um den Namen ergänzt
         'target' => 'TG ' . $tg,
@@ -406,7 +407,54 @@ function parse_talker_line($line, $use_names = 0, &$dmrIDline = "", &$call_cache
 function last_heard($lines, $limit = 12) {
     $limit = max(1, min(100, intval($limit)));
 
-    // --- EINMALIGES EINLESEN AM ANFANG VON last_heard ---
+    // Absolute Pfade für die lokalen Cache-Dateien im selben Ordner
+    $raw_cache_file = __DIR__ . "/last_heard_input.txt";
+    $json_cache_file = __DIR__ . "/last_heard_cache.json";
+
+    // --- 1. ERMITTLUNG DER AKTUELLEN 12 GÜLTIGEN ROHZEILEN (OHNE NAMENSERMITTLUNG) ---
+    $valid_raw_lines = array();
+    for ($i = count($lines) - 1; $i >= 0 && count($valid_raw_lines) < $limit; $i--) {
+        $current_line = $lines[$i];
+        
+        // Nutzt exakt dieselbe Vorfilterung (Regex) wie parse_talker_line
+        if (preg_match('/^(.+?):\s*([A-Za-z][A-Za-z0-9_+\-]*):\s*Talker\s+(start|stop)\s+on\s+TG\s*#?\s*([0-9]+)\s*:\s*(.+)$/i', $current_line, $m)) {
+            $call = trim($m[5]);
+            $call = preg_replace('/\s+/', ' ', $call);
+            if ($call !== '' && strlen($call) <= 32) {
+                $valid_raw_lines[] = $current_line;
+            }
+        }
+    }
+    $valid_raw_lines = array_reverse($valid_raw_lines);
+    $current_raw_content = implode("\n", $valid_raw_lines) . "\n";
+
+    // --- 2. CACHE-PRÜFUNG: WENN UNVERÄNDERT, DIREKT GESPEICHERTE AUSGABE SENDEN ---
+    if (file_exists($raw_cache_file) && file_exists($json_cache_file)) {
+        $old_raw_content = file_get_contents($raw_cache_file);
+        
+        // Wenn die Logzeilen absolut identisch sind, laden wir das fertige alte Ergebnis
+        if ($old_raw_content === $current_raw_content) {
+            $cached_json = file_get_contents($json_cache_file);
+            $cached_data = json_decode($cached_json, true);
+            if (is_array($cached_data)) {
+                if (defined('debug') && debug > 0) echo "Cache-Hit: Keine Änderung. Ausgabe aus Datei geladen.\n";
+                //echo "Using chache data\n";
+                $req = "Using cache data ";
+                $log_file = __DIR__ . "/display.log";
+                file_put_contents($log_file,$req,FILE_APPEND);
+                return $cached_data; // Funktion bricht hier sofort ab und spart 100% CPU-Last!
+            }
+        }
+    }
+
+    // --- 3. CACHE-MISS: NEUE ROHDATEN FÜR NÄCHSTE PRÜFUNG SPEICHERN ---
+    //echo "writing new cache: $raw_cache_file\n";
+    file_put_contents($raw_cache_file, $current_raw_content);
+    $req = "Writing new cache ";
+    $log_file = __DIR__ . "/display.log";
+    file_put_contents($log_file,$req,FILE_APPEND);
+
+    // --- AB HIER FOLGT IHRE ORIGINALE EINLESE-STRUKTUR (UNVERÄNDERT) ---
     $use_names = 0;
     $dmrIDline = "";
     $call_cache = array(); // Cache-Array zur Vermeidung doppelter String-Suchen
@@ -424,19 +472,25 @@ function last_heard($lines, $limit = 12) {
         }  
     }   
     if (defined('debug') && debug > 0) echo "use names: $use_names\n";
-    // ----------------------------------------------------
+    // ------------------------------------------------------------------
 
+    // --- IHRE ORIGINALE SCHLEIFE MIT PARSE_TALKER_LINE (UNVERÄNDERT) ---
     $heard = array();
     $seen = array();
     for ($i = count($lines) - 1; $i >= 0 && count($heard) < $limit; $i--) {
         $item = parse_talker_line($lines[$i], $use_names, $dmrIDline, $call_cache);
-        //$item = parse_talker_line($lines[$i]);
         if (!$item) continue;
+//echo "parsing line: $lines[$i] with result: $item\n";
         $key = $item['callsign'] . '#' . $item['talkgroup'];
         if (isset($seen[$key])) continue;
         $seen[$key] = true;
         $heard[] = $item;
     }
+
+    // --- 4. DIE GERADE GENERIERTE AUSGABE FÜR DEN NÄCHSTEN AUFRUF SPEICHERN ---
+    file_put_contents($json_cache_file, json_encode($heard));
+    //echo "saving output: $json_cache_file\n";
+
     return $heard;
 }
 
@@ -681,6 +735,18 @@ if (DL3EL_DB) {
     $lat = "";
     $lon = "";
     check_pos($lat,$lon);
+    $log_file = __DIR__ . "/display.log";
+
+    $log_file_size = filesize($log_file);
+    if ($log_file_size > 100000) {
+        rename($log_file, $log_file . ".bak");
+          touch($log_file);
+    }
+
+    date_default_timezone_set('Europe/Berlin');
+    $dateStr = date("H:i:s");
+    $req = "REQ: " . $dateStr . " ";
+    file_put_contents($log_file, $req,FILE_APPEND);
 }	
 $lines = tail_lines(svx_log_path(), 12000);
 $logicNames = configured_logics($conf);
@@ -730,5 +796,10 @@ $response = array(
     )
 );
 
+$currentTime_R = microtime(true) - $currentTime;
+$req = " Ticks: " . round($currentTime_R, 4) ."\n ";
+file_put_contents($log_file, $req,FILE_APPEND);
 send_json($response);
+
+
 ?>
