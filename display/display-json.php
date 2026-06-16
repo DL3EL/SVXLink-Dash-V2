@@ -802,7 +802,7 @@ $response = array(
 
 if (DL3EL_DB) {
 	$currentTime_R = microtime(true) - $currentTime;
-	$req = " Ticks: " . round($currentTime_R, 4) ."\n ";
+	$req = " Ticks: " . round($currentTime_R, 4) ."\n";
 	file_put_contents($log_file, $req,FILE_APPEND);
 }	
 send_json($response);
