@@ -84,9 +84,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	if ((defined ('debug')) && (debug > 0)) echo "UK: $uknetwork NA: $nanetwork <br>";
 
 	if (check_network($fmnetwork,$uknetwork)) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $uknetwork_state . '">UK Monitor | </a> ';
+//	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $uknetwork_state . '">UK Monitor | </a> ';
+	    echo '<a class="hreflink" href=https://' . $uknetwork_state . ' target="UKN" rel="noopener noreferrer">UK Monitor | </a> ';
 	} elseif (check_network($fmnetwork,$nanetwork)) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $nanetwork_state . '">US Monitor | </a> ';
+//	    echo '<a class="hreflink" href="./caller_extern.php?id=https://' . $nanetwork_state . '">US Monitor | </a> ';
+	    echo '<a class="hreflink" href=https://' . $nanetwork_state . ' target="UKN" rel="noopener noreferrer">US Monitor | </a> ';
 	} else {    
 	    if (file_exists("/usr/local/bin/mqtt-simple")) {
 		echo '<a class="hreflink" href="./caller.php?id=monitor&refresh=15" style = "color: crimson;" id="log" target="_top">MonitorCalls | </a> ';
@@ -148,10 +150,16 @@ if (session_status() === PHP_SESSION_NONE) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=https://qsolink.websdrbordeaux.fr/dashboard.html">QSOLinkDB | </a> ';
 	}
 	if ((defined('DL3EL_UK_NET')) && (DL3EL_UK_NET === "yes")) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://ukwide.svxlink.net/">UK Net | </a> ';
+	    if (!check_network($fmnetwork,$uknetwork)) {
+//	    echo '<a class="hreflink" href="./caller_extern.php?id=https://ukwide.svxlink.net/">UK Net | </a> ';
+		echo '<a class="hreflink" href=https://' . $uknetwork_state . ' target="UKN" rel="noopener noreferrer">UK Monitor | </a> ';
+	    } 
 	}
 	if ((defined('DL3EL_US_NET')) && (DL3EL_US_NET === "yes")) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://north.america.svxlink.net/">US Net | </a> ';
+	    if (!check_network($fmnetwork,$nanetwork)) {
+//	    echo '<a class="hreflink" href="./caller_extern.php?id=https://north.america.svxlink.net/">US Net | </a> ';
+		echo '<a class="hreflink" href=https://' . $nanetwork_state . ' target="UKN" rel="noopener noreferrer">US Monitor | </a> ';
+	    }
 	}
 	echo '<a class="hreflink" href="./config_backup.php" >Backup/Restore</a> ';
     } else {

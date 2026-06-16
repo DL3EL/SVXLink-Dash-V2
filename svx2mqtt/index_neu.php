@@ -88,7 +88,11 @@ if (file_exists($file)) {
                         $time = $line_e['time'];
                         $talk_state = $line_e['talk'];
                         $call = $line_e['call'];
-                        $tg = $line_e['tg'];
+                        if (!isset($line_e['tg'])) {
+                            $tg = 0;
+                        } else{     
+                            $tg = $line_e['tg'];
+                        }    
                         
                         // Nur verarbeiten, wenn dieses Call-Ereignis noch nicht finalisiert wurde
                         // Da wir rückwärts lesen, ignorieren wir Dubletten
