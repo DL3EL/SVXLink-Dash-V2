@@ -207,9 +207,11 @@ function getEchoLinkProxy() {
           exec($command,$screen,$retval);
           if ($retval === 0) {
             echo "svxlink sucessfull restartet";
+            $logtext = "svxlink sucessfull restartet, new EcholinkProxy: $eproxy\n";
           } else {
-            echo "svxlink restart failure, check log";
+            echo "svxlink restart failure, check log (change of Echolink Proxy)";
           }
+          addsvxlog($logtext);
         }
       } else {
           $eproxy="<span style=\"color:red;font-weight:bold;\">Disconnected proxy</span><br><span style=\"color:brown;font-weight:bold;\">".$proxy."</span>";
@@ -397,8 +399,12 @@ function svx_restart() {
     sleep(1);
     if ($retval === 0) {
       echo "svxlink sucessfull restartet";
+      $logtext = "svxlink sucessfull restarted by svx_restart\n";
+      addsvxlog($logtext);
     } else {
       echo "svxlink restart failure, check log";
+      $logtext = "svxlink restart failure by svx_restart, check log\n";
+      addsvxlog($logtext);
     }
 }
 

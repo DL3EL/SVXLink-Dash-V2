@@ -92,6 +92,8 @@ if (isset($_POST['btnSvxRef']))
         //exec('sudo nmcli dev wifi rescan');
         $command = "sudo systemctl restart svxreflector 2>&1";
         exec($command,$screen,$retval);
+        $logtext = "svxreflector restart (manual)\n";
+        addsvxlog($logtext);
 }
 
 if (isset($_POST['btnSvxlinkoff']))
@@ -144,6 +146,9 @@ if (isset($_POST['btnRestart']))
         //$sAconn = $_POST['sAconn'];
         //$password = $_POST['password'];
         //exec('sudo nmcli dev wifi rescan');
+        $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+        $logtext = "system shutdown, manual, by $ip\n";
+        addsvxlog($logtext);
         $command = "sudo shutdown -r now 2>&1";
         exec($command,$screen,$retval);
 }

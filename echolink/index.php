@@ -70,8 +70,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
             <?php
             include_once "../include/functions.php";
-            $directory = MODULEPATH;
-            $svxConfigFile = ECHOLINKCONFIG;
+            $directory = SVXCONFPATH . "svxlink.d/";
+            $svxConfigFile = 'ModuleEchoLink.conf';
             $file = $directory . $svxConfigFile;
             $owner = 'svxlink';
             $group = 'svxlink';
@@ -118,6 +118,8 @@ if (session_status() === PHP_SESSION_NONE) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSave'])) {
                 save_svxconfig($file, $_POST);
                 sleep(1);
+                $logtext = "svxlink restart (echolink config change)\n";
+                addsvxlog($logtext);
                 exec('sudo systemctl restart svxlink 2>&1', $screen, $retval);
 
                 if ($retval === 0) {

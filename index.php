@@ -75,9 +75,13 @@ if ((defined('DL3EL_SC_CHANGE')) && (DL3EL_SC_CHANGE === "yes")) {
             sleep(1);
             exec('sudo systemctl restart svxlink 2>&1', $screen, $retval);
             if ($retval === 0) {
-                echo "SVXLink sucessfull restartet, please reload page";
+                $logtext = "svxlink sucessfull restarted, new SoundCard setting for card: $sc\n";
+                addsvxlog($logtext);
+                echo "SVXLink sucessfull restarted, please reload page";
             } else {
                 echo "SVXLink restart failure, check log";
+                $logtext = "SVXLink restart failure, check log";
+                addsvxlog($logtext);
             }
          }   
     }

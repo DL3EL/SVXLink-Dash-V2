@@ -121,6 +121,8 @@ if (session_status() === PHP_SESSION_NONE) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSave'])) {
                 save_svxconfig($file, $_POST);
                 sleep(1);
+                $logtext = "svxlink restart (svxlink config change)\n";
+                addsvxlog($logtext);
                 exec('sudo systemctl restart svxlink 2>&1', $screen, $retval);
 
                 if ($retval === 0) {
