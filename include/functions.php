@@ -115,8 +115,32 @@ function getSVXRstatus($reflector) {
            $svxrstat = `tail -10000 $logPath | egrep -a -h "Authentication|Connection established|Heartbeat timeout|No route to host|Connection refused|Connection timed out|Locally ordered disconnect|Deactivating link|Activating link" | grep $reflector: | tail -1`;}
            if(strpos($svxrstat,"Authentication OK") || strpos($svxrstat,"Connection established") || strpos($svxrstat,"Activating link")){
               $svxrstatus="Connected";
+              if ((defined('DL3EL_SVX_QUICK_RESTART')) && (DL3EL_SVX_QUICK_RESTART === "yes")) {
+                $svxReboot = DL3EL . "/svxreboot";
+                if (file_exists($svxReboot)) {
+                  unlink($svxReboot);
+                }  
+              }  
             }
-           elseif (strpos($svxrstat,"Heartbeat timeout") || strpos($svxrstat,"No route to host") || strpos($svxrstat,"Connection refused") || strpos($svxrstat,"Connection timed out") || strpos($svxrstat,"Locally ordered disconnect") || strpos($svxrstat,"Deactivating link")) { $svxrstatus="Not connected";}
+//           elseif (strpos($svxrstat,"Heartbeat timeout") || strpos($svxrstat,"No route to host") || strpos($svxrstat,"Connection refused") || strpos($svxrstat,"Connection timed out") || strpos($svxrstat,"Locally ordered disconnect") || strpos($svxrstat,"Deactivating link")) { $svxrstatus="Not connected";}
+           elseif (strpos($svxrstat,"Heartbeat timeout") || strpos($svxrstat,"No route to host") || strpos($svxrstat,"Connection refused") || strpos($svxrstat,"Connection timed out") || strpos($svxrstat,"Locally ordered disconnect") || strpos($svxrstat,"Deactivating link")) { 
+                  if ((defined('DL3EL_SVX_QUICK_RESTART')) && (DL3EL_SVX_QUICK_RESTART === "yes")) {
+                    $svxReboot = DL3EL . "/svxreboot";
+                    if (!file_exists($svxReboot)) {
+                        file_put_contents($svxReboot, "1");
+                        $logtext = "SVXLink Restarted from Status \n";
+                        addsvxlog($logtext);
+                        $svxlink = "svxlink";
+                        $command = "sudo systemctl restart " . $svxlink . " 2>&1";
+                        exec($command,$screen,$retval);
+                    } else {
+                        $logtext = "SVXLink (Status) Restart already ongoing \n";
+                        addsvxlog($logtext);
+                    }
+                  }  
+                  $svxrstatus="Not connected";
+             }
+
            else { $svxrstatus="No status";}
       return $svxrstatus;
 }
