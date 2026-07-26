@@ -135,6 +135,14 @@ if (isset($_POST['btnRestartMQTT'])) {
         addsvxlog($logtext);
     }  
 
+if (isset($_POST['btnRestartDSTAR'])) {
+        $command = "/home/pi/DMR-Hotspot/start/st_dstar_only.sh 2>&1";
+        exec($command,$screen,$retval);
+        $logtext =  "D-Star Hotspot neu gestartet\n";
+        addsvxlog($logtext);
+    }  
+
+
 if (isset($_POST['btnRestart']))
     {
 
@@ -341,6 +349,10 @@ if (isset($_POST['btnCleanUp']))
         <br>
 	<button name="btnPower" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Power OFF</button>
 <?php
+   if (file_exists('/home/pi/DMR-Hotspot/start/st_dstar_only.sh')) {
+        echo '<button name="btnRestartDSTAR" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart D-Star Hotspot</button>';
+        echo '<br>';
+   }
    if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
         echo '<button name="btnSvxRef" type="submit" class="red" style = "height:30px; width:400px; font-size:12px;">Restart SVXReflector Service</button>';
         echo '<br>';
