@@ -136,9 +136,9 @@ if (isset($_POST['btnRestartMQTT'])) {
     }  
 
 if (isset($_POST['btnRestartDSTAR'])) {
-        $command = "/home/pi/DMR-Hotspot/start/st_dstar_only.sh 2>&1";
+        $command = DL3EL . "/st_dstar_only.sh 2>&1";
         exec($command,$screen,$retval);
-        $logtext =  "D-Star Hotspot neu gestartet\n";
+        $logtext =  "D-Star Hotspot neu gestartet ($command)\n";
         addsvxlog($logtext);
     }  
 
