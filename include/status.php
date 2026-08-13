@@ -88,8 +88,10 @@ if (defined('SVXNAME')) {
    $svxprocess = 'svxlink';
 } else {
    $svxprocess = 'svxlink';
-}      
-if (isProcessRunning($svxprocess)) {
+}
+$svx_running = shell_exec("pgrep " . $svxprocess);
+if (strlen($svx_running)) {
+//if (isProcessRunning($svxprocess)) {
    echo "<table style=\"margin-top:4px;margin-bottom:13px;\">\n";
    echo "<tr><th><span style=\"font-size:12px;\">Active Logics</span></th></tr>\n";
    if ((defined('SVXCONFIG')) && (defined('SVXCONFPATH'))) {
