@@ -53,14 +53,16 @@ if (file_exists($wx_file)) {
                     }
                 }
                 if ((defined ('debug')) && (debug > 0)) echo "WX found: $call [" . $content . "], Score:" . $data['score'] . " <br>";;
-                $data['display'] = implode(' | ', $info);
-                $data['time'] = $time;
-                $data['ztime'] = $ztime;
-                $stations[$call] = $data;
-                if ((defined ('DL3EL_WX_STN')) && (DL3EL_WX_STN === $call)) {
-                    if ((defined ('debug')) && (debug > 0)) echo "WX_STN:" . DL3EL_WX_STN . " " . $call . "<br>";;
-                    $wx_stn_found = 1;
-                    break;
+                if ($data['dist'] !== 9999) {
+                    $data['display'] = implode(' | ', $info);
+                    $data['time'] = $time;
+                    $data['ztime'] = $ztime;
+                    $stations[$call] = $data;
+                    if ((defined ('DL3EL_WX_STN')) && (DL3EL_WX_STN === $call)) {
+                        if ((defined ('debug')) && (debug > 0)) echo "WX_STN:" . DL3EL_WX_STN . " " . $call . "<br>";;
+                        $wx_stn_found = 1;
+                        break;
+                    }
                 }
 
             }
