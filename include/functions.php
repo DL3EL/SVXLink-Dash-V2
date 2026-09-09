@@ -490,6 +490,8 @@ function upd_svx_config($file,$file_new) {
     }  
 
     file_put_contents($file, $content);
+    $logtext = "profile changes to $file_new, next restart\n";
+    addsvxlog($logtext);
     svx_restart();
     return(1);
 }
@@ -1266,22 +1268,47 @@ function display_config($config) {
 	    if ((defined ('debug')) && (debug > 4)) echo "Stat: $cmd<br>";
 	    exec($cmd);
 // 6. check for Updates
-        $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
-//        $content = file_get_contents('http://192.68.17.16/FM-Relais/dbversion');
-        if ($content !== ".g")  {
+        if ((defined ('DL3EL_AUTO_UPDATE')) && (DL3EL_AUTO_UPDATE === "no")) {
+// important, it is only possible to opt out of autoupdate, it is enabled by default          
+          $autoupdate = 0;
+        } else {
+          $autoupdate = 1;
+        }
+        if ($autoupdate) {
+          $content = file_get_contents('http://192.68.17.16/FM-Funknetz/dbversion.auto') . ".g";
+        } else {
+          $content = file_get_contents('https://github.com/DL3EL/SVXLink-Dash-V2/raw/refs/heads/main/dl3el/dbversion') . ".g";
+        }    
+        if ($content !== ".g") {
           list($gitversion, $rest) = explode(" ", $content);
           $dbversionFile = DL3EL . "/dbversion";
           $dbversion = file_get_contents($dbversionFile);
           list($version, $rest) = explode(" ", $dbversion);
-//        $logtext =  "Update $gitversion to version $version possible\n";
-//        addsvxlog($logtext);
           if ($gitversion !== $version) {
-              $dbversionFile = DL3EL . "/dbversion.upd";
-              $content = "update";
-              file_put_contents($dbversionFile, $content);
-              $logtext =  "Update to version $gitversion possible\n";
+//            $logtext =  "Update from $version to version $gitversion possible\n";
+//            addsvxlog($logtext);
+            $dbversionFile = DL3EL . "/dbversion.upd";
+            $content = "update";
+            file_put_contents($dbversionFile, $content);
+            if ($autoupdate) {
+              $logtext =  "Auto-Update enabled and started from $version to version $gitversion\n";
               addsvxlog($logtext);
-          }    
+              update_db();
+            } else {  
+//              $dbversionFile = DL3EL . "/dbversion.upd";
+//              $content = "update";
+//              file_put_contents($dbversionFile, $content);
+              $logtext =  "Update to version $gitversion possible, !!Autoupdate is manually disabled, consider re-enabling it!!\n";
+              addsvxlog($logtext);
+            }    
+          } else {
+            if ($autoupdate) {
+                $logtext =  "Auto-Update enabled, System up to date (Local: $version, Git: $gitversion)\n";
+            } else {
+                $logtext =  "System up to date (Local: $version, Git: $gitversion)\n";
+            }      
+            addsvxlog($logtext);
+          }
         }
 // 7. start mqtt Task, if possible
     start_mqtt();
@@ -1639,5 +1666,130 @@ echo "<br>Stat: $cmd";
       } else {
         return (0);
       }  
+    }
+
+    function update_db() {
+        $logtext =  "Update started..\n";
+        addsvxlog($logtext);
+
+        $dbversionFile = DL3EL . "/dbversion";
+        $dbversion = file_get_contents($dbversionFile);
+        list($old_dbversion, $rest) = explode(" ", $dbversion);
+        $file = DL3EL_BASE .'git_pull.sh';
+        $log = DL3EL_BASE .'git_pull.log';
+        $gitdir = substr(DL3EL_BASE,0,strlen(DL3EL_BASE)-1);
+        $owner = 'svxlink';
+        $group = 'svxlink';
+
+        $logtext =  "Starting git download..\n";
+        addsvxlog($logtext);
+        $command = "sudo chown $owner:$group " . escapeshellarg($file) . " >" . $log . " 2>&1";
+        $output = [];
+        $return_var = 0;
+        exec($command, $output, $return_var);
+        $logtext =  "git update done..\n";
+        addsvxlog($logtext);
+        $retval = null;
+        $screen = null;
+        $command = "sudo chmod g+x " . $file . " >>" . $log . " 2>&1";
+        exec($command,$output,$retval);
+        $command = $file . " " . $gitdir . " >>" . $log . " 2>&1";
+        exec($command,$output,$retval);
+        echo '<textarea name="content" rows="2" cols="72">' . htmlspecialchars($logtext) . '</textarea><br>';
+        $content = file_get_contents($log);
+        exec("find " . DL3EL_BASE . "* ! -exec sudo chown $owner:$group {} +");
+        if (str_contains($content,'error: Your local changes to the following files would be overwritten')) {
+                $content = $content . "\nDatei Inkonsistenz zu Github \n";
+        addsvxlog($content);
+                $pos1 = stripos($content, "merge:");
+                $pos2 = stripos($content, "Please");
+                $str = substr($content,$pos1,$pos2-$pos1);
+                $str = str_replace("\r\n","\n",$str); 
+                $str = str_replace("\t","\n",$str); 
+                $str_array = explode("\n",$str);
+                $nn = 1; 
+                foreach ($str_array as $file) {
+                  if (($file !== "") && ($file !== "merge:") && ($file !== "power/index.php")) {
+                    $file = DL3EL_BASE . $file;
+                    $mvfile = $nn . ": [" . $file . "]\n";
+                    $content = $content . $mvfile;
+                    $cmd = $file . " " . $file . ".bak\n";
+                    $content = $content . "Datei wird umbenannt:\nrename " . $cmd;
+                    $logtext =  "Datei wird umbenannt:\nrename " . $cmd;
+                    addsvxlog($logtext);
+                    if ((defined('DL3EL_VERSION')) && (DL3EL_VERSION === "develop")) {
+                       echo "no renaming, development\n";
+                       $content = $content .  "no renaming, development";
+                    } else {        
+                       rename($file, $file. ".bak");
+                    }    
+                    $content = $content . "\n";
+                    ++$nn;
+                  }
+                }        
+                $content = $content . "\nDateien wurden umbenannt, bitte den Update nocheinmal ausführen";
+                addsvxlog($content);
+// send Update crashed msg
+                $dbversionFile = DL3EL . "/dbversion";
+                $new_dbversion = file_get_contents($dbversionFile);
+                list($dbversion, $rest) = explode(" ", $new_dbversion);
+                $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=Update Abbruch\"";
+                exec($cmd);
+//
+                $logtext =  "Update not successful\n";
+        } else {       
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 1\n");
+                $dbversionFile = DL3EL . "/dbversion";
+                $new_dbversion = file_get_contents($dbversionFile);
+                list($dbversion, $rest) = explode(" ", $new_dbversion);
+                if (file_exists('/etc/systemd/system/svxlink-node.service')) {
+                  $dbversion = $dbversion . "(s)";
+                }  
+//                if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
+                $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
+                if (strlen($aprs_script)) {
+                // process is running
+                    $dbversion = $dbversion . "(a)";
+                }  
+                $mqtt_script = shell_exec("pgrep fmn-mqtt.pl");
+                if (strlen($mqtt_script)) {
+                    $dbversion = $dbversion . "(m)";
+                }
+                $gitversion = file_get_contents("gitversion");
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 2\n");
+                if (DL3EL_GIT_UPDATE === "nocheck") {
+                  $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
+                } else {
+                  $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
+                }        
+                $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 3\n");
+                if (!strlen($fmnetwork)) {
+                        $fmnetwork = getfmnetwork();
+                }     
+                $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
+                $useragent = str_replace(";",",",$useragent); 
+
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 4\n");
+                $logtext =  "Github Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
+                $cmd = "wget -q -O " . DL3EL . "/dbwget.log \"http://relais.dl3el.de/cgi-bin/db-log.pl?call=" . $callsign . "&vers='" . $dbversion . "'&net=" . $fmnetwork . $upd . "&ua='" . $useragent . "'\"";
+                if ((defined ('debug')) && (debug > 4)) addlog("L",$cmd);
+                exec($cmd);
+                $dbversionFile = DL3EL . "/dbversion.upd";
+                $dbversionFilecontent = "up2date";
+                file_put_contents($dbversionFile, $dbversionFilecontent);
+                if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 5\n");
+                $logtext =  "$old_dbversion Update to version $gitversion successful\n";
+// if this file exists, aprs task will terminate, status.php will start it again
+                $aprs_exit = DL3EL . "/aprs.exit";
+                touch($aprs_exit);
+// kill fmn-mqtt.pl, status.php will start it again
+                $command = "sudo killall fmn-mqtt.pl 2>&1";
+                exec($command,$screen,$retval);
+                
+        }
+        // Display in textarea           
+        addsvxlog($logtext);
+        echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($content) . '</textarea><br>';
     }
 ?>
