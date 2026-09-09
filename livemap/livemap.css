@@ -1,0 +1,212 @@
+html,
+body {
+    width: 1210px;
+    height: 780px;
+    margin: 0;
+    padding: 0;
+	background-color: #fififi;
+    font: 11pt arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: right;
+}
+
+#map {
+    width: 1210px;
+    height: 780px;
+}
+
+/* Linkes Panel */
+#talkerPanel {
+    position: absolute;
+    top: 95px;
+    left: 10px;
+    width: 240px;
+    z-index: 1000;
+    background: rgba(30, 30, 60, 0.32);	
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+/* Überschrift */
+.panelHeader {
+	padding: 5px 8px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    background: rgba(0, 0, 255, 0.5);
+    color: #ffffff;
+    text-align: center;
+    border-bottom: 1px solid #666666;
+	
+}
+
+/* Funkstille */
+.emptyMessage {
+    padding: 15px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* Liste */
+#talkerList {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Ein einzelner Sprecher */
+.talkerEntry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(150, 150, 150, 0.35);
+    background: transparent;
+    font-family: Arial, sans-serif;
+}
+
+/* Call */
+.talkerCall {
+    font-weight: bold;
+    color: #ffff00 !important;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.talkerCall:hover {
+    color: #fff36a !important;
+    text-decoration: underline;
+}
+
+/* TG */
+.talkerTG {
+    padding: 3px  8px;
+    border-radius: 5px;
+    background: #2e8b57;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition:
+        filter 0.15s ease,
+        transform 0.15s ease;
+}
+
+.talkerTG:hover {
+    filter: brightness(1.15);
+}
+
+.talkerTG:active {
+    transform: scale(0.95);
+}
+
+/* Sprecher Marker */
+.talker-marker {
+    background: transparent;
+    border: none;
+}
+
+.talker-marker-inner {
+    width: 18px;
+    height: 18px;
+    background: #ff0000;
+	border: none;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+}
+
+.talkerCall:hover {
+    color: #c00000;
+    text-decoration: underline;
+}
+
+/* Empfänger Marker */
+.receiver-marker {
+    background: transparent;
+    border: none;
+}
+
+.receiver-marker-inner {
+    width: 14px;
+    height: 14px;
+    background: green;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+}
+
+.seiten-titel {
+    color: #00aeeb;
+    margin-bottom: 20px;
+    font-family: arial, sans-serif;
+}
+
+.tabelle-zentriert {
+    border-collapse: collapse;
+    background-color: #fififi;
+    margin: 0 auto;
+}
+
+.back-button {
+    border: none;
+    border-radius: 10px;
+    margin-top: 15px;
+    color: yellow;
+    background: #bb0000;
+    height: 35px;
+    width: 180px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Darstellungs-Menü */
+#displayPanel {
+    position: absolute;
+    bottom: 30px;
+    left: 10px;
+    width: 240px;
+    z-index: 1000;
+	background: rgba(30, 30, 60, 0.32);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+/* Überschrift */
+.displayHeader {
+    padding: 8px 10px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+	background: rgba(0, 0, 255, 0.5);
+    color: #ffffff;
+    text-align: center;
+}
+
+/* Checkbox-Zeile */
+.displayOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffff00;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Checkbox */
+.displayOption input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}

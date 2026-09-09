@@ -161,6 +161,10 @@ if (session_status() === PHP_SESSION_NONE) {
 		echo '<a class="hreflink" href=https://' . $nanetwork_state . ' target="UKN" rel="noopener noreferrer">US Monitor | </a> ';
 	    }
 	}
+	if (defined('DL4EM_LIVEMAP'))  {
+//	    echo '<a class="hreflink" href="./caller.php?id=livemap/index.html" ">LiveMap</a> | ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=livemap/index.html" ">LiveMap</a> | ';
+	}    
 	echo '<a class="hreflink" href="./config_backup.php" >Backup/Restore</a> ';
     } else {
 	echo '<a class="hreflink" href="./index.php" >Dashboard</a> ';
