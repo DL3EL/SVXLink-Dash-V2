@@ -163,7 +163,7 @@ if (session_status() === PHP_SESSION_NONE) {
 	}
 	if (defined('DL4EM_LIVEMAP'))  {
 //	    echo '<a class="hreflink" href="./caller.php?id=livemap/index.html" ">LiveMap</a> | ';
-	    echo '<a class="hreflink" href="./caller_extern.php?id=livemap/index.html" ">LiveMap</a> | ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=livemap/index.php" ">LiveMap</a> | ';
 	}    
 	echo '<a class="hreflink" href="./config_backup.php" >Backup/Restore</a> ';
     } else {

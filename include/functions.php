@@ -1293,7 +1293,7 @@ function display_config($config) {
             if ($autoupdate) {
               $logtext =  "Auto-Update enabled and started from $version to version $gitversion\n";
               addsvxlog($logtext);
-              update_db();
+              update_db($autoupdate);
             } else {  
 //              $dbversionFile = DL3EL . "/dbversion.upd";
 //              $content = "update";
@@ -1668,7 +1668,7 @@ echo "<br>Stat: $cmd";
       }  
     }
 
-    function update_db() {
+    function update_db($autoupdate) {
         $logtext =  "Update started..\n";
         addsvxlog($logtext);
 
@@ -1757,11 +1757,15 @@ echo "<br>Stat: $cmd";
                 }
                 $gitversion = file_get_contents("gitversion");
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 2\n");
-                if (DL3EL_GIT_UPDATE === "nocheck") {
-                  $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
-                } else {
-                  $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
-                }        
+                if ($autoupdate) {
+                  $upd = "&upd=a_" . $old_dbversion . "(" . $gitversion . ")";
+                } else {  
+                  if (DL3EL_GIT_UPDATE === "nocheck") {
+                    $upd = "&upd=f_" . $old_dbversion . "(" . $gitversion . ")";
+                  } else {
+                    $upd = "&upd=u_" . $old_dbversion . "(" . $gitversion . ")";
+                  }        
+                }  
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 3\n");
                 if (!strlen($fmnetwork)) {
