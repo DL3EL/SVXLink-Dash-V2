@@ -175,7 +175,7 @@ if (isset($_POST['btnrstshari']))
 if (isset($_POST['btnDashUpdate']))
     {
         $autoupdate = 0;
-        update_db($autoupdate);
+        update_db($autoupdate,$callsign);
 
 }
 

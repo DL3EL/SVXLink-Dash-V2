@@ -1293,7 +1293,7 @@ function display_config($config) {
             if ($autoupdate) {
               $logtext =  "Auto-Update enabled and started from $version to version $gitversion\n";
               addsvxlog($logtext);
-              update_db($autoupdate);
+              update_db($autoupdate,$callsign);
             } else {  
 //              $dbversionFile = DL3EL . "/dbversion.upd";
 //              $content = "update";
@@ -1668,7 +1668,7 @@ echo "<br>Stat: $cmd";
       }  
     }
 
-    function update_db($autoupdate) {
+    function update_db($autoupdate,$callsign) {
         $logtext =  "Update started..\n";
         addsvxlog($logtext);
 
