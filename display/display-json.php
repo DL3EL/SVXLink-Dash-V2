@@ -658,7 +658,7 @@ function check_mqtt() {
 
 }
 
-function check_cron($fmnetwork) {
+function check_cron($fmnetwork,$callsign) {
     $cron_File = DL3EL . "/crontab.log";
     if (file_exists($cron_File)) {
 		if ((defined ('DL3EL_CRON_TIMER')) && (DL3EL_CRON_TIMER > 0)) {
@@ -732,10 +732,17 @@ function convertNmeaToDecimal($coordinateStr) {
 }
 
 $conf = read_conf();
+$lines = tail_lines(svx_log_path(), 12000);
+$logicNames = configured_logics($conf);
+$baseLogic = base_logic($conf, $logicNames);
+$reflectorSections = reflector_sections($conf, $logicNames);
+$primaryReflector = count($reflectorSections) ? $reflectorSections[0] : '';
+$reflectors = build_reflectors($conf, $lines, $reflectorSections, $fmnetwork);
+$callsign = callsign_from_conf($conf, $logicNames, $reflectorSections),
 if (DL3EL_DB) {
 	check_aprs();
 	check_mqtt();
-	check_cron($fmnetwork);
+	check_cron($fmnetwork,$callsign);
     $lat = "";
     $lon = "";
     check_pos($lat,$lon);
@@ -752,12 +759,6 @@ if (DL3EL_DB) {
     $req = "REQ: " . $dateStr . " ";
     file_put_contents($log_file, $req,FILE_APPEND);
 }	
-$lines = tail_lines(svx_log_path(), 12000);
-$logicNames = configured_logics($conf);
-$baseLogic = base_logic($conf, $logicNames);
-$reflectorSections = reflector_sections($conf, $logicNames);
-$primaryReflector = count($reflectorSections) ? $reflectorSections[0] : '';
-$reflectors = build_reflectors($conf, $lines, $reflectorSections, $fmnetwork);
 $primary = count($reflectors) ? $reflectors[0] : array('tg' => array('default' => '', 'active' => '', 'temporary_monitor' => '', 'monitor' => array(), 'list' => array()));
 
 $response = array(
@@ -771,7 +772,8 @@ $response = array(
         'log_file' => svx_log_path(),
         'dtmf_fifo' => dtmf_fifo_path()
     ),
-    'callsign' => callsign_from_conf($conf, $logicNames, $reflectorSections),
+//    'callsign' => callsign_from_conf($conf, $logicNames, $reflectorSections),
+    'callsign' => $callsign,
     'network_name' => $primaryReflector !== '' ? network_name_from_conf($conf, $primaryReflector) : '',
     'system' => array(
         'process' => process_running('svxlink') ? 'Running' : 'Stopped',
@@ -801,8 +803,18 @@ $response = array(
 );
 
 if (DL3EL_DB) {
+	$cpuLoad = sys_getloadavg();
+	$core_nums = trim(shell_exec("grep -P '^processor' /proc/cpuinfo | wc -l"));
+	$load = round($cpuLoad[0]/($core_nums + 1)*100, 2);
+	$cpuTempC = 0;
+	if (file_exists('/sys/class/thermal/thermal_zone0/temp')) {
+		$cpuTempCRaw = exec('cat /sys/class/thermal/thermal_zone0/temp');
+		if ($cpuTempCRaw !="") {
+			$cpuTempC = round(abs($cpuTempCRaw)/ 1000) + CPU_TEMP_OFFSET; 
+		}    
+	} 
 	$currentTime_R = microtime(true) - $currentTime;
-	$req = " Ticks: " . round($currentTime_R, 4) ."\n";
+	$req = " Ticks: " . round($currentTime_R, 4) . " [" . $load . "%/" . $cpuTempC . "c]\n";
 	file_put_contents($log_file, $req,FILE_APPEND);
 }	
 send_json($response);
