@@ -1,0 +1,84 @@
+<?php
+// Version 20260914
+
+// ============================================================
+// FM-Funknetz LiveMap
+// Benutzerkonfiguration
+// ============================================================
+//
+// In dieser Datei können die Farben der LiveMap angepasst
+// werden.
+//
+// Es müssen nur die HEX-Farbwerte geändert werden.
+// Beispiel:
+//     "#ff0000" = Rot
+//     "#00ff00" = Grün
+//     "#ffffff" = Weiß
+//
+// Keine TG-Nummern eintragen!
+// Die Zuordnung der TGs zu den Farben erfolgt automatisch.
+// ============================================================
+
+
+
+// ============================================================
+// 1. MARKERFARBEN
+// ============================================================
+
+// ------------------------------------------------------------
+// Aktiver Sender
+// ------------------------------------------------------------
+// Farbe der roten Sender-Marker auf der Karte.
+$LIVEMAP_TALKER_COLOR = "#ff0000"; 			//rot
+
+
+// ------------------------------------------------------------
+// Empfänger
+// ------------------------------------------------------------
+// Farbe der grünen Empfänger-Marker auf der Karte.
+$LIVEMAP_RECEIVER_COLOR = "#3cb371"; 		//grün
+
+
+
+// ============================================================
+// 2. FARBPALETTE DER TG-VERBINDUNGSLINIEN
+// ============================================================
+//
+// Die TGs werden automatisch einer Farbe aus dieser Palette
+// zugeordnet.
+//
+// Die Reihenfolge der Farben bleibt dabei wichtig.
+// Es müssen keine TG-Nummern eingetragen werden.
+//
+// Wenn eine Farbe geändert wird, ändern sich automatisch die
+// Linien derjenigen TGs, die dieser Farbposition zugeordnet
+// sind.
+//
+// Es können auch eigene HEX-Farben verwendet werden.
+//
+// Beispiel:
+//     "#ffff00" = Gelb
+//     "#00ffff" = Cyan
+//     "#ff00ff" = Magenta
+// ============================================================
+
+$LIVEMAP_COLORS = [
+    "#8A2BE2",       // 01 - Blau Violett
+    "#1874CD",       // 02 - Kräftiges Blau
+    "#458B74",       // 03 - Aquamarine
+    "#8B4513",       // 04 - Schokolade
+    "#CD2626",       // 05 - Feuer Rot
+    "#CD0000",       // 06 - Dunkles Rot
+    "#f4511e",       // 07 - Rotorange
+    "#EEB422",       // 08 - Gold
+    "#006400",       // 09 - Dunkelgrün
+    "#8B636C",       // 10 - Pink
+    "#5C5C5C",       // 11 - Grau
+    "#CD5555"        // 12 - Inian Rot
+];
+
+// ============================================================
+// ENDE DER BENUTZERKONFIGURATION
+// ============================================================
+
+?>

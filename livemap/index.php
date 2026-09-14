@@ -1,7 +1,9 @@
 <?php
-$talker   = "#ff0000"; // Rot
-$receiver = "#00ff00"; // Grün
+// Version V20260914
+// Farbpallette abrufen
+require_once __DIR__ . "/livemap_ini.php";
 ?>
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -19,8 +21,8 @@ $receiver = "#00ff00"; // Grün
     <!-- Hier werden die PHP-Variablen sicher an das CSS übergeben -->
     <style>
         :root {
-            --talker-color: <?php echo $talker; ?>;
-            --receiver-color: <?php echo $receiver; ?>;
+				--talker-color: <?php echo $LIVEMAP_TALKER_COLOR; ?>;
+				--receiver-color: <?php echo $LIVEMAP_RECEIVER_COLOR; ?>;
         }
     </style>
 </head>
@@ -53,6 +55,15 @@ $receiver = "#00ff00"; // Grün
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <!-- Eigene Logik -->
+	<script>
+		window.livemapConfig = <?php
+			echo json_encode(
+				$LIVEMAP_COLORS,
+				JSON_UNESCAPED_SLASHES |
+				JSON_UNESCAPED_UNICODE
+        );
+    ?>;
+	</script>
     <script src="livemap.js"></script>
 
     <p style="font-size:8px; color:gray; margin:0;">@DL4EM</p>

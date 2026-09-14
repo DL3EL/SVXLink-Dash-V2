@@ -1,5 +1,6 @@
-"use strict";
+// Version 20260914
 
+"use strict";
 
 // ============================================================
 // FM-Funknetz LiveMap
@@ -12,7 +13,7 @@ const map =
     L.map(
         "map"
     ).setView(
-        [51.1657, 10.4515], 6
+        [51.1657, 10.4515], 6    // zentraler Mittelpunkt der Karte und default Zoomfaktor
     );
 
 L.tileLayer(
@@ -25,7 +26,7 @@ L.tileLayer(
 ).addTo(map);
 
 // ============================================================
-// Positionsdaten
+// Positionsdaten Variablen Definition
 // ============================================================
 
 // Call -> Positionsdaten
@@ -52,7 +53,6 @@ const activeTG = new Map();
 
 // TG Netzwerk Darstellung
 let showTGNetwork = true;
-
 
 // ------------------------------------------------------------
 // Positionsdaten laden
@@ -168,6 +168,21 @@ async function loadNodePositions() {
                 }
 
                 // ------------------------------------------------
+                // 0/0 ist keine sinnvolle Stationsposition.
+                // Solche fehlerhaften SVXLink-Konfigurationen
+                // werden genauso behandelt wie eine fehlende
+                // Position: Die Station wird nicht als Marker
+                // dargestellt und nicht für TG-Linien verwendet.
+                // ------------------------------------------------
+                if (lat === 0 && lon === 0) {
+                    console.log(
+                        "Ungültige Position 0/0 - Station übersprungen:",
+                        call
+                    );
+                    return;
+                }
+
+                // ------------------------------------------------
                 // Position speichern
                 // ------------------------------------------------
                 nodePositions.set(
@@ -195,9 +210,12 @@ async function loadNodePositions() {
             ).slice(0, 5)
         );
 
-        // Falls bereits Sender aktiv sind,
-        // Marker jetzt erzeugen.
+        // Positionsdaten wurden komplett neu geladen.
+        // Deshalb Markerbestand sofort gegen den aktuellen
+        // active/activeTG-Zustand synchronisieren.
         updateTalkerMarkers();
+        updateTGLines();
+        renderTalkers();
     }
     catch (error) {
         console.error(
@@ -314,6 +332,40 @@ function createTalkerIcon() {
         }
     );
 }
+
+// ============================================================
+// TG-Wechsel über Empfänger-Popup
+// ------------------------------------------------------------
+// Globaler Capture-Handler für dynamisch erzeugte Leaflet-Popups.
+// ============================================================
+document.addEventListener(
+    "click",
+    function (event) {
+        const actionElement =
+            event.target &&
+            event.target.closest(
+                ".receiver-popup-action"
+            );
+
+        if (!actionElement) {
+            return;
+        }
+
+        const tg =
+            actionElement.dataset.tg;
+
+        if (!tg) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        changeTG(tg);
+    },
+    true
+);
 
 // ============================================================
 // Marker Icon Empfänger
@@ -452,8 +504,23 @@ function updateActiveTG(
         Array.from(receiverSet)
     );
 
+    // --------------------------------------------------------
+    // Empfänger-Marker sofort mit dem neuen activeTG-Zustand
+    // synchronisieren.
+    //
+    // Wichtig:
+    // Ein activeTG-MQTT-Update kann Empfänger hinzufügen oder
+    // entfernen, ohne dass gleichzeitig eine neue Talker-
+    // Nachricht eintrifft. Deshalb reicht updateTGLines()
+    // alleine hier nicht aus.
+    // --------------------------------------------------------
+    updateTalkerMarkers();
+
     // TG Linien aktualisieren
     updateTGLines();
+
+    // Linke Liste ebenfalls sofort aktualisieren.
+    renderTalkers();
 }
 
 
@@ -577,16 +644,26 @@ function updateTalkerMarkers() {
                 );
 
                 // Popup aktualisieren
+
                 marker.setPopupContent(
                     `
-                    <div class="talker-popup">
-                        <b>${call}</b>
-                        <br>
-                        TG: ${talker.tg}
-                    </div>
-                    `
+    <div class="talker-popup talker-popup-action">
+        <b>${call}</b>
+        <br>
+        TG: ${talker.tg}
+        <br>
+        <span class="talker-popup-hint">
+            ▶ Klicken zum TG-Wechsel
+        </span>
+    </div>
+    `
                 );
-                return;
+
+                marker._talkerTG =
+                    String(
+                        talker.tg || ""
+                    ).trim();
+                return
             }
 
             // ------------------------------------------------
@@ -616,46 +693,87 @@ function updateTalkerMarkers() {
                 );
 
             // ------------------------------------------------
-            // Popup
+            // Popup-Inhalt
             // ------------------------------------------------
-            marker.bindPopup(
-                `
-                <div class="talker-popup">
-                    <b>${call}</b>
-                    <br>
-                    TG: ${talker.tg}
-                </div>
-                `
-            );
+            function updateTalkerPopup() {
 
-            // ------------------------------------------------
-            // Doppelklick -> TG wechseln
-            // ------------------------------------------------
-            marker.on(
-                "dblclick",
-                function (event) {
-                    L.DomEvent.stopPropagation(
-                        event
-                    );
+                marker.bindPopup(
+                    `
+        <div class="talker-popup talker-popup-action">
+            <b>${call}</b>
+            <br>
+            TG: ${talker.tg}
+            <br>
+            <span class="talker-popup-hint">
+                ▶ Klicken zum TG-Wechsel
+            </span>
+        </div>
+        `
+                );
 
-                    console.log(
-                        "Marker Doppelklick:",
-                        call,
-                        "TG:",
-                        talker.tg
-                    );
-                    changeTG(
-                        talker.tg
-                    );
-                }
-            );
+                marker._talkerTG =
+                    String(
+                        talker.tg || ""
+                    ).trim();
+
+                marker.on(
+                    "popupopen",
+                    function (event) {
+
+                        const popupElement =
+                            event.popup.getElement();
+
+                        if (!popupElement) {
+                            return;
+                        }
+
+                        const actionElement =
+                            popupElement.querySelector(
+                                ".talker-popup-action"
+                            );
+
+                        if (!actionElement) {
+                            return;
+                        }
+
+                        if (
+                            actionElement.dataset.tgBound === "1"
+                        ) {
+                            return;
+                        }
+
+                        actionElement.dataset.tgBound = "1";
+
+                        actionElement.addEventListener(
+                            "click",
+                            function (clickEvent) {
+
+                                clickEvent.stopPropagation();
+
+                                console.log(
+                                    "TG-Wechsel über Sender-Popup:",
+                                    call,
+                                    "TG:",
+                                    marker._talkerTG
+                                );
+
+                                changeTG(
+                                    marker._talkerTG
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+
+            updateTalkerPopup();
 
             // ------------------------------------------------
             // Marker auf Karte
             // ------------------------------------------------
-			marker.addTo(
-				map
-			);
+            marker.addTo(
+                map
+            );
 
             // ------------------------------------------------
             // Marker eindeutig speichern
@@ -668,204 +786,173 @@ function updateTalkerMarkers() {
     );
 
     // --------------------------------------------------------
-    // Aktive Empfänger der aktuell belegten Talkgroups
+    // EMPFÄNGER: INKREMENTELLER VOLL-SYNC
+    //
+    // Der Soll-Zustand wird weiterhin aus ALLEN aktuell aktiven
+    // Talkern und deren activeTG-Daten berechnet. Es werden aber
+    // nur Marker geändert, die tatsächlich hinzugefügt, geändert
+    // oder entfernt werden müssen. Dadurch entsteht bei jedem
+    // MQTT-Ereignis kein komplettes Löschen/Neuanlegen mehr.
     // --------------------------------------------------------
-    const currentReceivers =
-        new Set();
-    active.forEach(
-        function (
-            talker
-        ) {
-            const tg =
-                String(
-                    talker.tg || ""
-                )
-                    .trim();
-            if (!tg) {
-                return;
-            }
+    const desiredReceivers = new Map();
 
-            const receivers =
-                activeTG.get(
-                    tg
-                );
-
-            if (!receivers) {
-                return;
-            }
-
-            receivers.forEach(
-                function (receiverCall) {
-                    const call =
-                        String(
-                            receiverCall || ""
-                        )
-                            .trim()
-                            .toUpperCase();
-
-                    if (!call) {
-                        return;
-                    }
-
-                    // Sender nicht zusätzlich
-                    // als Empfänger markieren
-                    if (
-                        currentTalkers.has(
-                            call
-                        )
-                    ) {
-                        return;
-                    }
-
-                    currentReceivers.add(
-                        call
-                    );
-
-                    // Position suchen
-                    const position =
-                        findNodePosition(
-                            call
-                        );
-
-                    if (!position) {
-                        return;
-                    }
-
-                    // Marker existiert bereits
-                    if (
-                        receiverMarkers.has(
-                            call
-                        )
-                    ) {
-                        const marker =
-                            receiverMarkers.get(
-                                call
-                            );
-                        marker.setLatLng(
-                            [
-                                position.lat,
-                                position.lon
-                            ]
-                        );
-                        marker.setPopupContent(
-                            `
-                            <div class="receiver-popup">
-                                <b>${call}</b>
-                                <br>
-                                TG: ${tg}
-                            </div>
-                            `
-                        );
-                        return;
-                    }
-
-                    // ------------------------------------------------
-                    // Neuer Empfänger Marker
-                    // ------------------------------------------------
-                    console.log(
-                        "Neuer Empfänger Marker:",
-                        call,
-                        "TG:",
-                        tg,
-                        "Position:",
-                        position.lat,
-                        position.lon
-                    );
-
-                    const marker =
-                        L.marker(
-                            [
-                                position.lat,
-                                position.lon
-                            ],
-                            {
-                                icon:
-                                    createReceiverIcon(),
-                                zIndexOffset: 100
-                            }
-                        );
-
-                    marker.bindPopup(
-                        `
-                        <div class="receiver-popup">
-                            <b>${call}</b>
-                            <br>
-                            TG: ${tg}
-                        </div>
-                        `
-                    );
-
-					marker.on(
-						"dblclick",
-						function (event) {
-
-							L.DomEvent.stopPropagation(
-								event
-							);
-
-							changeTG(
-								tg
-							);
-
-						}
-					);
-
-						receiverMarkers.set(
-							call,
-							marker
-						);
-
-						marker.addTo(
-						tgNetworkLayer
-					);
-                }
-            );
-        }
+    console.log(
+        "Empfänger-Sync aktive Talker:",
+        Array.from(active.values()).map(function (talker) {
+            return String(talker.call || "").trim().toUpperCase() +
+                " -> TG " + String(talker.tg || "").trim();
+        })
     );
 
-    // --------------------------------------------------------
-    // Nicht mehr aktive Empfänger entfernen
-    // --------------------------------------------------------
-    receiverMarkers.forEach(
-        function (
-            marker,
-            call
-        ) {
+    console.log(
+        "Empfänger-Sync verwendete TGs:",
+        Array.from(new Set(Array.from(active.values()).map(function (talker) {
+            return String(talker.tg || "").trim();
+        }).filter(Boolean)))
+    );
 
-            // Ein Sender darf keinen Empfänger-Marker besitzen.
-            if (
-                currentTalkers.has(
-                    call
-                )
-            ) {
+    active.forEach(function (talker) {
+        const tg = String(talker.tg || "").trim();
+        if (!tg) return;
 
-                console.log(
-                    "Empfänger Marker entfernen, da jetzt Sender:",
-                    call
-                );
-                marker.remove();
-                receiverMarkers.delete(
-                    call
-                );
-                return;
+        const receivers = activeTG.get(tg);
+        if (!receivers || receivers.size === 0) return;
+
+        // Empfänger nur dann anzeigen, wenn der zugehörige Sprecher
+        // selbst eine gültige Position liefert. Ohne Sprecherposition
+        // kann auch keine TG-Linie zum Sprecher gezeichnet werden.
+        const speakerPosition = findNodePosition(
+            String(talker.call || '').trim().toUpperCase()
+        );
+
+        if (!speakerPosition) {
+            console.log(
+                "Empfänger-Sync: TG übersprungen - keine Sprecherposition:",
+                String(talker.call || '').trim().toUpperCase(),
+                "TG:",
+                tg,
+                "Empfänger:",
+                Array.from(receivers)
+            );
+            return;
+        }
+
+        receivers.forEach(function (receiverCall) {
+            const call = String(receiverCall || "").trim().toUpperCase();
+            if (!call) return;
+
+            // Aktiver Sender niemals zusätzlich als Empfänger anzeigen.
+            if (currentTalkers.has(call)) return;
+
+            // Ein Empfänger kann in mehreren TGs vorkommen. Für den
+            // einzelnen Marker verwenden wir die zuerst gefundene TG.
+            if (!desiredReceivers.has(call)) {
+                desiredReceivers.set(call, tg);
             }
+        });
+    });
 
-            // Nicht mehr aktiver Empfänger.
-            if (
-                !currentReceivers.has(
-                    call
-                )
-            ) {
-                console.log(
-                    "Empfänger Marker entfernen:",
-                    call
-                );
-                marker.remove();
-                receiverMarkers.delete(
-                    call
-                );
+    // Nicht mehr benötigte Empfänger entfernen.
+    receiverMarkers.forEach(function (marker, call) {
+        if (!desiredReceivers.has(call)) {
+            marker.remove();
+            receiverMarkers.delete(call);
+            console.log(
+                "Empfänger-Sync: Marker entfernt:",
+                call
+            );
+        }
+    });
+
+    // Benötigte Empfänger hinzufügen bzw. vorhandene Marker aktualisieren.
+    desiredReceivers.forEach(function (tg, call) {
+        const position = findNodePosition(call);
+
+        if (!position) {
+            console.log(
+                "Empfänger-Sync: keine Position:",
+                call
+            );
+            return;
+        }
+
+        let marker = receiverMarkers.get(call);
+
+        if (!marker) {
+            console.log(
+                "Neuer Empfänger Marker:",
+                call,
+                "TG:",
+                tg,
+                "Position:",
+                position.lat,
+                position.lon
+            );
+
+            marker = L.marker(
+                [position.lat, position.lon],
+                {
+                    icon: createReceiverIcon(),
+                    zIndexOffset: 100
+                }
+            );
+
+            marker._receiverTG = tg;
+
+            marker.bindPopup(
+                `
+    <div class="receiver-popup receiver-popup-action" data-tg="${tg}">
+        <b>${call}</b>
+        <br>
+        TG: ${tg}
+        <br>
+        <span class="receiver-popup-hint">
+            ▶ Klicken zum TG-Wechsel
+        </span>
+    </div>
+    `
+            );
+
+            receiverMarkers.set(call, marker);
+
+            if (showTGNetwork) {
+                marker.addTo(tgNetworkLayer);
             }
         }
+        else {
+            // Position und TG des bestehenden Markers aktualisieren,
+            // ohne ihn aus der Karte zu entfernen.
+            marker.setLatLng([position.lat, position.lon]);
+            marker._receiverTG = tg;
+
+            marker.setPopupContent(
+                `
+    <div class="receiver-popup receiver-popup-action" data-tg="${tg}">
+        <b>${call}</b>
+        <br>
+        TG: ${tg}
+        <br>
+        <span class="receiver-popup-hint">
+            ▶ Klicken zum TG-Wechsel
+        </span>
+    </div>
+    `
+            );
+
+            if (showTGNetwork && !tgNetworkLayer.hasLayer(marker)) {
+                marker.addTo(tgNetworkLayer);
+            }
+        }
+    });
+
+    console.log(
+        "Empfänger-Sync abgeschlossen:",
+        "Marker=",
+        receiverMarkers.size,
+        "Soll=",
+        desiredReceivers.size,
+        "Calls=",
+        Array.from(receiverMarkers.keys())
     );
 
     // --------------------------------------------------------
@@ -896,46 +983,43 @@ function updateTalkerMarkers() {
 }
 
 // ============================================================
-// Feste Farben für Talkgroups
+// Feste Farben für Talkgroups aus livemap_ini.php 
+// und default Werte, wenn livemap_ini.php fehlt 
+// bzw. fehlerhaft ist
 // ============================================================
-
-const tgColors = [
-
-    "#e53935",   // Rot
-    "#1565c0",   // Kräftiges Blau
-    "#43a047",   // Grün
-    "#fb8c00",   // Orange
-    "#8e24aa",   // Violett
-    "#00838f",   // Dunkles Cyan
-    "#f4511e",   // Rotorange
-    "#c62828",   // Dunkelrot
-    "#7cb342",   // Olivgrün
-    "#d81b60",   // Pink
-    "#6d4c41",   // Braun
-    "#455a64"    // Blau-Grau
-
-];
-
+const tgColors =
+    Array.isArray(window.livemapConfig) &&
+        window.livemapConfig.length > 0
+        ? window.livemapConfig
+        : [
+		    "#8A2BE2",       // 01 - Blau Violett
+			"#1874CD",       // 02 - Kräftiges Blau
+			"#458B74",       // 03 - Aquamarine
+			"#8B4513",       // 04 - Schokolade
+			"#CD2626",       // 05 - Feuer Rot
+			"#CD0000",       // 06 - Dunkles Rot
+			"#f4511e",       // 07 - Rotorange
+			"#EEB422",       // 08 - Gold
+			"#006400",       // 09 - Dunkelgrün
+			"#8B636C",       // 10 - Pink
+			"#5C5C5C",       // 11 - Grau
+			"#CD5555"        // 12 - Inian Rot
+        ];
 
 // ============================================================
 // Farbe für Talkgroup bestimmen
 // ============================================================
-
 function getTGColor(tg) {
-
     const text =
         String(tg || "");
-
     let hash =
         0;
-
 
     for (
         let i = 0;
         i < text.length;
         i++
     ) {
-
         hash =
             text.charCodeAt(i) +
             (
@@ -945,9 +1029,7 @@ function getTGColor(tg) {
                 -
                 hash
             );
-
     }
-
 
     const index =
         Math.abs(
@@ -955,19 +1037,25 @@ function getTGColor(tg) {
         )
         %
         tgColors.length;
-
-
     return tgColors[
         index
     ];
 
 }
 
-
 // ============================================================
 // TG Verbindungslinien aktualisieren
 // ============================================================
 function updateTGLines() {
+
+    // --------------------------------------------------------
+    // TG-Netzwerk deaktiviert:
+    // Keine Linien erzeugen oder aktualisieren.
+    // Der Checkbox-Handler entfernt vorhandene Linien vollständig.
+    // --------------------------------------------------------
+    if (!showTGNetwork) {
+        return;
+    }
 
     // --------------------------------------------------------
     // Aktuell benötigte Linien
@@ -1034,6 +1122,12 @@ function updateTGLines() {
                         return;
                     }
 
+                    if (
+                        active.has(receiverCall)
+                    ) {
+                        return;
+                    }
+
                     const receiverPosition =
                         findNodePosition(
                             receiverCall
@@ -1073,57 +1167,67 @@ function updateTGLines() {
                             tg
                         );
 
-						const line =
-							L.polyline(
-								[
-									[
-										speakerPosition.lat,
-										speakerPosition.lon
-									],
-									[
-										receiverPosition.lat,
-										receiverPosition.lon
-									]
-								],
-								{
-									color:
-										getTGColor(
-											tg
-										),
+                        const line =
+                            L.polyline(
+                                [
+                                    [
+                                        speakerPosition.lat,
+                                        speakerPosition.lon
+                                    ],
+                                    [
+                                        receiverPosition.lat,
+                                        receiverPosition.lon
+                                    ]
+                                ],
+                                {
+                                    color:
+                                        getTGColor(
+                                            tg
+                                        ),
 
-										weight:
-										3,
+                                    weight:
+                                        3,
+                                    opacity:
+                                        0.85,
+                                    dashArray:
+                                        "8,5",
+                                    lineCap:
+                                        "round",
+                                    lineJoin:
+                                        "round",
+                                    interactive:
+                                        false
+                                }
+                            );
 
-										opacity:
-										0.85,
+                        tgLines.set(
+                            lineKey,
+                            line
+                        );
 
-									dashArray:
-										"8,5",
+                        line.addTo(
+                            tgNetworkLayer
+                        );
+                    }
 
-									lineCap:
-										"round",
+                    else {
+                        const line =
+                            tgLines.get(
+                                lineKey
+                            );
 
-									lineJoin:
-										"round",
-
-									interactive:
-										false
-								}
-							);
-
-
-						tgLines.set(
-							lineKey,
-							line
-						);
-
-
-						line.addTo(
-							tgNetworkLayer
-						);
-
-
-						
+                        line.setLatLngs(
+                            [
+                                [
+                                    speakerPosition.lat,
+                                    speakerPosition.lon
+                                ],
+                                [
+                                    receiverPosition.lat,
+                                    receiverPosition.lon
+                                ]
+                            ]
+                        );
                     }
                 }
             );
@@ -1144,18 +1248,66 @@ function updateTGLines() {
                     lineKey
                 )
             ) {
-
                 console.log(
                     "TG Linie entfernen:",
                     lineKey
                 );
-
                 line.remove();
                 tgLines.delete(
                     lineKey
                 );
             }
         }
+    );
+}
+
+// ============================================================
+// Live-Zustand bei MQTT-Verbindungsabbruch zurücksetzen
+// ============================================================
+function clearLiveMapState(reason) {
+
+    console.log(
+        "LiveMap Zustand wird zurückgesetzt:",
+        reason || "unbekannt"
+    );
+
+    // Aktive Senderdaten löschen
+    active.clear();
+
+    // Aktive Empfänger je TG löschen
+    activeTG.clear();
+
+    // Alle Sender-Marker entfernen
+    talkerMarkers.forEach(
+        function (marker) {
+            marker.remove();
+        }
+    );
+    talkerMarkers.clear();
+
+    // Alle Empfänger-Marker entfernen
+    receiverMarkers.forEach(
+        function (marker) {
+            marker.remove();
+        }
+    );
+    receiverMarkers.clear();
+
+    // Sicherheitshalber den gemeinsamen Layer vollständig leeren
+    tgNetworkLayer.clearLayers();
+
+    // Alle gespeicherten TG-Linien löschen
+    tgLines.clear();
+
+    // Linke Liste ebenfalls sofort auf Funkstille setzen
+    renderTalkers();
+
+    console.log(
+        "LiveMap Zustand zurückgesetzt:",
+        "Sender=", active.size,
+        "Empfänger=", receiverMarkers.size,
+        "TG=", activeTG.size,
+        "Linien=", tgLines.size
     );
 }
 
@@ -1187,53 +1339,57 @@ const talkerList =
 const toggleTGNetwork =
     document.getElementById(
         "toggleTGNetwork"
-    );	
-	
+    );
+
 // ============================================================
 // Darstellung TG Netzwerk
 // ============================================================
-
 toggleTGNetwork.addEventListener(
-
     "change",
-
     function () {
-
         showTGNetwork =
             toggleTGNetwork.checked;
 
-
         console.log(
-
             "TG Netzwerk Anzeige:",
-
             showTGNetwork
                 ?
                 "EIN"
                 :
                 "AUS"
-
         );
 
-
         if (showTGNetwork) {
-
+            // Layer wieder sichtbar machen.
             tgNetworkLayer.addTo(
                 map
             );
-
+            // Aktuellen Zustand der Marker und Linien
+            // vollständig neu aufbauen.
+            updateTalkerMarkers();
+            updateTGLines();
         }
 
         else {
+            // ----------------------------------------------------
+            // Beim Ausschalten den gemeinsamen Layer vollständig
+            // leeren. Das ist wichtig, weil darin sowohl TG-Linien
+            // als auch Empfänger-Marker liegen.
+            //
+            // Nur den Layer von der Karte zu entfernen reicht nicht:
+            // Marker können sonst weiterhin im Layer gespeichert
+            // bleiben und beim sofortigen Wiedereinschalten zusammen
+            // mit bereits nicht mehr gültigen Objekten erscheinen.
+            // ----------------------------------------------------
+            tgLines.clear();
+            tgNetworkLayer.clearLayers();
 
+            // Layer aus der Karte entfernen.
             map.removeLayer(
                 tgNetworkLayer
             );
-
         }
-
     }
-
 );
 
 // ============================================================
@@ -1260,7 +1416,6 @@ function connectMQTT() {
     console.log(
         "MQTT Verbindung wird aufgebaut..."
     );
-
     client =
         mqtt.connect(
             WS_URL,
@@ -1341,92 +1496,53 @@ function connectMQTT() {
         }
     );
 
-    // --------------------------------------------------------
-    // Aktive Empfänger je Talkgroup
-    // --------------------------------------------------------
-    client.subscribe(
-        "/server/state/activeTG/+",
-        {
-            qos:
-                0
-        },
 
-        function (err) {
-            if (err) {
-                console.error(
-                    "MQTT Subscribe Fehler activeTG:",
-                    err
-                );
-                return;
-            }
-
-            console.log(
-                "MQTT Topic abonniert:",
-                "/server/state/activeTG/+"
-            );
-        }
-    );
 
     // --------------------------------------------------------
     // Reconnect
     // --------------------------------------------------------
-
     client.on(
-
         "reconnect",
-
         function () {
 
             console.log(
                 "MQTT reconnect..."
             );
-
         }
-
     );
-
-
 
     // --------------------------------------------------------
     // Verbindung geschlossen
     // --------------------------------------------------------
-
     client.on(
-
         "close",
-
         function () {
 
             console.log(
                 "MQTT Verbindung geschlossen"
             );
 
+            // Nach einem Verbindungsabbruch dürfen keine alten
+            // Sender-, Empfänger- oder TG-Zustände sichtbar bleiben.
+            // MQTT verbindet sich anschließend automatisch neu.
+            clearLiveMapState(
+                "MQTT close"
+            );
         }
-
     );
-
-
 
     // --------------------------------------------------------
     // MQTT Fehler
     // --------------------------------------------------------
-
     client.on(
-
         "error",
-
         function (err) {
 
             console.error(
-
                 "MQTT Fehler:",
-
                 err
-
             );
-
         }
-
     );
 
 
@@ -1434,11 +1550,8 @@ function connectMQTT() {
     // --------------------------------------------------------
     // MQTT Nachricht
     // --------------------------------------------------------
-
     client.on(
-
         "message",
-
         function (
             topic,
             payload
@@ -1450,17 +1563,14 @@ function connectMQTT() {
             );
 
             try {
-
                 // =================================================
                 // Aktive Empfänger einer Talkgroup
                 // =================================================
-
                 if (
                     topic.startsWith(
                         "/server/state/activeTG/"
                     )
                 ) {
-
                     const text =
                         typeof payload === "string"
                             ?
@@ -1469,14 +1579,12 @@ function connectMQTT() {
                             new TextDecoder()
                                 .decode(payload);
 
-
                     console.log(
                         "ACTIVE TG ERKANNT:",
                         topic,
                         "PAYLOAD:",
                         text
                     );
-
 
                     const activeTGNumber =
                         topic
@@ -1489,14 +1597,27 @@ function connectMQTT() {
                             )
                             .trim();
 
-
+                    // Eine leere Payload bedeutet: diesen TG-Zustand löschen.
+                    // Der Broker kann beim Zurücksetzen eines activeTG-Topics
+                    // eine wirklich leere Payload liefern und nicht [].
+                    if (text.trim() === "") {
+                        console.log(
+                            "ACTIVE TG LEER - Zustand gelöscht:",
+                            activeTGNumber
+                        );
+                        activeTG.delete(
+                            activeTGNumber
+                        );
+                        updateTalkerMarkers();
+                        updateTGLines();
+                        renderTalkers();
+                        return;
+                    }
                     try {
-
                         const calls =
                             JSON.parse(
                                 text
                             );
-
 
                         console.log(
                             "ACTIVE TG MQTT:",
@@ -1504,50 +1625,36 @@ function connectMQTT() {
                             calls
                         );
 
-
                         updateActiveTG(
                             activeTGNumber,
                             calls
                         );
 
                         // TG Linien aktualisieren
-
                         updateTGLines();
-
                     }
 
                     catch (error) {
-
                         console.error(
                             "ACTIVE TG JSON Fehler:",
                             error
                         );
-
                     }
-
-
                     return;
-
                 }
-
 
                 // =================================================
                 // Nur Live-Talker Topic weiterverarbeiten
                 // =================================================
-
                 if (
                     topic !== TOPIC
                 ) {
-
                     return;
-
                 }
-
 
                 // =================================================
                 // Live-Talker Nachricht
                 // =================================================
-
                 const text =
                     typeof payload === "string"
                         ?
@@ -1555,20 +1662,14 @@ function connectMQTT() {
                         :
                         new TextDecoder()
                             .decode(payload);
-
-
                 const msg =
                     parseMsg(
                         text
                     );
 
-
                 if (!msg) {
-
                     return;
-
                 }
-
 
                 console.log(
                     "MQTT RAW MSG:",
@@ -1578,403 +1679,306 @@ function connectMQTT() {
                 // ------------------------------------------------
                 // Nachricht auswerten
                 // ------------------------------------------------
-
                 const now =
                     Date.now();
-
-
                 const id =
-
                     String(
-
                         msg.call ||
-
                         ""
-
                     )
-
                         .trim()
-
                         .toUpperCase();
-
-
                 const tg =
-
                     String(
-
                         msg.tg ||
-
                         ""
-
                     )
-
                         .trim();
-
-
                 const kind =
-
                     String(
-
                         msg.talk ||
-
                         ""
-
                     )
-
                         .toLowerCase();
 
-
                 if (!id) {
-
                     return;
-
                 }
 
-
                 console.log(
-
                     "MQTT:",
-
                     kind,
-
                     id,
-
                     "TG:",
-
                     tg
-
                 );
-
-
 
                 // =================================================
                 // START
                 // =================================================
-
                 if (
-
                     kind === "start"
-
                 ) {
 
-
                     if (
-
                         !active.has(id)
-
                     ) {
-
-
                         active.set(
-
                             id,
-
                             {
-
                                 call:
                                     id,
-
-
                                 tg:
                                     tg,
-
-
                                 startMs:
                                     now
-
                             }
-
                         );
-
 
                         console.log(
-
                             "START:",
-
                             id,
-
                             "TG:",
-
                             tg
-
                         );
-
                     }
 
-
                     else {
-
-
                         const a =
-
                             active.get(
                                 id
                             );
-
-
                         a.tg =
-
                             tg ||
-
                             a.tg;
-
                     }
-
                 }
-
-
 
                 // =================================================
                 // STOP
                 // =================================================
-
                 else if (
-
                     kind === "stop"
-
                 ) {
-
-
                     if (
-
                         active.has(id)
-
                     ) {
-
-
                         active.delete(
                             id
                         );
 
-
                         console.log(
-
                             "STOP:",
-
                             id
-
                         );
-
                     }
-
                 }
 
                 // =================================================
                 // Anzeige aktualisieren
                 // =================================================
-
                 updateTalkerMarkers();
-
                 updateTGLines();
-
                 renderTalkers();
 
-                // --------------------------------------------------------
-                // Debug: Liste und Marker vergleichen
-                // --------------------------------------------------------
-
-                console.log(
-                    "AKTIVE CALLS:",
-                    activeTalkers.size,
-                    Array.from(activeTalkers.keys())
-                );
-                console.log(
-                    "MARKER:",
-                    talkerMarkers.size,
-                    Array.from(talkerMarkers.keys())
-                );
-
             }
-
             catch (err) {
 
-
                 console.error(
-
                     "MQTT Parsing Fehler:",
-
                     err
-
                 );
-
             }
-
         }
-
     );
-
 }
 
-
+// ============================================================
+// Sender-Sicherheitsbereinigung 30 Sekunden
+// ============================================================
+setInterval(
+    cleanupStaleTalkers,
+    30 * 1000
+);
 
 // ============================================================
 // MQTT Nachricht parsen
 // ============================================================
-
 function parseMsg(text) {
-
-
     const clean =
-
         text.replace(
-
             /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,
-
             ""
-
         );
-
-
     try {
-
-
         return JSON.parse(
             clean
         );
-
     }
-
-
     catch {
-
-
         return null;
-
     }
-
 }
 
+// ============================================================
+// Veraltete Sender automatisch entfernen
+// ============================================================
+function cleanupStaleTalkers() {
+    const now =
+        Date.now();
+    // Kein automatisches Löschen mehr nach 10/30 Sekunden.
+    // Ein laufendes QSO kann deutlich länger dauern. Der MQTT-close-Reset
+    // leert den Zustand bei Verbindungsverlust; ein normaler MQTT-stop
+    // entfernt den Talker sofort.
+    const maxAge =
+        0;
 
+    console.log(
+        "CLEANUP:",
+        new Date(now).toLocaleTimeString(),
+        "aktive Sender:",
+        active.size
+    );
+
+    active.forEach(
+        function (
+            talker,
+            call
+        ) {
+            const age =
+                now -
+                Number(
+                    talker.startMs || 0
+                );
+
+            console.log(
+                "CLEANUP PRÜFUNG:",
+                call,
+                "Alter:",
+                Math.round(age / 1000),
+                "Sekunden"
+            );
+            // Absichtlich kein Timeout-Löschen.
+            // Der ursprüngliche 10-Sekunden-Cleanup hat lange QSOs
+            // fälschlich aus active entfernt und dadurch den Empfänger-
+            // Zustand inkonsistent gemacht.
+        }
+    );
+    updateTalkerMarkers();
+    updateTGLines();
+    renderTalkers();
+}
 
 // ============================================================
 // Aktive Sender in linker Liste darstellen
 // ============================================================
-
 function renderTalkers() {
-
-
     const arr =
-
         Array
-
             .from(
                 active.values()
             )
-
             .sort(
-
                 function (
-
                     a,
-
                     b
-
                 ) {
 
-
                     return (
-
                         a.startMs -
-
                         b.startMs
-
                     );
-
                 }
-
             );
-
-
 
     // --------------------------------------------------------
     // Keine Sender
     // --------------------------------------------------------
-
     if (
-
         arr.length === 0
-
     ) {
-
-
         talkerEmpty.style.display =
             "block";
-
-
         talkerList.innerHTML =
             "";
-
-
         return;
-
     }
-
-
 
     // --------------------------------------------------------
     // Sender vorhanden
     // --------------------------------------------------------
-
     talkerEmpty.style.display =
         "none";
-
-
     talkerList.innerHTML =
         "";
-
-
 
     // --------------------------------------------------------
     // Sender erzeugen
     // --------------------------------------------------------
-
     arr.forEach(
-
         function (a) {
-
-
             const entry =
-
                 document.createElement(
                     "div"
                 );
-
-
             entry.className =
                 "talkerEntry";
 
-
-
             // Rufzeichen
-
             const call =
-
                 document.createElement(
                     "div"
                 );
-
 
             call.className =
                 "talkerCall";
 
-
             call.textContent =
                 a.call;
 
+            // --------------------------------------------------------
+            // Warnhinweis bei aktivem Sprecher ohne Positionsdaten
+            // --------------------------------------------------------
+            const talkerPosition = findNodePosition(
+                String(a.call || "").trim().toUpperCase()
+            );
+
+            if (!talkerPosition) {
+                const warning =
+                    document.createElement("span");
+                warning.textContent = "!";
+                warning.title =
+                    "Keine Positionsdaten für diesen Sprecher. Empfänger dieses Sprechers werden nicht auf der Karte angezeigt.";
+                warning.setAttribute(
+                    "aria-label",
+                    "Keine Positionsdaten für diesen Sprecher"
+                );
+                warning.style.display = "inline-flex";
+                warning.style.alignItems = "center";
+                warning.style.justifyContent = "center";
+                warning.style.width = "16px";
+                warning.style.height = "16px";
+                warning.style.marginLeft = "6px";
+                warning.style.background = "#ffd54f";
+                warning.style.color = "#222222";
+                warning.style.fontWeight = "700";
+                warning.style.fontSize = "12px";
+                warning.style.lineHeight = "16px";
+                warning.style.clipPath = "polygon(50% 0%, 100% 100%, 0% 100%)";
+                warning.style.paddingTop = "3px";
+                warning.style.boxSizing = "border-box";
+                warning.style.cursor = "help";
+                call.appendChild(warning);
+            }
 
             // --------------------------------------------------------
             // Klick auf Rufzeichen:
             // Talkgroup wechseln
             // --------------------------------------------------------
-
             call.addEventListener(
-
                 "click",
-
                 function (event) {
-
                     event.stopPropagation();
-
 
                     console.log(
                         "TG-Wechsel über Senderliste:",
@@ -1983,119 +1987,86 @@ function renderTalkers() {
                         a.tg
                     );
 
-
                     if (a.tg) {
-
                         changeTG(
                             a.tg
                         );
-
                     }
-
                 }
-
             );
-
-
 
             // Talkgroup
+            const tg =
+                document.createElement(
+                    "div"
+                );
+            tg.className =
+                "talkerTG";
+            tg.textContent =
+                a.tg ||
+                "—";
 
-// Talkgroup
+            // --------------------------------------------------------
+            // TG-Hintergrundfarbe = Farbe der TG-Verbindungslinien
+            // --------------------------------------------------------
+            if (a.tg) {
+                tg.style.backgroundColor =
+                    getTGColor(a.tg);
+                // Weiße Schrift für gute Lesbarkeit
+                tg.style.color =
+                    "#ffffff";
+            }
 
-const tg =
+            // --------------------------------------------------------
+            // Klick auf TG
+            // --------------------------------------------------------
+            tg.addEventListener(
+                "click",
 
-    document.createElement(
-        "div"
-    );
+                function (
+                    event
+                ) {
+                    event.stopPropagation();
 
-
-tg.className =
-    "talkerTG";
-
-
-tg.textContent =
-
-    a.tg ||
-
-    "—";
-
-
-// --------------------------------------------------------
-// Klick auf TG
-// --------------------------------------------------------
-
-tg.addEventListener(
-
-    "click",
-
-    function(
-        event
-    ) {
-
-        event.stopPropagation();
-
-
-        if (
-
-            a.tg
-
-        ) {
-
-            changeTG(
-                a.tg
+                    if (
+                        a.tg
+                    ) {
+                        changeTG(
+                            a.tg
+                        );
+                    }
+                }
             );
-
-        }
-
-    }
-
-);
-
-
-
             entry.appendChild(
                 call
             );
-
-
             entry.appendChild(
                 tg
             );
-
-
             talkerList.appendChild(
                 entry
             );
-
         }
-
     );
-
 }
 
 
 // ============================================================
 // Schnittstelle für MQTT
 // ============================================================
-
 window.FMMap = {
-
     updateActiveTG:
 
         function (
             tg,
             calls
         ) {
-
             updateActiveTG(
                 tg,
                 calls
             );
-
         }
-
 };
-
 
 // ============================================================
 // Initialisierung

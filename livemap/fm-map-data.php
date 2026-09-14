@@ -1,4 +1,6 @@
 <?php
+// Version V20260914
+
 header('Content-Type: application/json; charset=utf-8');
 $urls = array(
     'https://dashboard.fm-funknetz.de/reflector1.json',

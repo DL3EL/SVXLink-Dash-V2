@@ -1,4 +1,6 @@
 <?php
+// Version V20260914
+
 header('Content-Type: application/json; charset=utf-8');
 $tg = '';
 if (isset($_POST['dtmfsvx'])) {

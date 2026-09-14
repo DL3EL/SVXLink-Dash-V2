@@ -1,3 +1,5 @@
+//Version V20260914
+
 (function () {
     'use strict';
     console.log(
@@ -88,7 +90,6 @@
                 '********************************'
             );
 
-
             // Node-Zustände
             client.subscribe(
                 '/server/state/nodes/+',
@@ -135,6 +136,7 @@
             );
         }
     );
+
     // Activ TG
     client.subscribe(
         '/server/state/activeTG/+',
@@ -156,7 +158,6 @@
             }
         }
     );
-
 
     // ------------------------------------------------------------
     // MQTT Nachrichten

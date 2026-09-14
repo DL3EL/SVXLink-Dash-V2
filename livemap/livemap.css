@@ -1,4 +1,6 @@
 html,
+/* Version 20260914 */
+
 body {
     width: 1400px;
     height: 780px;
@@ -49,7 +51,7 @@ body {
     padding: 15px;
     font-family: Arial, sans-serif;
     font-size: 14px;
-    color: #666;
+    color: #000000;
 }
 
 /* Liste */
@@ -72,7 +74,7 @@ body {
 /* Call */
 .talkerCall {
     font-weight: bold;
-    color: #ffff00 !important;
+    color: #000000 !important; /* schwarz */
     cursor: pointer;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
@@ -88,7 +90,7 @@ body {
     border-radius: 5px;
     background: #2e8b57;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition: filter 0.15s ease, transform 0.15s ease;
@@ -114,7 +116,7 @@ body {
     background: var(--talker-color); /* Nutzt die PHP-Farbe */
     border: none;
     border-radius: 50%;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.0);
 }
 
 /* Empfänger Marker */
@@ -144,18 +146,6 @@ body {
     margin: 0 auto;
 }
 
-.back-button {
-    border: none;
-    border-radius: 10px;
-    margin-top: 15px;
-    color: yellow;
-    background: #bb0000;
-    height: 35px;
-    width: 180px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
 /* Darstellungs-Menü */
 #displayPanel {
     position: absolute;
@@ -173,7 +163,7 @@ body {
 .displayHeader {
     padding: 8px 10px;
     font-family: Arial, sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     background: rgba(0, 0, 255, 0.5);
     color: #ffffff;
@@ -189,7 +179,7 @@ body {
     font-family: Arial, sans-serif;
     font-size: 14px;
     font-weight: bold;
-    color: #ffff00;
+    color: #000000 !important; /* schwarz */
     cursor: pointer;
     user-select: none;
 }
@@ -279,7 +269,7 @@ body {
 /* Call */
 .talkerCall {
     font-weight: bold;
-    color: #ffff00 !important;
+    color: #000000 !important; /* schwarz */
     cursor: pointer;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
@@ -295,7 +285,7 @@ body {
     border-radius: 5px;
     background: #2e8b57;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition:
@@ -323,7 +313,7 @@ body {
     background: <?php $talker ?>;
 	border: none;
     border-radius: 50%;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.0);
 }
 
 .talkerCall:hover {
@@ -346,30 +336,6 @@ body {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
 }
 
-.seiten-titel {
-    color: #00aeeb;
-    margin-bottom: 20px;
-    font-family: arial, sans-serif;
-}
-
-.tabelle-zentriert {
-    border-collapse: collapse;
-    background-color: #fififi;
-    margin: 0 auto;
-}
-
-.back-button {
-    border: none;
-    border-radius: 10px;
-    margin-top: 15px;
-    color: yellow;
-    background: #bb0000;
-    height: 35px;
-    width: 180px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
 /* Darstellungs-Menü */
 #displayPanel {
     position: absolute;
@@ -387,7 +353,7 @@ body {
 .displayHeader {
     padding: 8px 10px;
     font-family: Arial, sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
 	background: rgba(0, 0, 255, 0.5);
     color: #ffffff;
