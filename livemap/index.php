@@ -1,8 +1,20 @@
 <?php
-// Version V20260914
+// Version V20260915_1640
 // Farbpallette abrufen
-require_once __DIR__ . "/livemap_ini.php";
+
+if (!file_exists(__DIR__ . '/livemap_ini.php') && file_exists(__DIR__ . '/livemap_ini.php.example')) {
+    copy(__DIR__ . '/livemap_ini.php.example', __DIR__ . '/livemap_ini.php');
+    sleep(3); 
+}
+
+if (file_exists(__DIR__ . "/livemap_ini.php")) {
+    require_once __DIR__ . "/livemap_ini.php";
+} else {
+    // Sicherheitsnetz: Falls auch die .example fehlte, stürzt das Skript kontrolliert ab
+    die("Fehler: Die Konfigurationsdatei 'livemap_ini.php' fehlt und konnte nicht erstellt werden.");
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="de">

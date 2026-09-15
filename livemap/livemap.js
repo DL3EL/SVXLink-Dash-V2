@@ -1,4 +1,4 @@
-// Version 20260914
+// Version 20260915
 
 "use strict";
 
@@ -411,7 +411,8 @@ async function changeTG(tg) {
 
         const response =
             await fetch(
-                "/TEST/livemap/fm-set-tg.php",
+//                "/TEST/livemap/fm-set-tg.php",
+                "fm-set-tg.php",
                 {
                     method:
                         "POST",

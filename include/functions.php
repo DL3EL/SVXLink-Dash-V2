@@ -1670,6 +1670,13 @@ echo "<br>Stat: $cmd";
     }
 
     function update_db($autoupdate,$callsign) {
+/*
+        if ((defined ('debug')) && (debug > 0)) {
+            $logtext =  "Debug ist eingeschaltet, kein Update möglich..\n";
+            addsvxlog($logtext);
+            return (0);
+        }    
+*/
         $logtext =  "Update started..\n";
         addsvxlog($logtext);
 
