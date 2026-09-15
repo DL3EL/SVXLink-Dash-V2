@@ -114,7 +114,10 @@ define("DL3EL_EXTERN1_TAB", "new");
 // setting DL3EL_SC_CHANGE to "yes" enables the dashboard to select the correct soundcard and restart svxlink on the first run after reboot.
 define("DL3EL_SC_CHANGE", "no");
 // this string has to match the name of the card in the linux system
+// Shari / RFGuru?
 define("DL3EL_SC_STRING", "Audio Device");
+// Elenata
+//define("DL3EL_SC_STRING", "Audio");
 // needed for an external Mike ie. QX-18
 define("DL3EL_SC_Card_ID", "Device");
 //define("DL3EL_SC_SPEAKER_STRING", "Speaker Playback Volume");
@@ -133,6 +136,7 @@ define("DL3EL_SHOW_NEXT_RUN", "no");
 // allow update "git pull" via this dashboard (can be found in the power menu, if enabled
 // therefore for the command "git" had to be added in the file "www-data.sudoers", to activate this command, the script "upd_sudoer" has to be executed (as root)
 define("DL3EL_GIT_UPDATE", "yes");
+define("DL4EM_LIVEMAP", "yes");
 // enable APRS Feature, if yes
 define("DL3EL_APRS_MSG", "no");
 //
