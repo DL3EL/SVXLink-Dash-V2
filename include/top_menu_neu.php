@@ -43,6 +43,8 @@ $monuknet = $check;
 $monfmnet = !$check;
 
 // SVX Cube
+$cube01 = false;
+$cube02 = false;
 if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
     $cubeip = str_replace(' ', '<br />', exec('hostname -I | awk \'{print $1}\''));
 	$cubeip = "http://" . $cubeip . ":8081";
@@ -55,21 +57,26 @@ if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
 	}
 
 // DVS
+    $dvs = false;
 	if ((defined('DL3EL_VERSION')) && (strncmp(DL3EL_VERSION, "develop", 7) === 0) && (file_exists('/usr/bin/dvs'))) {
 		$dvs = true;
 	}
 	
 // Reflector
+	$local_ref = false;
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 		$local_ref = true;
 	}
 
+	$l_log = false;
+	$r_log = false;
 	if ((file_exists('/var/log/svxreflector')) || (file_exists('/var/log/svxreflector.log'))) {
 		$l_log = true;
 		$r_log = true;
 	} 
 
 // Shell
+	$shell_box = false;
 	if ((file_exists('/etc/default/shellinabox')) && ((defined('DL3EL_SSH')) && (strncmp(DL3EL_SSH, "yes", 3) === 0))) {
 		$getPortCommand = "grep -m 1 'SHELLINABOX_PORT=' /etc/default/shellinabox | awk -F '=' '/SHELLINABOX_PORT=/ {print $2}'";
 		$shellPort = exec($getPortCommand);    
@@ -80,6 +87,7 @@ if (file_exists('/opt/svxlink_mqtt/svxlink_mqtt_controller.py')) {
 	}	
 
 // TclVoiceMail Config
+	$voice_mail = false;
 	if ((defined('TclVoiceMail')) && (strncmp(TclVoiceMail, "no", 1) !== 0)) {
 		//echo '<a class="hreflink" href="./caller.php?file=TclVoiceMail.conf" id="tclvoicemail">TclVoiceMail</a> | ';
 		$voice_mail = true;
@@ -114,6 +122,7 @@ $livedb =  defined('DL3EL_LIVEDB') && DL3EL_LIVEDB == "top";
 $shari =   defined('DL3EL_RADIO') && DL3EL_RADIO == "Shari";
 $guru =    defined('DL3EL_RADIO') && DL3EL_RADIO == "RFGuru";
 $elenata =    defined('DL3EL_RADIO') && DL3EL_RADIO == "Elenata";
+$map = defined('DL4EM_LIVEMAP') && DL4EM_LIVEMAP == "yes";
 
 $livedb01 = false;
 $livedb02 = false;
@@ -189,7 +198,9 @@ $displayRoutes = [
     13 => './svx2mqtt.php',
     14 => './caller.php?id=svx2mqtt/index_neu&refresh=1',	
     15 => './svx2mqtt.php',
-	16 => './caller_extern.php?id=https://ukwide.svxlink.net'
+	16 => './caller_extern.php?id=https://ukwide.svxlink.net',
+	17 => './caller_extern.php?id=livemap/index.php'
+//	    echo '<a class="hreflink" href="./caller_extern.php?id=livemap/index.php&wid=950" ">LiveMap</a> | ';
 	
 ];
 // derzeit maimal 30 Links Inline möglich
@@ -341,6 +352,7 @@ echo '<option value="12">Web Chat</option>';
 if ($livedb01)  echo '<option value="13">Live DB</option>';
 if ($livedb02)  echo '<option value="14">Live DB</option>';
 if ($livedb03)  echo '<option value="15">Live DB</option>';
+if ($map)   echo '<option value="17">MAP</option>';
 
 // derzeit max 10 externe Links definiert in DISPLAY ROUTING
 for ($i = 1; $i < $max_links + 1; $i++) {
