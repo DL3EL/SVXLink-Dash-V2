@@ -270,7 +270,7 @@ if (isset($_POST['btnCleanUp']))
         } else {       
             list($gitversion, $rest) = explode(" ", $content);
             $gitversionf = $gitversion;
-            file_put_contents("gitversion",$gitversionf);
+            file_put_contents(DL3EL . "/gitversion",$gitversionf);
         }
         $dbversionFile = DL3EL . "/dbversion";
         $dbversion = file_get_contents($dbversionFile);

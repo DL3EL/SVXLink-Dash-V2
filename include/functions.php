@@ -1290,6 +1290,7 @@ function display_config($config) {
             $dbversionFile = DL3EL . "/dbversion.upd";
             $content = "update";
             file_put_contents($dbversionFile, $content);
+            file_put_contents(DL3EL . "/gitversion",$gitversion);
             if ($autoupdate) {
               $logtext =  "Auto-Update enabled and started from $version to version $gitversion\n";
               addsvxlog($logtext);
@@ -1755,7 +1756,7 @@ echo "<br>Stat: $cmd";
                 if (strlen($mqtt_script)) {
                     $dbversion = $dbversion . "(m)";
                 }
-                $gitversion = file_get_contents("gitversion");
+                $gitversion = file_get_contents(DL3EL . "/gitversion");
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 2\n");
                 if ($autoupdate) {
                   $upd = "&upd=a_" . $old_dbversion . "(" . $gitversion . ")";
