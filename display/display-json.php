@@ -738,7 +738,7 @@ $baseLogic = base_logic($conf, $logicNames);
 $reflectorSections = reflector_sections($conf, $logicNames);
 $primaryReflector = count($reflectorSections) ? $reflectorSections[0] : '';
 $reflectors = build_reflectors($conf, $lines, $reflectorSections, $fmnetwork);
-$callsign = callsign_from_conf($conf, $logicNames, $reflectorSections),
+$callsign = callsign_from_conf($conf, $logicNames, $reflectorSections);
 if (DL3EL_DB) {
 	check_aprs();
 	check_mqtt();
