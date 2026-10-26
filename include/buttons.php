@@ -10,6 +10,7 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
 */
  $exec="";
  $dtmf_pty = get_pty();
+ $logtext = "";
  
 for ($i = 1; $i <= 20; $i++) {
     $buttonName = 'button' . $i;
@@ -97,36 +98,30 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
         echo '</center>';
         echo '</form>';
     }    
-  if (isset($_POST["dtmfsvx"])){
-    $exec= "echo '" . $_POST['dtmfsvx'] . "' > " . $dtmf_pty;
-    exec($exec,$output);
-    echo "<meta http-equiv='refresh' content='0'>";
-    $logtext = "DTMF via Dashboard: "  . $_POST['dtmfsvx'];
+
+    if (isset($_POST["dtmfsvx"])){
+        $logtext = execCleanDtmf($_POST["dtmfsvx"], "", "", $dtmf_pty);
     }
-  if (isset($_POST["jmpto"])) {
-    $exec= "echo '91" . $_POST['jmpto'] . "#' > " . $dtmf_pty;
-    exec($exec,$output);
-    echo "<meta http-equiv='refresh' content='0'>";
-    $logtext = "DTMF via Dashboard: "  . $_POST['jmpto'];
+// wird benötigt für jmp Funktionen aus dem Hauptdashboard
+    if (isset($_POST["jmpto"])) {
+        $logtext = execCleanDtmf($_POST["jmpto"], "91", "#", $dtmf_pty);
     }
- if (isset($_POST["jmptoA"])) {
-    $exec= "echo '*91" . $_POST['jmptoA'] . "#' > " . $dtmf_pty;
-    exec($exec,$output);
-    echo "<meta http-equiv='refresh' content='0'>";
-    $logtext = "DTMF via Dashboard: "  . $_POST['jmptoA'];
+    if (isset($_POST["jmptoA"])) {
+        $logtext = execCleanDtmf($_POST["jmptoA"], "*91", "#", $dtmf_pty) . " test";
     }
-if (isset($_POST["jmptoM"])) {
-    $exec= "echo '94" . $_POST['jmptoM'] . "#' > " . $dtmf_pty;
-    exec($exec,$output);
-    echo "<meta http-equiv='refresh' content='0'>";
-    $logtext =  "DTMF via Dashboard: "  . $_POST['jmptoM'];
+    if (isset($_POST["jmptoM"])) {
+        $logtext = execCleanDtmf($_POST["jmptoM"], "94", "#", $dtmf_pty);
     }
-$logtext = "[" . $logtext . "]\n";
-if ($logtext !== "[]\n") {
-    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
-    $logtext = $ip . ": " . $logtext;
-    addsvxlog($logtext);
-}    
+    if (isset($_POST["jmptoE"])) {
+        $logtext = execCleanDtmf($_POST["jmptoE"], "2#", "#", $dtmf_pty);
+    }
+
+// Globales Logging am Ende
+    if ($logtext !== "") {
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0';
+        $logtext = $ip . ": [" . $logtext . "]\n";
+        addsvxlog($logtext);
+    }
 
 ?>
 <p style = "margin-bottom:-2px;"></p>

@@ -1804,4 +1804,72 @@ echo "<br>Stat: $cmd";
         addsvxlog($logtext);
         echo '<textarea name="content" rows="35" cols="72">' . htmlspecialchars($content) . '</textarea><br>';
     }
+// tackle CodeInjection
+/**
+ * Prüft einen fertig zusammengebauten Shell-Befehl auf gefährliche Injection-Zeichen.
+ * Führt den Befehl nur aus, wenn er absolut sauber ist. Keine Autokorrektur.
+ *
+ * @param string $command Der komplette auszuführende Systembefehl
+ * @return bool True, wenn der Befehl sicher ausgeführt wurde. False, wenn er blockiert wurde.
+ */
+function checkAndExecuteCommand($command) {
+    $command = trim($command);
+    if ($command === '') {
+        return false;
+    }
+
+    $ip = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '0';;
+    // Erlaubte Zeichen (Whitelist):
+    // Buchstaben, Zahlen, Leerzeichen, sowie: / . - _ : ? = & + * # ' " >
+    // WICHTIG: Semikolon (;), Pipe (|), Backticks (`), Dollar ($) und Zeilenumbrüche (\n) fehlen hier bewusst!
+    $allowedPattern = '/^[a-zA-Z0-9\s\/\.\-\_\:\?\=\&\+\*\#\'\"\>]+$/';
+
+    // Wenn ein verbotenes Zeichen gefunden wird, wird die Ausführung blockiert
+    if (!preg_match($allowedPattern, $command)) {
+        // Optional: Hier könnte ein Sicherheits-Log eingebaut werden
+        $logtext = "Ungültige Zeichen ! " . $command . " IP: " . $ip . "\n";
+        addsvxlog($logtext);
+        return false; 
+    }
+
+    // Befehl ist sauber -> Ausführung
+    $logtext = "Exec to system: " . $command . " IP: " . $ip . "\n";
+    addsvxlog($logtext);
+    exec($command, $output);
+    return true;
+}
+// neu
+function isValidCallsign($callsign) {
+    // Erlaubt z.B. DL1ABC, K69XYZ, VE3XYZ/P, 4X4BL
+    return preg_match('/^[a-zA-Z0-9]{1,4}[0-9][a-zA-Z0-9]{1,4}(\/[pPmMaA])?$/', trim($callsign));
+}
+
+function isValidLocator($locator) {
+    // Erlaubt exakt 4 oder 6 Zeichen im Format AA00 oder AA00aa
+    return preg_match('/^[a-zA-Z]{2}[0-9]{2}([a-zA-Z]{2})?$/', trim($locator));
+}
+
+// Die universelle, sichere Ausführungs-Funktion
+function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty) {
+    $trimmed = trim($dtmf);
+    
+    // Prüfen, ob die Benutzereingabe NUR aus DTMF-Zeichen besteht
+    if (preg_match('/^[0-9\*#A-D]+$/', $trimmed)) {
+        
+        // Wir bauen den kompletten Befehl (z.B. 91123#) zusammen und maskieren ihn komplett für die Shell
+        $full_command = $prefix . $trimmed . $suffix;
+        
+        // Sicherer Shell-Aufruf ohne Anführungszeichen-Chaos
+        $exec = "echo " . escapeshellarg($full_command) . " > " . $dtmf_pty;
+        exec($exec, $output);
+        
+        // Seite neu laden
+        echo "<meta http-equiv='refresh' content='0'>";
+        
+        // Wir geben den Logtext zurück, damit er global geloggt werden kann
+        return "DTMF via Dashboard: " . $full_command;
+    }
+    
+    return ""; // Ungültig -> Nichts tun, leerer String zurück
+}
 ?>

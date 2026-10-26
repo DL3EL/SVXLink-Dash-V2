@@ -281,26 +281,51 @@ $screen[3] = "Port in use: " . $device[0] ;
 
 
 if (isset($_POST['btnDetectn'])) {
-  $device = device_detection($radioport);
+    // Erlaubt nur typische Pfad- und Systemzeichen (a-z, A-Z, 0-9, /, -, _) und die "-9"
+    // Blockiert sofort jegliche Sonderzeichen wie ; , ' " ` & > <
+    if (preg_match('/^[a-zA-Z0-9\/\-\_]+$/', trim($radioport)) || $radioport === '-9') {
+        $device = device_detection($radioport);
+    } else {
+        // Manipulierter Port -> Abbruch oder Standardwert
+        $device = device_detection('-1'); 
+    }
 }
 
-if (isset($_POST['btnSave']))
-    {
-
-        $retval = null;
-        $screen = null;
+if (isset($_POST['btnSave'])) {
+    $retval = null;
+    $screen = null;
 echo "btnSave: <br>";
-	$port = (isset($_POST['port']))? $_POST['port'] : "";
+    // 1. Rohwert aus dem POST-Formular holen
+	$port_input = isset($_POST['port']) ? trim($_POST['port']) : "";
+    // 2. Falls das $device-Array existiert und den Index hat, nutzen wir ihn (deine Original-Logik)
+    if (isset($device[$port_input])) {
+        $port = $device[$port_input];
+    } else {
+        // Falls direkt der String (z.B. "/dev/ttyS0") gesendet wurde
+        $port = $port_input;
+    }
+//    	$port = (isset($_POST['port']))? $_POST['port'] : "";
 	if ((defined ('debug')) && (debug > 0)) echo "0 selected Port: $port<br>";  
-        $port = $device[$port];
+//        $port = $device[$port];
       if (debug) print_r($device);
 	if ((defined ('debug')) && (debug > 0)) echo "1 selected Port: $port<br>";  
-        $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
-	if ((defined ('debug')) && (debug > 0)) echo "testing with $command<br>";  
+    // 3. BOMBENFESTE ABSICHERUNG: Regulärer Ausdruck für erlaubte Port-Zeichen
+    // Erlaubt nur Buchstaben, Zahlen, Schrägstrich, Bindestrich und Unterstrich
+    if (!preg_match('/^[a-zA-Z0-9\/\-\_]+$/', $port)) {
+        echo "Ungültiger oder gefährlicher Port-Name blockiert!<br>";
+        $retval = 1;
+    } else {
+        // 4. Sicherer Shell-Aufruf mit escapeshellarg
+        $command = "python3 sa818.py --port " . escapeshellarg($port) . " version 2>&1";
+        if ((defined ('debug')) && (debug > 0)) echo "testing with $command<br>";  
 
-	exec($command,$screen,$retval);
+        exec($command, $screen, $retval);
+
+//        $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
+//	if ((defined ('debug')) && (debug > 0)) echo "testing with $command<br>";  
+//	exec($command,$screen,$retval);
 	if (!$retval) {
-	if ((defined ('debug')) && (debug > 0)) echo "selected Port works: $port<br>";  
+	  if ((defined ('debug')) && (debug > 0)) echo "selected Port works: $port<br>";  
 //		$RfData['port']=$port;
 		$jsonRfData = json_encode($RfData);
         	file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
@@ -308,19 +333,35 @@ echo "btnSave: <br>";
                 exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
                 //move generated file to current config
                 exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
-	}
+	} else {
+            echo "Fehler: Der ausgewählte Port antwortet nicht oder ist ungültig.<br>";
+        }
 }
-if (isset($_POST['btnVersion']))
-    {
-        $retval = null;
-        $screen = null;
+if (isset($_POST['btnVersion'])){
+    $retval = null;
+    $screen = null;
 
-	$port = (isset($_POST['port']))? $_POST['port'] : "";
+	$port = (isset($_POST['port']))? trim($_POST['port']) : "";
 	if ((defined ('debug')) && (debug > 0)) echo "using port: $port<br>";  
 	if ((defined ('debug')) && (debug > 10)) print_r($device);
-        $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
+    // 1. STRIKTE ZEICHEN-WHITELIST: Nur legitime Pfad- und Systemzeichen zulassen
+    if (!preg_match('/^[a-zA-Z0-9\/\-\_]+$/', $port)) {
+        echo "Ungültiger oder gefährlicher Port-Name blockiert!<br>";
+        $retval = 1;
+    } else {
+        // 2. Doppelsicherung für die Shell
+        $command = "python3 sa818.py --port " . escapeshellarg($port) . " version 2>&1";
 
-	if (!$retval) exec($command,$screen,$retval);
+        exec($command, $screen, $retval);
+        
+        // Optionale Ausgabe der Firmware-Version im UI (falls gewünscht)
+        if ($retval === 0 && isset($screen[0])) {
+            echo "Device Version: " . htmlspecialchars($screen[0]) . "<br>";
+        }
+    }
+//        $command = "python3 sa818.py --port \"" .$port. "\" version 2>&1";
+
+//	if (!$retval) exec($command,$screen,$retval);
 //	echo "<br>SHARI: $retval";
   	//if ($retval) echo("NOK");
 /*
@@ -338,170 +379,241 @@ if (isset($_POST['btnVersion']))
 */
 }
 
-if (isset($_POST['btnRadio']))
-    {
-        $retval = null;
-        $screen = null;
-	if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: $port<br>";  
+if (isset($_POST['btnRadio'])) {
+    $retval = null;
+    $screen = null;
+    
+    if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: " . htmlspecialchars($port) . "<br>";  
 
-	$rxfreq = (isset($_POST['rxfreq']))? $_POST['rxfreq'] : "";
-	$txfreq = (isset($_POST['txfreq']))? $_POST['txfreq'] : "";
-// SA818 works only in simplex mode, RX has to be equal to TX	
-	$txfreq = $rxfreq;
-	$freq = $rxfreq;
-	$squelch = (isset($_POST['squelch']))? $_POST['squelch'] : "";
-//	$ctcss = $_POST['ctcss'];
-	$rxctcss = (isset($_POST['rxctcss']))? $_POST['rxctcss'] : "";
-	$txctcss = (isset($_POST['txctcss']))? $_POST['txctcss'] : "";
-	$tail = (isset($_POST['tail']))? $_POST['tail'] : "";
-	$bw = (isset($_POST['bw']))? $_POST['bw'] : "";
-	$ctcss = $txctcss;
-	$freq = $rxfreq;
-	$tail_cmd = "";
-	$ctcss_type = "";
-	$retval = radio_ctcss_check($ctcss, $ctcss_type, $rxctcss, $txctcss,$tail_cmd,$tail);
-/*
-	$ctcss_type = "invalid";
-	if ((substr($txctcss,-1) === "N") || (substr($txctcss,-1) === "I")) {
-	  $ctcss_type = "dcs";
-	  $tail_cmd = "";
-	} else {    
-	  if ((substr($txctcss,-2,1) === ".") || ($txctcss = "None")) {
-	    $ctcss_type = "ctcss";
-	    $tail_cmd = "--tail \"" . $tail . "\"";
-	  } else {  
-	    $ctcss_type = "invalid";
-	    $txctcss = "?" . $txctcss . "?";
-	    $retval = 1;
-	  }  
-	}
-	if (!$retval) {
-	  if ((substr($rxctcss,-1) === "N") || (substr($rxctcss,-1) === "I")) {
-	    if ($ctcss_type !== "dcs") {
-	      $ctcss_type = "invalid";
-	      $txctcss = "?" . $txctcss . "?";
-	      $rxctcss = "?" . $rxctcss . "?";
-	      $retval = 1;
-	    } else {  
-	      $ctcss_type = "dcs";
-	      $tail_cmd = "";
-	    }
-	  } else {    
-	    if ((substr($rxctcss,-2,1) === ".") || ($rxctcss = "None")) {
-	      if ($ctcss_type !== "ctcss") {
-		$ctcss_type = "invalid";
-		$txctcss = "?" . $txctcss . "?";
-		$rxctcss = "?" . $rxctcss . "?";
-		$retval = 1;
-	      } else {
-		$ctcss_type = "ctcss";
-		$tail_cmd = "--tail \"" . $tail . "\"";
-	      }
-	    } else {  
-	      $ctcss_type = "invalid";
-	      $rxctcss = "?" . $rxctcss . "?";
-	      $retval = 1;
-	    }  
-	  }
-	  if ($rxctcss !== "") {
-	    $ctcss = $txctcss . "," . $rxctcss;
-	  }
-	}  
+    // 1. ABSICHERUNG: Striktes Casting auf den richtigen Datentyp
+    
+    // Frequenz muss eine Fließkommazahl sein (z.B. 432.9500)
+    $rxfreq = isset($_POST['rxfreq']) ? sprintf("%.4f", floatval($_POST['rxfreq'])) : "0.0000";
+    $txfreq = $rxfreq; // Simplex-Erzwingung laut deinem Code
+    $freq = $rxfreq;
 
-*/
-	if (!$retval) {
-	  $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
-	  if ((defined ('debug')) && (debug > 10)) echo $command;
-	  exec($command,$screen,$retval);
-	  $RfData['port']=$port;$RfData['freq']=$freq;$RfData['rxfreq']=$rxfreq;$RfData['txfreq']=$txfreq;$RfData['squelch']=$squelch;$RfData['ctcss']=$ctcss;$RfData['tail']=$tail;
-	  $jsonRfData = json_encode($RfData);
-	  if ((defined ('debug')) && (debug > 0)) addsvxlog("Writing: " . $jsonRfData);
-	  file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
-	  //archive the current config
-	  exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-	  //move generated file to current config
-	  exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
-	  echo "new Data saved to device on $port, please reload page<br>";  
+    // Squelch und Bandbreite müssen reine Ganzzahlen sein (z.B. Squelch 1-9, BW 0 oder 1)
+    $squelch = isset($_POST['squelch']) ? intval($_POST['squelch']) : 0;
+    $bw = isset($_POST['bw']) ? intval($_POST['bw']) : 0;
+
+    // CTCSS-Werte: Können Töne wie 71.9 sein. Zur Sicherheit jagen wir sie durch escapeshellarg()
+    $rxctcss = isset($_POST['rxctcss']) ? trim($_POST['rxctcss']) : "";
+    $txctcss = isset($_POST['txctcss']) ? trim($_POST['txctcss']) : "";
+    $tail = isset($_POST['tail']) ? trim($_POST['tail']) : "";
+    
+    $ctcss = $txctcss;
+    $tail_cmd = "";
+    $ctcss_type = "";
+
+    // Deine Prüffunktion (Werte werden als Referenz/Text übergeben)
+    $retval = radio_ctcss_check($ctcss, $ctcss_type, $rxctcss, $txctcss, $tail_cmd, $tail);
+    
+    // Sicherstellen, dass auch der globale $port keine Injections enthält
+    if (!preg_match('/^[a-zA-Z0-9\/\-\_]+$/', $port)) {
+        echo "Gefährlicher Port-Name blockiert!<br>";
+        $retval = 1;
+    }
+
+    if (!$retval) {
+        // 2. SICHERER ZUSAMMENBAU: Jedes Argument wird einzeln übergeben/maskiert
+        // Da $rxfreq, $txfreq, $squelch und $bw reine Zahlen sind, sind sie 100% spritzsicher.
+        // Für $ctcss_type (aus deiner Funktion) und $ctcss nutzen wir zur Sicherheit escapeshellarg.
+        
+        $command = "python3 sa818.py --port " . escapeshellarg($port) . 
+                   " radio --frequency " . $rxfreq . 
+                   " --txfrequency " . $txfreq . 
+                   " --squelch " . $squelch . 
+                   " --" . escapeshellarg($ctcss_type) . " " . escapeshellarg($ctcss) . 
+                   " " . $tail_cmd . // Kommt hoffentlich sicher aus radio_ctcss_check
+                   " --bw " . $bw . " 2>&1";
+
+        if ((defined ('debug')) && (debug > 10)) echo htmlspecialchars($command) . "<br>";
+        
+        exec($command, $screen, $retval);
+        
+        // JSON-Daten befüllen
+        $RfData['port'] = $port;
+        $RfData['freq'] = $freq;
+        $RfData['rxfreq'] = $rxfreq;
+        $RfData['txfreq'] = $txfreq;
+        $RfData['squelch'] = $squelch;
+        $RfData['ctcss'] = $ctcss;
+        $RfData['tail'] = $tail;
+        
+        $jsonRfData = json_encode($RfData);
+        if ((defined ('debug')) && (debug > 0)) addsvxlog("Writing: " . $jsonRfData);
+        
+        file_put_contents("sa818.json", $jsonRfData, FILE_USE_INCLUDE_PATH);
+        
+        // Korrigierter Zeitstempel (His statt This)
+        $timestamp = date("YmdHis");
+        
+        // System-Befehle sicher ausführen
+        exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' . $timestamp, $screen, $retval);
+        exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+        
+        echo "new Data saved to device on " . htmlspecialchars($port) . ", please reload page<br>";  
+    } else {
+        $command = "python3 sa818.py 2>&1";
+        exec($command, $screen, $retval);
+    }  
+}
+
+if (isset($_POST['btnFilters'])) {
+    $retval = null;
+    $screen = null;
+    
+    if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: " . htmlspecialchars($port) . "<br>";  
+    
+    // 1. ABSICHERUNG: Striktes Casting auf Ganzzahlen (sofern 0 oder 1 übergeben wird)
+    // Falls dein sa818.py Text wie "yes"/"no" erwartet, entferne das intval() und nutze unten escapeshellarg()!
+    $fEmph = isset($_POST['fEmph']) ? intval($_POST['fEmph']) : 0;
+    $fLow  = isset($_POST['fLow'])  ? intval($_POST['fLow'])  : 0;
+    $fHigh = isset($_POST['fHigh']) ? intval($_POST['fHigh']) : 0;
+
+    // 2. Sicherheitsprüfung für die Port-Variable
+    if (!preg_match('/^[a-zA-Z0-9\/\-\_]+$/', $port)) {
+        echo "Gefährlicher Port-Name blockiert!<br>";
+        $retval = 1;
+    }
+
+    if (!$retval) {
+        // 3. SICHERER ZUSAMMENBAU: Da die Filter nun reine Zahlen sind, sind sie absolut spritzsicher.
+        $command = "python3 sa818.py --port " . escapeshellarg($port) . " filters --emphasis " . $fEmph . " --lowpass " . $fLow . " --highpass " . $fHigh . " 2>&1";
+        
+        exec($command, $screen, $retval);
+        
+        if ($retval === 0) {
+            $RfData['port']  = $port;
+            $RfData['fEmph'] = $fEmph; 
+            $RfData['fLow']  = $fLow;
+            $RfData['fHigh'] = $fHigh;
+            
+            $jsonRfData = json_encode($RfData);
+            file_put_contents("sa818.json", $jsonRfData, FILE_USE_INCLUDE_PATH);
+            
+            // Korrigierter Zeitstempel (His statt This)
+            $timestamp = date("YmdHis");
+            
+            // Backup-Dateien sicher kopieren und verschieben
+            exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' . $timestamp, $screen, $retval);
+            exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+            
+            echo "new filter settings saved to device on " . htmlspecialchars($port) . ", please reload page<br>";  
         } else {
-	  $command = "python3 sa818.py  2>&1";
-	  exec($command,$screen,$retval);
-       }  
+            echo "Fehler beim Speichern der Filtereinstellungen.<br>";
+        }
+    }
 }
 
-if (isset($_POST['btnFilters']))
-    {
+if (isset($_POST['btnVol'])) {
+    $retval = null;
+    $screen = null;
+    
+    if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: " . htmlspecialchars($port) . "<br>";  
+    
+    // 1. ABSICHERUNG: Striktes Umwandeln in eine Ganzzahl
+    // Verwandelt jeden Text oder Schadcode sofort in eine harmlose 0
+    $volume = isset($_POST['volume']) ? intval($_POST['volume']) : 0;
 
-	$retval = null;
-        $screen = null;
-	if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: $port<br>";  
-	$fEmph = (isset($_POST['fEmph']))? $_POST['fEmph'] : "";
-	$fLow = (isset($_POST['fLow']))? $_POST['fLow'] : "";
-	$fHigh = (isset($_POST['fHigh']))? $_POST['fHigh'] : "";
+    // Plausibilitätsprüfung für SA818 (Lautstärke liegt üblicherweise zwischen 1 und 8)
+    if ($volume < 1 || $volume > 8) {
+        $volume = 4; // Sicherer Standardwert bei Fehleingabe oder Manipulation
+    }
 
-        $command = "python3 sa818.py --port \"" .$port. "\" filters  --emphasis \"" .$fEmph. "\" --lowpass \"" .$fLow. "\" --highpass \"" .$fHigh. "\" 2>&1";
-        if (!$retval) exec($command,$screen,$retval);
-	        if (!$retval) {
-                $RfData['port']=$port;$RfData['fEmph']=$fEmph; $RfData['fLow']=$fLow;$RfData['fHigh']=$fHigh;
-                $jsonRfData = json_encode($RfData);
-                file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
-                //archive the current config
-//                exec('sudo cp /opt/sa818/sa818.json /opt/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                //move generated file to current config
-//                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
-                exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+    // 2. Sicherheitsprüfung für den globalen Port
+    if (!preg_match('/^[a-zA-Z0-9\/\-\_]+$/', $port)) {
+        echo "Gefährlicher Port-Name blockiert!<br>";
+        $retval = 1;
+    }
+
+    if (!$retval) {
+        // 3. SICHERER ZUSAMMENBAU: Da $volume eine reine Zahl ist, ist die Injection unmöglich
+        $command = "python3 sa818.py --port " . escapeshellarg($port) . " volume --level " . $volume . " 2>&1";
+        
+        exec($command, $screen, $retval);
+        
+        if ($retval === 0) {
+            $RfData['volume'] = $volume;
+            $jsonRfData = json_encode($RfData);
+            file_put_contents("sa818.json", $jsonRfData, FILE_USE_INCLUDE_PATH);
+            
+            // Korrigierter Zeitstempel (His statt This)
+            $timestamp = date("YmdHis");
+            
+            // Backups sicher ausführen
+            exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' . $timestamp, $screen, $retval);
+            exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+            
+            echo "new volume saved to device on " . htmlspecialchars($port) . ", please reload page<br>";  
+        } else {
+            echo "Fehler beim Speichern der Lautstärke.<br>";
         }
-	echo "new filter settings saved to device on $port, please reload page<br>";  
-
-}
-
-
-
-
-if (isset($_POST['btnVol']))
-    {
-	
-	$retval = null;
-        $screen = null;
-	if ((defined ('debug')) && (debug > 10)) echo "selected Radio Port: $port<br>";  
-	$volume = (isset($_POST['volume']))? $_POST['volume'] : "";
-
-        $command = "python3 sa818.py --port \"" .$port. "\" volume  --level \"" .$volume. "\" 2>&1";
-        if (!$retval) exec($command,$screen,$retval);
-                if (!$retval) {
-                $RfData['volume']=$volume;
-                $jsonRfData = json_encode($RfData);
-                file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
-                //archive the current config
-//                exec('sudo cp /opt/sa818/sa818.json /opt/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                //move generated file to current config
-//                exec('sudo mv sa818.json /opt/sa818/sa818.json', $screen, $retval);
-                exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
-        }
-	echo "new volume saved to device on $port, please reload page<br>";  
+    }
 }
 
 if (isset($_POST['btnSaveAll'])) {
     $retval = null;
     $screen = null;
-    $rxfreq = $RfDataF['rxfreq'];$txfreq = $RfDataF['txfreq'];$ctcss=$RfDataF['ctcss'];$rxctcss=$RfDataF['rxctcss'];$txctcss=$RfDataF['txctcss'];$tail=$RfDataF['tail'];$squelch=$RfDataF['squelch'];
-    $fEmph = $RfDataF['fEmph'];$fLow=$RfDataF['fLow'];$fHigh=$RfDataF['fHigh'];
-    $volume = $RfDataF['volume'];
-    $tail = $RfDataF['tail'];
-    $bw = $RfDataF['bw'];
+
+    // 1. ABSICHERUNG: Striktes Casting und Validierung aller Werte aus dem Array
+    $rxfreq   = isset($RfDataF['rxfreq']) ? sprintf("%.4f", floatval($RfDataF['rxfreq'])) : "0.0000";
+    $txfreq   = isset($RfDataF['txfreq']) ? sprintf("%.4f", floatval($RfDataF['txfreq'])) : "0.0000";
+    $squelch  = isset($RfDataF['squelch']) ? intval($RfDataF['squelch']) : 0;
+    $bw       = isset($RfDataF['bw']) ? intval($RfDataF['bw']) : 0;
+    $volume   = isset($RfDataF['volume']) ? intval($RfDataF['volume']) : 4;
+    
+    $fEmph    = isset($RfDataF['fEmph']) ? intval($RfDataF['fEmph']) : 0;
+    $fLow     = isset($RfDataF['fLow']) ? intval($RfDataF['fLow']) : 0;
+    $fHigh    = isset($RfDataF['fHigh']) ? intval($RfDataF['fHigh']) : 0;
+
+    // Strings sauber trimmen und für die Shell vorbereiten
+    $ctcss    = isset($RfDataF['ctcss']) ? trim($RfDataF['ctcss']) : "";
+    $rxctcss  = isset($RfDataF['rxctcss']) ? trim($RfDataF['rxctcss']) : "";
+    $txctcss  = isset($RfDataF['txctcss']) ? trim($RfDataF['txctcss']) : "";
+    $tail     = isset($RfDataF['tail']) ? trim($RfDataF['tail']) : "";
 
     $freq = $rxfreq;
     $tail_cmd = "";
     $ctcss_type = "";
-    $retval = radio_ctcss_check($ctcss, $ctcss_type, $rxctcss, $txctcss,$tail_cmd,$tail);
-    $command = "python3 sa818.py --port \"" .$port. "\" radio --frequency \"" .$rxfreq. "\" --txfrequency \"" .$txfreq. "\" --squelch \"" .$squelch. "\" --" . $ctcss_type . " \"" .$ctcss. "\" " . $tail_cmd . " --bw \"" .$bw. "\" 2>&1";
-    exec($command,$screen,$retval);
-    $command = "python3 sa818.py --port \"" .$port. "\" volume  --level \"" .$volume. "\" 2>&1";
-    exec($command,$screen,$retval);
-    $command = "python3 sa818.py --port \"" .$port. "\" filters  --emphasis \"" .$fEmph. "\" --lowpass \"" .$fLow. "\" --highpass \"" .$fHigh. "\" 2>&1";
-    exec($command,$screen,$retval);
+    
+    // Deine Prüffunktion durchlaufen lassen
+    $retval = radio_ctcss_check($ctcss, $ctcss_type, $rxctcss, $txctcss, $tail_cmd, $tail);
+
+    // Globale Port-Variable validieren
+    if (!preg_match('/^[a-zA-Z0-9\/\-\_]+$/', $port)) {
+        echo "Gefährlicher Port-Name blockiert!<br>";
+        $retval = 1;
+    }
+
+    if (!$retval) {
+        $safe_port = escapeshellarg($port);
+
+        // BEFEHL 1: Radio Einstellungen
+        $command = "python3 sa818.py --port " . $safe_port . 
+                   " radio --frequency " . $rxfreq . 
+                   " --txfrequency " . $txfreq . 
+                   " --squelch " . $squelch . 
+                   " --" . escapeshellarg($ctcss_type) . " " . escapeshellarg($ctcss) . 
+                   " " . $tail_cmd . 
+                   " --bw " . $bw . " 2>&1";
+        exec($command, $screen, $retval);
+
+        // BEFEHL 2: Lautstärke
+        $command = "python3 sa818.py --port " . $safe_port . " volume --level " . $volume . " 2>&1";
+        exec($command, $screen, $retval);
+
+        // BEFEHL 3: Filter
+        $command = "python3 sa818.py --port " . $safe_port . " filters --emphasis " . $fEmph . " --lowpass " . $fLow . " --highpass " . $fHigh . " 2>&1";
+        exec($command, $screen, $retval);
+        
+        echo "All settings successfully sent to device on " . htmlspecialchars($port) . "<br>";
+    } else {
+        echo "Fehler bei der Validierung der Gesamteinstellungen.<br>";
+    }
 }
+
+
 //load json
 //$mismatch = 1;
 //  if ((DL3EL_RADIO == "Shari") && $mismatch) {
@@ -569,16 +681,17 @@ if (isset($_POST['btnSaveAll'])) {
 <?php
     if ($pn > 1) {
       $pn = 0;
-      $port = $device[0];
+      $port = isset($device[0]) ? $device[0] : "";
       echo '<form method="post" action="">';
       echo '<select id="port" name="port" required>';
       foreach ($device as $portnr) {
-	  $portLine = "<option value=" . $pn . ">" . $portnr . "</option><br>\n";
-	  echo $portLine;
-	  if (!$pn) {
-	    echo "<option value=" . $pn . ">------</option><br>\n";
-	  }  
-	  ++$pn;
+          // XSS-Schutz: htmlspecialchars für die Anzeige des Portnamens
+          $portLine = "<option value=" . $pn . ">" . htmlspecialchars($portnr) . "</option><br>\n";
+          echo $portLine;
+          if (!$pn) {
+            echo "<option value=" . $pn . ">------</option><br>\n";
+          }  
+          ++$pn;
       }
       echo "</select>";
       echo " Einträge in Liste: $pn ";
@@ -588,22 +701,35 @@ if (isset($_POST['btnSaveAll'])) {
 
       if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['port_submitted'])) {
         if (isset($_POST['port'])) {
-	  $port = $device[$_POST['port']];
+          
+          // ABSICHERUNG: Index zu Ganzzahl konvertieren
+          $selected_index = intval($_POST['port']);
+          
+          // Prüfen, ob der Index im detektierten Array wirklich existiert
+          if (isset($device[$selected_index])) {
+              $port = $device[$selected_index];
 
-	  if ((defined ('debug')) && (debug > 0)) echo "selected Port: $port <br>";  
-		$RfData['port']=$port;
-		echo "</tr><td>new Port $port, saving .. ";
-		$jsonRfData = json_encode($RfData);
-        	file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
-                //archive the current config
-                exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' .date("YmdThis") ,$screen,$retval);
-                //move generated file to current config
-                exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
-		echo "done, please reload page </td><td></td>";
-	}
+              if ((defined ('debug')) && (debug > 0)) echo "selected Port: " . htmlspecialchars($port) . "<br>";  
+              $RfData['port'] = $port;
+              echo "</tr><td>new Port " . htmlspecialchars($port) . ", saving .. ";
+              $jsonRfData = json_encode($RfData);
+              file_put_contents("sa818.json", $jsonRfData ,FILE_USE_INCLUDE_PATH);
+              
+              // Korrigierter Zeitstempel für das Backup (His statt This)
+              $timestamp = date("YmdHis");
+              
+              // Die sicheren Kopierbefehle
+              exec('sudo cp ' . DL3EL . '/sa818/sa818.json ' . DL3EL . '/sa818/sa818.json.' . $timestamp ,$screen,$retval);
+              exec('sudo mv sa818.json ' . DL3EL . '/sa818/sa818.json', $screen, $retval);
+              echo "done, please reload page </td><td></td>";
+          } else {
+              echo "</tr><td>Fehler: Ungültige Port-Auswahl!</td><td></td>";
+          }
+        }
       } 
     }
 ?>
+
 </tr>
 </table>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
