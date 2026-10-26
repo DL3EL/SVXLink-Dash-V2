@@ -163,7 +163,7 @@ if (fopen($RfConfFile,'r')) {
 	$RfData['txctcss'] = $txctcss;
       }    
       if ($squelch !== "") {
-	if ($squelch !== $RfData['squelch']) {
+	if ($squelch != $RfData['squelch']) {
 	    echo "different squelch, Shari: [$squelch], sa818.json: [" . $RfData['squelch'] . "], save the correct one<br>";
 	    $mismatch = 1;
 	}	
