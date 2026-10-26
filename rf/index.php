@@ -336,6 +336,7 @@ echo "btnSave: <br>";
 	} else {
             echo "Fehler: Der ausgewählte Port antwortet nicht oder ist ungültig.<br>";
         }
+    }
 }
 if (isset($_POST['btnVersion'])){
     $retval = null;
