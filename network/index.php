@@ -104,8 +104,8 @@ $screen[5] = "[Set Static IP] needs |IP|/|CIDR| & |GW| & |DNS|.";
 $screen[6] = "Please use 24 for 255.255.255.0 in CIDR. ect.";
 $screen[7] = "For |IP| & |GW| & |DNS| please use IP notation like 192.168.1.2 ect.";
 $screen[8] = "";
-	$ipgw_str= "192.168.241.1\n";
-$screen[9] = $ipgw_str;
+$ipgw_str = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0';
+$screen[9] = "Local IP:" . $ipgw_str . " / Server: " . $fmnetwork;
 
 
 
@@ -159,10 +159,8 @@ if (isset($_POST['btnPingRef']))
 
         $retval = null;
         $screen = null;
-        //$ssid = $_POST['ssid'];
-	//exec('sudo nmcli dev wifi rescan');
-        $command = 'nmap svxlink.pl -p 5295 2>&1'; 
-//        $command = 'ping svxlink.pl -c 1 2>&1'; 
+	$command = "ping " . $fmnetwork . " -c 1 2>&1"; 
+	$screnn = $command;
 	exec($command,$screen,$retval);
 }
 
