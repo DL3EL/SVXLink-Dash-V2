@@ -110,18 +110,36 @@ $screen[9] = $ipgw_str;
 
 
 
-if (isset($_POST['btnPingGw']))
-    {
-        $retval = null;
+if (isset($_POST['btnPingGw'])) {
+	$retval = null;
 	$screen = null;
-	$sAconn = $_POST['sAconn'];
-	$ipgw = "192.168.241.1";
-	//$ipgw_str =implode("\n",$ipgw);
-	exec("sudo nmcli -g ipv4.gateway con show \"" .$sAconn. "\" 2>&1",$ipgw,$retval);
-	$ipgw_str =implode("\n",$ipgw);
-	$ipgw_str= "192.168.241.1";
-//	echo("ping ". $ipgw_str ." -c 1 2>&1",$screen,$retval);
-	exec("ping ". $ipgw_str ." -c 1 2>&1",$screen,$retval);
+	$sAconn = escapeshellarg($_POST['sAconn'] ?? '');
+
+	// Wir ermitteln das aktive Default Gateway direkt aus der Routing-Tabelle
+	$routing_output = [];
+	exec("ip route show default 2>&1", $routing_output, $retval);
+    
+	$ipgw_str = '';
+    
+	// Die Ausgabe von 'ip route show default' sieht typischerweise so aus:
+	// "default via 192.168.241.1 dev eth0 proto dhcp src 192.168.241.50 metric 100"
+	if (!empty($routing_output)) {
+	   // Wir suchen nach der IP-Adresse, die direkt nach "via " steht
+	   if (preg_match('/via\s+([0-9a-fA-F\.:]+)/', $routing_output[0], $matches)) {
+	      $ipgw_str = trim($matches[1]);
+	   }
+        }
+    
+        // 4. Sicherheits-Check: Ist das gefundene Gateway eine valide IP-Adresse?
+        if (filter_var($ipgw_str, FILTER_VALIDATE_IP)) {
+           // Da filter_var() die IP validiert hat, ist sie sicher für die Shell
+           $command_ping = "ping " . $ipgw_str . " -c 1 2>&1";
+           exec($command_ping, $screen, $retval);
+        } else {
+          $screen = ["Fehler: Es konnte kein gültiges Default Gateway für diese Verbindung ermittelt werden (Erhalten: '" . htmlentities($ipgw_str) . "')."];
+          $retval = 1;
+       }
+    
 }
 
 if (isset($_POST['btnPingGoogle']))
@@ -154,17 +172,26 @@ if (isset($_POST['btnAuto']))
 
         $retval = null;
         $screen = null;
-	$sAconn = $_POST['sAconn'];
+//	$sAconn = $_POST['sAconn'];
+	$sAconn = escapeshellarg($_POST['sAconn'] ?? '');
         //$ssid = $_POST['ssid'];
         //$password = $_POST['password'];
 	//exec('sudo nmcli dev wifi rescan');
         //$command = "sudo nmcli radio  2>&1";
 	
+	// Da escapeshellarg bereits Anführungszeichen setzt, entfernen wir die manuellen " im Command-String
+	$command = "sudo nmcli con mod " . $sAconn . " ipv4.method auto 2>&1";
+	exec($command, $screen, $retval);
+
+	$command = "sudo nmcli -p -f ipv4,general con show " . $sAconn . " 2>&1";
+	exec($command, $screen, $retval);
+
+/*
 	$command = "sudo nmcli con mod \"" .$sAconn. "\" ipv4.method auto 2>&1";
         exec($command,$screen,$retval);
 	$command = "sudo nmcli -p -f ipv4,general con show \"" .$sAconn. "\" 2>&1";
         exec($command,$screen,$retval);
-
+*/
 
 
 }
@@ -175,14 +202,47 @@ if (isset($_POST['btnStatic']))
 
         $retval = false;
         $screen = null;
+/*
         $sAconn = $_POST['sAconn'];
 	$myIp = $_POST['myIp'];
 	$cidr = $_POST['cidr'];
 	$gw = $_POST['gw'];
 	$dns = $_POST['dns'];
+*/
+    // String-Argumente sicher maskieren
+    $sAconn = escapeshellarg($_POST['sAconn'] ?? '');
+    
+    // IP-Adressen und Zahlen strikt validieren (liefert false bei ungültigem Format)
+    $myIp  = filter_var($_POST['myIp'] ?? '', FILTER_VALIDATE_IP);
+    $cidr  = filter_var($_POST['cidr'] ?? '', FILTER_VALIDATE_INT, ["options" => ["min_range" => 0, "max_range" => 32]]);
+    $gw    = filter_var($_POST['gw'] ?? '', FILTER_VALIDATE_IP);
+    
+    // DNS kann IP oder Hostname sein, daher primär mit escapeshellarg sichern
+    $dns   = escapeshellarg($_POST['dns'] ?? '');
 
+    // Nur ausführen, wenn die kritischen Netzwerkdaten valide sind
+    if ($myIp !== false && $cidr !== false && $gw !== false) {
+        
+        $command = "sudo nmcli con mod " . $sAconn . " ipv4.addresses " . $myIp . "/" . $cidr . " 2>&1";
+        if (!$retval) exec($command, $screen, $retval);
 
+        $command = "sudo nmcli con mod " . $sAconn . " ipv4.gateway " . $gw . " 2>&1";
+        if (!$retval) exec($command, $screen, $retval);
 
+        $command = "sudo nmcli con mod " . $sAconn . " ipv4.dns " . $dns . " 2>&1";
+        if (!$retval) exec($command, $screen, $retval);
+
+        $command = "sudo nmcli con mod " . $sAconn . " ipv4.method manual 2>&1";
+        if (!$retval) exec($command, $screen, $retval);
+
+        $command = "sudo nmcli -p -f ipv4,general con show " . $sAconn . " 2>&1";
+        if (!$retval) exec($command, $screen, $retval);
+        
+    } else {
+        $screen = ["Fehler: Ungültige IP-Adresse, CIDR-Subnetzmaske oder Gateway angegeben."];
+        $retval = 1;
+    }
+/*
 	$command = "sudo nmcli con mod \"" .$sAconn. "\" ipv4.addresses " .$myIp. "\/" .$cidr. " 2>&1";
         if (!$retval) exec($command,$screen,$retval);
 
@@ -197,7 +257,7 @@ if (isset($_POST['btnStatic']))
 
         $command = "sudo nmcli -p -f ipv4,general con show \"" .$sAconn. "\" 2>&1";
 	if (!$retval) exec($command,$screen,$retval);
-
+*/
 }
 
 
@@ -207,7 +267,7 @@ if (isset($_POST['btnDetails']))
 
         $retval = null;
         $screen = null;
-        $sAconn = $_POST['sAconn'];
+        //$sAconn = $_POST['sAconn'];
         //$password = $_POST['password'];
         //exec('sudo nmcli dev wifi rescan');
 //        $command = "sudo nmcli -p -f ipv4,general con show \"" .$sAconn. "\" 2>&1";
@@ -223,10 +283,12 @@ if (isset($_POST['btnUp']))
 
         $retval = null;
         $screen = null;
-        $sAconn = $_POST['sAconn'];
+        //$sAconn = $_POST['sAconn'];
         //$password = $_POST['password'];
         //exec('sudo nmcli dev wifi rescan');
-        $command = "sudo nmcli con up \"" .$sAconn. "\" 2>&1";
+        //$command = "sudo nmcli con up \"" .$sAconn. "\" 2>&1";
+    $sAconn = escapeshellarg($_POST['sAconn'] ?? '');
+    $command = "sudo nmcli con up " . $sAconn . " 2>&1";
         exec($command,$screen,$retval);
 }
 if (isset($_POST['btnDown']))
@@ -234,10 +296,11 @@ if (isset($_POST['btnDown']))
 
         $retval = null;
         $screen = null;
-        $sAconn = $_POST['sAconn'];
+        //$sAconn = $_POST['sAconn'];
         //$password = $_POST['password'];
         //exec('sudo nmcli dev wifi rescan');
-        $command = "sudo nmcli con down \"" .$sAconn. "\" 2>&1";
+	$sAconn = escapeshellarg($_POST['sAconn'] ?? '');
+        $command = "sudo nmcli con down " .$sAconn. " 2>&1";
         exec($command,$screen,$retval);
 }
 

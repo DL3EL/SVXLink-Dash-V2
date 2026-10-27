@@ -59,17 +59,17 @@ if (isset($_POST['btnSwitch'])) {
 if (isset($_POST['btnDelete'])) {
     $retval = null;
     $screen = null;
-    $ssid = $_POST['ssid'];
-    $command = "sudo nmcli con delete \"" . $ssid . "\" 2>&1";
+    $ssid = escapeshellarg($_POST['ssid'] ?? '');
+    $command = "sudo nmcli con delete " . $ssid . " 2>&1";
     exec($command, $screen, $retval);
 }
 
 if (isset($_POST['btnAdd'])) {
     $retval = null;
     $screen = null;
-    $ssid = $_POST['ssid'];
-    $password = $_POST['password'];
-    $command = "sudo nmcli dev wifi connect \"" . $ssid . "\" password  \"" . $password . "\"  2>&1";
+    $ssid     = escapeshellarg($_POST['ssid'] ?? '');
+    $password = escapeshellarg($_POST['password'] ?? '');
+    $command = "sudo nmcli dev wifi connect " . $ssid . " password  " . $password . " 2>&1";
     exec($command, $screen, $retval);
 }
 
