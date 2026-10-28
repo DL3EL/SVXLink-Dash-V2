@@ -172,6 +172,9 @@ if (session_status() === PHP_SESSION_NONE) {
 //	    echo '| <a href="./caller.php?id=dxcluster" style = "color: #0000ff;" target="_top">DX</a> ';
 	    echo '| <a class="hreflink" href="./caller.php?id=include/svxdxc&refresh=15" >DX</a> | ';
 	}    
+	if ((defined('DL3EL_LIVEDB_UNAUTH')) && (DL3EL_LIVEDB_UNAUTH === "yes")) {
+	    echo '<a class="hreflink" href="./svx2mqtt.php">LIVE DB</a> | ';
+	}
     }   
 ?>
 <?php
