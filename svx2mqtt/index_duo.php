@@ -102,8 +102,12 @@
 include_once  '../include/settings.php';
 
     if ($_SESSION['auth'] !== 'AUTHORISED') {
-        echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
-        return;
+        if ((defined('DL3EL_LIVEDB_UNAUTH')) && (DL3EL_LIVEDB_UNAUTH === "yes")) {
+            if ((defined ('debug')) && (debug > 0)) echo "Live Status, even if not auth<br>";
+        } else {
+            echo '<button id="n/a" style = "margin-right:90px; width:150px; color:white; background-color:red; border-color:transparent; border-radius:8px; height:40px; font-size:16px;"><b>nicht angemeldet</b></button>';
+            return;
+        }    
     }
 
 if (defined ('SVXMQTT_COLOR_active')) {
