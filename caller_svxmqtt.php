@@ -1,6 +1,10 @@
 <?php
 if ($_SESSION['auth'] !== "AUTHORISED") {
-    return;
+	if ((defined('DL3EL_LIVEDB_UNAUTH')) && (DL3EL_LIVEDB_UNAUTH === "yes")) {
+        if ((defined ('debug')) && (debug > 0)) echo "Live Status, even if not auth<br>";
+	} else {
+        return;
+    }    
 }
 
 // Erkennung: Wird das Script via AJAX (jQuery .load) aufgerufen?
