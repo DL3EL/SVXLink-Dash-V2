@@ -8,6 +8,9 @@ include_once "functions.php";
 
 ?>
 <?php
+   global $rx_status; // Zugriff erlauben
+   global $rx_rssi;
+  
    if ((defined ('DL3EL_APRS_MSG')) && (DL3EL_APRS_MSG === "yes")) {
       $aprs_script = shell_exec("pgrep aprs-is-msg.pl");
       if (!strlen($aprs_script)) {
@@ -446,11 +449,23 @@ if ($reflectorlogic2 != "") {
             if ($radioport !== "") {
                $command = "perl " . DL3EL . "/sa818/get_shari_hf_data.pl d=" . DL3EL . " p=" . $radioport;
 //               echo "QRG:",exec($command, $output, $retval);
-               exec($command, $output, $retval);
+                exec($command, $output, $retval);
                if (substr($output[0],0,1) === "/") {
                   echo "Radio is gone";
                } else {
                   echo "QRG:$output[0]";
+                  if ($rx_status) {
+                     if (preg_match('/RSSI:([0-9]*)/', $string, $matches) && !empty($matches[1])) {
+                        $rx_rssi = $matches[1];
+                        $logtext = "RSSI: " . $rx_rssi . " receivd\n";
+                        addsvxlog($logtext);
+                     } else {
+                        $rx_rssi = "0"; // Standardwert, wenn leer oder nicht vorhanden
+                     }
+                   } else {
+                     $rx_rssi = 0;
+                   }  
+
                }   
             } else {
                echo " no Radio found";
