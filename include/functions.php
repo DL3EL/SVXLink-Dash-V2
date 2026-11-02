@@ -1881,4 +1881,30 @@ function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty, $caller) {
     
     return ""; // Ungültig -> Nichts tun, leerer String zurück
 }
+/**
+ * Rechnet den unkalibrierten RSSI-Wert (0-255) eines SA818-Moduls in einen S-Wert um.
+ *
+ * @param int $rssi Der RSSI-Wert vom SA818 (Bereich 0 bis 255)
+ * @return string Der berechnete S-Wert (z.B. "S5" oder "S9+20dB")
+ */
+function sa818_rssi_to_swert(int $rssi): string {
+    // Wertebereich absichern
+    if ($rssi < 0) $rssi = 0;
+    if ($rssi > 255) $rssi = 255;
+
+    // Zuordnung basierend auf der SA818-Empfangskurve
+    if ($rssi >= 210) return 'S9+20dB';
+    if ($rssi >= 160) return 'S9+10dB';
+    if ($rssi >= 120) return 'S9';
+    if ($rssi >= 105) return 'S8';
+    if ($rssi >= 90)  return 'S7';
+    if ($rssi >= 80)  return 'S6';
+    if ($rssi >= 70)  return 'S5';
+    if ($rssi >= 55)  return 'S4';
+    if ($rssi >= 40)  return 'S3';
+    if ($rssi >= 25)  return 'S2';
+    if ($rssi >= 10)  return 'S1';
+    
+    return 'S0'; // Kein messbares Signal / Rauschen
+}
 ?>
