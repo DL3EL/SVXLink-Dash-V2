@@ -459,6 +459,8 @@ if ($reflectorlogic2 != "") {
                   if ($rx_status) {
                      if (preg_match('/RSSI:([0-9]*)/', $output[0], $matches) && !empty($matches[1])) {
                         $rx_rssi = $matches[1];
+                        $_SESSION['rx_rssi'] = $matches[1];
+                        session_write_close(); // Schreibt die Session SOFORT und sperrt sie nicht länger
                         if ((defined ('debug')) && (debug > 0)) echo "[$rx_rssi]";
                      } else {
  #                       $rx_rssi = "0"; // Standardwert, wenn leer oder nicht vorhanden
