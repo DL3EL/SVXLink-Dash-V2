@@ -1893,17 +1893,17 @@ function sa818_rssi_to_swert(int $rssi): string {
     if ($rssi > 255) $rssi = 255;
 
     // Zuordnung basierend auf der SA818-Empfangskurve
-    if ($rssi >= 210) return 'S9+20dB';
-    if ($rssi >= 160) return 'S9+10dB';
-    if ($rssi >= 120) return 'S9';
-    if ($rssi >= 105) return 'S8';
-    if ($rssi >= 90)  return 'S7';
-    if ($rssi >= 80)  return 'S6';
-    if ($rssi >= 70)  return 'S5';
-    if ($rssi >= 55)  return 'S4';
+    if ($rssi >= 120) return 'S9+20dB';
+    if ($rssi >= 110) return 'S9+10dB';
+    if ($rssi >= 100) return 'S9';
+    if ($rssi >= 90) return 'S8';
+    if ($rssi >= 80)  return 'S7';
+    if ($rssi >= 70)  return 'S6';
+    if ($rssi >= 60)  return 'S5';
+    if ($rssi >= 50)  return 'S4';
     if ($rssi >= 40)  return 'S3';
-    if ($rssi >= 25)  return 'S2';
-    if ($rssi >= 10)  return 'S1';
+    if ($rssi >= 30)  return 'S2';
+    if ($rssi >= 20)  return 'S1';
     
     return 'S0'; // Kein messbares Signal / Rauschen
 }
