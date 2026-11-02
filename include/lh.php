@@ -144,12 +144,12 @@ $duration = time() - strtotime($local_time);
 	}
 
 	if (($fmnetwork === $uknetwork) || ($fmnetwork === $nanetwork) || (!defined ('DL3EL_LH_DETAIL'))) {
-	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $rx_rssi ."</td>";
+	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $show_rssi ."</td>";
 	} else {  
 	  if ((defined ('DL3EL_LH_DETAIL') && (DL3EL_LH_DETAIL === "FMN"))) {
-	    echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$listElem[1]."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $rx_rssi ."</td>";
+	    echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"https://dashboard.fm-funknetz.de/node.php?call=".$listElem[1]."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $show_rssi ."</td>";
 	  } else {
-	    echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $rx_rssi ."</td>";
+	    echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $show_rssi ."</td>";
 	  }
 	}  
       }
