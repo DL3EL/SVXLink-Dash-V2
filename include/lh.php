@@ -122,7 +122,7 @@ $duration = time() - strtotime($local_time);
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
 //                        $_SESSION['rx_rssi'] = $matches[1];
-	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi']) {
+	if (isset($_SESSION['rx_rssi'])) {
 	  $show_rssi = $_SESSION['rx_rssi'];
 	  $logtext = "[lh.php] RSSI: " . $show_rssi . " receivd\n";
 	  addsvxlog($logtext);
