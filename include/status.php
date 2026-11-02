@@ -457,7 +457,7 @@ if ($reflectorlogic2 != "") {
                   if ((defined ('debug')) && (debug > 0)) echo "RX: [$rx_status]";
                
                   if ($rx_status) {
-                     if (preg_match('/RSSI:([0-9]*)/', $$output[0], $matches) && !empty($matches[1])) {
+                     if (preg_match('/RSSI:([0-9]*)/', $output[0], $matches) && !empty($matches[1])) {
                         $rx_rssi = $matches[1];
                         if ((defined ('debug')) && (debug > 0)) echo "[$rx_rssi]";
                      } else {
