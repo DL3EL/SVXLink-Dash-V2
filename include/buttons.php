@@ -100,20 +100,20 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
     }    
 
     if (isset($_POST["dtmfsvx"])){
-        $logtext = execCleanDtmf($_POST["dtmfsvx"], "", "", $dtmf_pty);
+        $logtext = execCleanDtmf($_POST["dtmfsvx"], "", "", $dtmf_pty,"Button");
     }
 // wird benötigt für jmp Funktionen aus dem Hauptdashboard
     if (isset($_POST["jmpto"])) {
-        $logtext = execCleanDtmf($_POST["jmpto"], "91", "#", $dtmf_pty);
+        $logtext = execCleanDtmf($_POST["jmpto"], "91", "#", $dtmf_pty,"Button");
     }
     if (isset($_POST["jmptoA"])) {
-        $logtext = execCleanDtmf($_POST["jmptoA"], "*91", "#", $dtmf_pty) . " test";
+        $logtext = execCleanDtmf($_POST["jmptoA"], "*91", "#", $dtmf_pty),"Button";
     }
     if (isset($_POST["jmptoM"])) {
-        $logtext = execCleanDtmf($_POST["jmptoM"], "94", "#", $dtmf_pty);
+        $logtext = execCleanDtmf($_POST["jmptoM"], "94", "#", $dtmf_pty),"Button";
     }
     if (isset($_POST["jmptoE"])) {
-        $logtext = execCleanDtmf($_POST["jmptoE"], "2#", "#", $dtmf_pty);
+        $logtext = execCleanDtmf($_POST["jmptoE"], "2#", "#", $dtmf_pty),"Button";
     }
 
 // Globales Logging am Ende

@@ -1850,7 +1850,7 @@ function isValidLocator($locator) {
 }
 
 // Die universelle, sichere Ausführungs-Funktion
-function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty) {
+function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty, $caller) {
     $trimmed = trim($dtmf);
     
     // Prüfen, ob die Benutzereingabe NUR aus DTMF-Zeichen besteht
@@ -1867,7 +1867,7 @@ function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty) {
         echo "<meta http-equiv='refresh' content='0'>";
         
         // Wir geben den Logtext zurück, damit er global geloggt werden kann
-        return "DTMF via Dashboard: " . $full_command;
+        return "DTMF via " . $calller . ": " . $full_command;
     }
     
     return ""; // Ungültig -> Nichts tun, leerer String zurück
