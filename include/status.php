@@ -465,13 +465,13 @@ if ($reflectorlogic2 != "") {
                         //  if ((defined ('debug')) && (debug > 0)) echo "[$rx_rssi]";
                      } else {
  #                       $rx_rssi = "0"; // Standardwert, wenn leer oder nicht vorhanden
-                        $_SESSION['rx_rssi'] = 0;
+                        $_SESSION['rx_rssi'] = "";
                      }
                      $logtext = "RSSI: " . $rx_rssi . " receivd\n";
                      addsvxlog($logtext);
                    } else {
                      $rx_rssi = 0;
-                     $_SESSION['rx_rssi'] = 0;
+                     $_SESSION['rx_rssi'] = "";
                    }  
                    session_write_close(); // Schreibt die Session SOFORT und sperrt sie nicht länger
                }   
