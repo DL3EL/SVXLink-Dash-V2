@@ -100,7 +100,7 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
     }    
 
     if (isset($_POST["dtmfsvx"])){
-        $logtext = execCleanDtmf($_POST["dtmfsvx"], "", "", $dtmf_pty,"Button");
+        $logtext = execCleanDtmf($_POST["dtmfsvx"], "", "", $dtmf_pty,"DTMF");
     }
 // wird benötigt für jmp Funktionen aus dem Hauptdashboard
     if (isset($_POST["jmpto"])) {

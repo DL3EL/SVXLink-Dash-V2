@@ -1776,7 +1776,7 @@ echo "<br>Stat: $cmd";
                 }  
                 $content = $content . "\nGithub Update erfolgreich.\nVersion " . $dbversion . " ist bereit.\nAPRS Task neu gestartet\n";
                 if ((defined ('debug')) && (debug > 0)) addsvxlog("Step 3\n");
-                if (!strlen($fmnetwork)) {
+                if (empty($fmnetwork)) {
                         $fmnetwork = getfmnetwork();
                 }     
                 $useragent=htmlspecialchars($_SERVER['HTTP_USER_AGENT']);
@@ -1851,11 +1851,15 @@ function isValidLocator($locator) {
 
 // Die universelle, sichere Ausführungs-Funktion
 function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty, $caller) {
+    if (($caller === null) || (empty($caller))) { 
+      $caller = "Dashboard";
+    }  
     $trimmed = trim($dtmf);
     
     // Prüfen, ob die Benutzereingabe NUR aus DTMF-Zeichen besteht
-    if (preg_match('/^[0-9\*#A-D]+$/', $trimmed)) {
+    if (preg_match('/^[0-9\*#A-D\+]+$/', $trimmed)) {
         
+        $trimmed = rtrim($trimmed, '+');
         // Wir bauen den kompletten Befehl (z.B. 91123#) zusammen und maskieren ihn komplett für die Shell
         $full_command = $prefix . $trimmed . $suffix;
         
@@ -1867,7 +1871,7 @@ function execCleanDtmf($dtmf, $prefix, $suffix, $dtmf_pty, $caller) {
         echo "<meta http-equiv='refresh' content='0'>";
         
         // Wir geben den Logtext zurück, damit er global geloggt werden kann
-        return "DTMF via " . $calller . ": " . $full_command;
+        return "DTMF via " . $caller . ": " . $full_command;
     }
     
     return ""; // Ungültig -> Nichts tun, leerer String zurück
