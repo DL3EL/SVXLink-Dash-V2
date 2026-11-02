@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 //include_once "tools.php";        
 //include_once "functions.php";    
 include_once "settings.php";    
+   global $rx_rssi;
 
 echo '<span style = "font-size:25px"> </span>';
 echo '<span style = "font-weight:bold; font-size:15px;">SVXReflector Activity</span>';
