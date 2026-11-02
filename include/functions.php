@@ -607,14 +607,19 @@ function getLastHeard($logLines) {
 //14.06.2021 16:57:33: Tx1: Turning the transmitter OFF
 
 function getTXInfo() {
-
+  global $rx_status; // Zugriff erlauben
+  $rx_status = 0;
+  
 	$rxtx_state = "/tmp/svxlink_last_state.txt";
   if (file_exists($rxtx_state)) { 
       $content = file_get_contents($rxtx_state);
-      if (strpos($content, "ON")) { 
+      if (strpos($content, "ON") !== false) {
+      //if (strpos($content, "ON")) { 
           return "<tr><td style=\"background:#ff6600;color:white;\"><div style=\"margin-top:2px;margin-bottom:2px;font-weight:bold;\">TX</div></td></tr>\n";       
-      }    
-      if (strpos($content, "OPEN")) {
+      }
+      if (strpos($content, "OPEN") !== false) {          
+      //if (strpos($content, "OPEN")) {
+          $rx_status = 1;
           return "<tr><td style=\"background:#4aa361;color:black;\"><div style=\"margin-top:2px;margin-bottom:2px;font-weight:bold;\">RX</div></td></tr>\n";
       } 
       return  "<td style=\"background:#c3e5cc;\"><div style=\"margin-top:2px;margin-bottom:2px;color:#464646;font-weight:bold;\">Listening</div></td></tr>\n"; 
