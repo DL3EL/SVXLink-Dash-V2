@@ -454,6 +454,8 @@ if ($reflectorlogic2 != "") {
                   echo "Radio is gone";
                } else {
                   echo "QRG:$output[0]";
+                  if ((defined ('debug')) && (debug > 0)) echo "RX: [$rx_status]";
+               
                   if ($rx_status) {
                      if (preg_match('/RSSI:([0-9]*)/', $string, $matches) && !empty($matches[1])) {
                         $rx_rssi = $matches[1];
