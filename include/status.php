@@ -462,17 +462,18 @@ if ($reflectorlogic2 != "") {
                         $rx_rssi = sa818_rssi_to_swert($matches[1]); 
                         //$_SESSION['rx_rssi'] = $matches[1];
                         $_SESSION['rx_rssi'] = sa818_rssi_to_swert($matches[1]); 
-                        session_write_close(); // Schreibt die Session SOFORT und sperrt sie nicht länger
                         //  if ((defined ('debug')) && (debug > 0)) echo "[$rx_rssi]";
                      } else {
  #                       $rx_rssi = "0"; // Standardwert, wenn leer oder nicht vorhanden
+                        $_SESSION['rx_rssi'] = 0;
                      }
                      $logtext = "RSSI: " . $rx_rssi . " receivd\n";
                      addsvxlog($logtext);
                    } else {
                      $rx_rssi = 0;
+                     $_SESSION['rx_rssi'] = 0;
                    }  
-
+                   session_write_close(); // Schreibt die Session SOFORT und sperrt sie nicht länger
                }   
             } else {
                echo " no Radio found";
