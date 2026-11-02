@@ -121,9 +121,12 @@ $duration = time() - strtotime($local_time);
       if ($listElem[3] == "OFF" ) {$bgcolor="";}
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
-	$show_rssi = $rx_rssi;
-        $logtext = "[lh.php] RSSI: " . $rx_rssi . " receivd\n";
-        addsvxlog($logtext);
+//                        $_SESSION['rx_rssi'] = $matches[1];
+	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi']) {
+	  $show_rssi = $_SESSION['rx_rssi'];
+	  $logtext = "[lh.php] RSSI: " . $show_rssi . " receivd\n";
+	  addsvxlog($logtext);
+	}  
 	if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
 	  $bgcolor="style=\"background-color:#bfefff;\"";
 	} else {

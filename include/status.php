@@ -461,7 +461,7 @@ if ($reflectorlogic2 != "") {
                         $rx_rssi = $matches[1];
                         if ((defined ('debug')) && (debug > 0)) echo "[$rx_rssi]";
                      } else {
-                        $rx_rssi = "0"; // Standardwert, wenn leer oder nicht vorhanden
+ #                       $rx_rssi = "0"; // Standardwert, wenn leer oder nicht vorhanden
                      }
                      $logtext = "RSSI: " . $rx_rssi . " receivd\n";
                      addsvxlog($logtext);
