@@ -120,10 +120,13 @@ $duration = time() - strtotime($local_time);
       if ($listElem[3] == "OFF" ) {$bgcolor="";}
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
-//	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi'] !== "" && ($listElem[1] === $callsign)) {
-	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi'] !== "" ) {
+	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi'] !== "" && ($listElem[1] === $callsign)) {
+//	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi'] !== "" ) {
 	  $show_rssi = "<span style='vertical-align: middle; color: #555;'>&nbsp;[" . $_SESSION['rx_rssi'] . "/" . $listElem[1] . "]</span>";
-	}  
+	} else {
+	  	  $show_rssi = $callsign . "/" . $listElem[1] . "]";
+
+}  
 	if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
 	  $bgcolor="style=\"background-color:#bfefff;\"";
 	} else {
