@@ -459,6 +459,7 @@ if ($reflectorlogic2 != "") {
                   if ($rx_status) {
                      if (preg_match('/RSSI:([0-9]*)/', $string, $matches) && !empty($matches[1])) {
                         $rx_rssi = $matches[1];
+                        if ((defined ('debug')) && (debug > 0)) echo "[$rx_rssi]";
                         $logtext = "RSSI: " . $rx_rssi . " receivd\n";
                         addsvxlog($logtext);
                      } else {
