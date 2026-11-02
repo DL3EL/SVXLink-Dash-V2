@@ -107,13 +107,13 @@ if ($_SESSION['auth'] !== "AUTHORISED") {
         $logtext = execCleanDtmf($_POST["jmpto"], "91", "#", $dtmf_pty,"Button");
     }
     if (isset($_POST["jmptoA"])) {
-        $logtext = execCleanDtmf($_POST["jmptoA"], "*91", "#", $dtmf_pty),"Button";
+        $logtext = execCleanDtmf($_POST["jmptoA"], "*91", "#", $dtmf_pty),"Button");
     }
     if (isset($_POST["jmptoM"])) {
-        $logtext = execCleanDtmf($_POST["jmptoM"], "94", "#", $dtmf_pty),"Button";
+        $logtext = execCleanDtmf($_POST["jmptoM"], "94", "#", $dtmf_pty),"Button");
     }
     if (isset($_POST["jmptoE"])) {
-        $logtext = execCleanDtmf($_POST["jmptoE"], "2#", "#", $dtmf_pty),"Button";
+        $logtext = execCleanDtmf($_POST["jmptoE"], "2#", "#", $dtmf_pty),"Button");
     }
 
 // Globales Logging am Ende
