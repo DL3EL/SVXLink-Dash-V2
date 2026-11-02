@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 //include_once "tools.php";        
 //include_once "functions.php";    
 include_once "settings.php";    
-   global $rx_rssi;
 
 echo '<span style = "font-size:25px"> </span>';
 echo '<span style = "font-weight:bold; font-size:15px;">SVXReflector Activity</span>';
@@ -118,15 +117,16 @@ $duration = time() - strtotime($local_time);
 	$listElem[3] = "OFF";
       }
       $show_rssi = "";
+      $show_rssi_raw = "";
       if ($listElem[3] == "OFF" ) {$bgcolor="";}
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
 //                        $_SESSION['rx_rssi'] = $matches[1];
 	if (isset($_SESSION['rx_rssi']) && $_SESSION['rx_rssi'] !== "") {
-	  $show_rssi = $_SESSION['rx_rssi'];
+	  $show_rssi_raw = "&nbsp;[" . $_SESSION['rx_rssi'] . "]";
 	  $show_rssi = "<span style='vertical-align: middle; color: #555;'>&nbsp;[" . $_SESSION['rx_rssi'] . "]</span>";
-	  $logtext = "[lh.php] RSSI: " . $show_rssi . " receivd\n";
-	  addsvxlog($logtext);
+//	  $logtext = "[lh.php] RSSI: " . $show_rssi . " receivd\n";
+//	  addsvxlog($logtext);
 	}  
 	if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
 	  $bgcolor="style=\"background-color:#bfefff;\"";
@@ -143,7 +143,9 @@ $duration = time() - strtotime($local_time);
 	if ($ssid){
 	  $call = substr($listElem[1],0,$ssid);
 	}
-
+	if ($show_rssi_raw  !== "") {
+	  $listElem[1] = $show_rssi_raw;
+	}  
 	if (($fmnetwork === $uknetwork) || ($fmnetwork === $nanetwork) || (!defined ('DL3EL_LH_DETAIL'))) {
 	  echo "<td $bgcolor align=\"left\">&nbsp;&nbsp;<a href=\"http://www.qrz.com/db/".$call."\" target=\"_blank\" class=\"qrz_link\"><b>$listElem[1]</b></a>&nbsp;". $show_rssi ."</td>";
 	} else {  
