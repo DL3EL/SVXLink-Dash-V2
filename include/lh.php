@@ -121,6 +121,8 @@ $duration = time() - strtotime($local_time);
 // normal      if ($listElem[3] == "ON" ) {$bgcolor="style=\"background-color:#00FF00;\"";}
       if ($listElem[3] == "ON" ) {
 	$show_rssi = $rx_rssi;
+        $logtext = "[lh.php] RSSI: " . $rx_rssi . " receivd\n";
+        addsvxlog($logtext);
 	if (defined('DL3EL_DARK_MODE') && (DL3EL_DARK_MODE === "yes")) {
 	  $bgcolor="style=\"background-color:#bfefff;\"";
 	} else {
