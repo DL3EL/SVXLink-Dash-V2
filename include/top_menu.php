@@ -124,9 +124,11 @@ if (session_status() === PHP_SESSION_NONE) {
 	if (defined('DL3EL_OPENWEBRX')) {
 	    echo '<a class="hreflink" href="./caller_extern.php?id=' . DL3EL_OPENWEBRX . '" >OWR | </a> ';
 	}    
+/* wurde ins FM FUnknetz Dasboard integriert
 	if ((defined('DL3EL_FMFUNKNETZ')) && (DL3EL_FMFUNKNETZ === "yes")) {
-	    echo '<a class="hreflink" href="./caller_extern.php?id=https://stream.fm-funknetz.de" >Voice FMN | </a> ';
+	    echo '<a class="hreflink" href="./caller_extern.php?id=https://dashboard.fm-funknetz.de/scanner.php" >Voice FMN | </a> ';
 	}    
+*/ 
 // FM-Funknetz WebChat
 	if ((defined('DL3EL_WEBCHAT')) && (DL3EL_WEBCHAT === "no")) {
 	    // do not display Chat in Menu

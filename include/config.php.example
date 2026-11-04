@@ -101,7 +101,7 @@ define("DL3EL_OPENHAMCLOCK", "https://openhamclock.com/");
 // own installation of openhamclock
 //define("DL3EL_OPENHAMCLOCK", "http://192.168.1.1:3030/");
 // FM-Funknetz WebSDR
-define("DL3EL_FMFUNKNETZ", "yes");
+//define("DL3EL_FMFUNKNETZ", "yes");
 //define("DL3EL_FMFUNKNETZ", "no");
 //define("DL3EL_OPENWEBRX", "https://websdr.z-05.de/#freq=144800000,mod=empty,secondary_mod=packet,sql=-150");
 // if you want to see the svxcube, but do not have the svxcube mqtt option installed
