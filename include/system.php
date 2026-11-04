@@ -56,6 +56,8 @@ $os_info = shell_exec('lsb_release -d | awk -F"\t" \'{print $2}\'');
 if (file_exists('/usr/local/sbin/platformDetect.sh')) {
     $os_info = $os_info . "<br>" . shell_exec('/usr/local/sbin/platformDetect.sh');
 }
+$svxlink_version = shell_exec('svxlink --version');
+$os_info = $os_info . "<br>SVX:" . $svxlink_version;
 
 $svxConfigFile = SVXCONFPATH.SVXCONFIG;
 if (fopen($svxConfigFile,'r')) {
