@@ -2,11 +2,14 @@
 <?php
 
 include_once DL3EL_BASE . "include/tgdb.php"; 
-  if ((defined ('debug')) && (debug > 0)) echo "TG: " .$tgdb_array[262649] . "<br>";
-  $tgdb_array[262618] = "OV Welle F18 Usingen";
-  $tgdb_array[60431] = "Frankfurt Stadt, DB0HTV";
-  $tgdb_array[63607] = "Wittgenborn, DB0CGW";
-  $tgdb_array[90574] = "Mittelfranken";
+  $tgdb_array[262618] = "OV Welle F18 Usingen.";
+  $tgdb_array[60431] = "Frankfurt Stadt, DB0HTV.";
+  $tgdb_array[26260431] = "Frankfurt Stadt, DB0HTV.";
+  $tgdb_array[63607] = "Wittgenborn, DB0CGW.";
+  $tgdb_array[26263607] = "Wittgenborn, DB0CGW.";
+  $tgdb_array[26261389] = "Region Main Taunus.";
+  $tgdb_array[26369] = "Rhein Main Link.";
+  $tgdb_array[90574] = "Mittelfranken.";
   if ((defined ('debug')) && (debug > 0)) echo "TG: ($tg)" .$tgdb_array[262649] . "<br>";
 
   $nn = 0;
