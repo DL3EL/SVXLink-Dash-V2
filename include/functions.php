@@ -1461,7 +1461,10 @@ echo "<br>Stat: $cmd";
         if ((defined ('debug')) && (debug > 1)) echo "Array: " . count($tgdb_array) . "<br>";
         include "tgdb_ext.php";    
         if ((defined ('debug')) && (debug > 1)) echo "ExtArray: " . count($tgdb_ext_array) . "<br>";
-        $tgdb_array = $tgdb_ext_array + $tgdb_array;
+// meine Änderungen überschreiben das Original
+//        $tgdb_array = $tgdb_ext_array + $tgdb_array;
+// meine Änderungen ergänzen das Original
+        $tgdb_array = $tgdb_array + $tgdb_ext_array;
         if ((defined ('debug')) && (debug > 1)) echo "AllArray: " . count($tgdb_array) . "<br>";
         ksort($tgdb_array, SORT_NUMERIC);
         $nn = 0;
