@@ -1443,14 +1443,33 @@ echo "<br>Stat: $cmd";
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       $tgdb_File = DL3EL_BASE . "include/tgdb.php";
-      $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
-      $contentl = strlen($content);
-      $logtext = $jetzt . " " . $tgdb_File . " read, length:" . $contentl . "\n";
-      addlog ("F",$logtext);
-      if ($contentl) {
-        file_put_contents($tgdb_File, $content);
+      $tgdb_dj1jay_file = "https://FM-Funknetz.de/Download/tgdb_list.txt";
+      if (file_exists($tgdb_dj1jay_file)) {
+        $content = file_get_contents($tgdb_dj1jay_file);
+        $contentl = strlen($content);
+        if ($contentl) {
+          $logtext = $jetzt . " " . $tgdb_File . " read, length:" . $contentl . "\n";
+          addlog ("F",$logtext);
+            addsvxlog($logtext);
+          file_put_contents($tgdb_File, $content);
+        }  
+      } else {
+          $content = file_get_contents('http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt');
+          $contentl = strlen($content);
+          if ($contentl) {
+            $logtext = $jetzt . " http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt read, length:" . $contentl . "\n";
+            addlog ("F",$logtext);
+            addsvxlog($logtext);
+            file_put_contents($tgdb_File, $content);
+          }  
+      }
+//      $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
+//      $contentl = strlen($content);
+//      if ($contentl) {
+//        file_put_contents($tgdb_File, $content);
 
         $tgdb_ext_File = DL3EL_BASE . "include/tgdb_ext.php";
+      if (file_exists($tgdb_ext_File)) {
         $content = file_get_contents('http://relais.dl3el.de/FM-Funknetz/tgdb_ext.txt');
         $contentl = strlen($content);
         $logtext = $jetzt . " " . $tgdb_ext_File . " read, length:" . $contentl . "\n";
