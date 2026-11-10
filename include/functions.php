@@ -1444,6 +1444,34 @@ echo "<br>Stat: $cmd";
       $jetzt = date("Y-m-d H:i:s");
       $tgdb_File = DL3EL_BASE . "include/tgdb.php";
       $tgdb_dj1jay_file = "https://FM-Funknetz.de/Download/tgdb_list.txt";
+
+      $headers = @get_headers($tgdb_dj1jay_file);
+
+// Prüft, ob der Server mit "200 OK" antwortet
+      if ($headers && strpos($headers[0], '200') !== false) {
+//        $logtext = $jetzt . " Datei existiert und ist erreichbar:" . $tgdb_dj1jay_file . "\n";
+//        addsvxlog($logtext);
+        $content = file_get_contents($tgdb_dj1jay_file);
+        $contentl = strlen($content);
+        if ($contentl) {
+          $logtext = $jetzt . " " . $tgdb_File . " read, length:" . $contentl . "\n";
+          addsvxlog($logtext);
+          file_put_contents($tgdb_File, $content);
+        }  
+    // Hier kannst du die Datei z.B. mit file_get_contents() einlesen
+      } else {
+        $logtext = $jetzt . " Datei existiert nicht oder Server ist offline:" . $tgdb_dj1jay_file . "\n";
+        addsvxlog($logtext);
+          $content = file_get_contents('http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt');
+          $contentl = strlen($content);
+          if ($contentl) {
+            $logtext = $jetzt . " http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt read, length:" . $contentl . "\n";
+            addsvxlog($logtext);
+            file_put_contents($tgdb_File, $content);
+          }  
+      }
+
+/*
       if (file_exists($tgdb_dj1jay_file)) {
         $content = file_get_contents($tgdb_dj1jay_file);
         $contentl = strlen($content);
@@ -1457,12 +1485,13 @@ echo "<br>Stat: $cmd";
           $content = file_get_contents('http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt');
           $contentl = strlen($content);
           if ($contentl) {
-            $logtext = $jetzt . " http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt read, length:" . $contentl . "\n";
+            $logtext = $jetzt . " http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt read, length: " . $contentl . "\n";
             addlog ("F",$logtext);
             addsvxlog($logtext);
             file_put_contents($tgdb_File, $content);
           }  
       }
+*/
 //      $content = file_get_contents('https://FM-Funknetz.de/Download/tgdb_list.txt');
 //      $contentl = strlen($content);
 //      if ($contentl) {
