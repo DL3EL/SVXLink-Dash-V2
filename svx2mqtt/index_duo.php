@@ -209,7 +209,8 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                 </div>
             </main>
             <script>
-                const WS_URL = "wss://status.thueringen.link/mqtt";
+//                const WS_URL = "wss://status.thueringen.link/mqtt";
+                const WS_URL = "wss://mqtt.fm-funknetz.de";
                 const TOPIC = "/server/statethr/1"; // {"time":"18:09:43","talk":"start|stop","call":"DK0GH-HS","tg":"37574"}
                 const TGDB_URL = "https://nc1.fm-funknetz.de/dashtt/tgdb_proxy.php"; // CORS-ok plaintext
                 const CLIENTS_TOPIC = "/server/state/loginz"; // Zahl erwartet

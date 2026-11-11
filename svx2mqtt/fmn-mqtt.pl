@@ -67,7 +67,8 @@ my $mqttdatei = $dir  . "mqtt.data";
 # Connect to broker
 my $mqtt_client_id = sprintf "%s-%s", $callsign,time();;
 $ENV{MQTT_CLIENT_ID} = $mqtt_client_id;
-my $mqtt = Net::MQTT::Simple->new('FM-Funknetz.de');
+#my $mqtt = Net::MQTT::Simple->new('FM-Funknetz.de');
+my $mqtt = Net::MQTT::Simple->new('mqtt.fm-funknetz.de');
     STDOUT->autoflush(1);
     print "MQTT started mit Log: $logdatei um $log_time (ClientID:$mqtt_client_id)\n";
     $log_time = act_time();
