@@ -1,4 +1,4 @@
-// Version 20261112
+// Version 20261112_1400
 
 "use strict";
 
@@ -61,15 +61,21 @@ let showMonitorTGsOnly = false;
 // der lokalen /etc/svxlink/svxlink.conf bereitgestellt.
 const monitorTGSet = new Set(
     (Array.isArray(window.livemapMonitorTGs) ? window.livemapMonitorTGs : [])
-        .map(function (tg) {
-            return String(tg || "").replace(/\D+/g, "");
-        })
+        .map(normalizeTG)
         .filter(Boolean)
 );
 
+// Talkgroups immer als Zeichenkette behandeln und Zusätze entfernen.
+// Dadurch funktionieren auch lange TG-Nummern sowie Kennzeichnungen
+// wie + oder > sowohl aus svxlink.conf als auch aus MQTT.
+function normalizeTG(tg) {
+    return String(tg === null || tg === undefined ? "" : tg)
+        .replace(/\D+/g, "");
+}
+
 // Prüft, ob eine Talkgroup gemäß aktueller Kartenauswahl sichtbar ist.
 function isVisibleTG(tg) {
-    const normalizedTG = String(tg || "").trim();
+    const normalizedTG = normalizeTG(tg);
     if (!normalizedTG) return false;
     return !showMonitorTGsOnly || monitorTGSet.has(normalizedTG);
 }
@@ -79,6 +85,8 @@ function isVisibleTG(tg) {
 // ------------------------------------------------------------
 const MONITOR_TG_POLL_INTERVAL = 30 * 1000;
 let monitorTGCheckRunning = false;
+// Änderungszeitpunkt, den PHP beim initialen Seitenaufruf geliefert hat.
+let monitorTGConfigMtime = Number(window.livemapMonitorTGmtime || 0);
 
 async function refreshMonitorTGs() {
     // Verhindert parallele Abfragen, falls eine Anfrage länger dauert.
@@ -86,8 +94,14 @@ async function refreshMonitorTGs() {
     monitorTGCheckRunning = true;
 
     try {
+        // PHP prüft zunächst nur filemtime(). Die Konfiguration wird nur
+        // dann eingelesen, wenn sich der Zeitstempel geändert hat.
+        const url = "monitor-tgs.php?mtime=" +
+            encodeURIComponent(monitorTGConfigMtime) +
+            "&_=" + Date.now();
+
         const response = await fetch(
-            "monitor-tgs.php?_=" + Date.now(),
+            url,
             {
                 method: "GET",
                 cache: "no-store",
@@ -100,18 +114,25 @@ async function refreshMonitorTGs() {
         }
 
         const data = await response.json();
-
-        // Bei einem Lesefehler oder ungültigen Datenbestand die bisherige
-        // Liste behalten. So führt ein temporäres Problem nicht zum Leeren.
-        if (!data || data.success !== true || !Array.isArray(data.monitorTGs)) {
+        if (!data || data.success !== true || !Number.isFinite(Number(data.mtime))) {
             throw new Error("Ungültige Antwort des Monitor-TG-Servers");
+        }
+
+        // Zeitstempel nach erfolgreicher Serverantwort übernehmen.
+        monitorTGConfigMtime = Number(data.mtime);
+
+        // Unveränderte Datei: PHP hat MONITOR_TGS gar nicht erst gelesen.
+        if (data.changed !== true) {
+            return;
+        }
+
+        if (!Array.isArray(data.monitorTGs)) {
+            throw new Error("Geänderte Konfiguration enthält keine gültige Monitor-TG-Liste");
         }
 
         const newTGs = new Set(
             data.monitorTGs
-                .map(function (tg) {
-                    return String(tg || "").replace(/\D+/g, "");
-                })
+                .map(normalizeTG)
                 .filter(Boolean)
         );
 
@@ -123,6 +144,7 @@ async function refreshMonitorTGs() {
             });
 
         if (!changed) {
+            console.log("svxlink.conf wurde geändert, die Monitor-TG-Liste ist aber unverändert.");
             return;
         }
 
@@ -562,9 +584,7 @@ function updateActiveTG(
     tg,
     calls
 ) {
-    const talkgroup =
-        String(tg || "")
-            .trim();
+    const talkgroup = normalizeTG(tg);
 
     if (!talkgroup) {
         return;
@@ -922,7 +942,7 @@ function updateTalkerMarkers() {
     );
 
     active.forEach(function (talker) {
-        const tg = String(talker.tg || "").trim();
+        const tg = normalizeTG(talker.tg);
         if (!isVisibleTG(tg)) return;
 
         const receivers = activeTG.get(tg);
@@ -1181,11 +1201,7 @@ function updateTGLines() {
             speaker,
             speakerCall
         ) {
-            const tg =
-                String(
-                    speaker.tg || ""
-                )
-                    .trim();
+            const tg = normalizeTG(speaker.tg);
 
             if (!isVisibleTG(tg)) {
                 return;
@@ -1732,8 +1748,10 @@ function connectMQTT() {
                             .replace(
                                 /\/$/,
                                 ""
-                            )
-                            .trim();
+                            );
+
+                    const normalizedActiveTGNumber =
+                        normalizeTG(activeTGNumber);
 
                     // Eine leere Payload bedeutet: diesen TG-Zustand löschen.
                     // Der Broker kann beim Zurücksetzen eines activeTG-Topics
@@ -1744,7 +1762,7 @@ function connectMQTT() {
                             activeTGNumber
                         );
                         activeTG.delete(
-                            activeTGNumber
+                            normalizedActiveTGNumber
                         );
                         updateTalkerMarkers();
                         updateTGLines();
@@ -1764,7 +1782,7 @@ function connectMQTT() {
                         );
 
                         updateActiveTG(
-                            activeTGNumber,
+                            normalizedActiveTGNumber,
                             calls
                         );
 

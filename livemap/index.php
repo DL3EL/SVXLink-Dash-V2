@@ -1,5 +1,5 @@
 <?php
-// Version V20261111_1200
+// Version V20261112_1400
 // Farbpallette und Monitor-Talkgroups abrufen
 
 if (!file_exists(__DIR__ . '/livemap_ini.php') && file_exists(__DIR__ . '/livemap_ini.php.example')) {
@@ -53,6 +53,9 @@ if (is_readable($svxlinkConfigFile)) {
 }
 
 $monitorTGs = array_values(array_unique($monitorTGs));
+
+// Änderungszeitpunkt der SVXLink-Konfiguration für die Hintergrundprüfung.
+$svxlinkConfigMtime = is_readable($svxlinkConfigFile) ? @filemtime($svxlinkConfigFile) : false;
 ?>
 
 
@@ -122,9 +125,13 @@ $monitorTGs = array_values(array_unique($monitorTGs));
         window.livemapMonitorTGs = <?php
             echo json_encode($monitorTGs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         ?>;
+        window.livemapMonitorTGmtime = <?php
+            echo json_encode($svxlinkConfigMtime === false ? 0 : (int)$svxlinkConfigMtime);
+        ?>;
 	</script>
     <script src="livemap.js"></script>
 
     <p style="font-size:8px; color:gray; margin:0;">@DL4EM</p>
 </body>
+
 </html>
