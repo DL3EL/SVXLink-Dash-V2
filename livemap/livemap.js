@@ -1,4 +1,4 @@
-// Version 20260915
+// Version 20261112
 
 "use strict";
 
@@ -53,6 +53,105 @@ const activeTG = new Map();
 
 // TG Netzwerk Darstellung
 let showTGNetwork = true;
+
+// Nur Monitor-Talkgroups auf der Karte darstellen
+let showMonitorTGsOnly = false;
+
+// Monitor-TGs werden von PHP aus [ReflectorLogic] / MONITOR_TGS
+// der lokalen /etc/svxlink/svxlink.conf bereitgestellt.
+const monitorTGSet = new Set(
+    (Array.isArray(window.livemapMonitorTGs) ? window.livemapMonitorTGs : [])
+        .map(function (tg) {
+            return String(tg || "").replace(/\D+/g, "");
+        })
+        .filter(Boolean)
+);
+
+// Prüft, ob eine Talkgroup gemäß aktueller Kartenauswahl sichtbar ist.
+function isVisibleTG(tg) {
+    const normalizedTG = String(tg || "").trim();
+    if (!normalizedTG) return false;
+    return !showMonitorTGsOnly || monitorTGSet.has(normalizedTG);
+}
+
+// ------------------------------------------------------------
+// Monitor-Talkgroups regelmäßig neu aus der svxlink.conf lesen
+// ------------------------------------------------------------
+const MONITOR_TG_POLL_INTERVAL = 30 * 1000;
+let monitorTGCheckRunning = false;
+
+async function refreshMonitorTGs() {
+    // Verhindert parallele Abfragen, falls eine Anfrage länger dauert.
+    if (monitorTGCheckRunning) return;
+    monitorTGCheckRunning = true;
+
+    try {
+        const response = await fetch(
+            "monitor-tgs.php?_=" + Date.now(),
+            {
+                method: "GET",
+                cache: "no-store",
+                headers: { "Accept": "application/json" }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+
+        // Bei einem Lesefehler oder ungültigen Datenbestand die bisherige
+        // Liste behalten. So führt ein temporäres Problem nicht zum Leeren.
+        if (!data || data.success !== true || !Array.isArray(data.monitorTGs)) {
+            throw new Error("Ungültige Antwort des Monitor-TG-Servers");
+        }
+
+        const newTGs = new Set(
+            data.monitorTGs
+                .map(function (tg) {
+                    return String(tg || "").replace(/\D+/g, "");
+                })
+                .filter(Boolean)
+        );
+
+        const oldList = Array.from(monitorTGSet).sort();
+        const newList = Array.from(newTGs).sort();
+        const changed = oldList.length !== newList.length ||
+            oldList.some(function (tg, index) {
+                return tg !== newList[index];
+            });
+
+        if (!changed) {
+            return;
+        }
+
+        monitorTGSet.clear();
+        newTGs.forEach(function (tg) {
+            monitorTGSet.add(tg);
+        });
+
+        console.log(
+            "Monitor-TGs wurden aktualisiert:",
+            newList
+        );
+
+        // Aktuelle Marker, Empfänger und Verbindungslinien mit der
+        // geänderten TG-Liste synchronisieren. MQTT bleibt unangetastet.
+        updateTalkerMarkers();
+        updateTGLines();
+        renderTalkers();
+    }
+    catch (error) {
+        console.warn(
+            "Monitor-TGs konnten nicht aktualisiert werden; bisherige Liste bleibt aktiv:",
+            error
+        );
+    }
+    finally {
+        monitorTGCheckRunning = false;
+    }
+}
 
 // ------------------------------------------------------------
 // Positionsdaten laden
@@ -578,6 +677,16 @@ function updateTalkerMarkers() {
                 call
             );
 
+            // Bei aktivem Monitor-Filter nur Sprecher aus den
+            // konfigurierten Monitor-Talkgroups auf der Karte zeigen.
+            if (!isVisibleTG(talker.tg)) {
+                if (talkerMarkers.has(call)) {
+                    talkerMarkers.get(call).remove();
+                    talkerMarkers.delete(call);
+                }
+                return;
+            }
+
             // ------------------------------------------------
             // Falls dieser Call vorher als Empfänger angezeigt
             // wurde, Empfänger-Marker entfernen.
@@ -814,7 +923,7 @@ function updateTalkerMarkers() {
 
     active.forEach(function (talker) {
         const tg = String(talker.tg || "").trim();
-        if (!tg) return;
+        if (!isVisibleTG(tg)) return;
 
         const receivers = activeTG.get(tg);
         if (!receivers || receivers.size === 0) return;
@@ -1078,7 +1187,7 @@ function updateTGLines() {
                 )
                     .trim();
 
-            if (!tg) {
+            if (!isVisibleTG(tg)) {
                 return;
             }
 
@@ -1342,9 +1451,37 @@ const toggleTGNetwork =
         "toggleTGNetwork"
     );
 
+const toggleMonitorTGs =
+    document.getElementById(
+        "toggleMonitorTGs"
+    );
+
 // ============================================================
 // Darstellung TG Netzwerk
 // ============================================================
+// ============================================================
+// Darstellung auf Monitor-Talkgroups begrenzen
+// ============================================================
+toggleMonitorTGs.addEventListener(
+    "change",
+    function () {
+        showMonitorTGsOnly = toggleMonitorTGs.checked;
+
+        console.log(
+            "Monitor-TG Filter:",
+            showMonitorTGsOnly ? "EIN" : "AUS",
+            "Monitor-TGs:",
+            Array.from(monitorTGSet)
+        );
+
+        // Marker und Linien anhand des aktuellen Zustands neu aufbauen.
+        updateTalkerMarkers();
+        if (showTGNetwork) {
+            updateTGLines();
+        }
+    }
+);
+
 toggleTGNetwork.addEventListener(
     "change",
     function () {
@@ -1800,6 +1937,14 @@ function connectMQTT() {
 setInterval(
     cleanupStaleTalkers,
     30 * 1000
+);
+
+// ============================================================
+// Monitor-Talkgroups alle 30 Sekunden im Hintergrund prüfen
+// ============================================================
+setInterval(
+    refreshMonitorTGs,
+    MONITOR_TG_POLL_INTERVAL
 );
 
 // ============================================================

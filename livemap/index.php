@@ -1,6 +1,6 @@
 <?php
-// Version V20260915_1640
-// Farbpallette abrufen
+// Version V20261111_1200
+// Farbpallette und Monitor-Talkgroups abrufen
 
 if (!file_exists(__DIR__ . '/livemap_ini.php') && file_exists(__DIR__ . '/livemap_ini.php.example')) {
     copy(__DIR__ . '/livemap_ini.php.example', __DIR__ . '/livemap_ini.php');
@@ -13,6 +13,46 @@ if (file_exists(__DIR__ . "/livemap_ini.php")) {
     // Sicherheitsnetz: Falls auch die .example fehlte, stürzt das Skript kontrolliert ab
     die("Fehler: Die Konfigurationsdatei 'livemap_ini.php' fehlt und konnte nicht erstellt werden.");
 }
+
+// ------------------------------------------------------------
+// Monitor-Talkgroups aus der lokalen SVXLink-Konfiguration lesen
+// ------------------------------------------------------------
+$monitorTGs = [];
+$svxlinkConfigFile = '/etc/svxlink/svxlink.conf';
+
+if (is_readable($svxlinkConfigFile)) {
+    $configLines = file($svxlinkConfigFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $inReflectorLogic = false;
+
+    foreach ($configLines as $configLine) {
+        $line = trim($configLine);
+
+        // Kommentare ignorieren
+        if ($line === '' || str_starts_with($line, '#') || str_starts_with($line, ';')) {
+            continue;
+        }
+
+        // Abschnittswechsel erkennen
+        if (preg_match('/^\[([^]]+)\]$/', $line, $sectionMatch)) {
+            $inReflectorLogic = (strcasecmp(trim($sectionMatch[1]), 'ReflectorLogic') === 0);
+            continue;
+        }
+
+        if ($inReflectorLogic && preg_match('/^MONITOR_TGS\s*=\s*(.*)$/i', $line, $tgMatch)) {
+            // Nur Ziffern je kommasepariertem Eintrag übernehmen.
+            // Zusätze wie + oder > sind für die Kartenfilterung irrelevant.
+            foreach (explode(',', $tgMatch[1]) as $tgEntry) {
+                $tg = preg_replace('/\D+/', '', trim($tgEntry));
+                if ($tg !== '') {
+                    $monitorTGs[] = $tg;
+                }
+            }
+            break;
+        }
+    }
+}
+
+$monitorTGs = array_values(array_unique($monitorTGs));
 ?>
 
 
@@ -57,6 +97,10 @@ if (file_exists(__DIR__ . "/livemap_ini.php")) {
                 <input type="checkbox" id="toggleTGNetwork" checked>
                 <span>TG Netzwerk anzeigen</span>
             </label>
+            <label class="displayOption">
+                <input type="checkbox" id="toggleMonitorTGs">
+                <span>Nur Monitor-TGs anzeigen</span>
+            </label>
         </div>
     </div>
 
@@ -75,10 +119,12 @@ if (file_exists(__DIR__ . "/livemap_ini.php")) {
 				JSON_UNESCAPED_UNICODE
         );
     ?>;
+        window.livemapMonitorTGs = <?php
+            echo json_encode($monitorTGs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        ?>;
 	</script>
     <script src="livemap.js"></script>
 
     <p style="font-size:8px; color:gray; margin:0;">@DL4EM</p>
 </body>
-
 </html>
