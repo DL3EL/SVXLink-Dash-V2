@@ -1,5 +1,5 @@
 <?php
-// Version V20261112_1400
+// Version V20261112_MQTTDATA
 // Farbpallette und Monitor-Talkgroups abrufen
 
 if (!file_exists(__DIR__ . '/livemap_ini.php') && file_exists(__DIR__ . '/livemap_ini.php.example')) {
@@ -109,9 +109,6 @@ $svxlinkConfigMtime = is_readable($svxlinkConfigFile) ? @filemtime($svxlinkConfi
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- MQTT.js -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <!-- Eigene Logik -->
 	<script>

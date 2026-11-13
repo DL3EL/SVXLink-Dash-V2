@@ -1,7 +1,7 @@
 =======================================
 == FM-Funknetz LiveMap für Dashboard ==
 =======================================
-// Version 20260914
+// Version 20261113
 
 Zweck:
 ------
@@ -14,22 +14,36 @@ Im Verzeichnis livemap müssen folgende Datein vorhanden sein:
 
 	LiveMap
 	   ├── 
-       ├── README.md		Dieses Readme
-       ├── fm-map-data.php	MQTT Positions-Daten vom Server holen
+           ├── README.md		Dieses Readme
+           ├── fm-map-data.php	        MQTT Positions-Daten vom Server holen
 	   ├── fm-map.js		MQTT Daten Aufbereitung		
-	   ├── fm-set-tg.php	TG Wechsel
+	   ├── fm-set-tg.php	        TG Wechsel
 	   ├── index.php		LiveMap Darstellung als Web Seite
 	   ├── livemap.css		Farbdefinitionen für Kartendarstellung
 	   ├── livemap.js		LiveMap Darstellung erstellen
-	   └── livemap_ini.php	Benutzer definierte Farben
+	   ├── livemap_ini.php	        Benutzer definierte Farben
+           ├── livemap_ini.php.example  (Beispieldatei und Sicherung)
+           ├── monitor-tgs.php          Monitor TGs aus svxlink.conf lesen
+           └── mqtt-live-state.php      Inhalt von mqtt.data lesen
+ 
+
 
 2. Grundprinzip:
 ----------------
 Die LiveMap stellt den aktuellen Funkbetrieb auf einer Karte dar:
 Aktive Sender → rote Marker
-Empfänger → grüne Marker
-TG-Linien → Verbindung vom Sender zu seinen Empfängern
+Empfänger     → grüne Marker
+TG-Linien     → Verbindung vom Sender zu seinen Empfängern
 Die LiveMap bildet die aktuellen MQTT-Zustände ab.
+Standort Daten aus fogenden Quellen:
+    'https://dashboard.fm-funknetz.de/reflector1.json',
+    'https://dashboard.fm-funknetz.de/reflector2.json'
+
+MQTT-Daten vom Broker status.thueringen.link:
+MQTT-Topics                Funktion
+    /server/statethr/1         Aktuelle Sprecher
+    /server/state/activeTG/+   Aktive Empfänger je TG
+
 
 Zusätzliche Funktionen sind:
 ----------------------------
@@ -44,20 +58,19 @@ Eine Liste der "Aktiven Stationen"
 
 3. MQTT-Datenquellen:
 ---------------------
-Verwendete MQTT-Pfade:
-/server/statethr/1
-/server/state/activeTG/+
-/server/statethr/1
+MQTT-Daten vom Broker status.thueringen.link:
+MQTT-Topics                    Funktion
+    /server/statethr/1         Aktuelle Sprecher
+    /server/state/activeTG/+   Aktive Empfänger je TG
 
 Meldungen enthalten unter anderem:
 	time
-	talk
+	talk start/stop
 	call
 	tg
-	server
 
 Bei talk = start wird der Sender als aktiv übernommen.
-Bei talk = stop wird der Sender aus dem aktiven Zustand entfernt.
+Bei talk = stop  wird der Sender aus dem aktiven Zustand entfernt.
 
 Beispiel:
 start DB0AM-L TG: 263803
@@ -99,20 +112,21 @@ nicht angezeigt.
 6. Entscheidende Regel für Empfänger:
 -------------------------------------
 Die wichtigste Regel der aktuellen LiveMap lautet:
-Liefert ein aktiver Sender keine gültige Position, werden auch die von diesem Sender 
-abgeleiteten Empfänger nicht auf der Karte angezeigt.
+Liefert ein aktiver Sender keine gültige Position, werden dise sowie die von diesem Sender 
+abgeleiteten Empfänger nicht auf der Karte angezeigt!!!
 
-Ein Empfänger darf nur angezeigt werden, wenn:
+Ein Empfänger wird nur angezeigt werden, wenn:
 	der Sender aktuell aktiv ist,
 	der Sender einer aktiven TG zugeordnet ist,
 	für diese TG Empfänger vorhanden sind,
 	der Sender selbst eine gültige Position besitzt.
 
 Beispiel:
-	Sender: DB0QH
+	Sender:   DB0QH
 	TG:       26349
-	Position: nicht vorhanden
-Auch wenn activeTG/26349 Empfänger enthält, werden diese Empfänger nicht als grüne Marker
+	Position: nicht in den o.g. Quellen vorhanden
+        Empfänger und Sender werden nicht angezeigt
+Auch wenn activeTG/26349 diverse Empfänger enthält, werden diese nicht als grüne Marker
 in der Karte angezeigt!!!
 
 7. Warum diese Regel notwendig ist:
@@ -146,12 +160,12 @@ zur erfolgreichen Ändereung von Linien- und Markerfarben (default rot und grün
 	--------------
 	aktiver Sender
 		│
-		└── aktive TG
-             │
-             ├── Empfänger 1
-             ├── Empfänger 2
-			 ...
-             └── Empfänger x
+		└── Linien der aktiven TG zu:
+                       │
+                       ├── Empfänger 1
+                       ├── Empfänger 2
+		              ...
+                       └── Empfänger x
 
 Die Linie wird nur erzeugt, wenn die Position des Senders bekannt ist.
 Damit stimmen Empfänger- und Linienlogik überein.
@@ -160,7 +174,7 @@ Default Farben der Linien und Marker:
 -------------------------------------
 Marker:
 -------
-Sender:   $LIVEMAP_TALKER_COLOR = "#ff0000"; //rot
+Sender:     $LIVEMAP_TALKER_COLOR = "#ff0000"; //rot
 Empfänger:  $LIVEMAP_RECEIVER_COLOR = "#3cb371"; //grün
 
 Linien:
@@ -189,12 +203,17 @@ Bei einem Klick auf einen Marker in der Karte werden Informationen angezeigt bes
 	
 Ein Klick in das PopUp führt zum TG Wechsel.
 
-11. Checkbox FM Funknetz TG-Netzwerk ein-/ausschalten:
------------------------------------------------------
-Die Checkbox "Darstellung" steuert die Darstellung des TG-Netzwerks.
-	Beim Ausschalten werden Empfänger-Marker und TG-Linien der Netzwerkdarstellung entfernt.
-	Beim Einschalten wird der aktuelle Zustand neu aufgebaut.
-		Alte TG-Linien dürfen dabei nicht zurückbleiben.
+11. Checkboxen FM Funknetz TG-Netzwerk ein-/ausschalten:
+--------------------------------------------------------
+Die Checkboxen in "Darstellung" steuern die Darstellung des TG-Netzwerks.
+
+Checkbox: TG Netzwerk anzeigen:
+	Deaktiviert: es werden Empfänger-Marker und TG-Linien der Netzwerkdarstellung entfernt.
+	Aktiviert:   wird der aktuelle Zustand mit Marker und Linien neu aufgebaut.
+
+Checkbox: Nur Monitor TGs anzeigen:
+        Aktiviert:   filtert die Anzeige der in der svxlink.conf definierten Monitor TGs  
+        Deaktiviert: es werden wieder alle Marker und Linien angezeigt
 
 12. MQTT-Verbindungsabbruch:
 ----------------------------
@@ -223,6 +242,8 @@ Maßgeblich sind grundsätzlich die MQTT-Zustände:
 	stop
 	
 14. Typische Zustände:
+----------------------
+
 --------------------------
 |  Sender mit Position |
 --------------------------
@@ -242,6 +263,7 @@ grüne Empfänger-Marker
     ↓
 TG-Linien möglich
 
+
 --------------------------
 | Sender ohne Position |
 --------------------------
@@ -259,6 +281,7 @@ keine Empfänger-Marker dieses Senders
     ↓
 keine TG-Linie dieses Senders
 
+
 -------------------
 | Sender stoppt |
 -------------------
@@ -273,8 +296,8 @@ abgeleitete Empfänger aktualisieren
 zugehörige TG-Linien entfernen
 
 
-15. Diagnose und Fehlersuche:
------------------------------
+15. Diagnose und Fehlersuche mittels Browser-Konsole:
+-----------------------------------------------------
 Wichtige Meldungen in der Browser-Konsole sind unter anderem:
 	START:
 	STOP:
@@ -286,10 +309,10 @@ Wichtige Meldungen in der Browser-Konsole sind unter anderem:
 	RX DIAG - URSPRUNG:
 		zeigt, aus welchem aktiven Sender/TG-Zusammenhang ein Empfänger abgeleitet wurde.
 
-Die Schlüsselwörter z.B. "STOP:" können zur Filterung der Bowser-Console Ausgabe genutzt werden.
+Die Schlüsselwörter z.B. "STOP:" können zur Filterung der Bowser-Konsole Ausgabe genutzt werden.
 
 Beispiel:
-Eingabe "RX DIAG - URSPRUNG:" im Filter der Bowser-Console führt zu fogender Ausgabe:
+Eingabe "RX DIAG - URSPRUNG:" im Filter der Bowser-Konsole führt zu fogender Ausgabe:
 	RX DIAG - URSPRUNG: DB1VW-L
 	MarkerTG: 26349
 	Quellen: [{"speaker":"DB0QH","tg":"26349","speakerPosition":false}]
@@ -363,7 +386,5 @@ keine Empfänger-Marker
 ----------------
 MQTT bestimmt den Funkzustand.
 Positionsdaten bestimmen, ob dieser Zustand auf der Karte dargestellt werden kann.
-Ein Sender ohne Position bleibt in der Liste sichtbar, aber seine Empfänger 
-werden nicht angezeigt.
-Damit ist die Darstellung der LiveMap logisch konsistent und verwaisten 
-Empfänger-Marker werden vermieden.
+Ein Sender ohne Position bleibt in der Liste "Aktive Stationen" mit Warnhinweis sichtbar, 
+aber seine Empfänger und seine eigene Position (roter Marker) werden nicht angezeigt.

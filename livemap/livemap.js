@@ -1,4 +1,4 @@
-// Version 20261112_1400
+// Version 20261113_MQTTDATA
 
 "use strict";
 
@@ -67,7 +67,7 @@ const monitorTGSet = new Set(
 
 // Talkgroups immer als Zeichenkette behandeln und Zusätze entfernen.
 // Dadurch funktionieren auch lange TG-Nummern sowie Kennzeichnungen
-// wie + oder > sowohl aus svxlink.conf als auch aus MQTT.
+// wie + oder > sowohl aus svxlink.conf als auch aus den gespeicherten Topic-Daten.
 function normalizeTG(tg) {
     return String(tg === null || tg === undefined ? "" : tg)
         .replace(/\D+/g, "");
@@ -159,7 +159,7 @@ async function refreshMonitorTGs() {
         );
 
         // Aktuelle Marker, Empfänger und Verbindungslinien mit der
-        // geänderten TG-Liste synchronisieren. MQTT bleibt unangetastet.
+        // geänderten TG-Liste synchronisieren. Die Datensammlung bleibt unangetastet.
         updateTalkerMarkers();
         updateTGLines();
         renderTalkers();
@@ -629,7 +629,7 @@ function updateActiveTG(
     // synchronisieren.
     //
     // Wichtig:
-    // Ein activeTG-MQTT-Update kann Empfänger hinzufügen oder
+    // Ein activeTG-Datensatz kann Empfänger hinzufügen oder
     // entfernen, ohne dass gleichzeitig eine neue Talker-
     // Nachricht eintrifft. Deshalb reicht updateTGLines()
     // alleine hier nicht aus.
@@ -647,6 +647,35 @@ function updateActiveTG(
 // ============================================================
 // Sender Marker aktualisieren
 // ============================================================
+// ============================================================
+// Rufzeichen neben Sprechermarkern anzeigen
+// Nur sichtbar, wenn das TG-Netzwerk ausgeschaltet ist.
+// ============================================================
+function updateTalkerLabel(marker, call) {
+
+    if (showTGNetwork) {
+        if (marker.getTooltip()) {
+            marker.unbindTooltip();
+        }
+        return;
+    }
+
+    const tooltipOptions = {
+        permanent: true,
+        direction: "right",
+        offset: [10, 0],
+        opacity: 0.65,
+        className: "talker-call-label"
+    };
+
+    if (marker.getTooltip()) {
+        marker.setTooltipContent(call);
+    }
+    else {
+        marker.bindTooltip(call, tooltipOptions);
+    }
+}
+
 function updateTalkerMarkers() {
 
     // --------------------------------------------------------
@@ -793,6 +822,9 @@ function updateTalkerMarkers() {
                     String(
                         talker.tg || ""
                     ).trim();
+
+                // Rufzeichen nur bei ausgeschaltetem TG-Netzwerk anzeigen.
+                updateTalkerLabel(marker, call);
                 return
             }
 
@@ -898,6 +930,9 @@ function updateTalkerMarkers() {
 
             updateTalkerPopup();
 
+            // Rufzeichen nur bei ausgeschaltetem TG-Netzwerk anzeigen.
+            updateTalkerLabel(marker, call);
+
             // ------------------------------------------------
             // Marker auf Karte
             // ------------------------------------------------
@@ -922,7 +957,7 @@ function updateTalkerMarkers() {
     // Talkern und deren activeTG-Daten berechnet. Es werden aber
     // nur Marker geändert, die tatsächlich hinzugefügt, geändert
     // oder entfernt werden müssen. Dadurch entsteht bei jedem
-    // MQTT-Ereignis kein komplettes Löschen/Neuanlegen mehr.
+    // Datensatz kein komplettes Löschen/Neuanlegen mehr.
     // --------------------------------------------------------
     const desiredReceivers = new Map();
 
@@ -1388,63 +1423,85 @@ function updateTGLines() {
 }
 
 // ============================================================
-// Live-Zustand bei MQTT-Verbindungsabbruch zurücksetzen
+// Live-Zustand aus mqtt.data über PHP beziehen
 // ============================================================
-function clearLiveMapState(reason) {
+const LIVE_STATE_URL = "mqtt-live-state.php";
+const LIVE_STATE_POLL_INTERVAL = 2000;
+let liveStatePollRunning = false;
+let lastLiveStateRevision = null;
 
-    console.log(
-        "LiveMap Zustand wird zurückgesetzt:",
-        reason || "unbekannt"
-    );
+async function refreshLiveState() {
+    if (liveStatePollRunning) return;
+    liveStatePollRunning = true;
 
-    // Aktive Senderdaten löschen
-    active.clear();
+    try {
+        const response = await fetch(
+            LIVE_STATE_URL + "?ts=" + Date.now(),
+            { cache: "no-store" }
+        );
 
-    // Aktive Empfänger je TG löschen
-    activeTG.clear();
-
-    // Alle Sender-Marker entfernen
-    talkerMarkers.forEach(
-        function (marker) {
-            marker.remove();
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
         }
-    );
-    talkerMarkers.clear();
 
-    // Alle Empfänger-Marker entfernen
-    receiverMarkers.forEach(
-        function (marker) {
-            marker.remove();
+        const data = await response.json();
+        if (!data || data.success !== true || !Array.isArray(data.talkers) || !data.activeTG) {
+            throw new Error(data && data.error ? data.error : "Ungültige Live-Daten");
         }
-    );
-    receiverMarkers.clear();
 
-    // Sicherheitshalber den gemeinsamen Layer vollständig leeren
-    tgNetworkLayer.clearLayers();
+        // Bei unverändertem Zustand muss die Karte nicht neu gezeichnet werden.
+        if (data.revision === lastLiveStateRevision) return;
 
-    // Alle gespeicherten TG-Linien löschen
-    tgLines.clear();
+        active.clear();
+        data.talkers.forEach(function (talker) {
+            if (!talker || typeof talker !== "object") return;
 
-    // Linke Liste ebenfalls sofort auf Funkstille setzen
-    renderTalkers();
+            const call = String(talker.call || "").trim().toUpperCase();
+            const tg = normalizeTG(talker.tg);
+            if (!call || !tg) return;
 
-    console.log(
-        "LiveMap Zustand zurückgesetzt:",
-        "Sender=", active.size,
-        "Empfänger=", receiverMarkers.size,
-        "TG=", activeTG.size,
-        "Linien=", tgLines.size
-    );
+            active.set(call, {
+                call: call,
+                tg: tg,
+                startMs: Number(talker.startMs) || Date.now()
+            });
+        });
+
+        activeTG.clear();
+        Object.entries(data.activeTG).forEach(function ([tg, calls]) {
+            const normalizedTG = normalizeTG(tg);
+            if (!normalizedTG || !Array.isArray(calls)) return;
+
+            const receiverSet = new Set();
+            calls.forEach(function (call) {
+                const normalizedCall = String(call || "").trim().toUpperCase();
+                if (normalizedCall) receiverSet.add(normalizedCall);
+            });
+            activeTG.set(normalizedTG, receiverSet);
+        });
+
+        lastLiveStateRevision = data.revision;
+
+        updateTalkerMarkers();
+        updateTGLines();
+        renderTalkers();
+
+        console.log(
+            "LiveMap Zustand aktualisiert:",
+            "Sprecher=", active.size,
+            "TG=", activeTG.size,
+            "Revision=", lastLiveStateRevision
+        );
+    }
+    catch (error) {
+        // Bei einem vorübergehenden PHP-/Dateizugriffsfehler den letzten
+        // gültigen Kartenstand beibehalten und beim nächsten Intervall erneut versuchen.
+        console.warn("LiveMap-Daten konnten nicht aktualisiert werden:", error);
+    }
+    finally {
+        liveStatePollRunning = false;
+    }
 }
-
-// ============================================================
-// MQTT Konfiguration
-// ============================================================
-const WS_URL =
-    "wss://status.thueringen.link/mqtt";
-
-const TOPIC =
-    "/server/statethr/1";
 
 // ============================================================
 // HTML Elemente
@@ -1560,395 +1617,6 @@ toggleTGNetwork.addEventListener(
 const active =
     new Map();
 
-// MQTT Client
-let client = null;
-
-// ============================================================
-// MQTT Verbindung
-// ============================================================
-function connectMQTT() {
-    console.log(
-        "MQTT Verbindung wird aufgebaut..."
-    );
-    client =
-        mqtt.connect(
-            WS_URL,
-            {
-                reconnectPeriod:
-                    3000,
-                keepalive:
-                    30,
-                clean:
-                    true,
-                clientId:
-                    "fm-livemap-" +
-                    Math.random()
-                        .toString(16)
-                        .slice(2, 10)
-            }
-        );
-
-    // --------------------------------------------------------
-    // MQTT verbunden
-    // --------------------------------------------------------
-    client.on(
-        "connect",
-        function () {
-
-            console.log(
-                "MQTT verbunden"
-            );
-
-            // ------------------------------------------------
-            // Sprach-/Talker-Status
-            // ------------------------------------------------
-            client.subscribe(
-                TOPIC,
-                {
-                    qos: 0
-                },
-                function (err) {
-                    if (err) {
-                        console.error(
-                            "MQTT Subscribe Fehler:",
-                            err
-                        );
-                        return;
-                    }
-
-                    console.log(
-                        "MQTT Topic abonniert:",
-                        TOPIC
-                    );
-                }
-            );
-
-            // ------------------------------------------------
-            // Aktive Empfänger je Talkgroup
-            // ------------------------------------------------
-            client.subscribe(
-                "/server/state/activeTG/+",
-                {
-                    qos: 0
-                },
-                function (err) {
-
-                    if (err) {
-                        console.error(
-                            "MQTT Subscribe Fehler activeTG:",
-                            err
-                        );
-                        return;
-                    }
-
-                    console.log(
-                        "MQTT Topic abonniert:",
-                        "/server/state/activeTG/+"
-                    );
-                }
-            );
-        }
-    );
-
-
-
-    // --------------------------------------------------------
-    // Reconnect
-    // --------------------------------------------------------
-    client.on(
-        "reconnect",
-        function () {
-
-            console.log(
-                "MQTT reconnect..."
-            );
-        }
-    );
-
-    // --------------------------------------------------------
-    // Verbindung geschlossen
-    // --------------------------------------------------------
-    client.on(
-        "close",
-        function () {
-
-            console.log(
-                "MQTT Verbindung geschlossen"
-            );
-
-            // Nach einem Verbindungsabbruch dürfen keine alten
-            // Sender-, Empfänger- oder TG-Zustände sichtbar bleiben.
-            // MQTT verbindet sich anschließend automatisch neu.
-            clearLiveMapState(
-                "MQTT close"
-            );
-        }
-    );
-
-    // --------------------------------------------------------
-    // MQTT Fehler
-    // --------------------------------------------------------
-    client.on(
-        "error",
-        function (err) {
-
-            console.error(
-                "MQTT Fehler:",
-                err
-            );
-        }
-    );
-
-
-
-    // --------------------------------------------------------
-    // MQTT Nachricht
-    // --------------------------------------------------------
-    client.on(
-        "message",
-        function (
-            topic,
-            payload
-        ) {
-
-            console.log(
-                "MQTT TOPIC:",
-                topic
-            );
-
-            try {
-                // =================================================
-                // Aktive Empfänger einer Talkgroup
-                // =================================================
-                if (
-                    topic.startsWith(
-                        "/server/state/activeTG/"
-                    )
-                ) {
-                    const text =
-                        typeof payload === "string"
-                            ?
-                            payload
-                            :
-                            new TextDecoder()
-                                .decode(payload);
-
-                    console.log(
-                        "ACTIVE TG ERKANNT:",
-                        topic,
-                        "PAYLOAD:",
-                        text
-                    );
-
-                    const activeTGNumber =
-                        topic
-                            .substring(
-                                "/server/state/activeTG/".length
-                            )
-                            .replace(
-                                /\/$/,
-                                ""
-                            );
-
-                    const normalizedActiveTGNumber =
-                        normalizeTG(activeTGNumber);
-
-                    // Eine leere Payload bedeutet: diesen TG-Zustand löschen.
-                    // Der Broker kann beim Zurücksetzen eines activeTG-Topics
-                    // eine wirklich leere Payload liefern und nicht [].
-                    if (text.trim() === "") {
-                        console.log(
-                            "ACTIVE TG LEER - Zustand gelöscht:",
-                            activeTGNumber
-                        );
-                        activeTG.delete(
-                            normalizedActiveTGNumber
-                        );
-                        updateTalkerMarkers();
-                        updateTGLines();
-                        renderTalkers();
-                        return;
-                    }
-                    try {
-                        const calls =
-                            JSON.parse(
-                                text
-                            );
-
-                        console.log(
-                            "ACTIVE TG MQTT:",
-                            activeTGNumber,
-                            calls
-                        );
-
-                        updateActiveTG(
-                            normalizedActiveTGNumber,
-                            calls
-                        );
-
-                        // TG Linien aktualisieren
-                        updateTGLines();
-                    }
-
-                    catch (error) {
-                        console.error(
-                            "ACTIVE TG JSON Fehler:",
-                            error
-                        );
-                    }
-                    return;
-                }
-
-                // =================================================
-                // Nur Live-Talker Topic weiterverarbeiten
-                // =================================================
-                if (
-                    topic !== TOPIC
-                ) {
-                    return;
-                }
-
-                // =================================================
-                // Live-Talker Nachricht
-                // =================================================
-                const text =
-                    typeof payload === "string"
-                        ?
-                        payload
-                        :
-                        new TextDecoder()
-                            .decode(payload);
-                const msg =
-                    parseMsg(
-                        text
-                    );
-
-                if (!msg) {
-                    return;
-                }
-
-                console.log(
-                    "MQTT RAW MSG:",
-                    msg
-                );
-
-                // ------------------------------------------------
-                // Nachricht auswerten
-                // ------------------------------------------------
-                const now =
-                    Date.now();
-                const id =
-                    String(
-                        msg.call ||
-                        ""
-                    )
-                        .trim()
-                        .toUpperCase();
-                const tg =
-                    String(
-                        msg.tg ||
-                        ""
-                    )
-                        .trim();
-                const kind =
-                    String(
-                        msg.talk ||
-                        ""
-                    )
-                        .toLowerCase();
-
-                if (!id) {
-                    return;
-                }
-
-                console.log(
-                    "MQTT:",
-                    kind,
-                    id,
-                    "TG:",
-                    tg
-                );
-
-                // =================================================
-                // START
-                // =================================================
-                if (
-                    kind === "start"
-                ) {
-
-                    if (
-                        !active.has(id)
-                    ) {
-                        active.set(
-                            id,
-                            {
-                                call:
-                                    id,
-                                tg:
-                                    tg,
-                                startMs:
-                                    now
-                            }
-                        );
-
-                        console.log(
-                            "START:",
-                            id,
-                            "TG:",
-                            tg
-                        );
-                    }
-
-                    else {
-                        const a =
-                            active.get(
-                                id
-                            );
-                        a.tg =
-                            tg ||
-                            a.tg;
-                    }
-                }
-
-                // =================================================
-                // STOP
-                // =================================================
-                else if (
-                    kind === "stop"
-                ) {
-                    if (
-                        active.has(id)
-                    ) {
-                        active.delete(
-                            id
-                        );
-
-                        console.log(
-                            "STOP:",
-                            id
-                        );
-                    }
-                }
-
-                // =================================================
-                // Anzeige aktualisieren
-                // =================================================
-                updateTalkerMarkers();
-                updateTGLines();
-                renderTalkers();
-
-            }
-            catch (err) {
-
-                console.error(
-                    "MQTT Parsing Fehler:",
-                    err
-                );
-            }
-        }
-    );
-}
-
 // ============================================================
 // Sender-Sicherheitsbereinigung 30 Sekunden
 // ============================================================
@@ -1966,34 +1634,14 @@ setInterval(
 );
 
 // ============================================================
-// MQTT Nachricht parsen
-// ============================================================
-function parseMsg(text) {
-    const clean =
-        text.replace(
-            /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,
-            ""
-        );
-    try {
-        return JSON.parse(
-            clean
-        );
-    }
-    catch {
-        return null;
-    }
-}
-
-// ============================================================
 // Veraltete Sender automatisch entfernen
 // ============================================================
 function cleanupStaleTalkers() {
     const now =
         Date.now();
-    // Kein automatisches Löschen mehr nach 10/30 Sekunden.
-    // Ein laufendes QSO kann deutlich länger dauern. Der MQTT-close-Reset
-    // leert den Zustand bei Verbindungsverlust; ein normaler MQTT-stop
-    // entfernt den Talker sofort.
+    // Kein automatisches Löschen nach 10/30 Sekunden.
+    // Ein laufendes QSO kann deutlich länger dauern; ein normaler STOP-
+    // Datensatz aus mqtt.data entfernt den Talker sofort.
     const maxAge =
         0;
 
@@ -2216,7 +1864,7 @@ function renderTalkers() {
 
 
 // ============================================================
-// Schnittstelle für MQTT
+// Schnittstelle für externe LiveMap-Steuerung
 // ============================================================
 window.FMMap = {
     updateActiveTG:
@@ -2239,5 +1887,6 @@ window.FMMap = {
 // Zuerst Positionsdaten laden.
 loadNodePositions();
 
-// MQTT Verbindung aufbauen.
-connectMQTT();
+// Live-Daten aus mqtt.data laden und anschließend alle 2 Sekunden aktualisieren.
+refreshLiveState();
+setInterval(refreshLiveState, LIVE_STATE_POLL_INTERVAL);
