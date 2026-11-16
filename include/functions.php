@@ -1443,70 +1443,25 @@ echo "<br>Stat: $cmd";
       date_default_timezone_set('Europe/Berlin');
       $jetzt = date("Y-m-d H:i:s");
       $tgdb_File = DL3EL_BASE . "include/tgdb.php";
-      $tgdb_dj1jay_file = "https://FM-Funknetz.de/Download/tgdb_list.txt";
+      $tgdb_dl3el_file = "http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt";
 
-      $headers = @get_headers($tgdb_dj1jay_file);
-
+      $headers = @get_headers($tgdb_dl3el_file);
 // Prüft, ob der Server mit "200 OK" antwortet
       if ($headers && strpos($headers[0], '200') !== false) {
-        $content = file_get_contents($tgdb_dj1jay_file);
+        $content = file_get_contents($tgdb_dl3el_file);
         $contentl = strlen($content);
         if ($contentl) {
-          $logtext = $jetzt . " " . $tgdb_File . " read, length:" . $contentl . "\n";
-          addsvxlog($logtext);
+          $logtext = $jetzt . " " . $tgdb_dl3el_file . " read, length:" . $contentl . "\n";
           file_put_contents($tgdb_File, $content);
-        }  
-      } else {
-        $logtext = $jetzt . " Datei existiert nicht oder Server ist offline:" . $tgdb_dj1jay_file . "\n";
+        } else {
+          $logtext = $jetzt . " PROBLEM: " . $tgdb_dl3el_file . " read, length:" . $contentl . "\n";
+        }    
         addsvxlog($logtext);
-          $content = file_get_contents('http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt');
-          $contentl = strlen($content);
-          if ($contentl) {
-            $logtext = $jetzt . " http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt read, length:" . $contentl . "\n";
-            addsvxlog($logtext);
-            file_put_contents($tgdb_File, $content);
-          }  
+      } else {
+        $logtext = $jetzt . " Datei existiert nicht oder Server ist offline:" . $tgdb_dl3el_file . ", alte Datei wird behalten\n";
+        addsvxlog($logtext);
       }
-
-      $tgdb_ext_File = DL3EL_BASE . "include/tgdb_ext.php";
-      if (file_exists($tgdb_ext_File)) {
-        $content = file_get_contents('http://relais.dl3el.de/FM-Funknetz/tgdb_ext.txt');
-        $contentl = strlen($content);
-        $logtext = $jetzt . " " . $tgdb_ext_File . " read, length:" . $contentl . "\n";
-        file_put_contents($tgdb_ext_File, $content);
-//      include_once DL3EL_BASE . "include/tg_ext.php";
-        include "tgdb.php";    
-        if ((defined ('debug')) && (debug > 1)) echo "Array: " . count($tgdb_array) . "<br>";
-        include "tgdb_ext.php";    
-        if ((defined ('debug')) && (debug > 1)) echo "ExtArray: " . count($tgdb_ext_array) . "<br>";
-// meine Änderungen überschreiben das Original
-//        $tgdb_array = $tgdb_ext_array + $tgdb_array;
-// meine Änderungen ergänzen das Original
-        $tgdb_array = $tgdb_array + $tgdb_ext_array;
-        if ((defined ('debug')) && (debug > 1)) echo "AllArray: " . count($tgdb_array) . "<br>";
-        ksort($tgdb_array, SORT_NUMERIC);
-        $nn = 0;
-        $content = "<?php\n
-/* talkgroup / number alias database */\n
-/* alle Angabennohne Gewähr / FM-Funknetz.de*/\n
-\$tgdb_array = [\n";
-
-        foreach ($tgdb_array as $tg => $tgname) {
-          if ((defined ('debug')) && (debug > 0)) echo "($nn) [$tg] [$tgname] <br>";
-          if (($tg !== "") && ($tg !== " ")) {
-            $content = $content . "'" . $tg . "' => '" . $tgdb_array[$tg] . "',\n";
-            ++$nn;
-          }  
-        }  
-        $content = $content . "    '0'			=> ' ;-) ',
-        ''			=> 'Hier könnte ihre Werbung stehen<br> oder einfach ihre Start <b>TG</b>  &#128580; &#128580;  '
-  ];
-  
-  /* Make my Day better, vy73 Jens, DJ1JAY */
-  ?>\n";
-  file_put_contents(DL3EL_BASE . "include/tgdb.php",$content);
-  }
-}
+    }
 
     function count_files($globber) {
 //      $globber = DL3EL . "/Reflector*.conf";

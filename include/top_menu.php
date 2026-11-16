@@ -370,10 +370,12 @@ if (session_status() === PHP_SESSION_NONE) {
 //	    echo '| <a class="hreflink" href="./statistic.php" id="log">Statistic</a> ';
 	    echo '| <a class="hreflink" href="./caller_extern.php?id=./statistic/index.php" >Stat</a> ';
 	}
+/*
 	$tgdb_File = DL3EL_BASE . "include/tgdb.php";
 	if (filesize($tgdb_File)  <= 1000) {
 	    echo '| <a class="hreflink" href="./include/tgdb_upd.php" id="upd">Update TGDB</a> ';
 	}
+*/
 	echo '</p>';
 } else {
     	echo '<a class="hreflink" href="./caller_extern.php?id=http://relais.dl3el.de/FM-Funknetz/hilfe.html&wid=950&noauth" style = "text-align: left; border-radius:8px; color:white;border-color:transparent; background-color:blue; font-size:14px;" id="info">&nbsp;&nbsp;Hilfe &nbsp;&nbsp;</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';

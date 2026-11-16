@@ -505,11 +505,12 @@ echo '</form>';
 echo "<br>";
 echo '<div id="display-links" align="center"></div>';
 
+/*
 $tgdb_File = DL3EL_BASE . "include/tgdb.php";
 if (filesize($tgdb_File)  <= 1000) {
     echo '<a style="color:red;" class="hreflink" href="./include/tgdb_upd.php" id="upd">Update TGDB</a> ';
 }
-
+*/
 }
 
 if($show_top_menu != 1) {
