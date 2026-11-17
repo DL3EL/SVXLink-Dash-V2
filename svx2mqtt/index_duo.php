@@ -100,6 +100,7 @@
 <?php
 // Farben:
 include_once  '../include/settings.php';
+include_once  '../include/tgdb.php';
 
     if ($_SESSION['auth'] !== 'AUTHORISED') {
         if ((defined('DL3EL_LIVEDB_UNAUTH')) && (DL3EL_LIVEDB_UNAUTH === "yes")) {
@@ -242,9 +243,16 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                 // Load TG DB (supports php-array style and line formats)
                 async function loadTGDB() {
                     try {
-                        const resp = await fetch(TGDB_URL, { cache: "no-store" });
-                        const text = await resp.text();
-                        parseTGDB(text);
+                        const rawData = <?php echo json_encode($tgdb_array, JSON_HEX_TAG | JSON_HEX_AMP); ?>
+                        tgMap.clear();
+                        for (const [id, raw] of Object.entries(rawData)) {
+                            const cleanId = String(id).trim();
+                            const cleanRaw = String(raw).trim();
+                            tgMap.set(cleanId, normalizeName(cleanId, cleanRaw));
+                        }    
+                        //const resp = await fetch(TGDB_URL, { cache: "no-store" });
+                        //const text = await resp.text();
+                        // parseTGDB(text);
                         render();
                     } catch (e) {
                         console.warn("TGDB fetch failed:", e);
