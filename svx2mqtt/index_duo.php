@@ -243,13 +243,13 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                 // Load TG DB (supports php-array style and line formats)
                 async function loadTGDB() {
                     try {
-const rawData = <?php 
-    if (isset($tgdb_array) && is_array($tgdb_array)) {
-        echo json_encode($tgdb_array, JSON_HEX_TAG | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}';
-    } else {
-        echo '{}';
-    }
-?>;
+                        const rawData = <?php 
+                        if (isset($tgdb_array) && is_array($tgdb_array)) {
+                            echo json_encode($tgdb_array, JSON_HEX_TAG | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}';
+                        } else {
+                            echo '{}';
+                        }
+                        ?>;
 
                         tgMap.clear();
                         for (const [id, raw] of Object.entries(rawData)) {
