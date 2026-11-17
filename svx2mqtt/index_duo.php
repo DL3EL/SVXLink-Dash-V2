@@ -243,52 +243,23 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                 // Load TG DB (supports php-array style and line formats)
                 async function loadTGDB() {
                     try {
-                        const rawData = <?php echo json_encode($tgdb_array, JSON_HEX_TAG | JSON_HEX_AMP); ?>
+                        const rawData = <?php 
+                                $utf8_array = array_map(
+                                    fn($v) => mb_convert_encoding((string)$v, 'UTF-8', 'UTF-8, ISO-8859-1'), 
+                                    $tgdb_array ?? []
+                                );
+                                echo json_encode($utf8_array, JSON_HEX_TAG | JSON_HEX_AMP) ?: '{}'; 
+                                ?>;
+
                         tgMap.clear();
                         for (const [id, raw] of Object.entries(rawData)) {
                             const cleanId = String(id).trim();
                             const cleanRaw = String(raw).trim();
                             tgMap.set(cleanId, normalizeName(cleanId, cleanRaw));
                         }    
-                        //const resp = await fetch(TGDB_URL, { cache: "no-store" });
-                        //const text = await resp.text();
-                        // parseTGDB(text);
                         render();
                     } catch (e) {
                         console.warn("TGDB fetch failed:", e);
-                    }
-                }
-
-                function parseTGDB(text) {
-                    tgMap.clear();
-                    // PHP array style: '123' => 'TG123 Foo Bar', ...
-                    const phpRe = /'(\d+)'\s*=>\s*'([^']*)'/g;
-                    let m, found = false;
-                    while ((m = phpRe.exec(text)) !== null) {
-                        found = true;
-                        const id = m[1].trim();
-                        const raw = m[2].trim();
-                        tgMap.set(id, normalizeName(id, raw));
-                    }
-                    if (found) return;
-
-                    // Fallback: line lists
-                    const lines = text.split(/\r?\n/);
-                    for (let line of lines) {
-                        line = line.trim();
-                        if (!line || line.startsWith("//") || line.startsWith("#") || line.startsWith(";")) continue;
-                        let parts = line.split(/\s*[,;\t]\s*/);
-                        if (parts.length === 1) {
-                            const mm = line.match(/^(\d+)\s+(.+)$/);
-                            if (mm) parts = [mm[1], mm[2]];
-                        }
-                        if (parts.length >= 2) {
-                            const id = parts[0].trim();
-                            const raw = parts.slice(1).join(" ").trim();
-                            if (/^\d+$/.test(id) && raw) {
-                                tgMap.set(id, normalizeName(id, raw));
-                            }
-                        }
                     }
                 }
 
