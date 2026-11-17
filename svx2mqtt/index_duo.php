@@ -100,7 +100,7 @@
 <?php
 // Farben:
 include_once  '../include/settings.php';
-include_once  '../include/tgdb.php';
+include_once __DIR__ . '/../include/tgdb.php';
 
     if ($_SESSION['auth'] !== 'AUTHORISED') {
         if ((defined('DL3EL_LIVEDB_UNAUTH')) && (DL3EL_LIVEDB_UNAUTH === "yes")) {
@@ -214,7 +214,7 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                 const WS_URL = "wss://mqtt.fm-funknetz.de";
                 const TOPIC = "/server/statethr/1"; // {"time":"18:09:43","talk":"start|stop","call":"DK0GH-HS","tg":"37574"}
 //                const TGDB_URL = "https://nc1.fm-funknetz.de/dashtt/tgdb_proxy.php"//; // CORS-ok plaintext
-                const TGDB_URL = "http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt";
+//                const TGDB_URL = "http://relais.dl3el.de/FM-Funknetz/tgdb.php.txt";
                 const CLIENTS_TOPIC = "/server/state/loginz"; // Zahl erwartet
 
                 const elConn = document.getElementById("conn");
@@ -243,13 +243,13 @@ if (defined ('SVXMQTT_COLOR_passive')) {
                 // Load TG DB (supports php-array style and line formats)
                 async function loadTGDB() {
                     try {
-                        const rawData = <?php 
-                                $utf8_array = array_map(
-                                    fn($v) => mb_convert_encoding((string)$v, 'UTF-8', 'UTF-8, ISO-8859-1'), 
-                                    $tgdb_array ?? []
-                                );
-                                echo json_encode($utf8_array, JSON_HEX_TAG | JSON_HEX_AMP) ?: '{}'; 
-                                ?>;
+const rawData = <?php 
+    if (isset($tgdb_array) && is_array($tgdb_array)) {
+        echo json_encode($tgdb_array, JSON_HEX_TAG | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}';
+    } else {
+        echo '{}';
+    }
+?>;
 
                         tgMap.clear();
                         for (const [id, raw] of Object.entries(rawData)) {
